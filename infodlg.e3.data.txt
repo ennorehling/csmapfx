@@ -1,0 +1,179 @@
+; (c) Xolgrim, v1.0.0 E3
+
+[Burgen]
+Typ				Baumaterial		ab Größe	Verdienst	Silberbonus		Bautalent				 
+
+Gerüst			Holz			1			0%			0 Silber		1
+Wache			Holz			5			0,5%		0 Silber		1
+Wachturm		Holz			10			1%			0 Silber		N/A
+Grundmauern		Stein			1			0%			0 Silber		1	
+Befestigung		Stein			10			1%			0 Silber		2	 
+Turm			Stein			50			2%			1 Silber		3	
+Burg			Stein			250			3%			2 Silber		4	
+Festung			Stein			1250		4%			3 Silber		5	
+Zitadelle		Stein			6250		5%			4 Silber		6	
+
+
+[Gebäude]
+Gebäude				Baukosten													Talente		Unterhalt				Max.	Kapazität
+
+Akademie			5 Stein, 5 Holz, 1 Eisen, 500 Silber						3			1000 Silber				25		Größe 
+Bergwerk			5 Steine, 10 Holz, 1 Eisen, 250 Silber						4			500 Silber				_		Größe
+Damm				5 Stein, 10 Holz, 1 Eisen, 500 Silber						4			1000 Silber, 3 Holz 	50		Größe
+Hafen				5 Stein, 5 Holz, 250 Silber									3			250 Silber				25		Größe 
+Karawanserei		1 Stein, 5 Holz, 1 Eisen, 500 Silber						2			3000 Silber, 2 Pferde	10		Größe 
+Leuchtturm			2 Stein, 1 Holz, 1 Eisen 100 Silber							3			100 Silber				_		4 Personen 
+Magierturm			5 Stein, 3 Holz, 3 Eisen, 2 Mallorn, 2 Laen, 500 Silber		5			1000 Silber				50		2 Personen
+Monument			1 Stein, 1 Holz, 1 Eisen, 400 Silber						4			_						_		Größe 
+Pferdezucht			2 Stein, 4 Holz, 1 Eisen, 100 Silber						2			150 Silber				_		Größe 
+Sägewerk			5 Stein, 5 Holz, 3 Eisen, 200 Silber						3			250 Silber				_		Größe 
+Schmiede			5 Stein, 5 Holz, 2 Eisen, 200 Silber						3			300 Silber, 1 Holz		_		Größe 
+Steinbruch 			1 Stein, 5 Holz, 1 Eisen, 250 Silber						2			250 Silber				_		Größe 
+Steinkreis			5 Stein, 5 Holz												5			_						100		3
+Taverne				4 Stein, 3 Holz, 1 Eisen, 200 Silber						2			5*Größe					_		Größe 
+Tunnel				10 Stein, 5 Holz, 1 Eisen, 300 Silber						6			100 Silber, 2 Stein		100		Größe
+
+
+[Kalender]
+Monat					Jahreszeit	Anmerkung
+
+Feldsegen				Sommer		
+Nebeltage				Herbst		Sturmwarnung 
+Sturmmond				Herbst		Sturmwarnung 
+Herdfeuer				Winter		
+Eiswind					Winter		
+Schneebann				Winter		
+Blütenregen				Frühling	 
+Mond der milden Winde	Frühling	 
+Sonnenfeuer				Sommer		
+
+
+[Kampfmodifikatoren]
+Person														Angriff		Verteidigung 
+
+Unbewaffneter													-2			-2 
+Bewaffneter ohne Talent											-2			-2 
+Person in einer Burg											-			+1 bis +5 
+Reiter ab Reiten 2 mit Streitroß (nur in Ebenen, Wüsten  		+1 bis +4	+1 bis +4 
+und Hochländern; nicht in einer Burg)							_			_
+Lanze/Speer zu Streitroß ab Reiten 2							+1			-
+Speer/Hellebarde gegen Reiter									-			+1 
+
+
+[Rassen]
+
+Talent					Goblins	Dämonen	Menschen	Elfen	Halblinge	Zwerge	Orks	Trolle	 
+Rekrutierungskosten		60		360		100			200		100			240		100		260
+Trefferpunkte			18		20		20			20		20			20		20		30
+nat. Rüstung			_		2		_			_		_			_		_		1*
+Magieresistenz			-5		15		_			10		5			5		-5		10
+Gewicht					6		10		10			10		10			10		10		20
+Traglast				4,4		5,4		5,4			5,4		5,4			5,4		4,4		10,8
+_
+Armbrustschießen		_		_		_			_		2			_		_		_
+Ausdauer				_		_		_			_		_			_		_		_
+Bergbau					1		_		_			-2		-1			2		1		1
+Bogenschießen			_		_		_			2		-1			-1		_		-2
+Burgenbau				_		_		_			-1		1			2		1		2
+Hiebwaffen				_		1		_			_		-1			1		_		1
+Holzfällen				_		1		_			_		_			-1		1		_				
+Katapultbedienung		1		_		_			-2		-1			2		_		2		
+Magie					N/A		_		N/A			_		N/A			_		N/A		_
+Pferdedressur			_		-3		_			2		-1			-2		-1		-1			
+Reiten					_		-1		1			_		-1			-2		_		N/A		
+Rüstungsbau				_		_		_			-1		_			2		_		2		
+Schiffbau				-2		-1		2			-1		-1			-1		-1		-1
+Segeln					-2		-1		2			-1		-2			-2		-1		-1
+Stangenwaffen 			_		1		_			_		-1			_		_		_
+Steinbau				_		_		_			-2		_			2		1		2
+Straßenbau				-2		_		_			-1		1			2		_		2
+Taktik					_		_		_			_		_			_		1		_
+Waffenbau				-1		1		_			_		_			2		2		_			
+Wagenbau				-1		-2		_			_		2			_		-1		_
+
+
+
+[Rüstungen]
+Name			Gewicht	Talent			Talentstufe		Rohstoffe		Panzerung	+Nah	+Fern
+
+Schild			1		Rüstungsbau		2				1 Eisen			_			-10%	-10%
+Turmschild		2		Rüstungsbau		4				2 Eisen			_			-15%	-25%
+Laenschild		0		Rüstungsbau		7				1 Laen			1			-10%	-10%	
+Kettenhemd		2		Rüstungsbau		3				2 Eisen			2			+10%	_					 
+Plattenpanzer	4		Rüstungsbau		4				4 Eisen			3			+15%	_					 
+Laenkettenhemd	1		Rüstungsbau		9				3 Laen			3			_		-10%					
+					
+				
+
+
+[Schiffe]
+
+Typ				Reichweite	Personen	Ladung	Holz/Silber		Kapitän/Bau		Gesamttalent		Spezial
+Einbaum			3			2			20		3					1				2				Boot, Fischerei
+Floß			1			5			500		10					1				5				Boot, Fischerei, Anlegen nur in Ebene/Sumpf/Wüste 
+Kutter			2			5			50		10					2				5				Boot, Fischerei, hochseetauglich
+Barke			3			11			50		10					2				5				Boot, Fischerei
+Königsbarke		5			11			50		10/1000				5				10				Boot, Fischerei, Guter Schutz vor Stürmen
+Katamaran		7			22			50		30/3000				7				20				Guter Schutz vor Stürmen
+Kogge			4			50			2000	100					4				20				Schutz vor Stürmen
+Karavelle		4			150			6000	300					6				30				Schutz vor Stürmen
+Fregatte		4			110			1000	100/1000			5				40				+2DB
+Galeone			4			310			3000	300/3000			7				60				+2DB
+Drachenschiff	6			110			500		100/1000			5				60				+1OB, Rammen und Entern
+Trireme			6			310			1500	300/3000			7				90				+1OB, Rammen und Entern
+
+
+[Regionen]
+
+Gelände		Arbeitsplätze	Steine für Straße	 
+Ebene/Wald	4000			50					 
+Hochland	2300			100					
+Sumpf		1200			75					
+Gebirge		600				250					
+Wüste		400				100					
+Vulkan		400				250					
+Gletscher	150				250					
+
+
+[Waffen]
+Name				Gewicht	Talent	Talentstufe	Rohstoffe			Schaden		zu Pferd		OB	DB	Hieb/Stange	Rassen
+
+Schwert				1		Waffenbau	3		1 Eisen				1d9+2			_			0	0		H		_	
+Kriegsaxt			2		Waffenbau	3		1 Eisen, 1 Holz		2d6+4			_			+1	-2		H		-G
+Bihänder			2		Waffenbau	4		2 Eisen				2d8+3			_			-1	-2		H		-G
+Laenschwert			1		Waffenbau	8		1 Laen				2W9+4			_			+1	+1		H		_
+Speer				1		Waffenbau	2		1 Holz				1d10			1d12+2		0	0 		S		_
+Mallornspeer		1		Waffenbau	2		1 Mallorn			1d10+1			1d12+3		0	0		S		_ 
+Lanze				2		Waffenbau	2		2 Holz				1d5				2d6+5		0	-2		S		-G
+Mallornlanze		2		Waffenbau	2		2 Mallorn			1d5+2			2d6+7		0	-2		S		-G
+Hellebarde			2		Waffenbau	3		1 Eisen, 2 Holz		2d6+3			_			-1	+2		S		-G 
+Armbrust			1		Waffenbau	3		1 Holz				3d3+5			_			0	0		_		_
+Mallornarmbrust		1		Waffenbau	3		1 Mallorn			3d3+6			_			0	0		_		_ 
+Repetierarmbrust	2		Waffenbau	5		1 Holz, 1 Eisen		4W3+3			_			0	0		_		+Z,+H
+Bogen				1		Waffenbau	2		1 Holz				1d11+1			_			-2	0		_		_ 
+Mallornbogen		1		Waffenbau	5		1 Mallorn			1d11+2			_			-2	0		_		_ 
+Elfenbogen			1		Waffenbau	5		2 Mallorn			2W4+5			_			-2	0		_		+E
+Katapult			100		Wagenbau	5		10 Holz				6mal, 3d10+5 	_			-4	0		_		_
+Unbewaffnet			6-10	_			_		_					1d5				1d6			0	0		_		_
+Unbewaffnet (Troll)	20		_			_		_					1d5+1			_			0	0		_		_
+
+[Waren]
+Name				Gewicht		Talent			Talenstufe		Rohstoffe
+
+Eisen				5			Bergbau			1				_
+Laen				2			Bergbau			7				_
+Holz				5			Holzfällen		1				_
+Mallorn				5			Holzfällen		2				_
+Stein				60			Steinbau		1				_
+Pferd				50			Pferdedressur	1 				_
+Silber				0,01		_				_				_
+Kräuter				0			_				_				Markt
+Wagen				40			Wagenbau		1				5 Holz 
+Katapultmunition	10			Steinbau		3				1 Stein 
+Öl					3			_				_				Markt
+Balsam				2			_				_				Markt		
+Weihrauch			2			_				_				Markt		
+Gewürz				2			_				_				Markt	
+Myrrhe				2			_				_				Markt		
+Seide				3			_				_				Markt	
+Juwelen				1			_				_				Markt

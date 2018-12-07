@@ -1,0 +1,462 @@
+#include <cctype>
+#include <sstream>
+#include <fstream>
+
+#include "main.h"
+#include "fxhelper.h"
+#include "infodlg.h"
+#include "symbols.h"
+#include "FXMenuSeparatorEx.h"
+
+#include "bindings.h"
+
+// *********************************************************************************************************
+
+// stub function
+bindings::value_t infodlg_parseTableFile(FXInfoDlg* dlg, const bindings::variant_t& arg)
+{
+	//dlg->parseTableFile();
+	return bindings::nil;
+}
+
+// *********************************************************************************************************
+// *** FXMessages implementation
+
+FXDEFMAP(FXInfoDlg) MessageMap[]=
+{ 
+	//________Message_Type_____________________ID_______________Message_Handler_______ 
+	FXMAPFUNC(SEL_COMMAND,				FXInfoDlg::ID_CLOSE,					FXInfoDlg::onCmdHide),
+
+	FXMAPFUNC(SEL_COMMAND,				FXInfoDlg::ID_SEARCH,					FXInfoDlg::onSearch),
+	FXMAPFUNC(SEL_CHANGED,				FXInfoDlg::ID_SEARCH,					FXInfoDlg::onSearch),
+
+	FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	FXInfoDlg::ID_LIST,						FXInfoDlg::onPopup),
+};
+
+FXIMPLEMENT(FXInfoDlg,FXDialogBox,MessageMap, ARRAYNUMBER(MessageMap))
+
+FXInfoDlg::FXInfoDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint opts, FXint x,FXint y,FXint w,FXint h)
+		: FXDialogBox(owner, name, opts, x,y,w,h, 10,10,10,10, 10,10)
+{
+	setIcon(icon);
+
+    // buttons on bottom
+	FXHorizontalFrame* buttons = new FXHorizontalFrame(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0,0,0,0, 0,0,0,0);
+	new FXButton(buttons, "S&chliessen", NULL, this,ID_CLOSE, BUTTON_DEFAULT|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_RIGHT);
+	new FXVerticalSeparator(buttons, SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_Y|LAYOUT_RIGHT);
+	search = new FXTextField(buttons, 17, this,ID_SEARCH, FRAME_LINE|TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_Y|LAYOUT_RIGHT);
+	search->setBorderColor(getApp()->getShadowColor());
+	new FXLabel(buttons, "Suche:", NULL, LAYOUT_FILL_Y|LAYOUT_RIGHT);
+
+	new FXHorizontalSeparator(this, SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
+
+	// tabbook
+	tabbook = new FXTabBook(this, NULL,0, TABBOOK_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
+
+	//bindings::register_module_method("Info", "load", boost::bind(&infodlg_parseTableFile, this, _1) );
+}
+
+void FXInfoDlg::create()
+{
+	FXDialogBox::create();
+	createTable();
+}
+
+FXInfoDlg::~FXInfoDlg()
+{
+}
+
+void FXInfoDlg::loadState(FXRegistry& reg)
+{
+	// default size is 640x480.
+	width = getApp()->reg().readUnsignedEntry("INFODLG", "WIDTH", 640);
+	height = getApp()->reg().readUnsignedEntry("INFODLG", "HEIGHT", 480);
+
+	if (width < 0) width = 640;
+	if (height < 0) height = 480;
+
+	setWidth(width);
+	setHeight(height);
+}
+
+void FXInfoDlg::saveState(FXRegistry& reg)
+{
+	if (!isMinimized())
+	{		
+		reg.writeUnsignedEntry("INFODLG", "WIDTH", getWidth());
+		reg.writeUnsignedEntry("INFODLG", "HEIGHT", getHeight());
+	}
+}
+
+void FXInfoDlg::setGame(const FXString& game)
+{
+	if (current_game == game)
+		return;
+	current_game = game;
+
+	// internal data storage
+	struct GameInfo {
+		const char* game;
+		const char*	data;
+		size_t		size;
+	};
+
+	GameInfo infoData[] = {
+		{ "default", (const char*)data::infodlg_data, data::infodlg_data_size },
+		{ "E3", (const char*)data::infodlg_data_e3, data::infodlg_data_e3_size },
+	};
+
+	// clear current data
+	blocks.clear();
+
+	// load internal data for specific game
+	GameInfo* loadInfo = &infoData[0];		// load "default" info by default
+	for (GameInfo* info = begin(infoData); info != end(infoData); ++info)
+		if (game == info->game)
+		{
+			loadInfo = info;
+			break;
+		}
+
+	if (loadInfo && loadInfo->data)
+	{
+		std::istringstream stream( std::string(loadInfo->data, loadInfo->size) );
+		parseTableData(stream);
+	}
+
+	// load additional info from file
+	// try game specific file first ("csmapfx.Eressea.info"),
+	// then try default file name ("csmapfx.info").
+	// use all files in getSearchPath().
+	std::vector<FXString> fileNames;
+	if (game != "default")
+		fileNames.push_back("csmapfx." + game + ".info");
+	fileNames.push_back("csmapfx.info");
+
+	std::vector<FXString> searchPath = getSearchPath();
+	for (size_t i = 0; i < fileNames.size(); i++)
+	{
+		FXString fileName = fileNames[i];
+		bool fileFound = false;
+		for (size_t i = 0; i < searchPath.size(); i++)
+		{
+			std::ifstream infoFile( (searchPath[i] + fileName).text() );
+			fileFound = parseTableData(infoFile) || fileFound;
+		}
+		if (fileFound)
+			break;
+	}
+}
+
+void FXInfoDlg::setSearchText(const FXString& text)
+{
+	search->setText(text);
+	onSearch(this, 0, (void*)search->getText().text());	
+}
+
+void FXInfoDlg::setClipboard(const FXString& text)
+{
+	getOwner()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void*)text.text());
+}
+
+long FXInfoDlg::onSearch(FXObject*, FXSelector, void* ptr)
+{
+	FXString str( ptr ? (const FXchar*)ptr : "" );
+	str = flatten(str.trim());
+
+	if (str.empty())
+		return 0;
+
+	FXFoldingList* found_list = NULL;
+	FXint found_tab = 0, found_line = 0, found_start = 0, found_length = 0;
+
+	FXint tab = 0;
+	for (std::map<FXString,infoblock>::iterator itor = blocks.begin(); itor != blocks.end(); itor++)
+	{
+		infoblock& block = itor->second;
+
+		if (!block.header.size() && !block.lines.size())
+			continue;
+
+		FXint line = 0;
+		for (std::list<infoblock::row>::iterator itor = block.lines.begin(); itor != block.lines.end(); itor++, line++)
+		{
+			for (infoblock::row::iterator entry = itor->begin(); entry != itor->end(); entry++)
+			{
+				FXint pos = flatten(*entry).find(str);
+				if (pos > -1 && (!found_length || pos < found_start || (pos == found_start && entry->length() < found_length)))
+				{
+					found_list = block.list;
+					found_tab = tab;
+					found_line = line;
+					found_start = pos;
+					found_length = entry->length();
+				}
+			}
+		}
+
+		tab++;		// should not be incremented by continue;
+	}
+
+	if (found_length)
+	{
+		tabbook->setCurrent(found_tab);
+
+		FXFoldingItem *item = found_list ? found_list->findItemByData((void*)found_line) : NULL;
+		if (!item)
+			return 0;
+
+		found_list->setCurrentItem(item);
+		found_list->selectItem(item);
+		found_list->makeItemVisible(item);
+	}
+
+	return 1;
+}
+
+long FXInfoDlg::onPopup(FXObject* sender,FXSelector sel,void* ptr)
+{
+	FXEvent *event = (FXEvent*)ptr;
+
+	// dont't show popup if mouse has moved
+	if (event->last_x != event->click_x || event->last_y != event->click_y)
+		return 0;
+
+	if (!sender->isMemberOf(&FXFoldingList::metaClass))
+		return 0;
+
+	FXFoldingList* list = static_cast<FXFoldingList*>(sender);
+
+	// create popup
+	FXFoldingItem *item = list->getItemAt(event->click_x, event->click_y);
+	if (!item)
+		return 0;
+
+	FXMenuPane popup(this);
+	FXMenuPane *menu = &popup;
+
+	FXString line = item->getText();
+	FXString title = line;
+	title.simplify();
+	if (title.length() > 20)
+		title = title.left(17) + "...";
+
+	new FXMenuSeparatorEx(menu, title);
+
+	FXMenuPane *clipboard = new FXMenuPane(this);
+	new FXMenuCascade(menu, "&Zwischenablage", NULL, clipboard, 0);
+
+	new FXMenuCommandEx(clipboard, "Alles", boost::bind(&FXInfoDlg::setClipboard, this, boost::bind(&FXInfoDlg::getTableText, this, list)));
+	new FXMenuCommandEx(clipboard, "Zeile", boost::bind(&FXInfoDlg::setClipboard, this, boost::bind(&FXFoldingItem::getText, item)));
+	new FXMenuSeparatorEx(clipboard);
+
+	std::vector<FXString> entries;
+	int headers = list->getNumHeaders();
+	for (int i = 0; i < headers; i++)
+	{
+		FXString header = list->getHeaderText(i);
+		FXString text = line.section('\t', i);
+
+		entries.push_back(text = header + ": " + text);
+
+		if (text.length() > 42)
+			text = text.left(39) + "...";
+
+		new FXMenuCommandEx(clipboard, text, boost::bind(&FXInfoDlg::setClipboard, this, entries.back()));
+	}
+	
+	// show popup
+	menu->create();
+	menu->popup(NULL, event->root_x,event->root_y);
+
+    getApp()->runModalWhileShown(menu);
+	return 1;
+}
+
+FXString FXInfoDlg::getTableText(FXFoldingList* list) const
+{
+    FXString text;
+	if (!list)
+		return text;
+
+	int headers = list->getNumHeaders();
+	for (int i = 0; i < headers; i++)
+	{
+		if (i)
+			text += '\t';
+		text += list->getHeaderText(i);
+	}
+
+	text += '\n';
+
+	for (FXFoldingItem* item = list->getFirstItem(); item; item = item->getNext())
+        text += item->getText() + '\n';		
+
+	return text;
+}
+
+// synch table view with infoblock data
+void FXInfoDlg::createTable()
+{
+	if (!xid)		// window must be created
+		return;
+
+	blocks.erase("- Fehler -");
+	if (!blocks.size())
+	{
+		blocks["- Fehler -"] = infoblock();
+		infoblock& block = blocks.begin()->second;
+
+		block.header.push_back("Informationsdatei fehlerhaft oder nicht vorhanden.");
+	}
+
+	for (std::map<FXString,infoblock>::iterator itor = blocks.begin(); itor != blocks.end(); itor++)
+	{
+		infoblock& block = itor->second;
+
+		if (!block.header.size() && !block.lines.size())
+			continue;
+
+		linked_ptr<FXTabItem> tab(new FXTabItem(tabbook, itor->first));
+		tab->create();
+
+		linked_ptr<FXHorizontalFrame> frame(new FXHorizontalFrame(tabbook, LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0,0,0,0, 0,0,0,0));
+		frame->setBorderColor(getApp()->getShadowColor());
+		frame->create();
+
+		FXFoldingList* list = new FXFoldingList(&*frame, this,ID_LIST, FOLDINGLIST_SINGLESELECT|FOLDINGLIST_SHOWS_LINES|FOLDINGLIST_SHOWS_BOXES|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+		list->getHeader()->setHeaderStyle(HEADER_RESIZE|HEADER_TRACKING);
+		list->create();
+
+		block.tab = tab;
+		block.frame = frame;
+		block.list = list;
+
+		FXFont* font = list->getHeader()->getFont();		// font for width calculation
+		FXint indent = 2 + list->getIndent() + font->getTextHeight("A")/2;	// parent to child indent
+
+		// create header
+		std::vector<FXint> widths;
+
+		for (infoblock::row::iterator header = block.header.begin(); header != block.header.end(); header++)
+		{
+			list->appendHeader(*header, NULL);
+			widths.push_back(font->getTextWidth(*header));
+		}
+
+		// create items
+		std::vector<FXFoldingItem*> fathers;
+		FXint line = 0;
+
+		for (std::list<infoblock::row>::iterator itor = block.lines.begin(); itor != block.lines.end(); itor++)
+		{
+			FXString text;
+
+			// count subitem depth
+			infoblock::row::iterator entry = itor->begin();
+			if (entry->left(1) == ">" && entry->find_first_not_of('>') == -1)
+			{
+				fathers.resize(std::min((FXint)fathers.size(), entry->length()));
+				entry++;
+			}
+			else
+				fathers.clear();
+
+			// add width to first column for indentation
+			FXint indentAdd = indent * fathers.size();
+
+			// append item to list
+			FXuint col = 0;
+			for (; entry != itor->end() && col < widths.size(); entry++)
+			{
+				text += *entry + "\t";
+				widths[col] = std::max(widths[col], font->getTextWidth(*entry) + indentAdd);
+				col++;
+
+				indentAdd = 0;		// counts for first column only. set to 0 after that.
+			}
+
+			FXFoldingItem *father = fathers.size() ? fathers.back() : NULL;
+			if (father)
+				father->setExpanded(true);
+
+			FXFoldingItem *item = list->appendItem(father, text, NULL,NULL, (void*)line);
+			fathers.push_back(item);
+			line++;
+		}
+
+		for (FXint col = 0; col < list->getNumHeaders(); col++)
+			list->setHeaderSize(col, 10+widths[col]);
+	}
+}
+
+bool FXInfoDlg::parseTableData(std::istream& input)
+{
+	if (!input)
+		return false;
+
+	// parse data
+	infoblock* block = NULL;
+
+	std::string sline;
+	while (std::getline(input, sline))
+	{
+		FXString line = iso2utf(sline.c_str()).trim();
+
+		// parse line
+		if (line.left(1) == ";")		// comment lines start with a semikolon
+			continue;
+
+		if (line.left(1) == "[")		// new tab lines start with [
+		{
+			/*
+				[Group1]	// new group, clear old with same name
+				[Group2]+	// append to old group
+			*/
+
+			FXString name = line.after('[').before(']').trim();
+            if (name.empty())
+				name = "Sonstiges";
+			
+			// select block by name
+			block = &blocks[name];
+
+			// clear old values, if the append form "[...]+" is not used
+			if (line.after(']').left(1) != "+")
+			{
+				block->header.clear();
+				block->lines.clear();
+			}
+		}
+		else
+		{
+			infoblock::row row;
+
+			for (; !line.empty(); line = line.after('\t'))
+			{
+				FXString entry = line.before('\t').trim();
+				
+				if (entry == "_")	// Ein Unterstrich "_" erzeugt eine leere Spalte.
+					row.push_back("");
+				else if (!entry.empty())
+					row.push_back(entry);
+			}
+
+			if (!row.size())		// Keine leeren Zeilen
+				continue;
+
+			// append row to active block.
+			// first row becomes the header
+			if (!block)
+				block = &blocks["Sonstiges"];	// if no block specified, append to block "Sonstiges"
+
+			if (block->header.empty())
+				block->header = row;
+			else
+				block->lines.push_back(row);
+		}
+	}
+
+	createTable();
+    return true;
+}

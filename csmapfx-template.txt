@@ -1,0 +1,19 @@
+; Zusatzinfos zum Informationen-Dialog. Die Datei muss csmapfx.txt heissen
+; und im Arbeitsverzeichnis liegen. Hier können eigene Informationen angefügt...
+;
+; [Gebäude]+
+; ; Name	Baukosten				Talent	Unterhalt	max.	Kapazität
+; Puff		10 Holz, 1 Mistelzweig	6		100 Silber	25		Größe
+;
+; ...oder neue Rubriken erstellt (bzw. vorhandene überschrieben) werden.
+;
+; [Magie Lirpa]
+; Stufe	Spruch			Komponenten		Kurzbeschreibung
+;	7	Erschaffe Gold	1 Aura * Stufe	Beschwört 10 Goldbarren aus dem Nichts.
+;
+; Ein einzelner Unterstrich "_" erzeugt ein leeres Feld.
+; Mit Größer-Als Zeichen ">", ">>", ... können Untereinträge erstellt werden.
+; Eine vorhandene Rubrik löscht man, indem man sie mit einer gleichnamigen
+; leeren Rubrik überschreibt.
+;
+; Wichtig: Die einzelnen Felder werden mit TAB getrennt!
