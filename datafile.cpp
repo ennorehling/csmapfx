@@ -8,8 +8,9 @@
 #include "fxhelper.h"
 #include "datafile.h"
 
-#define HAVE_BZ2LIB_H
+#ifdef HAVE_BZ2LIB_H
 #include <FXBZFileStream.h>
+#endif
 
 // ===========================
 // === datakey implementation
@@ -663,7 +664,8 @@ FXint datafile::load(const FXchar* filename)
 	FXString filename_str = filename;
 	if (filename_str.length() >= 7 && filename_str.right(7) == ".cr.bz2")
 	{
-		// load bzip2 packed CR
+#ifdef HAVE_BZ2LIB_H
+            // load bzip2 packed CR
 		FXBZFileStream file;
 		file.open(filename,FXStreamLoad);
 		if (file.status() != FXStreamOK)
@@ -684,6 +686,7 @@ FXint datafile::load(const FXchar* filename)
 		} while(file.status() == FXStreamOK);
 		
 		file.close();
+#endif
 	}
 	else if (filename_str.length() >= 4 && filename_str.right(4) == ".xml")
 	{
@@ -813,14 +816,18 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 	std::ostringstream file;
 
 	FXFileStream plainfile;
-	FXBZFileStream bzip2file;
+#ifdef HAVE_BZ2LIB_H
+        FXBZFileStream bzip2file;
+#endif
 	FXStream *filestr_ptr;
 
 	FXString filename_str = filename;
 	if (filename_str.length() >= 7 && filename_str.right(7) == ".cr.bz2")
 	{
-		bzip2file.open(filename, FXStreamSave);
+#ifdef HAVE_BZ2LIB_H
+            bzip2file.open(filename, FXStreamSave);
 		filestr_ptr = &bzip2file;
+#endif
 	}
 	else if (filename_str.length() >= 4 && filename_str.right(4) == ".xml")
 	{

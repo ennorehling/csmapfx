@@ -249,7 +249,7 @@ namespace bindings
 				if (TYPE(arg) == T_SYMBOL)
 					key = rb_id2name(rb_to_id(arg));
 				else
-					key = STR2CSTR(arg);
+                                    key = StringValuePtr(arg);
 
 				FXString type = iso2utf(key);
 
@@ -282,7 +282,7 @@ namespace bindings
 								if (TYPE(arg) == T_FIXNUM)
 									number = FIX2INT(arg);
 								else if (TYPE(arg) == T_STRING)
-									number = strtol(STR2CSTR(arg), NULL, 36);
+                                                                    number = strtol(StringValuePtr(arg), NULL, 36);
 
 								if (number != indices[i])
 									break;
@@ -499,7 +499,7 @@ namespace bindings
 				if (TYPE(arg) == T_SYMBOL)
 					key = rb_id2name(rb_to_id(arg));
 				else
-					key = STR2CSTR(arg);
+                                    key = StringValuePtr(arg);
 
 				if (block->type() == datablock::TYPE_REGION)
 					if (!strcmp(key, "Terrain"))
@@ -657,8 +657,9 @@ namespace bindings
 
 	static VALUE string_flatten(VALUE self)
 	{
-		long length;
-		const char* str = rb_str2cstr(self, &length);		
+            VALUE s = StringValue(self);
+            long length = RSTRING_LEN(s);
+            const char* str = RSTRING_PTR(s);
 
 		std::string flat = flatten(std::string(str, length));
 

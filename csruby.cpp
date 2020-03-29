@@ -14,6 +14,8 @@
 #include <ruby.h>
 #include "csruby.h"
 
+extern "C" VALUE ruby_errinfo;
+
 namespace Ruby
 {
 	/***********************************
@@ -92,33 +94,37 @@ namespace Ruby
 	*************************************/
 	Error::Error(const std::string& name) : name(name)
 	{
-		std::ostringstream where;
-		where << ruby_sourcefile << ":" << ruby_sourceline;
-		ID id = rb_frame_last_func();
+#ifdef TODO_RUBY
+            std::ostringstream where;
+                where << ruby_sourcefile << ":" << ruby_sourceline;
+                ID id = rb_frame_last_func();
 		if(id) {
 			where << ":in '" << rb_id2name(id) << "'";
 		}
 		this->where = where.str();
+#endif
 
 		VALUE exception_instance = rb_gv_get("$!");
 
 		// class
 		VALUE klass = rb_class_path(CLASS_OF(exception_instance));
-		this->klass = RSTRING(klass)->ptr;
+		this->klass = RSTRING_PTR(klass);
 
 		// message
 		VALUE message = rb_obj_as_string(exception_instance);
-		this->message = RSTRING(message)->ptr;
+                this->message = RSTRING_PTR(message);
 
-		// backtrace
+#ifdef TODO_RUBY
+                // backtrace
 		if(!NIL_P(ruby_errinfo)) {
 			std::ostringstream trace;
 			VALUE ary = rb_funcall(ruby_errinfo, rb_intern("backtrace"), 0);
-			for (int i = 0; i < RARRAY(ary)->len; i++) {
-				trace << "\tfrom " << RSTRING(RARRAY(ary)->ptr[i])->ptr << "\n";
+			for (int i = 0; i < RARRAY_LEN(ary); i++) {
+                            trace << "\tfrom " << RSTRING_PTR(RARRAY_PTR(ary)[i]) << "\n";
 			}
 			this->backtrace = trace.str();
 		}
+#endif
 	}
 
 	Error::~Error() throw()
@@ -210,7 +216,7 @@ namespace Ruby
 		VALUE val = IMPL2VALUE(pimpl);
 
 		if (TYPE(val) == T_STRING)
-			return std::string(RSTRING(val)->ptr, RSTRING(val)->len);
+			return std::string(RSTRING_PTR(val), RSTRING_LEN(val));
 		else
 		{
 			int error = 0;
@@ -219,7 +225,7 @@ namespace Ruby
 				throw Ruby::Error("converting to string failed");
 			if (TYPE(str) != T_STRING)
 				throw std::runtime_error("to_s returns no string");
-			return std::string(RSTRING(str)->ptr, RSTRING(str)->len);
+			return std::string(RSTRING_PTR(str), RSTRING_LEN(str));
 		}
 	}
 
@@ -445,29 +451,35 @@ namespace Ruby
 		Thus we must delay it til after the catch block!
 	*/
 
-	extern "C" VALUE ruby_errinfo;
-
 	void setException()
 	{
-		ruby_errinfo = Qnil;
+#ifdef TODO_RUBY
+            ruby_errinfo = Qnil;
+#endif
 	}
 
 	void setException(const std::string& err)
 	{
-		ruby_errinfo = rb_exc_new2(rb_eRuntimeError, err.c_str());
+#ifdef TODO_RUBY
+            ruby_errinfo = rb_exc_new2(rb_eRuntimeError, err.c_str());
+#endif
 	}
 
 	void setException(const std::exception& err)
 	{
 		std::ostringstream o;
 		o << "c++error: " << err.what();
-		ruby_errinfo = rb_exc_new2(rb_eRuntimeError, o.str().c_str());
+#ifdef TODO_RUBY
+                ruby_errinfo = rb_exc_new2(rb_eRuntimeError, o.str().c_str());
+#endif
 	}
 
 	void raise()
 	{
-		if(!NIL_P(ruby_errinfo))
+#ifdef TODO_RUBY
+            if (!NIL_P(ruby_errinfo))
 			rb_exc_raise(ruby_errinfo);
+#endif
 	}
 
 }	// ::Ruby

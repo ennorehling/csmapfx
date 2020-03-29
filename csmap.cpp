@@ -987,17 +987,20 @@ bool CSMap::saveCommands(FXString filename, bool stripped)
 	return true;
 }
 
+#ifdef HAVE_LIBPNG
 extern FXbool csmap_savePNG(FXStream& store, FXCSMap& map, FXImage& image, FXProgressDialog& win);
+#endif
 
 bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool show_koords, bool show_islands, int color)
 {
-	if (filename.empty())
+    if (filename.empty())
 		return false;
 
 	if (!files.size())
 		return false;
 
-	FXCSMap *map = new FXCSMap(this);
+#ifdef HAVE_LIBPNG
+        FXCSMap *map = new FXCSMap(this);
 	map->hide();
 	map->mapfiles(&files);
 	map->create();
@@ -1034,14 +1037,14 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
 	getApp()->refresh();
 	progress.show(PLACEMENT_SCREEN);
 
-	csmap_savePNG(file, *map, image, progress);
-
+        csmap_savePNG(file, *map, image, progress);
 	file.close();
 
 	delete map;
 
     mapChange();
-	return true;
+#endif
+    return true;
 }
 
 void CSMap::stripReportToMap()

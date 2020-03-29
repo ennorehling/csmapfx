@@ -5,9 +5,9 @@
 #define MACROTOSTRINGx(STR) #STR
 
 	// subversion revision data
-#define CSMAP_SVN_REV        132
-#define CSMAP_SVN_REVSTR     "132"
-#define CSMAP_SVN_REV_DATE   "2010/05/30 22:26:48"
+#define CSMAP_SVN_REV        133
+#define CSMAP_SVN_REVSTR     "133"
+#define CSMAP_SVN_REV_DATE   "2020/03/29 18:56:00"
 
 /*
 	- C:\Programme\TortoiseSVN\bin\SubWCRev.exe
@@ -24,7 +24,7 @@
 #define CSMAP_APP_TITLE      "Coast'n'Sea Mapper"
 
 	// current application version and subversion revision
-#define CSMAP_APP_VERSION    0, 5, 0, CSMAP_SVN_REV
+#define CSMAP_APP_VERSION    0, 5, 1, CSMAP_SVN_REV
 #define CSMAP_APP_REVISION   "rev " CSMAP_SVN_REVSTR
 
 	// application version string

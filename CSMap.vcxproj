@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4F4A777F-7B6F-464F-B784-1328012357CA}</ProjectGuid>
+    <RootNamespace>CSMap</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>CSMapFX</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>Debug\</OutDir>
+    <IntDir>Debug\</IntDir>
+    <IncludePath>C:\local\ruby-1.9.2-p0-i386-mswin32\include\ruby-1.9.1;C:\local\fox-1.6.57\include;C:\local\boost_1_66_0-msvc-14.1;$(ProjectDir);$(IncludePath)</IncludePath>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <LibraryPath>C:\local\fox-1.6.57\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>Release\</OutDir>
+    <IntDir>Release\</IntDir>
+    <IncludePath>C:\local\ruby-1.9.2-p0-i386-mswin32\include\ruby-1.9.1;C:\local\fox-1.6.57\include;C:\local\boost_1_66_0-msvc-14.1;$(ProjectDir);$(IncludePath)</IncludePath>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <LibraryPath>C:\local\fox-1.6.57\lib;C:\local\ruby-1.9.2-p0-i386-mswin32\lib;$(LibraryPath)</LibraryPath>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PreBuildEvent>
+      <Message>Generating version information...</Message>
+      <Command>"C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" "$(ProjectDir)."  "$(ProjectDir)version.tmpl.h" "$(ProjectDir)version.h"</Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>FLOAT_MATH_FUNCTIONS;BOOST_SIGNALS_NO_DEPRECATION_WARNING;WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>FOXD-1.6.lib;rubyd.lib;libpngd.lib;zlibd.lib;libbz2d.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)CsMapFX.exe</OutputFile>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libcmtd;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)CSMap.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>$(ProjectDir)CSMapFX.exe.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PreBuildEvent>
+      <Message>Generating version information...</Message>
+      <Command>"C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" "$(ProjectDir)."  "$(ProjectDir)version.tmpl.h" "$(ProjectDir)version.h"</Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>FLOAT_MATH_FUNCTIONS;BOOST_SIGNALS_NO_DEPRECATION_WARNING;WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4100;4512;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>FOX-1.6.lib;msvcrt-ruby191-static.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)CsMapFX.exe</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+      <ShowProgress>NotSet</ShowProgress>
+      <IgnoreSpecificDefaultLibraries>libboost_signals-vc120-mt-s-x32-1_66.lib</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>$(ProjectDir)CSMapFX.exe.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+    <PostBuildEvent>
+      <Message>Packen...</Message>
+      <Command>upx --best --compress-icons=0 $(OutDir)CsMapFX.exe</Command>
+    </PostBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="bindings.cpp" />
+    <ClCompile Include="calc.cpp" />
+    <ClCompile Include="commands.cpp" />
+    <ClCompile Include="csmap.cpp" />
+    <ClCompile Include="csruby.cpp" />
+    <ClCompile Include="datafile.cpp" />
+    <ClCompile Include="exportdlg.cpp" />
+    <ClCompile Include="FXFileDialogEx.cpp" />
+    <ClCompile Include="fxhelper.cpp" />
+    <ClCompile Include="FXMenuSeparatorEx.cpp" />
+    <ClCompile Include="FXSplitterEx.cpp" />
+    <ClCompile Include="imageio.cpp" />
+    <ClCompile Include="infodlg.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="map.cpp" />
+    <ClCompile Include="mapcanvas.cpp" />
+    <ClCompile Include="messages.cpp" />
+    <ClCompile Include="regioninfos.cpp" />
+    <ClCompile Include="regionlist.cpp" />
+    <ClCompile Include="scout.cpp" />
+    <ClCompile Include="searchdlg.cpp" />
+    <ClCompile Include="statistics.cpp" />
+    <ClCompile Include="statsinfos.cpp" />
+    <ClCompile Include="symbols.cpp" />
+    <ClCompile Include="tradeinfos.cpp" />
+    <ClCompile Include="translator.cpp" />
+    <ClCompile Include="unitlist.cpp" />
+    <ClCompile Include="boost\signals\connection.cpp" />
+    <ClCompile Include="boost\signals\named_slot_map.cpp" />
+    <ClCompile Include="boost\signals\signal_base.cpp" />
+    <ClCompile Include="boost\signals\slot.cpp" />
+    <ClCompile Include="boost\signals\trackable.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bindings.h" />
+    <ClInclude Include="calc.h" />
+    <ClInclude Include="commands.h" />
+    <ClInclude Include="csmap.h" />
+    <ClInclude Include="csruby.h" />
+    <ClInclude Include="datafile.h" />
+    <ClInclude Include="exportdlg.h" />
+    <ClInclude Include="FXFileDialogEx.h" />
+    <ClInclude Include="fxhelper.h" />
+    <ClInclude Include="FXMenuSeparatorEx.h" />
+    <ClInclude Include="FXSplitterEx.h" />
+    <ClInclude Include="fxwin.h" />
+    <ClInclude Include="infodlg.h" />
+    <ClInclude Include="linked_ptr.h" />
+    <ClInclude Include="main.h" />
+    <ClInclude Include="map.h" />
+    <ClInclude Include="mapcanvas.h" />
+    <ClInclude Include="messages.h" />
+    <ClInclude Include="regioninfos.h" />
+    <ClInclude Include="regionlist.h" />
+    <ClInclude Include="scout.h" />
+    <ClInclude Include="searchdlg.h" />
+    <ClInclude Include="statistics.h" />
+    <ClInclude Include="statsinfos.h" />
+    <ClInclude Include="symbols.h" />
+    <ClInclude Include="tradeinfos.h" />
+    <ClInclude Include="translator.h" />
+    <ClInclude Include="unitlist.h" />
+    <ClInclude Include="version.h" />
+    <ClInclude Include="version.tmpl.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="crsheet.ico" />
+    <Image Include="csmap.ico" />
+    <Image Include="nrsheet.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="version.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

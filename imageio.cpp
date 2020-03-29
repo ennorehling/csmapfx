@@ -1,6 +1,7 @@
 #include <fx.h>
 #include "map.h"
 
+#ifdef HAVE_LIBPNG
 #include "png.h"
 
 // Custom read function, which will read from the stream in our case
@@ -123,3 +124,4 @@ FXbool csmap_savePNG(FXStream& store, FXCSMap& map, FXImage& image, FXProgressDi
 
 	return TRUE;
 }
+#endif
