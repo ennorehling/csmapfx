@@ -759,46 +759,46 @@ namespace bindings
 		puts_handler = &puts_handler_ingore;
 
 		// there is no stdout.
-		Ruby::DefineMethod(Value(rb_mKernel), "puts", &local_puts, -1);
-		Ruby::DefineMethod(Value(rb_mKernel), "p", &local_p, -1);
+		Ruby::DefineMethodVariable(Value(rb_mKernel), "puts", local_puts);
+		Ruby::DefineMethodVariable(Value(rb_mKernel), "p", local_p);
 
 		// id should return the CR id instead.
 		rb_undef_method(rb_cObject, "id");
 
 		// define flatten method for strings
-		Ruby::DefineMethod(Value(rb_cString), "flatten", &string_flatten, 0);
+		Ruby::DefineMethod(Value(rb_cString), "flatten", string_flatten);
 
 		// define Block class
 		Block::klass = Ruby::DefineClass("Block");
 		rb_define_singleton_method(Block::klass, "new", RUBY_METHOD_FUNC(Block::makenew), 1);
-		Ruby::DefineMethod(Block::klass, "to_s", &Block::to_s, 0);
-		Ruby::DefineMethod(Block::klass, "tags", &Block::tags, 0);
-		Ruby::DefineMethod(Block::klass, "blocks", &Block::blocks, 0);
-		Ruby::DefineMethod(Block::klass, "type", &Block::type, 0);
-		Ruby::DefineMethod(Block::klass, "id", &Block::id, 0);
-		Ruby::DefineMethod(Block::klass, "id36", &Block::id36, 0);
-		Ruby::DefineMethod(Block::klass, "terrain", &Block::terrain, 0);
+		Ruby::DefineMethod(Block::klass, "to_s", Block::to_s);
+		Ruby::DefineMethod(Block::klass, "tags", Block::tags);
+		Ruby::DefineMethod(Block::klass, "blocks", Block::blocks);
+		Ruby::DefineMethod(Block::klass, "type", Block::type);
+		Ruby::DefineMethod(Block::klass, "id", Block::id);
+		Ruby::DefineMethod(Block::klass, "id36", Block::id36);
+		Ruby::DefineMethod(Block::klass, "terrain", Block::terrain);
 		
 		// define BlockList class
 		BlockList::klass = Ruby::DefineClass("BlockList");
 		rb_define_singleton_method(BlockList::klass, "new", RUBY_METHOD_FUNC(BlockList::makenew), 1);
-		Ruby::DefineMethod(BlockList::klass, "each", &BlockList::each, 0);
+		Ruby::DefineMethod(BlockList::klass, "each", BlockList::each);
 		rb_include_module(BlockList::klass, rb_mEnumerable);
-		Ruby::DefineMethod(BlockList::klass, "size", &BlockList::size, 0);
-		Ruby::DefineMethod(BlockList::klass, "[]", &BlockList::index_op, -1);
+		Ruby::DefineMethod(BlockList::klass, "size", BlockList::size);
+		Ruby::DefineMethodVariable(BlockList::klass, "[]", BlockList::index_op);
 
 		// define Tags class
 		Tags::klass = Ruby::DefineClass("Tags");
 		rb_define_singleton_method(Tags::klass, "new", RUBY_METHOD_FUNC(Tags::makenew), 1);
-		Ruby::DefineMethod(Tags::klass, "each", &Tags::each, 0);
+		Ruby::DefineMethod(Tags::klass, "each", Tags::each);
 		rb_include_module(Tags::klass, rb_mEnumerable);
-		Ruby::DefineMethod(Tags::klass, "each_pair", &Tags::each_pair, 0);
-		Ruby::DefineMethod(Tags::klass, "each_key", &Tags::each_key, 0);
-		Ruby::DefineMethod(Tags::klass, "each_value", &Tags::each_value, 0);
-		Ruby::DefineMethod(Tags::klass, "keys", &Tags::keys, 0);
-		Ruby::DefineMethod(Tags::klass, "values", &Tags::values, 0);
-		Ruby::DefineMethod(Tags::klass, "size", &Tags::size, 0);
-		Ruby::DefineMethod(Tags::klass, "[]", &Tags::index_op, -1);
+		Ruby::DefineMethod(Tags::klass, "each_pair", Tags::each_pair);
+		Ruby::DefineMethod(Tags::klass, "each_key", Tags::each_key);
+		Ruby::DefineMethod(Tags::klass, "each_value", Tags::each_value);
+		Ruby::DefineMethod(Tags::klass, "keys", Tags::keys);
+		Ruby::DefineMethod(Tags::klass, "values", Tags::values);
+		Ruby::DefineMethod(Tags::klass, "size", Tags::size);
+		Ruby::DefineMethodVariable(Tags::klass, "[]", Tags::index_op);
 		return true;
 	}
 

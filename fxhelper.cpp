@@ -4,7 +4,9 @@
 #include <fx.h>
 #include <FX88591Codec.h>
 
+#ifdef WIN32
 #include "shlobj.h"		// SHGetSpecialFolderPath
+#endif
 
 #include "version.h"
 #include "fxhelper.h"
@@ -37,13 +39,13 @@ std::string flatten(const std::string& str)
 	{
 		char c = str[i];
 
-		if (c == 'ß')
+		if (c == 'ÃŸ')
 			out += "ss";
-		else if (c == 'Ä' || c == 'ä')
+		else if (c == 'Ã„' || c == 'Ã¤')
 			out += "ae";
-		else if (c == 'Ö' || c == 'ö')
+		else if (c == 'Ã–' || c == 'Ã¶')
 			out += "oe";
-		else if (c == 'Ü' || c == 'ü')
+		else if (c == 'Ãœ' || c == 'Ã¼')
 			out += "ue";
 		else if (c != ' ')
 			out += std::tolower(c);
@@ -60,13 +62,13 @@ FXString flatten(const FXString& str)
 	{
 		FXwchar wc = str.wc(i);
 
-		if (wc == L'ß')
+		if (wc == L'ÃŸ')
 			out += "ss";
-		else if (wc == L'Ä' || wc == L'ä')
+		else if (wc == L'Ã„' || wc == L'Ã¤')
 			out += "ae";
-		else if (wc == L'Ö' || wc == L'ö')
+		else if (wc == L'Ã–' || wc == L'Ã¶')
 			out += "oe";
-		else if (wc == L'Ü' || wc == L'ü')
+		else if (wc == L'Ãœ' || wc == L'Ã¼')
 			out += "ue";
 		else
 			out += std::tolower(wc);

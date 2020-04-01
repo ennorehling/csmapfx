@@ -51,8 +51,8 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	
 	// search mode: Ignore case, regular expression matching
 	FXHorizontalFrame* mode_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0,0,0,0, 0,0,0,0);
-	options.regardcase = new FXCheckButton(mode_frame, iso2utf("&Groﬂ-/Kleinschreibung beachten"), this,ID_SEARCH, CHECKBUTTON_NORMAL);
-	options.regexp = new FXCheckButton(mode_frame, iso2utf("&Regul‰rer Ausdruck"), this,ID_SEARCH, CHECKBUTTON_NORMAL);
+	options.regardcase = new FXCheckButton(mode_frame, iso2utf("&Gro√ü-/Kleinschreibung beachten"), this,ID_SEARCH, CHECKBUTTON_NORMAL);
+	options.regexp = new FXCheckButton(mode_frame, iso2utf("&Regul√§rer Ausdruck"), this,ID_SEARCH, CHECKBUTTON_NORMAL);
 
 	// search domain: Search for what type, search in descriptions
 	FXHorizontalFrame* domain_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0,0,0,0, 0,0,0,0);
@@ -65,7 +65,7 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	box->appendItem("Alles");
 	box->appendItem("Regionen");
 	box->appendItem("Einheiten");
-	box->appendItem(iso2utf("Geb‰ude"));
+	box->appendItem(iso2utf("Geb√§ude"));
 	box->appendItem("Schiffe");
 	box->appendItem("Befehle");
 	box->setNumVisible(box->getNumItems());
@@ -78,7 +78,7 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	FXVerticalFrame *details_frame = new FXVerticalFrame(details, LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0);
 	details_frame->setBorderColor(getApp()->getShadowColor());
 	options.searchdirectly = new FXCheckButton(details_frame, "Bei Texteingabe suchen", NULL,0, CHECKBUTTON_NORMAL);
-	options.limitresults = new FXCheckButton(details_frame, iso2utf("Auf 1000 Treffer beschr‰nken"), this,ID_SEARCH, CHECKBUTTON_NORMAL);
+	options.limitresults = new FXCheckButton(details_frame, iso2utf("Auf 1000 Treffer beschr√§nken"), this,ID_SEARCH, CHECKBUTTON_NORMAL);
 
 	// results list
 	new FXHorizontalSeparator(content, SEPARATOR_GROOVE|LAYOUT_FILL_X, 0,0,0,0, 0,0,DEFAULT_SPACING,DEFAULT_SPACING);
@@ -90,7 +90,7 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	results->getHeader()->setHeaderStyle(HEADER_RESIZE|HEADER_TRACKING);
 	
     results->appendHeader("Region");
-	results->appendHeader(iso2utf("Einheit/Geb‰ude/Schiff"));
+	results->appendHeader(iso2utf("Einheit/Geb√§ude/Schiff"));
 }
 
 void FXSearchDlg::create()
@@ -503,7 +503,7 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 					FXString id = building->id();
 
 					if (name.empty())
-						name = iso2utf("Geb‰ude ") + id;
+						name = iso2utf("Geb√§ude ") + id;
 
 					object_str = name + " (" + id + ")";
 				}

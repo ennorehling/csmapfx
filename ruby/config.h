@@ -1,6 +1,4 @@
-#if _MSC_VER != 1800
-#error MSC version unmatch: _MSC_VER: 1800 is expected.
-#endif
+#if _MSC_VER == 1800
 #define RT_VER 120
 #define HAVE_ACOSH 1
 #define HAVE_SINH 1
@@ -148,6 +146,12 @@
 #define RUBY_SITEARCH "i386-msvcrt"
 #define RUBY_COREDLL "msvcrt"
 #define LIBRUBY_SO "msvcrt-ruby191.dll"
+#elif defined(_MSC_VER)
+#error "unsupported version of _MSC_VER"
+#else
+#error "do not include this file"
+#endif
+
 #if 0
 !if "msvcrt-ruby191" != "$(RUBY_SO_NAME)" || "i386-mswin32" != "$(ARCH)-$(PLATFORM)"
 config.h: nul

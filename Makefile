@@ -1,26 +1,29 @@
 #
-# Makefile für csmapfx
+# Makefile fÃ¼r csmapfx
 # (c) 2004-2010 by Thomas J. Gritzan <phygon@gmx.de>
 #
 
 INSTPATH = ~/Desktop
 
 # Standart-Variablen
-GPP = g++-4.0
+CPP = g++
+CPPFLAGS=-DBOOST_SIGNALS_NO_DEPRECATION_WARNING -w
+GPP = $(CPP) $(CPPFLAGS)
 EXEC_STATIC = csmapfx
 EXEC_DYNAMIC = csmapfx-dyn
-REVISION = $(shell ./svnrev.sh -r)
+REVISION = 133
 ARCHIV = csmapfx-rev$(REVISION).tar.bz2
-COMPILE = -O6 -finput-charset=ISO8859-15 -fexec-charset=ISO8859-15 -DNDEBUG -DBOOST_USER_CONFIG="<$(PWD)/boost/nodynlibs.hpp>"  -Wall -ffast-math -fstrict-aliasing -finline-functions -fomit-frame-pointer -fexpensive-optimizations -I /usr/local/include/fox-1.6/
-LINK_STATIC = -O6 -Wall -s /usr/local/lib/libFOX-1.6.a /usr/lib/libboost_signals-gcc-1_33_1.a -L/usr/X11R6/lib -lXext -lX11 -lz -lbz2 -lpng -lm -lpthread -lrt -ljpeg -lXrandr
+COMPILE = -O6 -finput-charset=ISO8859-15 -fexec-charset=ISO8859-15 -DNDEBUG -DBOOST_USER_CONFIG="<$(PWD)/boost/nodynlibs.hpp>"  -Wall -ffast-math -fstrict-aliasing -finline-functions -fomit-frame-pointer -fexpensive-optimizations -I/usr/include/fox-1.6 -I/usr/include/ruby-2.7.0 -I/usr/include/x86_64-linux-gnu/ruby-2.7.0
+LINK_STATIC = -O6 -Wall -s /usr/lib/x86_64-linux-gnu/libFOX-1.6.a -L/usr/lib/x86_64-linux-gnu -L/usr/X11R6/lib -lXext -lX11 -lz -lbz2 -lpng -lm -lpthread -lrt -ljpeg
 LINK_STATIC_SOME = -lXcursor
-LINK_DYNAMIC = -O6 -s -lFOX-1.6
+LINK_DYNAMIC = -O6 -s -lFOX-1.6 -lruby-2.7 -Wl,-rpath=.
 OBJDIR = ./bin
 HEADER = $(wildcard *.h)
 SOURCES = $(wildcard *.cpp)
+SOURCES += $(wildcard boost/signals/*.cpp)
 OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
 
-# Farben für vterm
+# Farben fÃ¼r vterm
 COL = $(firstword $(COLUMNS) 80)
 COL := $(shell expr $(COL) - 10)
 COLORRED = echo -ne "\033[31m"
@@ -32,7 +35,7 @@ MSGTEXT = echo -e "\033[A\r\033[$(COL)C\033[32mTEXT\033[0m\033[D\r"
 # using: @$(subst TEXT,<insert text>,$(MSGTEXT))
 
 # Build-Ziele
-default: static
+default: dynamic
 all: static dynamic
 
 static: $(EXEC_STATIC)
@@ -77,6 +80,6 @@ $(OBJDIR)/%.o: %.cpp $(HEADER) version.h
 	@$(MSGDONE)
 
 $(OBJDIR):
-	mkdir $@
+	mkdir -p $@
 
 # <eof>

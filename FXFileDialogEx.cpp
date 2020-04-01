@@ -522,7 +522,7 @@ FXuint FXFileDialogEx::execute(FXuint /*placement*/) {
 	  if (::CommDlgExtendedError() != FNERR_BUFFERTOOSMALL)
 		  return FALSE;
 
-	  FXMessageBox::error(m_owner, MBOX_OK, FXString(m_ofn->lpstrTitle).text(), iso2utf("Zuviele Dateien ausgew‰hlt.").text());
+	  FXMessageBox::error(m_owner, MBOX_OK, FXString(m_ofn->lpstrTitle).text(), iso2utf("Zuviele Dateien ausgew√§hlt.").text());
 
       return FALSE;
   }

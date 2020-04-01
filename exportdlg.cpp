@@ -30,7 +30,7 @@ FXExportDlg::FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 
 	FXHorizontalFrame* regionsize = new FXHorizontalFrame(options, LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT);
 
-	new FXLabel(regionsize, iso2utf("Regionsgröße"));
+	new FXLabel(regionsize, iso2utf("RegionsgrÃ¶ÃŸe"));
 
 	scalebox = new FXComboBox(regionsize, 0, NULL,0, COMBOBOX_STATIC|FRAME_NORMAL);
 	for (int i = 1; i <= 128; i*=2)
@@ -50,7 +50,7 @@ FXExportDlg::FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 
 	colorbox = new FXComboBox(backgrcolor, 0, NULL,0, COMBOBOX_STATIC|FRAME_NORMAL);
 	colorbox->appendItem(iso2utf("Schwarz"), (void*)0);
-	colorbox->appendItem(iso2utf("Weiß"), (void*)1);
+	colorbox->appendItem(iso2utf("WeiÃŸ"), (void*)1);
 	colorbox->setCurrentItem(0);
 	colorbox->setNumVisible(colorbox->getNumItems());
 }
@@ -75,7 +75,7 @@ int FXExportDlg::getScale() const
 	if (item < 0)
 		return 1;	// no current item?
 	
-	return (int)scalebox->getItemData(item);	// item data is scale
+	return ITEM_INT(scalebox->getItemData(item));	// item data is scale
 }
 
 int FXExportDlg::getColor() const
@@ -84,7 +84,7 @@ int FXExportDlg::getColor() const
 	if (item < 0)
 		return 1;	// no current item?
 	
-	return (int)colorbox->getItemData(item);	// item data is color index (0=black, 1=white)
+	return ITEM_INT(colorbox->getItemData(item));	// item data is color index (0=black, 1=white)
 }
 
 bool FXExportDlg::getShowNames() const

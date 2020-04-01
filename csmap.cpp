@@ -113,7 +113,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	status_faction->setBorderColor(getApp()->getShadowColor());
 	status_faction->hide(); status_lfaction->hide();
 
-	// Menübar, Toolbar
+	// MenÃ¼bar, Toolbar
 	FXDockSite* topdock = new FXDockSite(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X);
 	/*FXDockSite* bottomdock =*/ new FXDockSite(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
 	/*FXDockSite* leftdock =*/ new FXDockSite(this,LAYOUT_SIDE_LEFT|LAYOUT_FILL_Y);
@@ -146,8 +146,8 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	update_signal_t::slot_function_type whenActiveFaction = boost::bind(&CSMap::haveActiveFaction, this);
 
 	// Buttons
-	new FXButtonEx(toolbar, iso2utf("\tDatei öffnen...\tEine neue Datei öffnen."), boost::bind(&CSMap::onFileOpen,this), icons.open, BUTTON_TOOLBAR);
-	new FXButtonEx(toolbar, iso2utf("\tDatei hinzufügen...\tLädt einen Karten-Report in den aktuellen Report."), boost::bind(&CSMap::onFileMerge,this), whenFileOpen, icons.merge, BUTTON_TOOLBAR);
+	new FXButtonEx(toolbar, iso2utf("\tDatei Ã¶ffnen...\tEine neue Datei Ã¶ffnen."), boost::bind(&CSMap::onFileOpen,this), icons.open, BUTTON_TOOLBAR);
+	new FXButtonEx(toolbar, iso2utf("\tDatei hinzufÃ¼gen...\tLÃ¤dt einen Karten-Report in den aktuellen Report."), boost::bind(&CSMap::onFileMerge,this), whenFileOpen, icons.merge, BUTTON_TOOLBAR);
 	new FXButtonEx(toolbar, "\tDatei speichern unter...\tDie aktuelle Datei als neue Datei speichern.", boost::bind(&CSMap::onFileSaveAs,this), whenFileOpen, icons.save, BUTTON_TOOLBAR);
 	new FXButtonEx(toolbar, "\tDatei schliessen\tDie aktuelle Datei schliessen.", boost::bind(&CSMap::onFileClose,this), whenFileOpen, icons.close, BUTTON_TOOLBAR);
 
@@ -185,13 +185,13 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	}
 
 	new FXMenuSeparatorEx(terrainPopup);
-	FXMenuCommand *cmd = new FXMenuCommand(terrainPopup, iso2utf("Löschen\t\tZeichnen-Modus: Lösche Regionen"), icons.terrain[0], this,ID_MAP_SETMODUS);
+	FXMenuCommand *cmd = new FXMenuCommand(terrainPopup, iso2utf("LÃ¶schen\t\tZeichnen-Modus: LÃ¶sche Regionen"), icons.terrain[0], this,ID_MAP_SETMODUS);
 	cmd->setUserData((void*)(FXCSMap::MODUS_SETTERRAIN));
 
 	FXHorizontalFrame *terrainFrame = new FXHorizontalFrame(toolbar, LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0, 0,0);
-	terrainSelect = new FXButton(terrainFrame, iso2utf("\tZeichnen-Modus: Erstelle oder Lösche Regionen"), icons.terrain[0], this,ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
+	terrainSelect = new FXButton(terrainFrame, iso2utf("\tZeichnen-Modus: Erstelle oder LÃ¶sche Regionen"), icons.terrain[0], this,ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
 	terrainSelect->setUserData((void*)FXCSMap::MODUS_SETTERRAIN);
-	new FXMenuButton(terrainFrame, iso2utf("\tZeichnen-Modus: Erstelle oder Lösche Regionen"), NULL, terrainPopup, FRAME_RAISED|BUTTON_TOOLBAR|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|MENUBUTTON_DOWN, 0,0,12,0);
+	new FXMenuButton(terrainFrame, iso2utf("\tZeichnen-Modus: Erstelle oder LÃ¶sche Regionen"), NULL, terrainPopup, FRAME_RAISED|BUTTON_TOOLBAR|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|MENUBUTTON_DOWN, 0,0,12,0);
 
 	// Recent file list
 	recentFiles.setTarget(this);
@@ -202,9 +202,9 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	// File menu
 	filemenu = new FXMenuPane(this);
 	new FXMenuTitle(menubar,"&Datei",NULL,filemenu);
-	new FXMenuCommandEx(filemenu,iso2utf("Ö&ffnen...\tStrg-O\tEine neue Datei öffnen."),boost::bind(&CSMap::onFileOpen, this));
-	new FXMenuCommandEx(filemenu,iso2utf("&Hinzufügen...\tStrg-I\tLädt einen Karten-Report in den aktuellen Report."),boost::bind(&CSMap::onFileMerge, this),whenFileOpen);
-	new FXMenuCommandEx(filemenu,iso2utf("&Speichern\tStrg-S\tDie Änderungen speichern."),boost::bind(&CSMap::onFileSave, this),whenFileOpen);
+	new FXMenuCommandEx(filemenu,iso2utf("Ã–&ffnen...\tStrg-O\tEine neue Datei Ã¶ffnen."),boost::bind(&CSMap::onFileOpen, this));
+	new FXMenuCommandEx(filemenu,iso2utf("&HinzufÃ¼gen...\tStrg-I\tLÃ¤dt einen Karten-Report in den aktuellen Report."),boost::bind(&CSMap::onFileMerge, this),whenFileOpen);
+	new FXMenuCommandEx(filemenu,iso2utf("&Speichern\tStrg-S\tDie Ã„nderungen speichern."),boost::bind(&CSMap::onFileSave, this),whenFileOpen);
 	new FXMenuCommandEx(filemenu,"Speichern &unter...\tF12\tDie aktuelle Datei als neue Datei speichern.",boost::bind(&CSMap::onFileSaveAs, this),whenFileOpen);
 	new FXMenuCommandEx(filemenu,"Sch&liessen\t\tDie aktuelle Datei schliessen.",boost::bind(&CSMap::onFileClose, this),whenFileOpen);
 	
@@ -221,7 +221,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	new FXMenuSeparatorEx(filemenu);
 	new FXMenuCommandEx(filemenu,iso2utf("&Befehle laden...\tStrg-Shift-O\tDie Befehle aus Textdatei laden."),boost::bind(&CSMap::onFileOpenCommands, this),whenActiveFaction);
 	new FXMenuCommandEx(filemenu,iso2utf("&Befehle speichern...\tF11\tDie Befehle als Textdatei speichern."),boost::bind(&CSMap::onFileSaveCommands, this, false),whenActiveFaction);
-	new FXMenuCommandEx(filemenu,iso2utf("Befehle mit CR speichern...\t\tSpeichert den aktuellen Report zusammen mit den geänderten Befehlen."),boost::bind(&CSMap::onFileSaveWithCmds, this),whenActiveFaction);
+	new FXMenuCommandEx(filemenu,iso2utf("Befehle mit CR speichern...\t\tSpeichert den aktuellen Report zusammen mit den geÃ¤nderten Befehlen."),boost::bind(&CSMap::onFileSaveWithCmds, this),whenActiveFaction);
 
 	new FXMenuSeparatorEx(filemenu);
 	new FXMenuCommandEx(filemenu,L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",boost::bind(&CSMap::onFileSaveCommands, this, true),whenActiveFaction);
@@ -232,7 +232,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	for (int i = 0; i < 6; i++)
 		new FXMenuCommand(recentmenu, "", NULL, &recentFiles,FXRecentFiles::ID_FILE_1+i);
 
-	new FXMenuCascade(filemenu, iso2utf("&Zuletzt geöffnet"), NULL, recentmenu, 0);
+	new FXMenuCascade(filemenu, iso2utf("&Zuletzt geÃ¶ffnet"), NULL, recentmenu, 0);
 	new FXMenuSeparatorEx(filemenu);
 	new FXMenuCommandEx(filemenu,"B&eenden\tStrg-Q\tDas Programm beenden.",boost::bind(&CSMap::close, this, false));
 
@@ -243,13 +243,13 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	menu.maponly = new FXMenuCheck(viewmenu,"&Nur Karte anzeigen\tStrg-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this,ID_VIEW_MAPONLY,0);
 	menu.messages = new FXMenuCheck(viewmenu,"&Meldungen\tStrg-V\tRegionsmeldungen ein- bzw. ausblenden.", this,ID_VIEW_MESSAGES);
 	menu.calc = new FXMenuCheck(viewmenu,"&Taschenrechner\tStrg-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
-	menu.minimap = new FXMenuCheck(viewmenu,iso2utf("Übersichts&karte\tStrg-N\tÜbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
+	menu.minimap = new FXMenuCheck(viewmenu,iso2utf("Ãœbersichts&karte\tStrg-N\tÃœbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
 	menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tStrg-B\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
 	new FXMenuSeparatorEx(viewmenu, "Liste");
 	menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tAlt-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
 	new FXMenuSeparatorEx(viewmenu, "Karte");
 	menu.streets = new FXMenuCheck(viewmenu,"&Strassen zeigen\tAlt-S\tStrassen auf der Karte anzeigen.");
-	menu.visibility = new FXMenuCheck(viewmenu,iso2utf("&Sichtbarkeit zeigen\tAlt-V\tSymbole für Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise)."));
+	menu.visibility = new FXMenuCheck(viewmenu,iso2utf("&Sichtbarkeit zeigen\tAlt-V\tSymbole fÃ¼r Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise)."));
 	menu.shiptravel = new FXMenuCheck(viewmenu,"&Durchschiffung\tAlt-T\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
 	menu.shadowRegions = new FXMenuCheck(viewmenu,"Regionen ab&dunkeln\tAlt-F\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.");
 	menu.islands = new FXMenuCheck(viewmenu,"&Inselnamen zeigen\tAlt-I\tInselnamen auf der Karte zeigen.");
@@ -261,16 +261,16 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	new FXMenuCommand(regionmenu,"&Suchen...\tStrg-F\tEine Region, Einheit, Schiff, etc. suchen.",NULL, this,ID_VIEW_SEARCHDLG);
 	menu.regdescription = new FXMenuCheck(regionmenu,"&Beschreibung zeigen\t\tRegionsbeschreibung anzeigen.");
 	new FXMenuSeparatorEx(regionmenu, "Markieren");
-	new FXMenuCommand(regionmenu,iso2utf("&Alle markieren\tStrg-A\tAlle Regionen auswählen."),NULL,this,ID_REGION_SELALL);
-	new FXMenuCommand(regionmenu,iso2utf("Alle &Inseln auswählen\t\tAlle Landregionen auswählen (Ozean, Feuerwand und Eisberg zählen nicht als Land)."),NULL,this,ID_REGION_SELALLISLANDS);
-	new FXMenuCommand(regionmenu,iso2utf("&Keine markieren\t\tKeine Region auswählen."),NULL,this,ID_REGION_UNSEL);
-	new FXMenuCommand(regionmenu,iso2utf("Auswahl &invertieren\t\tAusgewählte Regionen abwählen und umgekehrt."),NULL,this,ID_REGION_INVERTSEL);
+	new FXMenuCommand(regionmenu,iso2utf("&Alle markieren\tStrg-A\tAlle Regionen auswÃ¤hlen."),NULL,this,ID_REGION_SELALL);
+	new FXMenuCommand(regionmenu,iso2utf("Alle &Inseln auswÃ¤hlen\t\tAlle Landregionen auswÃ¤hlen (Ozean, Feuerwand und Eisberg zÃ¤hlen nicht als Land)."),NULL,this,ID_REGION_SELALLISLANDS);
+	new FXMenuCommand(regionmenu,iso2utf("&Keine markieren\t\tKeine Region auswÃ¤hlen."),NULL,this,ID_REGION_UNSEL);
+	new FXMenuCommand(regionmenu,iso2utf("Auswahl &invertieren\t\tAusgewÃ¤hlte Regionen abwÃ¤hlen und umgekehrt."),NULL,this,ID_REGION_INVERTSEL);
 		selectionmenu = new FXMenuPane(this);
 		new FXMenuCommand(selectionmenu,"Auswahl &erweitern\tStrg-Shift-F7\tAuswahl mit dem Radius von einer Region erweitern.",NULL,this,ID_REGION_EXTENDSEL);
-		new FXMenuCommand(selectionmenu,iso2utf("&Inseln auswählen\tStrg-Shift-F9\tAuswahl auf komplette Inseln erweitern."),NULL,this,ID_REGION_SELISLANDS);
+		new FXMenuCommand(selectionmenu,iso2utf("&Inseln auswÃ¤hlen\tStrg-Shift-F9\tAuswahl auf komplette Inseln erweitern."),NULL,this,ID_REGION_SELISLANDS);
 	new FXMenuCascade(regionmenu, "&Erweitern", NULL, selectionmenu);
 	new FXMenuSeparatorEx(regionmenu, "Bearbeiten");
-	new FXMenuCommand(regionmenu,iso2utf("Markierte &löschen\t\t"),NULL,this,ID_REGION_REMOVESEL);
+	new FXMenuCommand(regionmenu,iso2utf("Markierte &lÃ¶schen\t\t"),NULL,this,ID_REGION_REMOVESEL);
 
 	// Faction menu
 	factionmenu = new FXMenuPane(this);
@@ -279,8 +279,8 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 	new FXMenuSeparatorEx(factionmenu, "Parteiinfo");
 	menu.name = new FXMenuCommand(factionmenu, "Parteiname\t\tName der Partei");
-	menu.type = new FXMenuCommand(factionmenu, iso2utf("Rasse (Silber)\t\tRasse und Typpräfix der Partei, Rekrutierungskosten"));
-	menu.magic = new FXMenuCommand(factionmenu, iso2utf("Magiegebiet\t\tgewähltes Magiegebiet"));
+	menu.type = new FXMenuCommand(factionmenu, iso2utf("Rasse (Silber)\t\tRasse und TypprÃ¤fix der Partei, Rekrutierungskosten"));
+	menu.magic = new FXMenuCommand(factionmenu, iso2utf("Magiegebiet\t\tgewÃ¤hltes Magiegebiet"));
 	menu.email = new FXMenuCommand(factionmenu, "eMail\t\teMail-Adresse der Partei");
 
 	new FXMenuSeparatorEx(factionmenu, "Statistik");
@@ -288,9 +288,9 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	menu.points = new FXMenuCommand(factionmenu, "Punkte (Durchschnitt)\t\tPunkte der Partei und Durchschnitt gleichaltriger Parteien");
 	menu.age = new FXMenuCommand(factionmenu, "Parteialter\t\tAlter der Partei in Runden");
 
-	new FXMenuSeparatorEx(factionmenu, iso2utf("Gegenstände"));
+	new FXMenuSeparatorEx(factionmenu, iso2utf("GegenstÃ¤nde"));
 		menu.factionpool = new FXMenuPane(this);
-		menu.poolnoitems = new FXMenuCommand(menu.factionpool,iso2utf("Keine Gegenstände\t\tDer Parteipool enthält keine Gegenstände."),NULL);
+		menu.poolnoitems = new FXMenuCommand(menu.factionpool,iso2utf("Keine GegenstÃ¤nde\t\tDer Parteipool enthÃ¤lt keine GegenstÃ¤nde."),NULL);
 		menu.poolnoitems->disable();
 	new FXMenuCascade(factionmenu, "&Parteipool", NULL, menu.factionpool, 0);
 
@@ -302,9 +302,9 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 		radio->setCheck();
 	new FXMenuCascade(mapmenu, "&Ebene", NULL, planemenu, 0);
 		zoommenu = new FXMenuPane(this);
-		new FXMenuCommand(zoommenu,iso2utf("Vergrößern\tStrg-+\tKarte vergrößern."),NULL,this,ID_MAP_ZOOM,0);
+		new FXMenuCommand(zoommenu,iso2utf("VergrÃ¶ÃŸern\tStrg-+\tKarte vergrÃ¶ÃŸern."),NULL,this,ID_MAP_ZOOM,0);
 		new FXMenuCommand(zoommenu,"Verkleinern\tStrg--\tKarte verkleinern.",NULL,this,ID_MAP_ZOOM,0);
-		new FXMenuSeparatorEx(zoommenu, iso2utf("Größe"));
+		new FXMenuSeparatorEx(zoommenu, iso2utf("GrÃ¶ÃŸe"));
 		new FXMenuRadio(zoommenu,"&1 Pixel\tStrg-8\t1.6%",this,ID_MAP_ZOOM,0);
 		new FXMenuRadio(zoommenu,"&2 Pixel\tStrg-7\t3.1%",this,ID_MAP_ZOOM,0);
 		new FXMenuRadio(zoommenu,"&4 Pixel\tStrg-6\t6.3%",this,ID_MAP_ZOOM,0);
@@ -313,14 +313,14 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 		new FXMenuRadio(zoommenu,"&32 Pixel\tStrg-3\t50%",this,ID_MAP_ZOOM,0);
 		new FXMenuRadio(zoommenu,"&64 Pixel\tStrg-2\t100%",this,ID_MAP_ZOOM,0);
 		new FXMenuRadio(zoommenu,"128 Pixel\tStrg-1\t200%",this,ID_MAP_ZOOM,0);
-	new FXMenuCascade(mapmenu,iso2utf("&Größe"), NULL, zoommenu, 0);
+	new FXMenuCascade(mapmenu,iso2utf("&GrÃ¶ÃŸe"), NULL, zoommenu, 0);
 	new FXMenuCommand(mapmenu,"&Ursprung setzen\tStrg-U\tDen Kartenursprung (0/0) auf die markierte Region setzen.",NULL,this,ID_MAP_SETORIGIN,0);
-	new FXMenuCommand(mapmenu,iso2utf("&Kartenreport erzeugen\t\tLöscht alle Informationen außer Regionsnamen und -terrain und Inseln."),NULL,this,ID_MAP_MAKEMAP,0);
+	new FXMenuCommand(mapmenu,iso2utf("&Kartenreport erzeugen\t\tLÃ¶scht alle Informationen auÃŸer Regionsnamen und -terrain und Inseln."),NULL,this,ID_MAP_MAKEMAP,0);
 	new FXMenuSeparatorEx(mapmenu, "Regionsmarker");
-	new FXMenuCommand(mapmenu,iso2utf("Markierte &auswählen\tStrg-Space\tMarkierte Region auswählen."),NULL,this,ID_MAP_SELECTMARKED,0);
+	new FXMenuCommand(mapmenu,iso2utf("Markierte &auswÃ¤hlen\tStrg-Space\tMarkierte Region auswÃ¤hlen."),NULL,this,ID_MAP_SELECTMARKED,0);
 	new FXMenuCommand(mapmenu,"Nach Westen\tStrg-H\tRegionsmarker eins nach Westen setzen.",NULL,this,ID_MAP_MARKERWEST,0);
 	new FXMenuCommand(mapmenu,"Nach Osten\tStrg-L\tRegionsmarker eins nach Osten setzen.",NULL,this,ID_MAP_MARKEREAST,0);
-	new FXMenuCommand(mapmenu,iso2utf("Nach Südwesten\tStrg-J\tRegionsmarker eins nach Südwesten setzen."),NULL,this,ID_MAP_MARKERSOUTHWEST,0);
+	new FXMenuCommand(mapmenu,iso2utf("Nach SÃ¼dwesten\tStrg-J\tRegionsmarker eins nach SÃ¼dwesten setzen."),NULL,this,ID_MAP_MARKERSOUTHWEST,0);
 	new FXMenuCommand(mapmenu,"Nach Nordosten\tStrg-K\tRegionsmarker eins nach Nordosten setzen.",NULL,this,ID_MAP_MARKERNORTHEAST,0);
 	
 	getAccelTable()->addAccel(MKUINT(KEY_KP_5,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_SELECTMARKED));
@@ -445,10 +445,10 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
     FXHorizontalFrame *cmdOptFrame = new FXHorizontalFrame(cmdBottomFrame,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 3,3,1,1);
 	cmdOptFrame->setBorderColor(getApp()->getShadowColor());
-	FXCheckButtonEx* confirmCmd = new FXCheckButtonEx(cmdOptFrame, iso2utf("bestätigt\tBefehle bestätigen (Strg-Y)\tBefehle für diese Einheit bestätigen"), boost::bind(&FXCommands::setConfirmed, commands, _1), boost::bind(&FXCommands::getConfirmed, commands));
+	FXCheckButtonEx* confirmCmd = new FXCheckButtonEx(cmdOptFrame, iso2utf("bestÃ¤tigt\tBefehle bestÃ¤tigen (Strg-Y)\tBefehle fÃ¼r diese Einheit bestÃ¤tigen"), boost::bind(&FXCommands::setConfirmed, commands, _1), boost::bind(&FXCommands::getConfirmed, commands));
 	
-	FXButtonEx* prevUnit = new FXButtonEx(cmdOptFrame, iso2utf("<\tVorherige Einheit (Strg-<)\tZur vorhergehenden unbestätigten Einheit"), boost::bind(&FXCommands::prevUnit, commands), whenActiveFaction, NULL, BUTTON_TOOLBAR);
-	FXButtonEx* nextUnit = new FXButtonEx(cmdOptFrame, iso2utf(">\tNächste Einheit (Strg->)\tZur nächsten unbestätigten Einheit"), boost::bind(&FXCommands::nextUnit, commands), whenActiveFaction, NULL, BUTTON_TOOLBAR);
+	FXButtonEx* prevUnit = new FXButtonEx(cmdOptFrame, iso2utf("<\tVorherige Einheit (Strg-<)\tZur vorhergehenden unbestÃ¤tigten Einheit"), boost::bind(&FXCommands::prevUnit, commands), whenActiveFaction, NULL, BUTTON_TOOLBAR);
+	FXButtonEx* nextUnit = new FXButtonEx(cmdOptFrame, iso2utf(">\tNÃ¤chste Einheit (Strg->)\tZur nÃ¤chsten unbestÃ¤tigten Einheit"), boost::bind(&FXCommands::nextUnit, commands), whenActiveFaction, NULL, BUTTON_TOOLBAR);
 	new FXButtonEx(cmdOptFrame, iso2utf("+temp\tNeue Temp-Einheit\tTemp-Einheit erstellen"), boost::bind(&FXCommands::makeTemp, commands), whenCommandable, NULL, BUTTON_TOOLBAR);
 
 	// activate hotkeys for next/prev commandable unit
@@ -462,7 +462,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	rowcol->setTextColor(getApp()->getShadowColor());
 
 	// minimap
-	minimap_frame = new FXDialogBox(this, iso2utf("Übersichtskarte"), DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100,100, 640,480, 0,0,0,0);
+	minimap_frame = new FXDialogBox(this, iso2utf("Ãœbersichtskarte"), DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100,100, 640,480, 0,0,0,0);
 	minimap_frame->setIcon(icon);
 	minimap_frame->getAccelTable()->addAccel(parseAccel("Strg-N"), this,FXSEL(SEL_COMMAND,ID_VIEW_MINIMAP));
 
@@ -757,7 +757,7 @@ bool CSMap::loadFile(FXString filename)
 	{
 		files.pop_back();
 		recentFiles.removeFile(filename);
-		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, iso2utf("Die Datei konnte nicht gelesen werden.\nMöglicherweise wird das Format nicht unterstützt.").text());
+		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, iso2utf("Die Datei konnte nicht gelesen werden.\nMÃ¶glicherweise wird das Format nicht unterstÃ¼tzt.").text());
 		return false;
 	}
 
@@ -805,7 +805,7 @@ bool CSMap::mergeFile(FXString filename)
 	{
 		files.pop_back();
 		recentFiles.removeFile(filename);
-		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, iso2utf("Die Datei konnte nicht gelesen werden.\nMöglicherweise wird das Format nicht unterstützt.").text());
+		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, iso2utf("Die Datei konnte nicht gelesen werden.\nMÃ¶glicherweise wird das Format nicht unterstÃ¼tzt.").text());
 		return false;
 	}
 
@@ -817,7 +817,7 @@ bool CSMap::mergeFile(FXString filename)
         return false;
 	}
 
-	// dann: Datei an den aktuellen CR anfügen (nur Karteninformationen)
+	// dann: Datei an den aktuellen CR anfÃ¼gen (nur Karteninformationen)
 	datafile &cr = files.front();
 
 	datablock regionblock;
@@ -896,15 +896,15 @@ bool CSMap::saveFile(FXString filename, bool merge_commands /*= false*/)
 		return false;
 
 	datafile &file = files.front();
-	FXint res = file.save(filename.text(), false, true);		// nicht überschreiben, mit Befehlen
+	FXint res = file.save(filename.text(), false, true);		// nicht Ã¼berschreiben, mit Befehlen
 	if (res == -2)
 	{
 		FXString text;
-		text = "Die Datei " + filename + iso2utf(" existiert bereits.\n\nMöchten Sie sie ersetzen?");
+		text = "Die Datei " + filename + iso2utf(" existiert bereits.\n\nMÃ¶chten Sie sie ersetzen?");
 
 		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", text.text());
 		if (MBOX_CLICKED_YES == answ)
-			res = file.save(filename.text(), true, true);	// überschreiben, mit Befehlen
+			res = file.save(filename.text(), true, true);	// Ã¼berschreiben, mit Befehlen
 	}
 	if (res == -1)
 	{
@@ -965,15 +965,15 @@ bool CSMap::saveCommands(FXString filename, bool stripped)
 		return false;
 
 	datafile &file = files.front();
-	FXint res = file.saveCmds(filename.text(), stripped, false);	// nicht überschreiben
+	FXint res = file.saveCmds(filename.text(), stripped, false);	// nicht Ã¼berschreiben
 	if (res == -2)
 	{
 		FXString text;
-		text = "Die Datei " + filename + iso2utf(" existiert bereits.\n\nMöchten Sie sie ersetzen?");
+		text = "Die Datei " + filename + iso2utf(" existiert bereits.\n\nMÃ¶chten Sie sie ersetzen?");
 
 		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", text.text());
 		if (MBOX_CLICKED_YES == answ)
-			res = file.saveCmds(filename.text(), stripped, true);	// überschreiben
+			res = file.saveCmds(filename.text(), stripped, true);	// Ã¼berschreiben
 	}
 	if (res == -1)
 	{
@@ -1218,7 +1218,7 @@ long CSMap::onChangeZoom(FXObject* sender, FXSelector, void*)
 
 	FXfloat scale = map->getScale();
 
-	if (txt == iso2utf("Vergrößern"))
+	if (txt == iso2utf("VergrÃ¶ÃŸern"))
 	{
 		FXfloat jump = 1.2f;
 
@@ -1333,7 +1333,7 @@ long CSMap::onSetOrigin(FXObject*, FXSelector, void*)
 
 long CSMap::onMakeMap(FXObject*, FXSelector, void*)
 {
-	FXString txt = iso2utf("Alle Informationen außer reine Karteninformationen\naus aktuellem Report löschen?");
+	FXString txt = iso2utf("Alle Informationen auÃŸer reine Karteninformationen\naus aktuellem Report lÃ¶schen?");
 
 	FXMessageBox dlg(this, CSMAP_APP_TITLE, txt, 0, MBOX_YES_NO);
 	FXuint res = dlg.execute(PLACEMENT_SCREEN);
@@ -1468,7 +1468,7 @@ long CSMap::onMapSetModus(FXObject* sender, FXSelector, void* ptr)
 	if (sender && sender->isMemberOf(&FXId::metaClass))
 	{
 		FXId *item = (FXId*)sender;
-		FXint data = (int)item->getUserData();
+		FXint data = ITEM_INT(item->getUserData());
 
 		if (data >= FXCSMap::MODUS_SETTERRAIN && data < FXCSMap::MODUS_SETTERRAIN+datablock::TERRAIN_LAST)
 		{
@@ -1948,10 +1948,10 @@ long CSMap::onCalculator(FXObject*, FXSelector, void*)
 
 void CSMap::onFileOpen()
 {
-	FXFileDialog dlg(this, iso2utf("Öffnen..."));
+	FXFileDialog dlg(this, iso2utf("Ã–ffnen..."));
 	dlg.setIcon(icons.open);
 	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(iso2utf("Mögliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nEressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nAlle Dateien (*)"));
+	dlg.setPatternList(iso2utf("MÃ¶gliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nEressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nAlle Dateien (*)"));
 	FXint res = dlg.execute(PLACEMENT_SCREEN);
 	dialogDirectory = dlg.getDirectory();
 	if (res)
@@ -1960,11 +1960,11 @@ void CSMap::onFileOpen()
 
 void CSMap::onFileMerge()
 {
-	FXFileDialog dlg(this, iso2utf("Karte hinzufügen..."));
+	FXFileDialog dlg(this, iso2utf("Karte hinzufÃ¼gen..."));
 	dlg.setIcon(icons.merge);
 	dlg.setSelectMode(SELECTFILE_MULTIPLE);
 	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(iso2utf("Mögliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nEressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nAlle Dateien (*)"));
+	dlg.setPatternList(iso2utf("MÃ¶gliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nEressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nAlle Dateien (*)"));
 	FXint res = dlg.execute(PLACEMENT_SCREEN);
 	dialogDirectory = dlg.getDirectory();
 	if (res)
@@ -1986,7 +1986,7 @@ void CSMap::onFileSaveAs()
 	FXFileDialog dlg(this, "Speichern unter...", DLGEX_SAVE);
 	dlg.setIcon(icons.save);
 	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(iso2utf("Eressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nMögliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nAlle Dateien (*)"));
+	dlg.setPatternList(iso2utf("Eressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nMÃ¶gliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nAlle Dateien (*)"));
 	FXint res = dlg.execute(PLACEMENT_SCREEN);
 	dialogDirectory = dlg.getDirectory();
 	if (res)
@@ -1994,21 +1994,21 @@ void CSMap::onFileSaveAs()
 		FXString filename = dlg.getFilename();
 		FXString pattern = dlg.getPattern();
 
-		// Prüft, ob Dateiname bereits Endung enthält.
+		// PrÃ¼ft, ob Dateiname bereits Endung enthÃ¤lt.
 		FXString ext = filename.rafter('.');
 		for (int i = 0; ; i++)
 		{
 			FXString patt = pattern.section(',',i);
 			if (patt.empty())
 			{
-                // Der Dateiname endet nicht mit ".cr" o.ä., deshalb wird Endung angehangen.
+                // Der Dateiname endet nicht mit ".cr" o.Ã¤., deshalb wird Endung angehangen.
 				ext = pattern.section(',',0).after('.');
 				if (!ext.empty())
 					filename += "." + ext;
 				break;
 			}
 
-			// Dateiname endet auf ".cr" o.ä.
+			// Dateiname endet auf ".cr" o.Ã¤.
             if (ext == patt.after('.'))
 				break;
 		}
@@ -2022,7 +2022,7 @@ void CSMap::onFileClose()
 	// ask if modified commands should be safed
 	if (!files.empty() && files.front().modifiedCmds())
 	{
-		FXuint res = FXMessageBox::question(this, MBOX_SAVE_CANCEL_DONTSAVE, CSMAP_APP_TITLE, iso2utf("Die Änderungen an den Befehlen speichern?").text());
+		FXuint res = FXMessageBox::question(this, MBOX_SAVE_CANCEL_DONTSAVE, CSMAP_APP_TITLE, iso2utf("Die Ã„nderungen an den Befehlen speichern?").text());
 
 		if (res == MBOX_CLICKED_CANCEL)
 			return;					// don't close, cancel clicked
@@ -2045,7 +2045,7 @@ void CSMap::onFileOpenCommands()
 	FXFileDialog dlg(this, iso2utf("Befehle laden..."));
 	dlg.setIcon(icons.open);
 	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(iso2utf("Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nMögliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
+	dlg.setPatternList(iso2utf("Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nMÃ¶gliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
 	FXint res = dlg.execute(PLACEMENT_SCREEN);
 	dialogDirectory = dlg.getDirectory();
 	if (res)
@@ -2059,7 +2059,7 @@ void CSMap::onFileSaveCommands(bool stripped)
 
 	if (files.front().password().empty())
 	{
-		FXInputDialog dlg(this, "Passwort eingeben", iso2utf("Geben Sie das Passwort für die Partei ein:"), NULL,
+		FXInputDialog dlg(this, "Passwort eingeben", iso2utf("Geben Sie das Passwort fÃ¼r die Partei ein:"), NULL,
 			INPUTDIALOG_STRING | INPUTDIALOG_PASSWORD);
 		FXint res = dlg.execute(PLACEMENT_SCREEN);
 		if (res)
@@ -2075,7 +2075,7 @@ void CSMap::onFileSaveCommands(bool stripped)
 	FXFileDialog dlg(this, stripped ? "Versandbefehle speichern unter..." : "Befehle speichern unter...", DLGEX_SAVE);
 	dlg.setIcon(icons.save);
 	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(iso2utf("Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nMögliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
+	dlg.setPatternList(iso2utf("Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nMÃ¶gliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
 	FXint res = dlg.execute(PLACEMENT_SCREEN);
 	dialogDirectory = dlg.getDirectory();
 	if (res)
@@ -2083,21 +2083,21 @@ void CSMap::onFileSaveCommands(bool stripped)
 		FXString filename = dlg.getFilename();
 		FXString pattern = dlg.getPattern();
 
-		// Prüft, ob Dateiname bereits Endung enthält.
+		// PrÃ¼ft, ob Dateiname bereits Endung enthÃ¤lt.
 		FXString ext = filename.rafter('.');
 		for (int i = 0; ; i++)
 		{
 			FXString patt = pattern.section(',',i);
 			if (patt.empty())
 			{
-                // Der Dateiname endet nicht mit ".cr" o.ä., deshalb wird Endung angehangen.
+                // Der Dateiname endet nicht mit ".cr" o.Ã¤., deshalb wird Endung angehangen.
 				ext = pattern.section(',',0).after('.');
 				if (!ext.empty())
 					filename += "." + ext;
 				break;
 			}
 
-			// Dateiname endet auf ".cr" o.ä.
+			// Dateiname endet auf ".cr" o.Ã¤.
             if (ext == patt.after('.'))
 				break;
 		}
@@ -2111,7 +2111,7 @@ void CSMap::onFileSaveWithCmds()
 	FXFileDialog dlg(this, "Befehle mit CR speichern unter...", DLGEX_SAVE);
 	dlg.setIcon(icons.save);
 	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(iso2utf("Eressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nMögliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nAlle Dateien (*)"));
+	dlg.setPatternList(iso2utf("Eressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nMÃ¶gliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nAlle Dateien (*)"));
 	FXint res = dlg.execute(PLACEMENT_SCREEN);
 	dialogDirectory = dlg.getDirectory();
 	if (res)
@@ -2119,21 +2119,21 @@ void CSMap::onFileSaveWithCmds()
 		FXString filename = dlg.getFilename();
 		FXString pattern = dlg.getPattern();
 
-		// Prüft, ob Dateiname bereits Endung enthält.
+		// PrÃ¼ft, ob Dateiname bereits Endung enthÃ¤lt.
 		FXString ext = filename.rafter('.');
 		for (int i = 0; ; i++)
 		{
 			FXString patt = pattern.section(',',i);
 			if (patt.empty())
 			{
-                // Der Dateiname endet nicht mit ".cr" o.ä., deshalb wird Endung angehangen.
+                // Der Dateiname endet nicht mit ".cr" o.Ã¤., deshalb wird Endung angehangen.
 				ext = pattern.section(',',0).after('.');
 				if (!ext.empty())
 					filename += "." + ext;
 				break;
 			}
 
-			// Dateiname endet auf ".cr" o.ä.
+			// Dateiname endet auf ".cr" o.Ã¤.
             if (ext == patt.after('.'))
 				break;
 		}
@@ -2164,21 +2164,21 @@ void CSMap::onFileMapExport()
 		FXString filename = dlg.getFilename();
 		FXString pattern = dlg.getPattern();
 
-		// Prüft, ob Dateiname bereits Endung enthält.
+		// PrÃ¼ft, ob Dateiname bereits Endung enthÃ¤lt.
 		FXString ext = filename.rafter('.');
 		for (int i = 0; ; i++)
 		{
 			FXString patt = pattern.section(',',i);
 			if (patt.empty())
 			{
-                // Der Dateiname endet nicht mit ".cr" o.ä., deshalb wird Endung angehangen.
+                // Der Dateiname endet nicht mit ".cr" o.Ã¤., deshalb wird Endung angehangen.
 				ext = pattern.section(',',0).after('.');
 				if (!ext.empty())
 					filename += "." + ext;
 				break;
 			}
 
-			// Dateiname endet auf ".cr" o.ä.
+			// Dateiname endet auf ".cr" o.Ã¤.
             if (ext == patt.after('.'))
 				break;
 		}
@@ -2344,7 +2344,7 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
 	if (!(selection.selected & selection.MULTIPLE_REGIONS))
 		return 1;		// nothing to do
 
-	// Inseln auswählen
+	// Inseln auswÃ¤hlen
 	datafile::SelectionState state = selection;
 
 	int visiblePlane = map->getVisiblePlane();
@@ -2420,7 +2420,7 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
 
 long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
 {
-	// alle Landregionen markieren (also außer Ozean & Feuerwand & Eisberg)
+	// alle Landregionen markieren (also auÃŸer Ozean & Feuerwand & Eisberg)
 	datafile::SelectionState state = selection;
 	state.selected |= state.MULTIPLE_REGIONS;
 
@@ -2456,7 +2456,7 @@ long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
 
 long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 {
-	// markierte Regionen löschen
+	// markierte Regionen lÃ¶schen
 	if (!(selection.selected & selection.MULTIPLE_REGIONS) || !selection.regionsSelected.size())
 	{
 		FXString txt = "Keine Region markiert!";
@@ -2467,7 +2467,7 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 	}
 
 	FXString txt;
-	txt.format(iso2utf("Wirklich die markierten %d Regionen löschen?").text(), selection.regionsSelected.size());
+	txt.format(iso2utf("Wirklich die markierten %d Regionen lÃ¶schen?").text(), selection.regionsSelected.size());
 
 	FXMessageBox dlg(this, CSMAP_APP_TITLE, txt, 0, MBOX_YES_NO);
 	FXuint res = dlg.execute(PLACEMENT_SCREEN);
@@ -2510,14 +2510,14 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 	for (datafile::itor file = files.begin(); file != files.end(); file++)
 		file->createHashTables();
 
-	// Markierung auch löschen
+	// Markierung auch lÃ¶schen
 	selection.selected &= ~selection.MULTIPLE_REGIONS;
 	selection.regionsSelected.clear();
 
 	datafile::SelectionState state = selection;
 	state.selected &= ~state.MULTIPLE_REGIONS;
 
-	state.map |= state.MAPCHANGED;		// Datei wurde geändert
+	state.map |= state.MAPCHANGED;		// Datei wurde geÃ¤ndert
 	handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 	return 1;
 }

@@ -71,13 +71,16 @@ namespace Ruby
 	Value DefineClassUnder(Value module, const std::string& name);
 
 	template <typename FUN>
-	void DefineMethod(Value klass, const std::string& name, FUN fun, int argc)
+	void DefineMethod(Value klass, const std::string& name, FUN fun)
 	{
-		DefineMethod(klass, name, (void*)fun, argc);
+		rb_define_method(klass, name.c_str(), RUBY_METHOD_FUNC(fun), 0);
 	}
 
-	template <>
-	void DefineMethod(Value klass, const std::string& name, void* fun, int argc);
+	template <typename FUN>
+	void DefineMethodVariable(Value klass, const std::string& name, FUN fun)
+	{
+		rb_define_method(klass, name.c_str(), RUBY_METHOD_FUNC(fun), -1);
+	}
 
 	// translate a ruby exception into a C++ exception.
 	/* usage:

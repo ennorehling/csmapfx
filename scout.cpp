@@ -1,5 +1,7 @@
+#ifdef WIN32
 #define NOMINMAX
 #include <windows.h>
+#endif
 #include <boost/random.hpp>
 #include <ctime>
 #include <vector>
@@ -349,6 +351,7 @@ void Scout::show()
 	data->show(out);
 
 	out << "\n";
-
+#ifdef WIN32
 	OutputDebugString(out.str().c_str());
+#endif
 }

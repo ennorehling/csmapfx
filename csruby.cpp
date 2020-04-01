@@ -56,6 +56,8 @@ namespace Ruby
 		ruby_script("embed");
 
 		// inject int/float division hack
+		int error;
+#ifndef RUBY_INTEGER_UNIFICATION
 		const char* real_division_hack =
 			"class Fixnum\n"
 			"    alias :div :/\n"
@@ -67,10 +69,21 @@ namespace Ruby
 			"        end\n"
 			"    end\n"
 			"end";
-
-		int error;
 		rb_eval_string_protect(real_division_hack, &error);
-
+#else
+		const char* real_division_hack =
+			"class Integer\n"
+			"    alias :div :/\n"
+			"    def /(other)\n"
+			"        if self % other == 0\n"
+			"            self.div(other)\n"
+			"        else\n"
+			"            1.0*self/other\n"
+			"        end\n"
+			"    end\n"
+			"end";
+		rb_eval_string_protect(real_division_hack, &error);
+#endif
 		// setup our own environment
 		objects = new Objects;
 
@@ -94,15 +107,13 @@ namespace Ruby
 	*************************************/
 	Error::Error(const std::string& name) : name(name)
 	{
-#ifdef TODO_RUBY
             std::ostringstream where;
-                where << ruby_sourcefile << ":" << ruby_sourceline;
-                ID id = rb_frame_last_func();
+                where << rb_sourcefile << ":" << rb_sourceline;
+                ID id = rb_frame_this_func();
 		if(id) {
 			where << ":in '" << rb_id2name(id) << "'";
 		}
 		this->where = where.str();
-#endif
 
 		VALUE exception_instance = rb_gv_get("$!");
 
@@ -430,12 +441,6 @@ namespace Ruby
 	Value DefineClassUnder(Value module, const std::string& name)
 	{
 		return Value(rb_define_class_under(module, name.c_str(), rb_cObject));
-	}
-
-	template <>
-	void DefineMethod(Value klass, const std::string& name, void* fun, int argc)
-	{
-		rb_define_method(klass, name.c_str(), RUBY_METHOD_FUNC(fun), argc);
 	}
 
 	/*************************************

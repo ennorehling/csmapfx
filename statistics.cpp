@@ -53,11 +53,11 @@ FXStatistics::FXStatistics(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	FXToggleButton *btn;		
 	btn = new FXToggleButton(options, "Personen", "Personen", NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_PERSONS);
-	btn = new FXToggleButton(options, iso2utf("Gegenstände"), iso2utf("Gegenstände"), NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
+	btn = new FXToggleButton(options, iso2utf("GegenstÃ¤nde"), iso2utf("GegenstÃ¤nde"), NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_ITEMS);
 	btn = new FXToggleButton(options, "Talente", "Talente", NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_TALENTS);
-	btn = new FXToggleButton(options, iso2utf("Gebäude"), iso2utf("Gebäude"), NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
+	btn = new FXToggleButton(options, iso2utf("GebÃ¤ude"), iso2utf("GebÃ¤ude"), NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_BUILDINGS);
 	btn = new FXToggleButton(options, "Schiffe", "Schiffe", NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_SHIPS);
@@ -391,7 +391,7 @@ long FXStatistics::onChangeFaction(FXObject*, FXSelector, void*)
 	// the faction to list statistics for
 	int item = factionBox->getCurrentItem();
 	if (item >= 0)
-		select.faction = (int)factionBox->getItemData(item);
+		select.faction = 0xffffffff & (long)factionBox->getItemData(item);
 
 	// change statistics in list
 	updateList();
@@ -405,7 +405,7 @@ long FXStatistics::onChangeFilter(FXObject* sender, FXSelector, void* ptr)
 		return 0;
 
 	FXId *item = (FXId*)sender;
-	FXint data = (int)item->getUserData();
+	FXint data = 0xffffffff & (long)item->getUserData();
 
 	if (ptr)	// new button state
 		select.filter |= data;			// set filter
@@ -424,7 +424,7 @@ long FXStatistics::updChangeFilter(FXObject* sender, FXSelector, void*)
 		return 0;
 
 	FXId *item = (FXId*)sender;
-	FXint data = (int)item->getUserData();
+	FXint data = 0xffffffff & (long)item->getUserData();
 
 	sender->handle(this, FXSEL(SEL_COMMAND, (select.filter & data)?ID_CHECK:ID_UNCHECK), NULL);
 	return 1;
@@ -452,7 +452,7 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 	if (!item)
 		return 0;
 
-	int entryType = (int)item->getData();	// 0: unit, 1: building, 2: ship
+	int entryType = ITEM_INT(item->getData());	// 0: unit, 1: building, 2: ship
 
 	FXMenuPane *menu = new FXMenuPane(this);
 
@@ -487,7 +487,7 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
             FXString label;
 			label.format("%s (%s): ", name.text(), block->id().text());
 			if (entryType != 0)
-				label += iso2utf("Größe ");
+				label += iso2utf("GrÃ¶ÃŸe ");
 			label += FXStringVal(itor->second);
 			FXMenuCommand *menuitem = new FXMenuCommand(menu, label, NULL, this,ID_POPUP_CLICKED);
 			menuitem->setUserData((void*)&*block);
