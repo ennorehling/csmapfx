@@ -15,9 +15,12 @@
 // --------------------------------------
 FX::FXString iso2utf(const FX::FXString& s)
 {
+	/*
 	static FX::FX88591Codec codec;
 
 	return codec.mb2utf(s);
+	 */
+	 return s;
 }
 
 FX::FXString utf2iso(const FX::FXString& s)
