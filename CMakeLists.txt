@@ -3,7 +3,8 @@ project (csmap CXX)
 include (FindPkgConfig)
 
 pkg_search_module(FOX REQUIRED fox>=1.6)
-find_package(Ruby 2.7 REQUIRED)
+find_package(Ruby 2.5 REQUIRED)
+find_package(Boost 1.67 REQUIRED)
 
 set (SOURCES
 	bindings.cpp
