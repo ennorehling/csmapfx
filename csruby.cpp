@@ -51,7 +51,7 @@ namespace Ruby
 
 		// initialize ruby itself
 		ruby_init();
-		putenv("RUBYLIB=.");	// to make require 'script' work
+		setenv("RUBYLIB", ".", 1);	// to make require 'script' work
 		ruby_init_loadpath();
 		ruby_script("embed");
 

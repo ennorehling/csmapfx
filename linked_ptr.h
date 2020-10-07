@@ -197,20 +197,20 @@ public:
 	// construction
 	linked_ptr() throw();
 	template <typename Y> explicit linked_ptr(Y* ptr) throw();
-	template <typename Y> linked_ptr(std::auto_ptr<Y> other) throw();
+	template <typename Y> linked_ptr(std::unique_ptr<Y> other) throw();
 	linked_ptr(linked_ptr const& other) throw();
 	template <typename Y> linked_ptr(linked_ptr<Y> const& other) throw();
 	template <typename Y, typename Z> linked_ptr(linked_ptr<Y> const& other, Z* ptr) throw();	// aliasing constructor
 	~linked_ptr();
 
 	// (re-)assignment
-	template <typename Y> linked_ptr& operator=(std::auto_ptr<Y> other);
+	template <typename Y> linked_ptr& operator=(std::unique_ptr<Y> other);
 	linked_ptr& operator=(linked_ptr const& other);
 	template <typename Y> linked_ptr& operator=(linked_ptr<Y> const& other);
 
 	void reset();
 	template <typename Y> void reset(Y* ptr);
-	template <typename Y> void reset(std::auto_ptr<Y> other);
+	template <typename Y> void reset(std::unique_ptr<Y> other);
 	template <typename Y> void reset(linked_ptr<Y> const& other);
 	template <typename Y, typename Z> void reset(linked_ptr<Y> const& other, Z* ptr);
 
@@ -256,7 +256,7 @@ inline linked_ptr<X>::linked_ptr(Y* ptr) throw() : linked_ptr_policy<X>(ptr)
 
 template<typename X>
 template<typename Y>
-inline linked_ptr<X>::linked_ptr(std::auto_ptr<Y> other) throw()
+inline linked_ptr<X>::linked_ptr(std::unique_ptr<Y> other) throw()
 	: linked_ptr_policy<X>( other.release() )
 {}
 
@@ -304,7 +304,7 @@ inline linked_ptr<X>& linked_ptr<X>::operator=(linked_ptr<Y> const& other)
 
 template<typename X>
 template<typename Y>
-inline linked_ptr<X>& linked_ptr<X>::operator=(std::auto_ptr<Y> other)
+inline linked_ptr<X>& linked_ptr<X>::operator=(std::unique_ptr<Y> other)
 {
 	reset(other);
 	return *this;
@@ -328,7 +328,7 @@ inline void linked_ptr<X>::reset(Y* ptr)
 
 template<typename X>
 template<typename Y>
-inline void linked_ptr<X>::reset(std::auto_ptr<Y> other)
+inline void linked_ptr<X>::reset(std::unique_ptr<Y> other)
 {
 	reset( other.release() );
 }

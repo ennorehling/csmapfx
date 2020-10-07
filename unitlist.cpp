@@ -492,7 +492,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					list->appendItem(node, damage + iso2utf("% beschädigt"));
 
 				// Küste
-				char* coasts[] = { "Nordwest", "Nordost", "Ost", "Südost", "Südwest", "West", "-unknown-" };
+				const char* coasts[] = { "Nordwest", "Nordost", "Ost", "Südost", "Südwest", "West", "-unknown-" };
 
 				if (!coast.empty())
 				{

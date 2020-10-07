@@ -464,7 +464,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	// minimap
 	minimap_frame = new FXDialogBox(this, iso2utf("Übersichtskarte"), DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100,100, 640,480, 0,0,0,0);
 	minimap_frame->setIcon(icon);
-	minimap_frame->getAccelTable()->addAccel(parseAccel("Strg-N"), this,FXSEL(SEL_COMMAND,ID_VIEW_MINIMAP));
+	minimap_frame->getAccelTable()->addAccel(MKUINT(KEY_N,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_MINIMAP));
 
 	FXStatusBar *minimap_bar = new FXStatusBar(minimap_frame,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
 	minimap_bar->getStatusLine()->setFrameStyle(FRAME_LINE);
@@ -480,12 +480,12 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 	// info dialog
 	infodlg = new FXInfoDlg(this, "Informationen", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));
-	infodlg->getAccelTable()->addAccel(parseAccel("Strg-B"), this,FXSEL(SEL_COMMAND,ID_VIEW_INFODLG));
+	infodlg->getAccelTable()->addAccel(MKUINT(KEY_B,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_INFODLG));
 	infodlg->setGame("default");
 
 	// search dialog
 	searchdlg = new FXSearchDlg(this, "Suchen...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));
-	searchdlg->getAccelTable()->addAccel(parseAccel("Strg-F"), this,FXSEL(SEL_COMMAND,ID_VIEW_SEARCHDLG));
+	searchdlg->getAccelTable()->addAccel(MKUINT(KEY_F,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_SEARCHDLG));
 	searchdlg->mapfiles(&files);
 }
 
@@ -987,9 +987,7 @@ bool CSMap::saveCommands(FXString filename, bool stripped)
 	return true;
 }
 
-#ifdef HAVE_LIBPNG
 extern FXbool csmap_savePNG(FXStream& store, FXCSMap& map, FXImage& image, FXProgressDialog& win);
-#endif
 
 bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool show_koords, bool show_islands, int color)
 {
@@ -999,7 +997,6 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
 	if (!files.size())
 		return false;
 
-#ifdef HAVE_LIBPNG
         FXCSMap *map = new FXCSMap(this);
 	map->hide();
 	map->mapfiles(&files);
@@ -1043,7 +1040,6 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
 	delete map;
 
     mapChange();
-#endif
     return true;
 }
 

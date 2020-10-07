@@ -1,7 +1,6 @@
 #include <fx.h>
 #include "map.h"
 
-#ifdef HAVE_LIBPNG
 #include "png.h"
 
 // Custom read function, which will read from the stream in our case
@@ -28,7 +27,7 @@ static void user_error_fn(png_structp png_ptr,png_const_charp message){
   FXStream* store=(FXStream*)png_get_error_ptr(png_ptr);
   store->setError(FXStreamFormat);                      // Flag this as a format error in FXStream
   FXTRACE((100,"Error in png: %s\n",message));
-  longjmp(png_ptr->jmpbuf,1);                           // Bail out
+  longjmp(png_jmpbuf(png_ptr), 1);                           // Bail out
   }
 
 
@@ -62,7 +61,7 @@ FXbool csmap_savePNG(FXStream& store, FXCSMap& map, FXImage& image, FXProgressDi
 	}
 
 	// Set error handling.
-	if(setjmp(png_ptr->jmpbuf)){
+	if(setjmp(png_jmpbuf(png_ptr))){
 	png_destroy_write_struct(&png_ptr,&info_ptr);
 	return FALSE;
 	}
@@ -124,4 +123,3 @@ FXbool csmap_savePNG(FXStream& store, FXCSMap& map, FXImage& image, FXProgressDi
 
 	return TRUE;
 }
-#endif

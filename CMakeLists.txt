@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
-project (csmap CXX)
+cmake_policy(SET CMP0074 NEW)
+project (csmapfx CXX)
 include (FindPkgConfig)
 
 pkg_search_module(FOX REQUIRED fox>=1.6)
 find_package(Ruby 2.5 REQUIRED)
 find_package(Boost 1.67 REQUIRED)
+find_package(PNG 1.6 REQUIRED)
 
 set (SOURCES
 	bindings.cpp
@@ -39,8 +41,13 @@ set (SOURCES
 	boost/signals/signal_base.cpp
 	boost/signals/slot.cpp
 	boost/signals/trackable.cpp
-)	
-include_directories(${FOX_INCLUDE_DIRS} ${RUBY_INCLUDE_DIRS})
+)
+message(STATUS "png ${PNG_INCLUDE_DIR}")
+include_directories(
+	${PNG_INCLUDE_DIRS}
+	${FOX_INCLUDE_DIRS}
+	${RUBY_INCLUDE_DIRS}
+)
 add_executable(${PROJECT_NAME} ${SOURCES})
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	CXX_STANDARD 11
@@ -49,5 +56,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	COMPILE_DEFINITIONS
 	BOOST_SIGNALS_NO_DEPRECATION_WARNING)
-target_link_libraries(${PROJECT_NAME} ${FOX_LIBRARIES} ${RUBY_LIBRARY})
+target_link_libraries(${PROJECT_NAME}
+	${PNG_LIBRARIES}
+	${FOX_LIBRARIES}
+	${RUBY_LIBRARY}
+)
 

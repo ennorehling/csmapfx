@@ -72,7 +72,7 @@ namespace boost {
         // Allocate storage for an iterator that will hold the point of
         // insertion of the slot into the list. This is used to later remove
         // the slot when it is disconnected.
-        std::auto_ptr<iterator> saved_iter(new iterator);
+        std::unique_ptr<iterator> saved_iter(new iterator);
 
         // Add the slot to the list.
         iterator pos =
@@ -133,7 +133,7 @@ namespace boost {
         signal_base_impl* self = reinterpret_cast<signal_base_impl*>(obj);
 
         // We won't need the slot iterator after this
-        std::auto_ptr<iterator> slot(reinterpret_cast<iterator*>(data));
+        std::unique_ptr<iterator> slot(reinterpret_cast<iterator*>(data));
 
         // If we're flags.clearing, we don't bother updating the list of slots
         if (!self->flags.clearing) {
