@@ -179,9 +179,10 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	{
 		datablock terrainRegion;
 		terrainRegion.terrain(i);
+		FXival data = FXCSMap::MODUS_SETTERRAIN + i;
 
 		FXMenuCommand *cmd = new FXMenuCommand(terrainPopup, terrainRegion.terrainString() + "\t\tZeichnen-Modus: Setze Regionen", icons.terrain[i], this,ID_MAP_SETMODUS);
-		cmd->setUserData((void*)(FXCSMap::MODUS_SETTERRAIN+i));
+		cmd->setUserData((void*)data);
 	}
 
 	new FXMenuSeparatorEx(terrainPopup);
@@ -202,15 +203,15 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	// File menu
 	filemenu = new FXMenuPane(this);
 	new FXMenuTitle(menubar,"&Datei",NULL,filemenu);
-	new FXMenuCommandEx(filemenu,iso2utf("Ö&ffnen...\tStrg-O\tEine neue Datei öffnen."),boost::bind(&CSMap::onFileOpen, this));
-	new FXMenuCommandEx(filemenu,iso2utf("&Hinzufügen...\tStrg-I\tLädt einen Karten-Report in den aktuellen Report."),boost::bind(&CSMap::onFileMerge, this),whenFileOpen);
-	new FXMenuCommandEx(filemenu,iso2utf("&Speichern\tStrg-S\tDie Änderungen speichern."),boost::bind(&CSMap::onFileSave, this),whenFileOpen);
+	new FXMenuCommandEx(filemenu,iso2utf("Ö&ffnen...\tCtrl-O\tEine neue Datei öffnen."),boost::bind(&CSMap::onFileOpen, this));
+	new FXMenuCommandEx(filemenu,iso2utf("&Hinzufügen...\tCtrl-I\tLädt einen Karten-Report in den aktuellen Report."),boost::bind(&CSMap::onFileMerge, this),whenFileOpen);
+	new FXMenuCommandEx(filemenu,iso2utf("&Speichern\tCtrl-S\tDie Änderungen speichern."),boost::bind(&CSMap::onFileSave, this),whenFileOpen);
 	new FXMenuCommandEx(filemenu,"Speichern &unter...\tF12\tDie aktuelle Datei als neue Datei speichern.",boost::bind(&CSMap::onFileSaveAs, this),whenFileOpen);
 	new FXMenuCommandEx(filemenu,"Sch&liessen\t\tDie aktuelle Datei schliessen.",boost::bind(&CSMap::onFileClose, this),whenFileOpen);
 	
 	//fileopen->addHotKey(MKUINT('W',CONTROLMASK));
 
-  /*int acckey=parseAccel("Strg-W");
+  /*int acckey=parseAccel("Ctrl-W");
   if(acckey){
       FXAccelTable* table=getAccelTable();
       if(table){
@@ -219,7 +220,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 
 	new FXMenuSeparatorEx(filemenu);
-	new FXMenuCommandEx(filemenu,iso2utf("&Befehle laden...\tStrg-Shift-O\tDie Befehle aus Textdatei laden."),boost::bind(&CSMap::onFileOpenCommands, this),whenActiveFaction);
+	new FXMenuCommandEx(filemenu,iso2utf("&Befehle laden...\tCtrl-Shift-O\tDie Befehle aus Textdatei laden."),boost::bind(&CSMap::onFileOpenCommands, this),whenActiveFaction);
 	new FXMenuCommandEx(filemenu,iso2utf("&Befehle speichern...\tF11\tDie Befehle als Textdatei speichern."),boost::bind(&CSMap::onFileSaveCommands, this, false),whenActiveFaction);
 	new FXMenuCommandEx(filemenu,iso2utf("Befehle mit CR speichern...\t\tSpeichert den aktuellen Report zusammen mit den geänderten Befehlen."),boost::bind(&CSMap::onFileSaveWithCmds, this),whenActiveFaction);
 
@@ -234,17 +235,17 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 	new FXMenuCascade(filemenu, iso2utf("&Zuletzt geöffnet"), NULL, recentmenu, 0);
 	new FXMenuSeparatorEx(filemenu);
-	new FXMenuCommandEx(filemenu,"B&eenden\tStrg-Q\tDas Programm beenden.",boost::bind(&CSMap::close, this, false));
+	new FXMenuCommandEx(filemenu,"B&eenden\tCtrl-Q\tDas Programm beenden.",boost::bind(&CSMap::close, this, false));
 
 	// View menu
 	viewmenu = new FXMenuPane(this);
 	new FXMenuTitle(menubar,"&Ansicht",NULL,viewmenu);
-	menu.toolbar = new FXMenuCheck(viewmenu,"Tool&bar\tStrg-T\tToolbar ein- bzw. ausblenden.", toolbar,ID_TOGGLESHOWN);
-	menu.maponly = new FXMenuCheck(viewmenu,"&Nur Karte anzeigen\tStrg-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this,ID_VIEW_MAPONLY,0);
-	menu.messages = new FXMenuCheck(viewmenu,"&Meldungen\tStrg-V\tRegionsmeldungen ein- bzw. ausblenden.", this,ID_VIEW_MESSAGES);
-	menu.calc = new FXMenuCheck(viewmenu,"&Taschenrechner\tStrg-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
-	menu.minimap = new FXMenuCheck(viewmenu,iso2utf("Übersichts&karte\tStrg-N\tÜbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
-	menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tStrg-B\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
+	menu.toolbar = new FXMenuCheck(viewmenu,"Tool&bar\tCtrl-T\tToolbar ein- bzw. ausblenden.", toolbar,ID_TOGGLESHOWN);
+	menu.maponly = new FXMenuCheck(viewmenu,"&Nur Karte anzeigen\tCtrl-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this,ID_VIEW_MAPONLY,0);
+	menu.messages = new FXMenuCheck(viewmenu,"&Meldungen\tCtrl-V\tRegionsmeldungen ein- bzw. ausblenden.", this,ID_VIEW_MESSAGES);
+	menu.calc = new FXMenuCheck(viewmenu,"&Taschenrechner\tCtrl-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
+	menu.minimap = new FXMenuCheck(viewmenu,iso2utf("Übersichts&karte\tCtrl-N\tÜbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
+	menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tCtrl-B\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
 	new FXMenuSeparatorEx(viewmenu, "Liste");
 	menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tAlt-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
 	new FXMenuSeparatorEx(viewmenu, "Karte");
@@ -258,16 +259,16 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	// Region menu
 	regionmenu = new FXMenuPane(this);
 	new FXMenuTitle(menubar,"&Region",NULL,regionmenu);
-	new FXMenuCommand(regionmenu,"&Suchen...\tStrg-F\tEine Region, Einheit, Schiff, etc. suchen.",NULL, this,ID_VIEW_SEARCHDLG);
+	new FXMenuCommand(regionmenu,"&Suchen...\tCtrl-F\tEine Region, Einheit, Schiff, etc. suchen.",NULL, this,ID_VIEW_SEARCHDLG);
 	menu.regdescription = new FXMenuCheck(regionmenu,"&Beschreibung zeigen\t\tRegionsbeschreibung anzeigen.");
 	new FXMenuSeparatorEx(regionmenu, "Markieren");
-	new FXMenuCommand(regionmenu,iso2utf("&Alle markieren\tStrg-A\tAlle Regionen auswählen."),NULL,this,ID_REGION_SELALL);
+	new FXMenuCommand(regionmenu,iso2utf("&Alle markieren\tCtrl-A\tAlle Regionen auswählen."),NULL,this,ID_REGION_SELALL);
 	new FXMenuCommand(regionmenu,iso2utf("Alle &Inseln auswählen\t\tAlle Landregionen auswählen (Ozean, Feuerwand und Eisberg zählen nicht als Land)."),NULL,this,ID_REGION_SELALLISLANDS);
 	new FXMenuCommand(regionmenu,iso2utf("&Keine markieren\t\tKeine Region auswählen."),NULL,this,ID_REGION_UNSEL);
 	new FXMenuCommand(regionmenu,iso2utf("Auswahl &invertieren\t\tAusgewählte Regionen abwählen und umgekehrt."),NULL,this,ID_REGION_INVERTSEL);
 		selectionmenu = new FXMenuPane(this);
-		new FXMenuCommand(selectionmenu,"Auswahl &erweitern\tStrg-Shift-F7\tAuswahl mit dem Radius von einer Region erweitern.",NULL,this,ID_REGION_EXTENDSEL);
-		new FXMenuCommand(selectionmenu,iso2utf("&Inseln auswählen\tStrg-Shift-F9\tAuswahl auf komplette Inseln erweitern."),NULL,this,ID_REGION_SELISLANDS);
+		new FXMenuCommand(selectionmenu,"Auswahl &erweitern\tCtrl-Shift-F7\tAuswahl mit dem Radius von einer Region erweitern.",NULL,this,ID_REGION_EXTENDSEL);
+		new FXMenuCommand(selectionmenu,iso2utf("&Inseln auswählen\tCtrl-Shift-F9\tAuswahl auf komplette Inseln erweitern."),NULL,this,ID_REGION_SELISLANDS);
 	new FXMenuCascade(regionmenu, "&Erweitern", NULL, selectionmenu);
 	new FXMenuSeparatorEx(regionmenu, "Bearbeiten");
 	new FXMenuCommand(regionmenu,iso2utf("Markierte &löschen\t\t"),NULL,this,ID_REGION_REMOVESEL);
@@ -302,26 +303,26 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 		radio->setCheck();
 	new FXMenuCascade(mapmenu, "&Ebene", NULL, planemenu, 0);
 		zoommenu = new FXMenuPane(this);
-		new FXMenuCommand(zoommenu,iso2utf("Vergrößern\tStrg-+\tKarte vergrößern."),NULL,this,ID_MAP_ZOOM,0);
-		new FXMenuCommand(zoommenu,"Verkleinern\tStrg--\tKarte verkleinern.",NULL,this,ID_MAP_ZOOM,0);
+		new FXMenuCommand(zoommenu,iso2utf("Vergrößern\tCtrl-+\tKarte vergrößern."),NULL,this,ID_MAP_ZOOM,0);
+		new FXMenuCommand(zoommenu,"Verkleinern\tCtrl--\tKarte verkleinern.",NULL,this,ID_MAP_ZOOM,0);
 		new FXMenuSeparatorEx(zoommenu, iso2utf("Größe"));
-		new FXMenuRadio(zoommenu,"&1 Pixel\tStrg-8\t1.6%",this,ID_MAP_ZOOM,0);
-		new FXMenuRadio(zoommenu,"&2 Pixel\tStrg-7\t3.1%",this,ID_MAP_ZOOM,0);
-		new FXMenuRadio(zoommenu,"&4 Pixel\tStrg-6\t6.3%",this,ID_MAP_ZOOM,0);
-		new FXMenuRadio(zoommenu,"&8 Pixel\tStrg-5\t12.5%",this,ID_MAP_ZOOM,0);
-		new FXMenuRadio(zoommenu,"&16 Pixel\tStrg-4\t25%",this,ID_MAP_ZOOM,0);
-		new FXMenuRadio(zoommenu,"&32 Pixel\tStrg-3\t50%",this,ID_MAP_ZOOM,0);
-		new FXMenuRadio(zoommenu,"&64 Pixel\tStrg-2\t100%",this,ID_MAP_ZOOM,0);
-		new FXMenuRadio(zoommenu,"128 Pixel\tStrg-1\t200%",this,ID_MAP_ZOOM,0);
+		new FXMenuRadio(zoommenu,"&1 Pixel\tCtrl-8\t1.6%",this,ID_MAP_ZOOM,0);
+		new FXMenuRadio(zoommenu,"&2 Pixel\tCtrl-7\t3.1%",this,ID_MAP_ZOOM,0);
+		new FXMenuRadio(zoommenu,"&4 Pixel\tCtrl-6\t6.3%",this,ID_MAP_ZOOM,0);
+		new FXMenuRadio(zoommenu,"&8 Pixel\tCtrl-5\t12.5%",this,ID_MAP_ZOOM,0);
+		new FXMenuRadio(zoommenu,"&16 Pixel\tCtrl-4\t25%",this,ID_MAP_ZOOM,0);
+		new FXMenuRadio(zoommenu,"&32 Pixel\tCtrl-3\t50%",this,ID_MAP_ZOOM,0);
+		new FXMenuRadio(zoommenu,"&64 Pixel\tCtrl-2\t100%",this,ID_MAP_ZOOM,0);
+		new FXMenuRadio(zoommenu,"128 Pixel\tCtrl-1\t200%",this,ID_MAP_ZOOM,0);
 	new FXMenuCascade(mapmenu,iso2utf("&Größe"), NULL, zoommenu, 0);
-	new FXMenuCommand(mapmenu,"&Ursprung setzen\tStrg-U\tDen Kartenursprung (0/0) auf die markierte Region setzen.",NULL,this,ID_MAP_SETORIGIN,0);
+	new FXMenuCommand(mapmenu,"&Ursprung setzen\tCtrl-U\tDen Kartenursprung (0/0) auf die markierte Region setzen.",NULL,this,ID_MAP_SETORIGIN,0);
 	new FXMenuCommand(mapmenu,iso2utf("&Kartenreport erzeugen\t\tLöscht alle Informationen außer Regionsnamen und -terrain und Inseln."),NULL,this,ID_MAP_MAKEMAP,0);
 	new FXMenuSeparatorEx(mapmenu, "Regionsmarker");
-	new FXMenuCommand(mapmenu,iso2utf("Markierte &auswählen\tStrg-Space\tMarkierte Region auswählen."),NULL,this,ID_MAP_SELECTMARKED,0);
-	new FXMenuCommand(mapmenu,"Nach Westen\tStrg-H\tRegionsmarker eins nach Westen setzen.",NULL,this,ID_MAP_MARKERWEST,0);
-	new FXMenuCommand(mapmenu,"Nach Osten\tStrg-L\tRegionsmarker eins nach Osten setzen.",NULL,this,ID_MAP_MARKEREAST,0);
-	new FXMenuCommand(mapmenu,iso2utf("Nach Südwesten\tStrg-J\tRegionsmarker eins nach Südwesten setzen."),NULL,this,ID_MAP_MARKERSOUTHWEST,0);
-	new FXMenuCommand(mapmenu,"Nach Nordosten\tStrg-K\tRegionsmarker eins nach Nordosten setzen.",NULL,this,ID_MAP_MARKERNORTHEAST,0);
+	new FXMenuCommand(mapmenu,iso2utf("Markierte &auswählen\tCtrl-Space\tMarkierte Region auswählen."),NULL,this,ID_MAP_SELECTMARKED,0);
+	new FXMenuCommand(mapmenu,"Nach Westen\tCtrl-H\tRegionsmarker eins nach Westen setzen.",NULL,this,ID_MAP_MARKERWEST,0);
+	new FXMenuCommand(mapmenu,"Nach Osten\tCtrl-L\tRegionsmarker eins nach Osten setzen.",NULL,this,ID_MAP_MARKEREAST,0);
+	new FXMenuCommand(mapmenu,iso2utf("Nach Südwesten\tCtrl-J\tRegionsmarker eins nach Südwesten setzen."),NULL,this,ID_MAP_MARKERSOUTHWEST,0);
+	new FXMenuCommand(mapmenu,"Nach Nordosten\tCtrl-K\tRegionsmarker eins nach Nordosten setzen.",NULL,this,ID_MAP_MARKERNORTHEAST,0);
 	
 	getAccelTable()->addAccel(MKUINT(KEY_KP_5,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_SELECTMARKED));
 	getAccelTable()->addAccel(MKUINT(KEY_KP_7,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_MARKERNORTHWEST));
@@ -445,16 +446,11 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
     FXHorizontalFrame *cmdOptFrame = new FXHorizontalFrame(cmdBottomFrame,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 3,3,1,1);
 	cmdOptFrame->setBorderColor(getApp()->getShadowColor());
-	FXCheckButtonEx* confirmCmd = new FXCheckButtonEx(cmdOptFrame, iso2utf("bestätigt\tBefehle bestätigen (Strg-Y)\tBefehle für diese Einheit bestätigen"), boost::bind(&FXCommands::setConfirmed, commands, _1), boost::bind(&FXCommands::getConfirmed, commands));
+	FXCheckButtonEx* confirmCmd = new FXCheckButtonEx(cmdOptFrame, iso2utf("bestätigt\tBefehle bestätigen (Ctrl-Y)\tBefehle für diese Einheit bestätigen"), boost::bind(&FXCommands::setConfirmed, commands, _1), boost::bind(&FXCommands::getConfirmed, commands));
 	
-	FXButtonEx* prevUnit = new FXButtonEx(cmdOptFrame, iso2utf("<\tVorherige Einheit (Strg-<)\tZur vorhergehenden unbestätigten Einheit"), boost::bind(&FXCommands::prevUnit, commands), whenActiveFaction, NULL, BUTTON_TOOLBAR);
-	FXButtonEx* nextUnit = new FXButtonEx(cmdOptFrame, iso2utf(">\tNächste Einheit (Strg->)\tZur nächsten unbestätigten Einheit"), boost::bind(&FXCommands::nextUnit, commands), whenActiveFaction, NULL, BUTTON_TOOLBAR);
+	FXButtonEx* prevUnit = new FXButtonEx(cmdOptFrame, iso2utf("<\tVorherige Einheit (Ctrl-,)\tZur vorhergehenden unbestätigten Einheit"), boost::bind(&FXCommands::prevUnit, commands), whenActiveFaction, NULL, BUTTON_TOOLBAR);
+	FXButtonEx* nextUnit = new FXButtonEx(cmdOptFrame, iso2utf(">\tNächste Einheit (Ctrl-.)\tZur nächsten unbestätigten Einheit"), boost::bind(&FXCommands::nextUnit, commands), whenActiveFaction, NULL, BUTTON_TOOLBAR);
 	new FXButtonEx(cmdOptFrame, iso2utf("+temp\tNeue Temp-Einheit\tTemp-Einheit erstellen"), boost::bind(&FXCommands::makeTemp, commands), whenCommandable, NULL, BUTTON_TOOLBAR);
-
-	// activate hotkeys for next/prev commandable unit
-	getAccelTable()->addAccel(MKUINT(KEY_less,CONTROLMASK),nextUnit,FXSEL(SEL_COMMAND,ID_ACCEL));
-	getAccelTable()->addAccel(MKUINT(KEY_less,CONTROLMASK|SHIFTMASK),prevUnit,FXSEL(SEL_COMMAND,ID_ACCEL));
-	getAccelTable()->addAccel(MKUINT(KEY_y,CONTROLMASK),confirmCmd,FXSEL(SEL_COMMAND,ID_ACCEL));
 
 	FXTextField* rowcol = new FXTextField(cmdOptFrame, 5, commands,FXCommands::ID_ROWCOL, TEXTFIELD_READONLY|JUSTIFY_RIGHT|LAYOUT_FILL_X|LAYOUT_RIGHT);
 	rowcol->disable();
@@ -1464,7 +1460,7 @@ long CSMap::onMapSetModus(FXObject* sender, FXSelector, void* ptr)
 	if (sender && sender->isMemberOf(&FXId::metaClass))
 	{
 		FXId *item = (FXId*)sender;
-		FXint data = ITEM_INT(item->getUserData());
+		FXuval data = ITEM_INT(item->getUserData());
 
 		if (data >= FXCSMap::MODUS_SETTERRAIN && data < FXCSMap::MODUS_SETTERRAIN+datablock::TERRAIN_LAST)
 		{
@@ -1547,24 +1543,30 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 			for (std::set<int>::iterator plane = planeSet.begin(); plane != planeSet.end(); plane++)
 			{
 				FXString label;
+				FXuval item = (FXuval)*plane;
 
-				if (*plane == 0)
+				if (item == 0)
 					continue;
-				else if (*plane == 1)
+				switch (item) {
+				case 1:
 					label = "Astralraum";
-				else if (*plane == 1137)
+					break;
+				case 1137:
 					label = "Arena";
-				else if (*plane == 59034966)
+					break;
+				case 59034966:
 					label = "Eternath";
-				else if (*plane == 2000)
+					break;
+				case 2000:
 					label = "Weihnachtsinsel";
-				else
-					label.format("Ebene %d", *plane);
-
-				planes->appendItem(label, NULL, (void*)*plane);
+					break;
+				default:
+					label.format("Ebene %d", item);
+				}
+				planes->appendItem(label, NULL, (void*)item);
 
 				FXMenuRadio *radio = new FXMenuRadio(planemenu,label, this,ID_MAP_VISIBLEPLANE,0);
-				radio->setUserData((void*)*plane);
+				radio->setUserData((void*)item);
 				radio->create();
 			}
 
