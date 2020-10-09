@@ -9,12 +9,13 @@ end_of_line = lf
 insert_final_newline = true
 
 # 4 space indentation
-[*.{c,h,lua,py}]
-indent_style = tab
+[*.{c,h,cpp,hpp,lua,py}]
+indent_style = space
 indent_size = 4
 
 [*.{xml,json}]
 charset = utf-8
+indent_size = 2
 
 # Tab indentation (no size specified)
 [Makefile]

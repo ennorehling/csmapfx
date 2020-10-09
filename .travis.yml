@@ -1,0 +1,18 @@
+sudo: false
+language: c
+compiler:
+  - gcc
+  - clang
+script: s/build
+addons:
+  apt:
+    packages:
+      - libfox-1.6
+      - ruby 
+      - libboost-dev
+      - cppcheck
+os:
+  - linux
+notifications:
+  slack:
+    secure: F89aXLWaE125PaJIlETv12jT4EfH6wLXJmGCPZzrN3OcLn2ahDWqjwuzR7lOEDf2nAISmeMPyDZMhEHXLNHAE5qP6lg9yliYQw5hzGmDK9m1xUq/pPEne/b2Y7K3my1mkRZ6n3asbHgSmBWAfCIk1JN8R5Rv+rmbLuWLc+zofts=
