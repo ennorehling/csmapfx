@@ -29,6 +29,11 @@ public:
 	virtual void create();
 	virtual FXbool close(FXbool notify=FALSE);
 
+    static CSMap* getInstance();
+
+    connection_t register_selection_change(command_signal_t::slot_function_type slot);
+    connection_t register_map_change(command_signal_t::slot_function_type slot);
+
 private:
 	void mapChange(bool newfile = false);
 	bool haveActiveFaction() const;
@@ -42,11 +47,6 @@ private:
 	bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
 	void stripReportToMap();
 
-	connection_t register_selection_change(command_signal_t::slot_function_type slot);
-	connection_t register_map_change(command_signal_t::slot_function_type slot);
-
-	static CSMap* getInstance();
-	
 public:		// this functions are slots for menu commands
 	long onFileOpen(FXObject*, FXSelector, void*);
 	long updOpenFile(FXObject *sender, FXSelector, void *);
