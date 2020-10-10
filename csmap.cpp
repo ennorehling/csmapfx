@@ -29,9 +29,6 @@ FXDEFMAP(CSMap) MessageMap[]=
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_ORDERS,   CSMap::onFileExportCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_RECENT,		    CSMap::onFileRecent),
 
-    FXMAPFUNC(SEL_COMMAND,  FXCommands::ID_UNIT_NEXT,		    FXCommands::onNextUnit),
-    FXMAPFUNC(SEL_COMMAND,  FXCommands::ID_UNIT_PREV,		    FXCommands::onPrevUnit),
-
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_MERGE,		    CSMap::updOpenFile),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE,		    CSMap::updOpenFile),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_AS,		    CSMap::updOpenFile),

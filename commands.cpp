@@ -8,10 +8,13 @@ FXDEFMAP(FXCommands) MessageMap[]=
 { 
 	//________Message_Type_____________________ID_______________Message_Handler_______ 
 	FXMAPFUNC(SEL_COMMAND,			FXCommands::ID_UPDATE,			FXCommands::onMapChange), 
-	FXMAPFUNC(SEL_KEYPRESS,			0,								FXCommands::onKeyPress), 
+    FXMAPFUNC(SEL_COMMAND,          FXCommands::ID_UNIT_NEXT,		FXCommands::onNextUnit),
+    FXMAPFUNC(SEL_COMMAND,          FXCommands::ID_UNIT_PREV,		FXCommands::onPrevUnit),
+    
+    FXMAPFUNC(SEL_KEYPRESS,			0,								FXCommands::onKeyPress),
 	FXMAPFUNC(SEL_UPDATE,			0,								FXCommands::onUpdate), 
 
-	FXMAPFUNC(SEL_UPDATE,			FXCommands::ID_ROWCOL,			FXCommands::onRowCol), 
+    FXMAPFUNC(SEL_UPDATE,			FXCommands::ID_ROWCOL,			FXCommands::onRowCol),
 };
 
 FXIMPLEMENT(FXCommands,FXText,MessageMap, ARRAYNUMBER(MessageMap))

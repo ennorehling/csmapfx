@@ -121,8 +121,6 @@ public:
 		ID_REGIONS = FXMainWindow::ID_LAST,
 		ID_SELECTION,
 		ID_CALCULATOR,
-        ID_UNIT_NEXT,
-        ID_UNIT_PREV,
 
 		// File menu
 		ID_FILE_RECENT,

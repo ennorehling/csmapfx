@@ -41,7 +41,9 @@ public:
 	enum
 	{
 		ID_ROWCOL = FXText::ID_LAST,
-		ID_LAST
+        ID_UNIT_NEXT,
+        ID_UNIT_PREV,
+        ID_LAST
 	};
    
 protected:
