@@ -159,7 +159,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 					
 					FXTreeItem* item = appendItem(groups.other, block->value("rendered"));
 					
-					int unit = block->valueInt("unit");
+					FXival unit = block->valueInt("unit");
 					if (!unit)
 						unit = block->valueInt("mage");
 					if (!unit)

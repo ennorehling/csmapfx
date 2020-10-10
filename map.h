@@ -39,7 +39,7 @@ public:
 	void setShowKoords(bool show);
 	void setShowIslands(bool show);
 	
-	FXint getVisiblePlane() const { return visiblePlane; }
+	FXival getVisiblePlane() const { return visiblePlane; }
 
 	void calculateContentSize();
 
@@ -113,7 +113,7 @@ public:
 protected:
 	//Scout scout;
 
-	FXint visiblePlane;	
+	FXival visiblePlane;	
 	FXint cursor_x, cursor_y;	// coordinates of cursor grap for moving map view
 	FXint offset_x, offset_y;	// used to center map on screen
 	FXint image_w, image_h;		// width and height of the whole map

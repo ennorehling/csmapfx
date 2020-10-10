@@ -5,20 +5,9 @@
 #define MACROTOSTRINGx(STR) #STR
 
 	// subversion revision data
-#define CSMAP_SVN_REV        133
-#define CSMAP_SVN_REVSTR     "133"
-#define CSMAP_SVN_REV_DATE   "2020/03/29 18:56:00"
-
-/*
-	- C:\Programme\TortoiseSVN\bin\SubWCRev.exe
-	Highest committed revision number:  132
-	Date of highest committed revision: 2010/05/30 22:26:48
-	Update revision range:              132
-	Repository URL of the working copy: svn+ssh://phygon@draig.de/svn/csmapfx/trunk
-
-	True if local modifications found: true
-	True if mixed update revisions found: false
-*/
+#define CSMAP_SVN_REV        134
+#define CSMAP_SVN_REVSTR     "134"
+#define CSMAP_SVN_REV_DATE   "2020/10/08 10:54:00"
 
 	// global application title string
 #define CSMAP_APP_TITLE      "Coast'n'Sea Mapper"

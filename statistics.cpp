@@ -648,7 +648,7 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 		if (block->type() == datablock::TYPE_UNIT)
 		{
 			FXString fac = block->value(datakey::TYPE_FACTION);
-			int factionId = -1;
+			FXuval factionId = -1;
 			if (fac.length())
 				factionId = atoi(fac.text());
 

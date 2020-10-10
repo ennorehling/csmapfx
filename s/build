@@ -2,6 +2,6 @@
 
 mkdir -p build
 cd build
-cmake .. -D BOOST_USER_CONFIG=$(pwd)/boost/nodynlibs.hpp
+cmake .. 
 make
 
