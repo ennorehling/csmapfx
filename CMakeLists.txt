@@ -5,7 +5,7 @@ include (FindPkgConfig)
 
 pkg_search_module(FOX REQUIRED fox>=1.6)
 find_package(Ruby 2.5 REQUIRED)
-find_package(Boost 1.67 REQUIRED)
+find_package(Boost REQUIRED)
 find_package(PNG 1.6 REQUIRED)
 
 set (SOURCES
