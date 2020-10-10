@@ -34,7 +34,6 @@ public:
     connection_t register_selection_change(command_signal_t::slot_function_type slot);
     connection_t register_map_change(command_signal_t::slot_function_type slot);
 
-private:
 	void mapChange(bool newfile = false);
 	bool haveActiveFaction() const;
 	bool loadFile(FXString filename);
