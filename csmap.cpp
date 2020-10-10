@@ -17,6 +17,18 @@ FXDEFMAP(CSMap) MessageMap[]=
 {
 	//________Message_Type_____________________ID_______________Message_Handler_______
 	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_OPEN,		CSMap::onFileOpen),
+	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_MERGE,		CSMap::onFileMerge),
+	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_SAVE,		CSMap::onFileSave),
+	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_SAVE_AS,		CSMap::onFileSaveAs),
+	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_CLOSE,		CSMap::onFileClose),
+	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_EXPORT_MAP,	CSMap::onFileMapExport),
+	
+	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_FILE_MERGE,		CSMap::updOpenFile),
+	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_FILE_SAVE,		CSMap::updOpenFile),
+	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_FILE_SAVE_AS,		CSMap::updOpenFile),
+	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_FILE_CLOSE,		CSMap::updOpenFile),
+	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_FILE_EXPORT_MAP,	CSMap::updOpenFile),
+
 	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_RECENT,		CSMap::onFileRecent),
 
 	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_VIEW_MAPONLY,		CSMap::onViewMapOnly),
@@ -143,14 +155,29 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 		icons.terrain[i] = new FXGIFIcon(getApp(), data::terrainSymbols[i], 0, IMAGE_ALPHAGUESS);
 
 	// slot function that tests if a file is opened
-	update_signal_t::slot_function_type whenFileOpen = boost::bind(&CSMap::isFileOpen, this);
 	update_signal_t::slot_function_type whenActiveFaction = boost::bind(&CSMap::haveActiveFaction, this);
 
 	// Buttons
-	new FXButton(toolbar, iso2utf("\tDatei öffnen...\tEine neue Datei öffnen."), icons.open, this, ID_FILE_OPEN, BUTTON_TOOLBAR);
-	new FXButtonEx(toolbar, iso2utf("\tDatei hinzufügen...\tLädt einen Karten-Report in den aktuellen Report."), boost::bind(&CSMap::onFileMerge,this), whenFileOpen, icons.merge, BUTTON_TOOLBAR);
-	new FXButtonEx(toolbar, "\tDatei speichern unter...\tDie aktuelle Datei als neue Datei speichern.", boost::bind(&CSMap::onFileSaveAs,this), whenFileOpen, icons.save, BUTTON_TOOLBAR);
-	new FXButtonEx(toolbar, "\tDatei schliessen\tDie aktuelle Datei schliessen.", boost::bind(&CSMap::onFileClose,this), whenFileOpen, icons.close, BUTTON_TOOLBAR);
+	new FXButton(toolbar,
+		iso2utf("\tDatei öffnen...\tEine neue Datei öffnen."),
+		icons.open,
+		this,
+		ID_FILE_OPEN, BUTTON_TOOLBAR);
+	new FXButton(toolbar,
+		iso2utf("\tDatei hinzufügen...\tLädt einen Karten-Report in den aktuellen Report."),
+		icons.merge,
+		this,
+		ID_FILE_MERGE, BUTTON_TOOLBAR);
+	new FXButton(toolbar,
+		iso2utf("\tDatei speichern unter...\tDie aktuelle Datei als neue Datei speichern."),
+		icons.save,
+		this,
+		ID_FILE_SAVE_AS, BUTTON_TOOLBAR);
+	new FXButton(toolbar,
+		iso2utf("\tDatei schliessen\tDie aktuelle Datei schliessen."),
+		icons.close,
+		this,
+		ID_FILE_CLOSE, BUTTON_TOOLBAR);
 
 	FXVerticalSeparator *tb_separator = new FXVerticalSeparator(toolbar, SEPARATOR_LINE|LAYOUT_FILL_Y);
 	tb_separator->setBorderColor(getApp()->getShadowColor());
@@ -210,12 +237,22 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 		NULL, 
 		this,
 		ID_FILE_OPEN);
-		boost::bind(&CSMap::onFileOpen, this);
-	// new FXMenuCommandEx(filemenu,iso2utf("Ö&ffnen...\tCtrl-O\tEine neue Datei öffnen."),boost::bind(&CSMap::onFileOpen, this));
-	new FXMenuCommandEx(filemenu,iso2utf("&Hinzufügen...\tCtrl-I\tLädt einen Karten-Report in den aktuellen Report."),boost::bind(&CSMap::onFileMerge, this),whenFileOpen);
-	new FXMenuCommandEx(filemenu,iso2utf("&Speichern\tCtrl-S\tDie Änderungen speichern."),boost::bind(&CSMap::onFileSave, this),whenFileOpen);
-	new FXMenuCommandEx(filemenu,"Speichern &unter...\tF12\tDie aktuelle Datei als neue Datei speichern.",boost::bind(&CSMap::onFileSaveAs, this),whenFileOpen);
-	new FXMenuCommandEx(filemenu,"Sch&liessen\t\tDie aktuelle Datei schliessen.",boost::bind(&CSMap::onFileClose, this),whenFileOpen);
+	new FXMenuCommand(
+		filemenu,
+		iso2utf("&Hinzufügen...\tCtrl-I\tLädt einen Karten-Report in den aktuellen Report."),
+		NULL, this, ID_FILE_MERGE);
+	new FXMenuCommand(
+		filemenu,
+		iso2utf("&Speichern\tCtrl-S\tDie Änderungen speichern."),
+		NULL, this, ID_FILE_SAVE);
+	new FXMenuCommand(
+		filemenu,
+		iso2utf("Speichern &unter...\tF12\tDie aktuelle Datei als neue Datei speichern."),
+		NULL, this, ID_FILE_SAVE_AS);
+	new FXMenuCommand(
+		filemenu,
+		iso2utf("Sch&liessen\t\tDie aktuelle Datei schliessen."),
+		NULL, this, ID_FILE_CLOSE);
 	
 	//fileopen->addHotKey(MKUINT('W',CONTROLMASK));
 
@@ -234,7 +271,10 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 	new FXMenuSeparatorEx(filemenu);
 	new FXMenuCommandEx(filemenu,L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",boost::bind(&CSMap::onFileSaveCommands, this, true),whenActiveFaction);
-	new FXMenuCommandEx(filemenu,L"Karte exportieren...\t\tDie Karte als PNG speichern.",boost::bind(&CSMap::onFileMapExport, this),whenFileOpen);
+	new FXMenuCommand(
+		filemenu,
+		L"Karte exportieren...\t\tDie Karte als PNG speichern.",
+		NULL, this, ID_FILE_EXPORT_MAP);
 	new FXMenuSeparatorEx(filemenu);
 
 	recentmenu = new FXMenuPane(this);
@@ -629,7 +669,7 @@ void CSMap::create()
 /*virtual*/ FXbool CSMap::close(FXbool notify)
 {
 	// Dateien schliessen, Speicher frei geben
-	onFileClose();
+	closeFile();
 
 	if (files.empty())
 	{
@@ -712,9 +752,11 @@ void CSMap::mapChange(bool newfile /*= false*/)
 	handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 }
 
-bool CSMap::isFileOpen() const
+long CSMap::updOpenFile(FXObject *sender, FXSelector, void *)
 {
-	return !files.empty();
+	FXWindow *wnd = (FXWindow *)sender;
+	files.empty() ? wnd->disable() : wnd->enable();
+	return 1;
 }
 
 bool CSMap::haveActiveFaction() const
@@ -734,7 +776,7 @@ bool CSMap::loadFile(FXString filename)
 		return false;
 
 	// vorherige Dateien schliessen, Speicher frei geben
-	onFileClose();
+	closeFile();
 
 	if (!files.empty())
 		return false;
@@ -1965,7 +2007,7 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void*r)
 	return 1;
 }
 
-void CSMap::onFileMerge()
+long CSMap::onFileMerge(FXObject*, FXSelector, void*r)
 {
 	FXFileDialog dlg(this, iso2utf("Karte hinzufügen..."));
 	dlg.setIcon(icons.merge);
@@ -1981,14 +2023,16 @@ void CSMap::onFileMerge()
 			for (int i = 0; filenames[i].length(); i++)
 				mergeFile(filenames[i]);
 	}
+	return 1;
 }
 
-void CSMap::onFileSave()
+long CSMap::onFileSave(FXObject*, FXSelector, void*)
 {
 	FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Nicht implementiert.");
+	return 1;
 }
 
-void CSMap::onFileSaveAs()
+long CSMap::onFileSaveAs(FXObject*, FXSelector, void*)
 {
 	FXFileDialog dlg(this, "Speichern unter...", DLGEX_SAVE);
 	dlg.setIcon(icons.save);
@@ -2022,9 +2066,16 @@ void CSMap::onFileSaveAs()
 
 		saveFile(filename);
 	}
+	return 1;
 }
 
-void CSMap::onFileClose()
+long CSMap::onFileClose(FXObject*, FXSelector, void*)
+{
+	closeFile();
+	return 1;
+}
+
+void CSMap::closeFile()
 {
 	// ask if modified commands should be safed
 	if (!files.empty() && files.front().modifiedCmds())
@@ -2149,12 +2200,12 @@ void CSMap::onFileSaveWithCmds()
 	}
 }
 
-void CSMap::onFileMapExport()
+long CSMap::onFileMapExport(FXObject *, FXSelector, void *)
 {
     FXExportDlg exp(this, "Karte exportieren...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100,100, 400,250);
 	FXint res = exp.execute(PLACEMENT_SCREEN);
 	if (!res)
-		return;
+		return 0;
 
     FXint scale = exp.getScale();
 	FXint color = exp.getColor();
@@ -2193,7 +2244,7 @@ void CSMap::onFileMapExport()
 		exportMapFile(filename, scale, show_names, show_koords, show_islands, color);
 	}
 
-	return;
+	return 1;
 }
 
 long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)

@@ -35,6 +35,7 @@ public:
 	bool loadFile(FXString filename);
 	bool mergeFile(FXString filename);
 	bool saveFile(FXString filename, bool merge_commands = false);
+	void closeFile();
 	bool loadCommands(FXString filename);
 	bool saveCommands(FXString filename, bool stripped);
 	bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
@@ -47,16 +48,17 @@ public:
 	
 public:		// this functions are slots for menu commands
 	long onFileOpen(FXObject*, FXSelector, void*);
-	void onFileMerge();
-	void onFileSave();
-	void onFileSaveAs();
-	void onFileClose();
+	long updOpenFile(FXObject *sender, FXSelector, void *);
+
+	long onFileMerge(FXObject*, FXSelector, void*);
+	long onFileSave(FXObject*, FXSelector, void*);
+	long onFileSaveAs(FXObject*, FXSelector, void*);
+	long onFileClose(FXObject*, FXSelector, void*);
+	long onFileMapExport(FXObject*, FXSelector, void*);
 	
 	void onFileOpenCommands();
 	void onFileSaveCommands(bool stripped);
 	void onFileSaveWithCmds();
-
-	void onFileMapExport();
 
 public:
 	long onFileRecent(FXObject*, FXSelector, void* ptr);
@@ -121,7 +123,11 @@ public:
 		// File menu
 		ID_FILE_RECENT,
 		ID_FILE_OPEN,
+		ID_FILE_MERGE,
 		ID_FILE_SAVE,
+		ID_FILE_SAVE_AS,
+		ID_FILE_CLOSE,
+		ID_FILE_EXPORT_MAP,
 
 		// View menu
 		ID_VIEW_MAPONLY,
