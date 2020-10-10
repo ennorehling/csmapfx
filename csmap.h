@@ -46,7 +46,7 @@ public:
 	static CSMap* getInstance();
 	
 public:		// this functions are slots for menu commands
-	void onFileOpen();
+	long onFileOpen(FXObject*, FXSelector, void*);
 	void onFileMerge();
 	void onFileSave();
 	void onFileSaveAs();
@@ -120,6 +120,8 @@ public:
 
 		// File menu
 		ID_FILE_RECENT,
+		ID_FILE_OPEN,
+		ID_FILE_SAVE,
 
 		// View menu
 		ID_VIEW_MAPONLY,
@@ -160,7 +162,7 @@ public:
 	};
 
 private: 
-	// Menübar
+	// Menï¿½bar
 	FXMenuBar		*menubar;
 	FXMenuPane		*filemenu, *recentmenu, *viewmenu, *regionmenu, *factionmenu;
 	FXMenuPane		*mapmenu, *selectionmenu, *planemenu, *zoommenu, *helpmenu;
@@ -171,7 +173,7 @@ private:
 	FXPopup			*terrainPopup;
 	FXButton		*terrainSelect;
 	
-	// Menü: Speichert zuletzt verwendete Dateien
+	// Menï¿½: Speichert zuletzt verwendete Dateien
 	FXRecentFiles	recentFiles;
 	
 	// Dialog: Speichert aktuelles Verzeichnis

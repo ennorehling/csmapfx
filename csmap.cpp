@@ -16,6 +16,7 @@
 FXDEFMAP(CSMap) MessageMap[]=
 {
 	//________Message_Type_____________________ID_______________Message_Handler_______
+	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_OPEN,		CSMap::onFileOpen),
 	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_RECENT,		CSMap::onFileRecent),
 
 	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_VIEW_MAPONLY,		CSMap::onViewMapOnly),
@@ -146,7 +147,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	update_signal_t::slot_function_type whenActiveFaction = boost::bind(&CSMap::haveActiveFaction, this);
 
 	// Buttons
-	new FXButtonEx(toolbar, iso2utf("\tDatei öffnen...\tEine neue Datei öffnen."), boost::bind(&CSMap::onFileOpen,this), icons.open, BUTTON_TOOLBAR);
+	new FXButton(toolbar, iso2utf("\tDatei öffnen...\tEine neue Datei öffnen."), icons.open, this, ID_FILE_OPEN, BUTTON_TOOLBAR);
 	new FXButtonEx(toolbar, iso2utf("\tDatei hinzufügen...\tLädt einen Karten-Report in den aktuellen Report."), boost::bind(&CSMap::onFileMerge,this), whenFileOpen, icons.merge, BUTTON_TOOLBAR);
 	new FXButtonEx(toolbar, "\tDatei speichern unter...\tDie aktuelle Datei als neue Datei speichern.", boost::bind(&CSMap::onFileSaveAs,this), whenFileOpen, icons.save, BUTTON_TOOLBAR);
 	new FXButtonEx(toolbar, "\tDatei schliessen\tDie aktuelle Datei schliessen.", boost::bind(&CSMap::onFileClose,this), whenFileOpen, icons.close, BUTTON_TOOLBAR);
@@ -203,7 +204,14 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	// File menu
 	filemenu = new FXMenuPane(this);
 	new FXMenuTitle(menubar,"&Datei",NULL,filemenu);
-	new FXMenuCommandEx(filemenu,iso2utf("Ö&ffnen...\tCtrl-O\tEine neue Datei öffnen."),boost::bind(&CSMap::onFileOpen, this));
+	new FXMenuCommand(
+		filemenu,
+		iso2utf("Ö&ffnen...\tCtrl-O\tEine neue Datei öffnen."),
+		NULL, 
+		this,
+		ID_FILE_OPEN);
+		boost::bind(&CSMap::onFileOpen, this);
+	// new FXMenuCommandEx(filemenu,iso2utf("Ö&ffnen...\tCtrl-O\tEine neue Datei öffnen."),boost::bind(&CSMap::onFileOpen, this));
 	new FXMenuCommandEx(filemenu,iso2utf("&Hinzufügen...\tCtrl-I\tLädt einen Karten-Report in den aktuellen Report."),boost::bind(&CSMap::onFileMerge, this),whenFileOpen);
 	new FXMenuCommandEx(filemenu,iso2utf("&Speichern\tCtrl-S\tDie Änderungen speichern."),boost::bind(&CSMap::onFileSave, this),whenFileOpen);
 	new FXMenuCommandEx(filemenu,"Speichern &unter...\tF12\tDie aktuelle Datei als neue Datei speichern.",boost::bind(&CSMap::onFileSaveAs, this),whenFileOpen);
@@ -1944,7 +1952,7 @@ long CSMap::onCalculator(FXObject*, FXSelector, void*)
 	return 1;
 }
 
-void CSMap::onFileOpen()
+long CSMap::onFileOpen(FXObject*, FXSelector, void*r)
 {
 	FXFileDialog dlg(this, iso2utf("Öffnen..."));
 	dlg.setIcon(icons.open);
@@ -1954,6 +1962,7 @@ void CSMap::onFileOpen()
 	dialogDirectory = dlg.getDirectory();
 	if (res)
         loadFile(dlg.getFilename());
+	return 1;
 }
 
 void CSMap::onFileMerge()
