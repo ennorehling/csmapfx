@@ -55,7 +55,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>Release\</OutDir>
     <IntDir>Release\</IntDir>
-    <IncludePath>C:\local\fox-1.6.57\include;c:\usr\include\ruby-2.7.0\i386-mswin32_140;C:\usr\include\ruby-2.7.0;C:\local\boost_1_66_0;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>C:\local\fox-1.6.57\include;c:\usr\include\ruby-2.7.0\i386-mswin32_140;C:\usr\include\ruby-2.7.0;C:\local\boost_1_66_0;C:\vcpkg\installed\x86-windows\include;$(IncludePath)</IncludePath>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
     <LibraryPath>C:\local\fox-1.6.57\lib;C:\usr\lib;$(LibraryPath)</LibraryPath>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
@@ -115,10 +115,11 @@
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader />
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4100;4512;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;legacy_stdio_definitions.lib;FOX-1.6.lib;vcruntime140-ruby270.lib;wsock32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -131,7 +132,8 @@
       <DataExecutionPrevention />
       <TargetMachine>MachineX86</TargetMachine>
       <ShowProgress>NotSet</ShowProgress>
-      <IgnoreSpecificDefaultLibraries>libboost_signals-vc141-mt-x32-1_66.lib</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
@@ -175,11 +177,6 @@
     <ClCompile Include="tradeinfos.cpp" />
     <ClCompile Include="translator.cpp" />
     <ClCompile Include="unitlist.cpp" />
-    <ClCompile Include="boost\signals\connection.cpp" />
-    <ClCompile Include="boost\signals\named_slot_map.cpp" />
-    <ClCompile Include="boost\signals\signal_base.cpp" />
-    <ClCompile Include="boost\signals\slot.cpp" />
-    <ClCompile Include="boost\signals\trackable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bindings.h" />

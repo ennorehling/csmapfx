@@ -492,9 +492,9 @@ struct overlayPixelColor : colorTransform {
 	overlayPixelColor(double opaque, FXColor overlay) {
 		opaque_ = std::max(0.0, std::min(1.0, opaque));
 
-		red_    = (1 - opaque_) * FXREDVAL(overlay);
-		green_  = (1 - opaque_) * FXGREENVAL(overlay);
-		blue_   = (1 - opaque_) * FXBLUEVAL(overlay);
+		red_    = (FXuchar)((1 - opaque_) * FXREDVAL(overlay));
+		green_  = (FXuchar)((1 - opaque_) * FXGREENVAL(overlay));
+		blue_   = (FXuchar)((1 - opaque_) * FXBLUEVAL(overlay));
 	}
 
 	FXColor operator()(FXColor col) const {
