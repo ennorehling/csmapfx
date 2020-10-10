@@ -4,6 +4,7 @@
 #include "main.h"
 #include "fxhelper.h"
 #include "csmap.h"
+#include "commands.h"
 #include "datafile.h"
 #include "symbols.h"
 
@@ -16,69 +17,80 @@
 FXDEFMAP(CSMap) MessageMap[]=
 {
 	//________Message_Type_____________________ID_______________Message_Handler_______
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_OPEN,		CSMap::onFileOpen),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_MERGE,		CSMap::onFileMerge),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_SAVE,		CSMap::onFileSave),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_SAVE_AS,		CSMap::onFileSaveAs),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_CLOSE,		CSMap::onFileClose),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_EXPORT_MAP,	CSMap::onFileMapExport),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_OPEN,		    CSMap::onFileOpen),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_MERGE,		    CSMap::onFileMerge),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE,		    CSMap::onFileSave),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_AS,		    CSMap::onFileSaveAs),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_CLOSE,		    CSMap::onFileClose),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_MAP,	    CSMap::onFileMapExport),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_LOAD_ORDERS,	    CSMap::onFileOpenCommands),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ORDERS,	    CSMap::onFileSaveCommands),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ALL,	    CSMap::onFileSaveWithCmds),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_ORDERS,   CSMap::onFileExportCommands),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_RECENT,		    CSMap::onFileRecent),
+
+    FXMAPFUNC(SEL_COMMAND,  FXCommands::ID_UNIT_NEXT,		    FXCommands::onNextUnit),
+    FXMAPFUNC(SEL_COMMAND,  FXCommands::ID_UNIT_PREV,		    FXCommands::onPrevUnit),
+
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_MERGE,		    CSMap::updOpenFile),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE,		    CSMap::updOpenFile),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_AS,		    CSMap::updOpenFile),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_CLOSE,		    CSMap::updOpenFile),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_MAP,	    CSMap::updOpenFile),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_ORDERS,   CSMap::updOpenFile),
+
+    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_LOAD_ORDERS,     CSMap::updActiveFaction),
+    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ORDERS,     CSMap::updActiveFaction),
+    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ALL,        CSMap::updActiveFaction),
+
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_VIEW_MAPONLY,		    CSMap::onViewMapOnly),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_VIEW_MAPONLY,		    CSMap::updViewMapOnly),
+
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_VIEW_MESSAGES,        CSMap::onViewMessages),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_VIEW_MESSAGES,        CSMap::updViewMessages),
+
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_VIEW_MINIMAP,         CSMap::onViewMiniMap),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_VIEW_MINIMAP,         CSMap::updViewMiniMap),
+
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_VIEW_INFODLG,	        CSMap::onViewInfoDlg),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_VIEW_INFODLG,         CSMap::updViewInfoDlg),
+
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_VIEW_SEARCHDLG,       CSMap::onViewSearchDlg),
+
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_SELALL,        CSMap::onRegionSelAll),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_UNSEL,         CSMap::onRegionUnSel),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_INVERTSEL,	    CSMap::onRegionInvertSel),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_EXTENDSEL,	    CSMap::onRegionExtendSel),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_SELISLANDS,    CSMap::onRegionSelIslands),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_SELALLISLANDS, CSMap::onRegionSelAllIslands),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_REMOVESEL,     CSMap::onRegionRemoveSel),
+
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_HELP_ABOUT,		CSMap::onHelpAbout),
+
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_ZOOM,			CSMap::onChangeZoom),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_MAP_ZOOM,			CSMap::onUpdateZoom),
+
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_SETORIGIN,	CSMap::onSetOrigin),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_MAKEMAP,		CSMap::onMakeMap),
 	
-	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_FILE_MERGE,		CSMap::updOpenFile),
-	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_FILE_SAVE,		CSMap::updOpenFile),
-	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_FILE_SAVE_AS,		CSMap::updOpenFile),
-	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_FILE_CLOSE,		CSMap::updOpenFile),
-	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_FILE_EXPORT_MAP,	CSMap::updOpenFile),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_VISIBLEPLANE,	CSMap::onSetVisiblePlane),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_MAP_VISIBLEPLANE,	CSMap::onUpdVisiblePlane),
 
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_FILE_RECENT,		CSMap::onFileRecent),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_SELECTMARKED,		CSMap::onMapSelectMarked),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_MARKERNORTHWEST,	CSMap::onMapMoveMarker),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_MARKERNORTHEAST,	CSMap::onMapMoveMarker),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_MARKEREAST,		CSMap::onMapMoveMarker),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_MARKERSOUTHEAST,	CSMap::onMapMoveMarker),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_MARKERSOUTHWEST,	CSMap::onMapMoveMarker),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_MARKERWEST,		CSMap::onMapMoveMarker),
 
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_VIEW_MAPONLY,		CSMap::onViewMapOnly),
-	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_VIEW_MAPONLY,		CSMap::updViewMapOnly),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_SETMODUS,		CSMap::onMapSetModus),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_MAP_SETMODUS,		CSMap::onUpdMapSetModus),
 
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_VIEW_MESSAGES,	CSMap::onViewMessages),
-	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_VIEW_MESSAGES,	CSMap::updViewMessages),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_UPDATE,			CSMap::onMapChange),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_SELECTION,		CSMap::onQueryMap),
 
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_VIEW_MINIMAP,		CSMap::onViewMiniMap),
-	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_VIEW_MINIMAP,		CSMap::updViewMiniMap),
-
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_VIEW_INFODLG,		CSMap::onViewInfoDlg),
-	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_VIEW_INFODLG,		CSMap::updViewInfoDlg),
-
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_VIEW_SEARCHDLG,	CSMap::onViewSearchDlg),
-
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_REGION_SELALL,	CSMap::onRegionSelAll),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_REGION_UNSEL,		CSMap::onRegionUnSel),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_REGION_INVERTSEL,	CSMap::onRegionInvertSel),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_REGION_EXTENDSEL,	CSMap::onRegionExtendSel),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_REGION_SELISLANDS,CSMap::onRegionSelIslands),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_REGION_SELALLISLANDS,CSMap::onRegionSelAllIslands),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_REGION_REMOVESEL, CSMap::onRegionRemoveSel),
-
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_HELP_ABOUT,		CSMap::onHelpAbout),
-
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_MAP_ZOOM,			CSMap::onChangeZoom),
-	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_MAP_ZOOM,			CSMap::onUpdateZoom),
-
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_MAP_SETORIGIN,	CSMap::onSetOrigin),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_MAP_MAKEMAP,		CSMap::onMakeMap),
-	
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_MAP_VISIBLEPLANE,	CSMap::onSetVisiblePlane),
-	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_MAP_VISIBLEPLANE,	CSMap::onUpdVisiblePlane),
-
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_MAP_SELECTMARKED,		CSMap::onMapSelectMarked),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_MAP_MARKERNORTHWEST,	CSMap::onMapMoveMarker),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_MAP_MARKERNORTHEAST,	CSMap::onMapMoveMarker),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_MAP_MARKEREAST,		CSMap::onMapMoveMarker),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_MAP_MARKERSOUTHEAST,	CSMap::onMapMoveMarker),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_MAP_MARKERSOUTHWEST,	CSMap::onMapMoveMarker),
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_MAP_MARKERWEST,		CSMap::onMapMoveMarker),
-
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_MAP_SETMODUS,		CSMap::onMapSetModus),
-	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_MAP_SETMODUS,		CSMap::onUpdMapSetModus),
-
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_UPDATE,			CSMap::onMapChange),
-	FXMAPFUNC(SEL_UPDATE,		CSMap::ID_SELECTION,		CSMap::onQueryMap),
-
-	FXMAPFUNC(SEL_COMMAND,		CSMap::ID_CALCULATOR,		CSMap::onCalculator),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_CALCULATOR,		CSMap::onCalculator),
 	
 	FXMAPFUNC(SEL_CLIPBOARD_REQUEST, 0,						CSMap::onClipboardRequest),
 	FXMAPFUNC(SEL_CLIPBOARD_LOST, 0,						CSMap::onClipboardLost),
@@ -153,9 +165,6 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 	for (int i = 0; i < datablock::TERRAIN_LAST; i++)
 		icons.terrain[i] = new FXGIFIcon(getApp(), data::terrainSymbols[i], 0, IMAGE_ALPHAGUESS);
-
-	// slot function that tests if a file is opened
-	update_signal_t::slot_function_type whenActiveFaction = boost::bind(&CSMap::haveActiveFaction, this);
 
 	// Buttons
 	new FXButton(toolbar,
@@ -265,12 +274,24 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 
 	new FXMenuSeparatorEx(filemenu);
-	new FXMenuCommandEx(filemenu,iso2utf("&Befehle laden...\tCtrl-Shift-O\tDie Befehle aus Textdatei laden."),boost::bind(&CSMap::onFileOpenCommands, this),whenActiveFaction);
-	new FXMenuCommandEx(filemenu,iso2utf("&Befehle speichern...\tF11\tDie Befehle als Textdatei speichern."),boost::bind(&CSMap::onFileSaveCommands, this, false),whenActiveFaction);
-	new FXMenuCommandEx(filemenu,iso2utf("Befehle mit CR speichern...\t\tSpeichert den aktuellen Report zusammen mit den geänderten Befehlen."),boost::bind(&CSMap::onFileSaveWithCmds, this),whenActiveFaction);
+	new FXMenuCommand(
+        filemenu,
+        iso2utf("&Befehle laden...\tCtrl-Shift-O\tDie Befehle aus Textdatei laden."),
+        NULL, this, ID_FILE_LOAD_ORDERS);
+    new FXMenuCommand(
+        filemenu,
+        iso2utf("Be&fehle speichern...\tF11\tDie Befehle als Textdatei speichern."),
+        NULL, this, ID_FILE_SAVE_ORDERS);
+    new FXMenuCommand(
+        filemenu,
+        L"Befehle mit &CR speichern...\t\tSpeichert den aktuellen Report zusammen mit den geänderten Befehlen.",
+        NULL, this, ID_FILE_SAVE_ALL);
 
 	new FXMenuSeparatorEx(filemenu);
-	new FXMenuCommandEx(filemenu,L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",boost::bind(&CSMap::onFileSaveCommands, this, true),whenActiveFaction);
+    new FXMenuCommand(
+        filemenu,
+        L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",
+        NULL, this, ID_FILE_EXPORT_ORDERS);
 	new FXMenuCommand(
 		filemenu,
 		L"Karte exportieren...\t\tDie Karte als PNG speichern.",
@@ -496,9 +517,16 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	cmdOptFrame->setBorderColor(getApp()->getShadowColor());
 	FXCheckButtonEx* confirmCmd = new FXCheckButtonEx(cmdOptFrame, iso2utf("bestätigt\tBefehle bestätigen (Ctrl-Y)\tBefehle für diese Einheit bestätigen"), boost::bind(&FXCommands::setConfirmed, commands, _1), boost::bind(&FXCommands::getConfirmed, commands));
 	
-	FXButtonEx* prevUnit = new FXButtonEx(cmdOptFrame, iso2utf("<\tVorherige Einheit (Ctrl-,)\tZur vorhergehenden unbestätigten Einheit"), boost::bind(&FXCommands::prevUnit, commands), whenActiveFaction, NULL, BUTTON_TOOLBAR);
-	FXButtonEx* nextUnit = new FXButtonEx(cmdOptFrame, iso2utf(">\tNächste Einheit (Ctrl-.)\tZur nächsten unbestätigten Einheit"), boost::bind(&FXCommands::nextUnit, commands), whenActiveFaction, NULL, BUTTON_TOOLBAR);
-	new FXButtonEx(cmdOptFrame, iso2utf("+temp\tNeue Temp-Einheit\tTemp-Einheit erstellen"), boost::bind(&FXCommands::makeTemp, commands), whenCommandable, NULL, BUTTON_TOOLBAR);
+    new FXButton(
+        cmdOptFrame,
+        L"<\tVorherige Einheit (Ctrl-,)\tZur vorhergehenden unbestätigten Einheit",
+        NULL, commands, FXCommands::ID_UNIT_PREV, BUTTON_TOOLBAR);
+    new FXButton(
+        cmdOptFrame,
+        L">\tNächste Einheit (Ctrl-.)\tZur nächsten unbestätigten Einheit",
+        NULL, commands, FXCommands::ID_UNIT_NEXT, BUTTON_TOOLBAR);
+
+    new FXButtonEx(cmdOptFrame, iso2utf("+temp\tNeue Temp-Einheit\tTemp-Einheit erstellen"), boost::bind(&FXCommands::makeTemp, commands), whenCommandable, NULL, BUTTON_TOOLBAR);
 
 	FXTextField* rowcol = new FXTextField(cmdOptFrame, 5, commands,FXCommands::ID_ROWCOL, TEXTFIELD_READONLY|JUSTIFY_RIGHT|LAYOUT_FILL_X|LAYOUT_RIGHT);
 	rowcol->disable();
@@ -757,6 +785,13 @@ long CSMap::updOpenFile(FXObject *sender, FXSelector, void *)
 	FXWindow *wnd = (FXWindow *)sender;
 	files.empty() ? wnd->disable() : wnd->enable();
 	return 1;
+}
+
+long CSMap::updActiveFaction(FXObject *sender, FXSelector, void *)
+{
+    FXWindow *wnd = (FXWindow *)sender;
+    haveActiveFaction() ? wnd->disable() : wnd->enable();
+    return 1;
 }
 
 bool CSMap::haveActiveFaction() const
@@ -2065,8 +2100,9 @@ long CSMap::onFileSaveAs(FXObject*, FXSelector, void*)
 		}
 
 		saveFile(filename);
-	}
-	return 1;
+        return 1;
+    }
+	return 0;
 }
 
 long CSMap::onFileClose(FXObject*, FXSelector, void*)
@@ -2086,7 +2122,7 @@ void CSMap::closeFile()
 			return;					// don't close, cancel clicked
 		else if (res == MBOX_CLICKED_SAVE)
 		{
-            onFileSaveCommands(false);			// save commands
+            saveCommandsDlg(false);			// save commands
 
 			// cancel close, when save was unsuccessful
 			if (!files.empty() && files.front().modifiedCmds())
@@ -2098,7 +2134,7 @@ void CSMap::closeFile()
 	mapChange();
 }
 
-void CSMap::onFileOpenCommands()
+long CSMap::onFileOpenCommands(FXObject *, FXSelector, void *)
 {
 	FXFileDialog dlg(this, iso2utf("Befehle laden..."));
 	dlg.setIcon(icons.open);
@@ -2106,11 +2142,26 @@ void CSMap::onFileOpenCommands()
 	dlg.setPatternList(iso2utf("Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nMögliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
 	FXint res = dlg.execute(PLACEMENT_SCREEN);
 	dialogDirectory = dlg.getDirectory();
-	if (res)
+    if (res) {
         loadCommands(dlg.getFilename());
+        return 1;
+    }
+    return 0;
 }
 
-void CSMap::onFileSaveCommands(bool stripped)
+long CSMap::onFileSaveCommands(FXObject*, FXSelector, void* ptr)
+{
+    saveCommandsDlg(false);
+    return 1;
+}
+
+long CSMap::onFileExportCommands(FXObject*, FXSelector, void* ptr)
+{
+    saveCommandsDlg(true);
+    return 1;
+}
+
+void CSMap::saveCommandsDlg(bool stripped)
 {
 	if (files.empty())
 		return;
@@ -2164,7 +2215,7 @@ void CSMap::onFileSaveCommands(bool stripped)
 	}
 }
 
-void CSMap::onFileSaveWithCmds()
+long CSMap::onFileSaveWithCmds(FXObject *, FXSelector, void *)
 {
 	FXFileDialog dlg(this, "Befehle mit CR speichern unter...", DLGEX_SAVE);
 	dlg.setIcon(icons.save);
@@ -2198,6 +2249,7 @@ void CSMap::onFileSaveWithCmds()
 
 		saveFile(filename, true);	// save with commands
 	}
+    return 1;
 }
 
 long CSMap::onFileMapExport(FXObject *, FXSelector, void *)

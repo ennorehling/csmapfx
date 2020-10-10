@@ -23,17 +23,8 @@
 #ifdef CSMAP_MAIN
 
 #ifdef WIN32
-
 // use main() as starting point
 #pragma comment(linker, "/entry:mainCRTStartup")
-
-// libcmt conflicts with another lib
-#pragma comment(linker, "/nodefaultlib:libcmt")
-
-// use these libs, too:
-#pragma comment(lib,"comctl32.lib")	// ...
-#pragma comment(lib,"Ws2_32.lib")	// for gethostname (open/save dialogs)
-
 #endif // WIN32
 
 #ifdef WIN32

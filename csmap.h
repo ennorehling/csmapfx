@@ -28,14 +28,15 @@ public:
 	~CSMap();
 	virtual void create();
 	virtual FXbool close(FXbool notify=FALSE);
-	
+
+private:
 	void mapChange(bool newfile = false);
-	bool isFileOpen() const;
 	bool haveActiveFaction() const;
 	bool loadFile(FXString filename);
 	bool mergeFile(FXString filename);
 	bool saveFile(FXString filename, bool merge_commands = false);
 	void closeFile();
+    void saveCommandsDlg(bool stripped);
 	bool loadCommands(FXString filename);
 	bool saveCommands(FXString filename, bool stripped);
 	bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
@@ -49,6 +50,7 @@ public:
 public:		// this functions are slots for menu commands
 	long onFileOpen(FXObject*, FXSelector, void*);
 	long updOpenFile(FXObject *sender, FXSelector, void *);
+	long updActiveFaction(FXObject *sender, FXSelector, void *);
 
 	long onFileMerge(FXObject*, FXSelector, void*);
 	long onFileSave(FXObject*, FXSelector, void*);
@@ -56,12 +58,12 @@ public:		// this functions are slots for menu commands
 	long onFileClose(FXObject*, FXSelector, void*);
 	long onFileMapExport(FXObject*, FXSelector, void*);
 	
-	void onFileOpenCommands();
-	void onFileSaveCommands(bool stripped);
-	void onFileSaveWithCmds();
+	long onFileOpenCommands(FXObject*, FXSelector, void* ptr);
+	long onFileSaveCommands(FXObject*, FXSelector, void* ptr);
+    long onFileExportCommands(FXObject*, FXSelector, void* ptr);
+    long onFileSaveWithCmds(FXObject*, FXSelector, void* ptr);
 
-public:
-	long onFileRecent(FXObject*, FXSelector, void* ptr);
+    long onFileRecent(FXObject*, FXSelector, void* ptr);
 
 	long onViewMapOnly(FXObject*, FXSelector, void* ptr);
 	long updViewMapOnly(FXObject*, FXSelector, void* ptr);
@@ -119,6 +121,8 @@ public:
 		ID_REGIONS = FXMainWindow::ID_LAST,
 		ID_SELECTION,
 		ID_CALCULATOR,
+        ID_UNIT_NEXT,
+        ID_UNIT_PREV,
 
 		// File menu
 		ID_FILE_RECENT,
@@ -128,6 +132,10 @@ public:
 		ID_FILE_SAVE_AS,
 		ID_FILE_CLOSE,
 		ID_FILE_EXPORT_MAP,
+        ID_FILE_LOAD_ORDERS,
+        ID_FILE_SAVE_ORDERS,
+        ID_FILE_SAVE_ALL,
+        ID_FILE_EXPORT_ORDERS,
 
 		// View menu
 		ID_VIEW_MAPONLY,

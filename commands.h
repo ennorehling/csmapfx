@@ -21,9 +21,10 @@ public:
 
 	void connectMap(FXCSMap* map);
 
-	void prevUnit();						// goto previous...
-	void nextUnit();						// goto next unconfirmed unit
-	void makeTemp();
+    long onNextUnit(FXObject *, FXSelector, void *); // goto next unconfirmed unit
+    long onPrevUnit(FXObject *, FXSelector, void *); // goto previous
+
+    void makeTemp();
 	FXString getFreeTemp();
 
 	void setConfirmed(bool confirmed);		// set if unit's commands are confirmed

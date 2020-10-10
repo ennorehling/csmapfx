@@ -92,10 +92,10 @@ void FXCommands::connectMap(FXCSMap* map_)
 	map = map_;
 }
 
-void FXCommands::prevUnit()
+long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
 {
 	if (!files)
-		return;
+		return 0;
 
 	datablock::itor end = files->front().blocks().end();
 	datablock::itor unit = files->front().blocks().end();
@@ -106,7 +106,7 @@ void FXCommands::prevUnit()
 		unit = selection.region;
 
 	if (unit == end)	// sanity check
-		return;
+		return 0;
 
 	for (unit--; unit != end; unit--)
 	{
@@ -139,7 +139,7 @@ void FXCommands::prevUnit()
 				flags |= FLAG_UPDATE;
 				forceRefresh();
 				setFocus();
-				return;
+				return 1;
 			}
 		}
 	}
@@ -150,13 +150,13 @@ void FXCommands::prevUnit()
 	getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 	flags |= FLAG_UPDATE;
 	getApp()->beep();
-	return;
+	return 1;
 }
 
-void FXCommands::nextUnit()
+long FXCommands::onNextUnit(FXObject *, FXSelector, void *)
 {
 	if (!files)
-		return;
+		return 0;
 
 	datablock::itor end = files->front().blocks().end();
 	datablock::itor unit = files->front().blocks().begin();
@@ -166,7 +166,7 @@ void FXCommands::nextUnit()
 		unit = selection.region;
 
 	if (unit == end)	// sanity check
-		return;
+		return 0;
 
 	for (unit++; unit != end; unit++)
 	{
@@ -200,7 +200,7 @@ void FXCommands::nextUnit()
 				flags |= FLAG_UPDATE;
 				forceRefresh();
 				setFocus();
-				return;
+				return 1;
 			}
 		}
 	}
@@ -211,7 +211,7 @@ void FXCommands::nextUnit()
 	getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 	flags |= FLAG_UPDATE;
 	getApp()->beep();
-	return;
+	return 0;
 }
 
 void FXCommands::makeTemp()

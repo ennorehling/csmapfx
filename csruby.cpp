@@ -51,7 +51,11 @@ namespace Ruby
 
 		// initialize ruby itself
 		ruby_init();
+#ifdef WIN32
+        _putenv("RUBYLIB=.");
+#else
 		setenv("RUBYLIB", ".", 1);	// to make require 'script' work
+#endif
 		ruby_init_loadpath();
 		ruby_script("embed");
 
