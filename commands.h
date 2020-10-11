@@ -34,8 +34,11 @@ public:
 	long onMapChange(FXObject*,FXSelector,void*);
 	long onKeyPress(FXObject*,FXSelector,void*);
 	long onUpdate(FXObject*,FXSelector,void*);
+	long onConfirmUnit(FXObject*,FXSelector,void*);
+	long onCreateUnit(FXObject*,FXSelector,void*);
 
-	long onRowCol(FXObject*,FXSelector,void*);	// set row and col for this command
+	long updRowCol(FXObject*,FXSelector,void*);	// set row and col for this command
+	long updCommandable(FXObject*,FXSelector,void*);
 	
 public: 
 	enum
@@ -43,6 +46,8 @@ public:
 		ID_ROWCOL = FXText::ID_LAST,
         ID_UNIT_NEXT,
         ID_UNIT_PREV,
+        ID_UNIT_CONFIRM,
+        ID_UNIT_ADD,
         ID_LAST
 	};
    

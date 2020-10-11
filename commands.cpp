@@ -10,11 +10,16 @@ FXDEFMAP(FXCommands) MessageMap[]=
 	FXMAPFUNC(SEL_COMMAND,			FXCommands::ID_UPDATE,			FXCommands::onMapChange), 
     FXMAPFUNC(SEL_COMMAND,          FXCommands::ID_UNIT_NEXT,		FXCommands::onNextUnit),
     FXMAPFUNC(SEL_COMMAND,          FXCommands::ID_UNIT_PREV,		FXCommands::onPrevUnit),
-    
-    FXMAPFUNC(SEL_KEYPRESS,			0,								FXCommands::onKeyPress),
-	FXMAPFUNC(SEL_UPDATE,			0,								FXCommands::onUpdate), 
+    FXMAPFUNC(SEL_COMMAND,          FXCommands::ID_UNIT_CONFIRM,    FXCommands::onConfirmUnit),
+    FXMAPFUNC(SEL_COMMAND,          FXCommands::ID_UNIT_ADD,        FXCommands::onCreateUnit),
 
-    FXMAPFUNC(SEL_UPDATE,			FXCommands::ID_ROWCOL,			FXCommands::onRowCol),
+    // FXMAPFUNC(SEL_UPDATE,			FXCommands::ID_UNIT_CONFIRM,    FXCommands::updCommandable),
+    FXMAPFUNC(SEL_UPDATE,			FXCommands::ID_UNIT_ADD,       FXCommands::updCommandable),
+
+    FXMAPFUNC(SEL_KEYPRESS,			0,								FXCommands::onKeyPress),
+    FXMAPFUNC(SEL_UPDATE,			0,								FXCommands::onUpdate),
+
+    FXMAPFUNC(SEL_UPDATE,			FXCommands::ID_ROWCOL,			FXCommands::updRowCol),
 };
 
 FXIMPLEMENT(FXCommands,FXText,MessageMap, ARRAYNUMBER(MessageMap))
@@ -244,6 +249,18 @@ FXString FXCommands::getFreeTemp()
 	return FXStringVal(i++);
 }
 
+long FXCommands::onConfirmUnit(FXObject*, FXSelector, void*)
+{
+    setConfirmed(!getConfirmed());
+    return 1;
+}
+
+long FXCommands::onCreateUnit(FXObject*, FXSelector, void*)
+{
+    makeTemp();
+    return 1;
+}
+
 void FXCommands::setConfirmed(bool confirmed)
 {
 	if (!files)
@@ -470,7 +487,13 @@ long FXCommands::onUpdate(FXObject* sender,FXSelector sel,void* ptr)
 	return FXText::onUpdate(sender, sel, ptr);
 }
 
-long FXCommands::onRowCol(FXObject* sender,FXSelector,void*)
+long FXCommands::updCommandable(FXObject* sender, FXSelector, void*) {
+    FXCheckButton * btn = (FXCheckButton *)sender;
+    isEnabled() ? btn->enable() : btn->disable();
+    return 1;
+}
+
+long FXCommands::updRowCol(FXObject* sender,FXSelector,void*)
 {
 	if (!sender->isMemberOf(&FXTextField::metaClass))
         return 0;

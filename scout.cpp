@@ -49,7 +49,7 @@ private:
 
 Phenotype::Phenotype() : genom(GENOM_SIZE)
 {
-	static boost::rand48 rnd(static_cast<boost::uint64_t>(std::time(0)));
+	static boost::rand48 rnd(static_cast<boost::rand48::result_type>(std::time(0)));
 
 	for (size_t i = 0; i < genom.size(); i++)
 	{
@@ -59,7 +59,7 @@ Phenotype::Phenotype() : genom(GENOM_SIZE)
 
 Phenotype::Phenotype(const Phenotype& parent1, const Phenotype& parent2) : genom(GENOM_SIZE)
 {
-	static boost::rand48 rnd(static_cast<boost::uint64_t>(std::time(0)));
+	static boost::rand48 rnd(static_cast<boost::rand48::result_type>(std::time(0)));
 
 	// generate new genom by recombination of parent1 and parent2
 	size_t crossover = rnd() % Phenotype::GENOM_SIZE;
@@ -83,7 +83,7 @@ Phenotype::Phenotype(const Phenotype& parent1, const Phenotype& parent2) : genom
 
 void Phenotype::mutate()
 {
-	static boost::rand48 rnd(static_cast<boost::uint64_t>(std::time(0)));
+	static boost::rand48 rnd(static_cast<boost::rand48::result_type>(std::time(0)));
 
 	const double mutation = mutation_probability/100.0;
 
@@ -95,14 +95,14 @@ void Phenotype::mutate()
 
 void Phenotype::random_rate()
 {
-	static boost::rand48 rnd(static_cast<boost::uint64_t>(std::time(0)));
+	static boost::rand48 rnd(static_cast<boost::rand48::result_type>(std::time(0)));
 
 	fitness = std::floor(fitness) + rnd() / (double)rnd.max();
 }
 
 void Phenotype::rate(const boost::function<bool(int x, int y)>& isOcean)
 {
-	static boost::rand48 rnd(static_cast<boost::uint64_t>(std::time(0)));
+	static boost::rand48 rnd(static_cast<boost::rand48::result_type>(std::time(0)));
 
 	// NO, O, SO, SW, W, NW
 	const int offset_x[6] = {  0, +1, +1,  0, -1, -1 };
@@ -229,7 +229,7 @@ void Scout::ScoutData::rate_all(const boost::function<bool(int x, int y)>& cond)
 
 void Scout::ScoutData::select_best(const boost::function<bool(int x, int y)>& cond)
 {
-	static boost::rand48 rnd(static_cast<boost::uint64_t>(std::time(0)));
+	static boost::rand48 rnd(static_cast<boost::rand48::result_type>(std::time(0)));
 
 	while (generation.size() > elite_count + survivor_count)
 		generation.pop_back();

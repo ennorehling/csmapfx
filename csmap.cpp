@@ -512,18 +512,19 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
     FXHorizontalFrame *cmdOptFrame = new FXHorizontalFrame(cmdBottomFrame,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 3,3,1,1);
 	cmdOptFrame->setBorderColor(getApp()->getShadowColor());
-	FXCheckButtonEx* confirmCmd = new FXCheckButtonEx(cmdOptFrame, iso2utf("bestätigt\tBefehle bestätigen (Ctrl-Y)\tBefehle für diese Einheit bestätigen"), boost::bind(&FXCommands::setConfirmed, commands, _1), boost::bind(&FXCommands::getConfirmed, commands));
-	
-    new FXButton(
-        cmdOptFrame,
-        L"<\tVorherige Einheit (Ctrl-,)\tZur vorhergehenden unbestätigten Einheit",
-        NULL, commands, FXCommands::ID_UNIT_PREV, BUTTON_TOOLBAR);
-    new FXButton(
-        cmdOptFrame,
-        L">\tNächste Einheit (Ctrl-.)\tZur nächsten unbestätigten Einheit",
-        NULL, commands, FXCommands::ID_UNIT_NEXT, BUTTON_TOOLBAR);
+    FXCheckButton* confirmCmd = new FXCheckButton(cmdOptFrame,
+        L"bestätigt\tBefehle bestätigen (Ctrl-Y)\tBefehle für diese Einheit bestätigen",
+        commands, FXCommands::ID_UNIT_CONFIRM, CHECKBUTTON_NORMAL);
+    new FXButton(cmdOptFrame,
+        L"<\tVorherige Einheit (Ctrl-,)\tZur vorhergehenden unbestätigten Einheit", NULL,
+        commands, FXCommands::ID_UNIT_PREV, BUTTON_TOOLBAR);
+    new FXButton(cmdOptFrame,
+        L">\tNächste Einheit (Ctrl-.)\tZur nächsten unbestätigten Einheit", NULL,
+        commands, FXCommands::ID_UNIT_NEXT, BUTTON_TOOLBAR);
 
-    new FXButtonEx(cmdOptFrame, iso2utf("+temp\tNeue Temp-Einheit\tTemp-Einheit erstellen"), boost::bind(&FXCommands::makeTemp, commands), whenCommandable, NULL, BUTTON_TOOLBAR);
+    new FXButton(cmdOptFrame,
+        L"+temp\tNeue Temp-Einheit\tTemp-Einheit erstellen", NULL,
+        commands, FXCommands::ID_UNIT_ADD, BUTTON_TOOLBAR);
 
 	FXTextField* rowcol = new FXTextField(cmdOptFrame, 5, commands,FXCommands::ID_ROWCOL, TEXTFIELD_READONLY|JUSTIFY_RIGHT|LAYOUT_FILL_X|LAYOUT_RIGHT);
 	rowcol->disable();
