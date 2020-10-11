@@ -75,7 +75,7 @@ int FXExportDlg::getScale() const
 	if (item < 0)
 		return 1;	// no current item?
 	
-	return ITEM_INT(scalebox->getItemData(item));	// item data is scale
+	return (FXival)scalebox->getItemData(item);	// item data is scale
 }
 
 int FXExportDlg::getColor() const
@@ -84,7 +84,7 @@ int FXExportDlg::getColor() const
 	if (item < 0)
 		return 1;	// no current item?
 	
-	return ITEM_INT(colorbox->getItemData(item));	// item data is color index (0=black, 1=white)
+	return (FXival)colorbox->getItemData(item);	// item data is color index (0=black, 1=white)
 }
 
 bool FXExportDlg::getShowNames() const

@@ -31,9 +31,6 @@ public:
 
 public:
 	long onSearch(FXObject*, FXSelector, void*);		// hit enter in search textbox
-
-	long onPopup(FXObject*,FXSelector,void*);
-
 public:
 	enum
 	{

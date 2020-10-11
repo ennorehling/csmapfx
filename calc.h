@@ -32,11 +32,10 @@ public:
 
 	void connectMap(FXCSMap* map);
 
-	void onCloseButton();
-
 public:
 	long onToggleShown(FXObject*, FXSelector, void*);
 	long onUpdateShown(FXObject*, FXSelector, void*);
+	long onCloseButton(FXObject*, FXSelector, void*);
 	long onChanged(FXObject*, FXSelector, void*);
 	long onKeyPress(FXObject*, FXSelector, void*);
 	long onFocusIn(FXObject*, FXSelector, void*);
@@ -48,6 +47,7 @@ public:
 	enum
 	{
 		ID_FORMULA = FXHorizontalFrame::ID_LAST,
+        ID_CLOSE,
 		ID_LAST
 	};
 

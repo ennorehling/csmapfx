@@ -309,7 +309,7 @@ long FXCSMap::onSetModus(FXObject* sender, FXSelector, void*)
 		return 0;
 
 	FXId *item = (FXId*)sender;
-	FXint data = 0xffffffff & (long)item->getUserData();
+	FXival data = (FXival)item->getUserData();
 
 	modus = data;		// set new modus
 	return 1;
@@ -321,7 +321,7 @@ long FXCSMap::onUpdSetModus(FXObject* sender, FXSelector, void*)
 		return 0;
 
 	FXId *item = (FXId*)sender;
-	FXint data = 0xffffffff & (long)item->getUserData();
+	FXuval data = (FXuval)item->getUserData();
 
 	// check button, if actual modus is button's modus
 	sender->handle(this, FXSEL(SEL_COMMAND, (data==modus)?ID_CHECK:ID_UNCHECK), NULL);
@@ -330,17 +330,17 @@ long FXCSMap::onUpdSetModus(FXObject* sender, FXSelector, void*)
 
 long FXCSMap::onSetVisiblePlane(FXObject* sender, FXSelector, void* ptr)
 {
-	FXint plane = visiblePlane;
+    FXival plane = visiblePlane;
 
 	if (sender && sender->isMemberOf(&FXListBox::metaClass))
 	{
 		FXListBox *box = (FXListBox*)sender;
-        	plane = 0xffffffff & (long)box->getItemData((long)ptr);
+        	plane = (FXival)box->getItemData((long)ptr);
 	}
 	else if (sender && sender->isMemberOf(&FXId::metaClass))
 	{
 		FXId *item = (FXId*)sender;
-		plane = 0xffffffff & (long)item->getUserData();
+		plane = (FXival)item->getUserData();
 	}
 
 	if (plane < 0 || visiblePlane == plane)
@@ -1184,8 +1184,8 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 		FXMenuCommand *item = (FXMenuCommand*)sender;
 
 		// extract popup cmd
-		int cmd = 0xffff & (long)item->getUserData();
-		int param = 0xffff & (long)item->getUserData() >> 16;
+        FXival cmd = 0xffff & (FXival)item->getUserData();
+		FXival param = 0xffff & (FXival)item->getUserData() >> 16;
 
 		if (cmd == POPUP_GET_TEXT)
 		{

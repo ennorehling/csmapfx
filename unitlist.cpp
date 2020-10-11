@@ -11,7 +11,11 @@ FXDEFMAP(FXUnitList) MessageMap[]=
 { 
 	//________Message_Type_____________________ID_______________Message_Handler_______ 
 	FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_UPDATE,				FXUnitList::onMapChange), 
-	FXMAPFUNC(SEL_QUERY_HELP,		0,									FXUnitList::onQueryHelp), 
+    FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_POPUP_COPY_TREE,		FXUnitList::onCopyTree),
+    FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_POPUP_COPY_TEXT,	    FXUnitList::onCopyText),
+    FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_POPUP_SHOW_INFO,	    FXUnitList::onShowInfo),
+    
+    FXMAPFUNC(SEL_QUERY_HELP,		0,									FXUnitList::onQueryHelp),
 
 	FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	FXUnitList::ID_LIST,			FXUnitList::onPopup),
 }; 
@@ -558,6 +562,47 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 	return 1;
 }
 
+long FXUnitList::onCopyTree(FXObject* sender, FXSelector sel, void* ptr)
+{
+    if (sender && sender->isMemberOf(&FXMenuCommand::metaClass))
+    {
+        FXMenuCommand *cmd = (FXMenuCommand*)sender;
+        FXTreeItem *item = (FXTreeItem *)cmd->getUserData();
+        setClipboard(getSubTreeText(item));
+        return 1;
+    }
+    return 0;
+}
+
+long FXUnitList::onCopyText(FXObject* sender, FXSelector sel, void* ptr)
+{
+    if (sender && sender->isMemberOf(&FXMenuCommand::metaClass))
+    {
+        FXMenuCommand *cmd = (FXMenuCommand*)sender;
+        FXTreeItem *item = (FXTreeItem *)cmd->getUserData();
+        if (item) {
+            setClipboard(item->getText());
+            return 1;
+        }
+    }
+    return 0;
+}
+
+long FXUnitList::onShowInfo(FXObject* sender, FXSelector sel, void* ptr)
+{
+    if (sender && sender->isMemberOf(&FXMenuCommand::metaClass))
+    {
+        FXMenuCommand *cmd = (FXMenuCommand*)sender;
+        FXTreeItem *item = (FXTreeItem *)cmd->getUserData();
+        showInfo(item->getText());
+        if (item) {
+            setClipboard(item->getText());
+            return 1;
+        }
+    }
+    return 0;
+}
+
 long FXUnitList::onPopup(FXObject* sender, FXSelector sel, void* ptr)
 { 
 	FXVerticalFrame::onRightBtnRelease(sender, sel, ptr);
@@ -589,13 +634,13 @@ long FXUnitList::onPopup(FXObject* sender, FXSelector sel, void* ptr)
 	FXMenuPane *clipboard = new FXMenuPane(this);
 	new FXMenuCascade(menu, "&Zwischenablage", NULL, clipboard, 0);
 
-	new FXMenuCommandEx(clipboard, "Alles", boost::bind(&FXUnitList::setClipboard, this, boost::bind(&FXUnitList::getSubTreeText, this, (FXTreeItem*)NULL)));
-	new FXMenuCommandEx(clipboard, "Baum", boost::bind(&FXUnitList::setClipboard, this, boost::bind(&FXUnitList::getSubTreeText, this, item)));
-	new FXMenuCommandEx(clipboard, "Eintrag", boost::bind(&FXUnitList::setClipboard, this, boost::bind(&FXTreeItem::getText, item)));
+    (new FXMenuCommand(clipboard, L"Alles", NULL, this, ID_POPUP_COPY_TREE))->setUserData(NULL);
+    (new FXMenuCommand(clipboard, L"Baum", NULL, this, ID_POPUP_COPY_TREE))->setUserData(item);
+    (new FXMenuCommand(clipboard, L"Eintrag", NULL, this, ID_POPUP_COPY_TEXT))->setUserData(item);
 
-	if (item->getData())
-		new FXMenuCommandEx(menu, "Zeige Info", boost::bind(&FXUnitList::showInfo, this, boost::bind(&FXUnitList::trimNumbers, this, boost::bind(&FXTreeItem::getText, item))));
-
+    if (item->getData()) {
+        (new FXMenuCommand(menu, "Zeige Info", NULL, this, ID_POPUP_SHOW_INFO))->setUserData(item);
+    }
 	// show popup
 	menu->create();
 	menu->popup(NULL, event->root_x,event->root_y);

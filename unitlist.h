@@ -27,11 +27,17 @@ public:
 	long onQueryHelp(FXObject*,FXSelector,void*);
 
 	long onPopup(FXObject*,FXSelector,void*);
+	long onCopyTree(FXObject*,FXSelector,void*);
+	long onCopyText(FXObject*,FXSelector,void*);
+	long onShowInfo(FXObject*,FXSelector,void*);
 
 public: 
 	enum
 	{
 		ID_LIST = FXVerticalFrame::ID_LAST,		// tree list events
+        ID_POPUP_SHOW_INFO,
+        ID_POPUP_COPY_TREE,
+        ID_POPUP_COPY_TEXT,
 		ID_LAST
 	};
 

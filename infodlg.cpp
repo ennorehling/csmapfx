@@ -1,4 +1,5 @@
 #include <cctype>
+#include <cctype>
 #include <sstream>
 #include <fstream>
 
@@ -29,8 +30,6 @@ FXDEFMAP(FXInfoDlg) MessageMap[]=
 
 	FXMAPFUNC(SEL_COMMAND,				FXInfoDlg::ID_SEARCH,					FXInfoDlg::onSearch),
 	FXMAPFUNC(SEL_CHANGED,				FXInfoDlg::ID_SEARCH,					FXInfoDlg::onSearch),
-
-	FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	FXInfoDlg::ID_LIST,						FXInfoDlg::onPopup),
 };
 
 FXIMPLEMENT(FXInfoDlg,FXDialogBox,MessageMap, ARRAYNUMBER(MessageMap))
@@ -211,65 +210,6 @@ long FXInfoDlg::onSearch(FXObject*, FXSelector, void* ptr)
 		found_list->makeItemVisible(item);
 	}
 
-	return 1;
-}
-
-long FXInfoDlg::onPopup(FXObject* sender,FXSelector sel,void* ptr)
-{
-	FXEvent *event = (FXEvent*)ptr;
-
-	// dont't show popup if mouse has moved
-	if (event->last_x != event->click_x || event->last_y != event->click_y)
-		return 0;
-
-	if (!sender->isMemberOf(&FXFoldingList::metaClass))
-		return 0;
-
-	FXFoldingList* list = static_cast<FXFoldingList*>(sender);
-
-	// create popup
-	FXFoldingItem *item = list->getItemAt(event->click_x, event->click_y);
-	if (!item)
-		return 0;
-
-	FXMenuPane popup(this);
-	FXMenuPane *menu = &popup;
-
-	FXString line = item->getText();
-	FXString title = line;
-	title.simplify();
-	if (title.length() > 20)
-		title = title.left(17) + "...";
-
-	new FXMenuSeparatorEx(menu, title);
-
-	FXMenuPane *clipboard = new FXMenuPane(this);
-	new FXMenuCascade(menu, "&Zwischenablage", NULL, clipboard, 0);
-
-	new FXMenuCommandEx(clipboard, "Alles", boost::bind(&FXInfoDlg::setClipboard, this, boost::bind(&FXInfoDlg::getTableText, this, list)));
-	new FXMenuCommandEx(clipboard, "Zeile", boost::bind(&FXInfoDlg::setClipboard, this, boost::bind(&FXFoldingItem::getText, item)));
-	new FXMenuSeparatorEx(clipboard);
-
-	std::vector<FXString> entries;
-	int headers = list->getNumHeaders();
-	for (int i = 0; i < headers; i++)
-	{
-		FXString header = list->getHeaderText(i);
-		FXString text = line.section('\t', i);
-
-		entries.push_back(text = header + ": " + text);
-
-		if (text.length() > 42)
-			text = text.left(39) + "...";
-
-		new FXMenuCommandEx(clipboard, text, boost::bind(&FXInfoDlg::setClipboard, this, entries.back()));
-	}
-	
-	// show popup
-	menu->create();
-	menu->popup(NULL, event->root_x,event->root_y);
-
-    getApp()->runModalWhileShown(menu);
 	return 1;
 }
 

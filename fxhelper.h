@@ -8,8 +8,6 @@
 #include <boost/signal.hpp>
 #include <boost/bind.hpp>
 
-#define ITEM_INT(vptr) (0xffffffff & (long)(vptr))
-
 // array begin() / end() template
 // ------------------------------
 template <typename T, std::size_t size>

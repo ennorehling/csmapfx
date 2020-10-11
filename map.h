@@ -123,7 +123,7 @@ protected:
 	FXint popup_x, popup_y;			// which region is popup selected
 
 	FXfloat		scale;			// paint map in this scale
-	FXint		modus;			// mouse button modus
+    FXival  	modus;			// mouse button modus
 	FXint		mouse_select;	// select_set==1: select regions on mouse-over, select_set==2: unselect them
 
 	FXbool		minimap;		// is this map a minimap?

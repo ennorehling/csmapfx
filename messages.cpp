@@ -184,7 +184,7 @@ long FXMessages::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 		return FXTreeList::onDoubleClicked(sender, sel, ptr);
 
 	// select MESSAGE.unit on double-click
-    if (int id = ITEM_INT(item->getData()))
+    if (int id = (FXival)item->getData())
 	{
         datafile::SelectionState state;
 

@@ -76,7 +76,9 @@ FXCalculator::FXCalculator(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 		if (p->getParent()->getParent())
 		{
 			closeIcon = new FXGIFIcon(getApp(), data::small_x, FXRGB(255,255,255), IMAGE_ALPHACOLOR);
-			new FXButtonEx(this, "\t\tTaschenrechnerleiste schliessen", boost::bind(&FXCalculator::onCloseButton, this), closeIcon, BUTTON_TOOLBAR);
+            new FXButton(this,
+                L"\t\tTaschenrechnerleiste schliessen",
+                closeIcon, this, FXCalculator::ID_CLOSE, BUTTON_TOOLBAR);
 		}
 
 	new FXLabel(this, "Rechner ", 0, LAYOUT_CENTER_Y);
@@ -137,13 +139,14 @@ long FXCalculator::onUpdateShown(FXObject* sender, FXSelector, void*)
 	return 1;
 }
 
-void FXCalculator::onCloseButton()
+long FXCalculator::onCloseButton(FXObject*, FXSelector, void*)
 {
 	if (shown())
 	{
 		hide();
 		recalc();
 	}
+    return 1;
 }
 
 long FXCalculator::onFocusIn(FXObject* sender, FXSelector sel, void* ptr)

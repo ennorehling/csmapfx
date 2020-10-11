@@ -28,7 +28,7 @@ FXDEFMAP(CSMap) MessageMap[]=
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ALL,	    CSMap::onFileSaveWithCmds),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_ORDERS,   CSMap::onFileExportCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_RECENT,		    CSMap::onFileRecent),
-    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_QUIT,		    CSMap::onClose),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_QUIT,		    CSMap::onQuit),
 
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_MERGE,		    CSMap::updOpenFile),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE,		    CSMap::updOpenFile),
@@ -1536,7 +1536,7 @@ long CSMap::onMapSetModus(FXObject* sender, FXSelector, void* ptr)
 	if (sender && sender->isMemberOf(&FXId::metaClass))
 	{
 		FXId *item = (FXId*)sender;
-		FXuval data = ITEM_INT(item->getUserData());
+		FXuval data = (FXuval)item->getUserData();
 
 		if (data >= FXCSMap::MODUS_SETTERRAIN && data < FXCSMap::MODUS_SETTERRAIN+datablock::TERRAIN_LAST)
 		{

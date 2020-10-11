@@ -391,7 +391,7 @@ long FXStatistics::onChangeFaction(FXObject*, FXSelector, void*)
 	// the faction to list statistics for
 	int item = factionBox->getCurrentItem();
 	if (item >= 0)
-		select.faction = 0xffffffff & (long)factionBox->getItemData(item);
+		select.faction = (FXival)factionBox->getItemData(item);
 
 	// change statistics in list
 	updateList();
@@ -405,7 +405,7 @@ long FXStatistics::onChangeFilter(FXObject* sender, FXSelector, void* ptr)
 		return 0;
 
 	FXId *item = (FXId*)sender;
-	FXint data = 0xffffffff & (long)item->getUserData();
+    FXival data = (FXival)item->getUserData();
 
 	if (ptr)	// new button state
 		select.filter |= data;			// set filter
@@ -424,7 +424,7 @@ long FXStatistics::updChangeFilter(FXObject* sender, FXSelector, void*)
 		return 0;
 
 	FXId *item = (FXId*)sender;
-	FXint data = 0xffffffff & (long)item->getUserData();
+    FXival data = (FXival)item->getUserData();
 
 	sender->handle(this, FXSEL(SEL_COMMAND, (select.filter & data)?ID_CHECK:ID_UNCHECK), NULL);
 	return 1;
@@ -452,7 +452,7 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 	if (!item)
 		return 0;
 
-	int entryType = ITEM_INT(item->getData());	// 0: unit, 1: building, 2: ship
+    FXuval entryType = (FXuval)item->getData();	// 0: unit, 1: building, 2: ship
 
 	FXMenuPane *menu = new FXMenuPane(this);
 
