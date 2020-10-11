@@ -61,8 +61,9 @@ public:		// this functions are slots for menu commands
 	long onFileSaveCommands(FXObject*, FXSelector, void* ptr);
     long onFileExportCommands(FXObject*, FXSelector, void* ptr);
     long onFileSaveWithCmds(FXObject*, FXSelector, void* ptr);
-
     long onFileRecent(FXObject*, FXSelector, void* ptr);
+
+    long onQuit(FXObject*, FXSelector, void* ptr);
 
 	long onViewMapOnly(FXObject*, FXSelector, void* ptr);
 	long updViewMapOnly(FXObject*, FXSelector, void* ptr);
@@ -133,6 +134,7 @@ public:
         ID_FILE_SAVE_ORDERS,
         ID_FILE_SAVE_ALL,
         ID_FILE_EXPORT_ORDERS,
+        ID_FILE_QUIT,
 
 		// View menu
 		ID_VIEW_MAPONLY,

@@ -334,7 +334,7 @@ protected:
 	struct blocknames
 	{
 		FXint id;
-		FXchar *name;
+		const FXchar *name;
 	};
 	static blocknames BLOCKNAMES[];
 };

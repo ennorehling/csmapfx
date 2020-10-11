@@ -28,6 +28,7 @@ FXDEFMAP(CSMap) MessageMap[]=
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ALL,	    CSMap::onFileSaveWithCmds),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_ORDERS,   CSMap::onFileExportCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_RECENT,		    CSMap::onFileRecent),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_QUIT,		    CSMap::onClose),
 
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_MERGE,		    CSMap::updOpenFile),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE,		    CSMap::updOpenFile),
@@ -260,16 +261,6 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 		iso2utf("Sch&liessen\t\tDie aktuelle Datei schliessen."),
 		NULL, this, ID_FILE_CLOSE);
 	
-	//fileopen->addHotKey(MKUINT('W',CONTROLMASK));
-
-  /*int acckey=parseAccel("Ctrl-W");
-  if(acckey){
-      FXAccelTable* table=getAccelTable();
-      if(table){
-        table->addAccel(acckey,fileopen,FXSEL(SEL_COMMAND,ID_ACCEL));
-	  }}*/
-
-
 	new FXMenuSeparatorEx(filemenu);
 	new FXMenuCommand(
         filemenu,
@@ -301,7 +292,9 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 	new FXMenuCascade(filemenu, iso2utf("&Zuletzt geöffnet"), NULL, recentmenu, 0);
 	new FXMenuSeparatorEx(filemenu);
-	new FXMenuCommandEx(filemenu,"B&eenden\tCtrl-Q\tDas Programm beenden.",boost::bind(&CSMap::close, this, false));
+	new FXMenuCommand(filemenu,
+		L"B&eenden\tCtrl-Q\tDas Programm beenden.", NULL,
+		this, ID_FILE_QUIT);
 
 	// View menu
 	viewmenu = new FXMenuPane(this);
@@ -2302,6 +2295,12 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
 	const char* filename = (const char*)ptr;
 
 	loadFile(filename);
+	return 1;
+}
+
+long CSMap::onQuit(FXObject*, FXSelector, void* ptr)
+{
+	close();
 	return 1;
 }
 

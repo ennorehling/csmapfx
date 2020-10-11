@@ -40,17 +40,17 @@ std::string flatten(const std::string& str)
 
 	for (std::string::size_type i = 0; i < str.size(); i++)
 	{
-		char c = str[i];
+		unsigned char c = str[i];
 
-		if (c == 'ß')
+		if (c == 0xdf)
 			out += "ss";
-		else if (c == 'Ä' || c == 'ä')
+		else if (c == 0xef || c == 0xc4)
 			out += "ae";
-		else if (c == 'Ö' || c == 'ö')
+		else if (c == 0xd6 || c == 0xf6)
 			out += "oe";
-		else if (c == 'Ü' || c == 'ü')
+		else if (c == 0xdc || c == 0xfc)
 			out += "ue";
-		else if (c != ' ')
+		else if (isalnum(c))
 			out += std::tolower(c);
 	}
 
@@ -136,183 +136,3 @@ std::vector<FXString> getSearchPath()
 	return searchPath;
 }
 
-// menu command with signals
-// -------------------------
-FXDEFMAP(FXMenuCommandEx) CommandMessageMap[]={
-	FXMAPFUNC(SEL_COMMAND, FXMenuCommandEx::ID_SELFTARGET, FXMenuCommandEx::onInvokeCommand),
-	FXMAPFUNC(SEL_UPDATE, FXMenuCommandEx::ID_SELFTARGET, FXMenuCommandEx::onInvokeUpdate)
-};
-
-// Object implementation
-FXIMPLEMENT(FXMenuCommandEx,FXMenuCommand,CommandMessageMap,ARRAYNUMBER(CommandMessageMap))
-
-FXMenuCommandEx::FXMenuCommandEx() : FXMenuCommand()
-{
-	setTarget(this);
-	setSelector(ID_SELFTARGET);
-}
-
-FXMenuCommandEx::FXMenuCommandEx(FXComposite* p,const FXString& text,command_signal_t::slot_function_type slot,update_signal_t::slot_function_type upd,FXIcon* ic /*=NULL*/,FXuint opts /*=0*/) : FXMenuCommand(p, text, ic, NULL,0, opts)
-{
-	setTarget(this);
-	setSelector(ID_SELFTARGET);
-	onCommand(slot);
-	onUpdate(upd);
-}
-
-FXMenuCommandEx::FXMenuCommandEx(FXComposite* p,const FXString& text,command_signal_t::slot_function_type slot,FXIcon* ic /*=NULL*/,FXuint opts /*=0*/) : FXMenuCommand(p, text, ic, NULL,0, opts)
-{
-	setTarget(this);
-	setSelector(ID_SELFTARGET);
-	onCommand(slot);
-}
-
-long FXMenuCommandEx::onInvokeCommand(FXObject*,FXSelector,void*)
-{
-	if (isEnabled())
-		m_onCommand();
-	return 1;
-}
-
-long FXMenuCommandEx::onInvokeUpdate(FXObject*,FXSelector,void*)
-{
-	if (m_onUpdate.empty() || m_onUpdate())
-	{
-		if (!isEnabled())
-			enable();
-	}
-	else
-	{
-		if (isEnabled())
-			disable();
-	}
-	return 1;
-}
-
-// toolbar button with signals
-// ---------------------------
-FXDEFMAP(FXButtonEx) ButtonMessageMap[]={
-	FXMAPFUNC(SEL_COMMAND, FXButtonEx::ID_SELFTARGET, FXButtonEx::onInvokeCommand),
-	FXMAPFUNC(SEL_UPDATE, FXButtonEx::ID_SELFTARGET, FXButtonEx::onInvokeUpdate),
-	FXMAPFUNC(SEL_COMMAND, FXWindow::ID_ACCEL, FXButtonEx::onInvokeCommand),
-};
-
-// Object implementation
-FXIMPLEMENT(FXButtonEx,FXButton,ButtonMessageMap,ARRAYNUMBER(ButtonMessageMap))
-
-FXButtonEx::FXButtonEx() : FXButton(NULL, "", NULL, NULL,0, /*BUTTON_NORMAL|BUTTON_TOOLBAR|*/FRAME_RAISED|BUTTON_AUTOGRAY)
-{
-	setTarget(this);
-	setSelector(ID_SELFTARGET);
-}
-
-FXButtonEx::FXButtonEx(FXComposite* p,const FXString& text,command_signal_t::slot_function_type slot,update_signal_t::slot_function_type upd,FXIcon* ic /*=NULL*/,FXuint opts /*=0*/) : FXButton(p, text, ic, NULL,0, opts|/*BUTTON_NORMAL|BUTTON_TOOLBAR|*/FRAME_RAISED|BUTTON_AUTOGRAY)
-{
-	setTarget(this);
-	setSelector(ID_SELFTARGET);
-	onCommand(slot);
-	onUpdate(upd);
-}
-
-FXButtonEx::FXButtonEx(FXComposite* p,const FXString& text,command_signal_t::slot_function_type slot,FXIcon* ic /*=NULL*/,FXuint opts /*=0*/) : FXButton(p, text, ic, NULL,0, opts|/*BUTTON_NORMAL|BUTTON_TOOLBAR|*/FRAME_RAISED|BUTTON_AUTOGRAY)
-{
-	setTarget(this);
-	setSelector(ID_SELFTARGET);
-	onCommand(slot);
-}
-
-long FXButtonEx::onInvokeCommand(FXObject*,FXSelector,void*)
-{
-	if (isEnabled())
-		m_onCommand();
-	return 1;
-}
-
-long FXButtonEx::onInvokeUpdate(FXObject*,FXSelector,void*)
-{
-	if (m_onUpdate.empty() || m_onUpdate())
-	{
-		if (!isEnabled())
-			enable();
-	}
-	else
-	{
-		if (isEnabled())
-			disable();
-	}
-	return 1;
-}
-
-// check button with signals
-// -------------------------
-FXDEFMAP(FXCheckButtonEx) CheckButtonMessageMap[]={
-	FXMAPFUNC(SEL_COMMAND, FXCheckButtonEx::ID_SELFTARGET, FXCheckButtonEx::onInvokeCommand),
-	FXMAPFUNC(SEL_UPDATE, FXCheckButtonEx::ID_SELFTARGET, FXCheckButtonEx::onInvokeUpdate),
-	FXMAPFUNC(SEL_COMMAND, FXWindow::ID_ACCEL, FXCheckButtonEx::onAccelCmd),
-};
-
-// Object implementation
-FXIMPLEMENT(FXCheckButtonEx,FXCheckButton,CheckButtonMessageMap,ARRAYNUMBER(CheckButtonMessageMap))
-
-FXCheckButtonEx::FXCheckButtonEx() : FXCheckButton(NULL, "", NULL,0, CHECKBUTTON_NORMAL|CHECKBUTTON_AUTOGRAY)
-{
-	setTarget(this);
-	setSelector(ID_SELFTARGET);
-}
-
-FXCheckButtonEx::FXCheckButtonEx(FXComposite* p,const FXString& text,flag_signal_t::slot_function_type slot,update_signal_t::slot_function_type upd,FXuint opts /*=0*/) : FXCheckButton(p, text, NULL,0, opts|CHECKBUTTON_NORMAL|CHECKBUTTON_AUTOGRAY)
-{
-	setTarget(this);
-	setSelector(ID_SELFTARGET);
-	onCommand(slot);
-	onUpdate(upd);
-}
-
-FXCheckButtonEx::FXCheckButtonEx(FXComposite* p,const FXString& text,flag_signal_t::slot_function_type slot,FXuint opts /*=0*/) : FXCheckButton(p, text, NULL,0, opts|CHECKBUTTON_NORMAL|CHECKBUTTON_AUTOGRAY)
-{
-	setTarget(this);
-	setSelector(ID_SELFTARGET);
-	onCommand(slot);
-}
-
-long FXCheckButtonEx::onAccelCmd(FXObject*,FXSelector,void*)
-{
-	if (isEnabled())
-	{
-		setCheck(!getCheck(), 1);
-		//m_onCommand(getCheck() ? true : false);
-	}
-	return 1;
-}
-
-long FXCheckButtonEx::onInvokeCommand(FXObject*,FXSelector,void*)
-{
-	if (isEnabled())
-		m_onCommand(getCheck() ? true : false);
-	return 1;
-}
-
-long FXCheckButtonEx::onInvokeUpdate(FXObject*,FXSelector,void*)
-{
-	if (m_onUpdate.empty())
-	{
-		if (!isEnabled())
-			enable();
-	}
-	else
-	{
-		int res = m_onUpdate();
-		if (res == -1)
-		{
-			if (isEnabled())
-				disable();
-		}
-		else
-		{
-			if (!isEnabled())
-				enable();
-			setCheck(res);
-		}
-	}
-	return 1;
-}
