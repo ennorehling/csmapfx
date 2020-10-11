@@ -24,8 +24,8 @@ bindings::value_t infodlg_parseTableFile(FXInfoDlg* dlg, const bindings::variant
 // *** FXMessages implementation
 
 FXDEFMAP(FXInfoDlg) MessageMap[]=
-{ 
-	//________Message_Type_____________________ID_______________Message_Handler_______ 
+{
+	//________Message_Type_____________________ID_______________Message_Handler_______
 	FXMAPFUNC(SEL_COMMAND,				FXInfoDlg::ID_CLOSE,					FXInfoDlg::onCmdHide),
 
 	FXMAPFUNC(SEL_COMMAND,				FXInfoDlg::ID_SEARCH,					FXInfoDlg::onSearch),
@@ -81,7 +81,7 @@ void FXInfoDlg::loadState(FXRegistry& reg)
 void FXInfoDlg::saveState(FXRegistry& reg)
 {
 	if (!isMinimized())
-	{		
+	{
 		reg.writeUnsignedEntry("INFODLG", "WIDTH", getWidth());
 		reg.writeUnsignedEntry("INFODLG", "HEIGHT", getHeight());
 	}
@@ -150,7 +150,7 @@ void FXInfoDlg::setGame(const FXString& game)
 void FXInfoDlg::setSearchText(const FXString& text)
 {
 	search->setText(text);
-	onSearch(this, 0, (void*)search->getText().text());	
+	onSearch(this, 0, (void*)search->getText().text());
 }
 
 void FXInfoDlg::setClipboard(const FXString& text)
@@ -167,7 +167,7 @@ long FXInfoDlg::onSearch(FXObject*, FXSelector, void* ptr)
 		return 0;
 
 	FXFoldingList* found_list = NULL;
-	FXint found_tab = 0, found_line = 0, found_start = 0, found_length = 0;
+	FXival found_tab = 0, found_line = 0, found_start = 0, found_length = 0;
 
 	FXint tab = 0;
 	for (std::map<FXString,infoblock>::iterator itor = blocks.begin(); itor != blocks.end(); itor++)
@@ -230,7 +230,7 @@ FXString FXInfoDlg::getTableText(FXFoldingList* list) const
 	text += '\n';
 
 	for (FXFoldingItem* item = list->getFirstItem(); item; item = item->getNext())
-        text += item->getText() + '\n';		
+        text += item->getText() + '\n';
 
 	return text;
 }
@@ -286,7 +286,7 @@ void FXInfoDlg::createTable()
 
 		// create items
 		std::vector<FXFoldingItem*> fathers;
-		FXint line = 0;
+		FXival line = 0;
 
 		for (std::list<infoblock::row>::iterator itor = block.lines.begin(); itor != block.lines.end(); itor++)
 		{
@@ -357,7 +357,7 @@ bool FXInfoDlg::parseTableData(std::istream& input)
 			FXString name = line.after('[').before(']').trim();
             if (name.empty())
 				name = "Sonstiges";
-			
+
 			// select block by name
 			block = &blocks[name];
 
@@ -375,7 +375,7 @@ bool FXInfoDlg::parseTableData(std::istream& input)
 			for (; !line.empty(); line = line.after('\t'))
 			{
 				FXString entry = line.before('\t').trim();
-				
+
 				if (entry == "_")	// Ein Unterstrich "_" erzeugt eine leere Spalte.
 					row.push_back("");
 				else if (!entry.empty())

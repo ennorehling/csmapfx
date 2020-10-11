@@ -6,8 +6,8 @@
 // *** FXMessages implementation
 
 FXDEFMAP(FXExportDlg) MessageMap[]=
-{ 
-	//________Message_Type_____________________ID_______________Message_Handler_______ 
+{
+	//________Message_Type_____________________ID_______________Message_Handler_______
 	FXMAPFUNC(SEL_COMMAND,				FXExportDlg::ID_ACCEPT,					FXExportDlg::onAccept),
 };
 
@@ -33,7 +33,7 @@ FXExportDlg::FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	new FXLabel(regionsize, iso2utf("Regionsgröße"));
 
 	scalebox = new FXComboBox(regionsize, 0, NULL,0, COMBOBOX_STATIC|FRAME_NORMAL);
-	for (int i = 1; i <= 128; i*=2)
+	for (FXuval i = 1; i <= 128; i*=2)
 		scalebox->appendItem(FXStringVal(i), (void*)i);
 	scalebox->setCurrentItem(4);
 	scalebox->setNumVisible(scalebox->getNumItems());
@@ -74,7 +74,7 @@ int FXExportDlg::getScale() const
 	int item = scalebox->getCurrentItem();
 	if (item < 0)
 		return 1;	// no current item?
-	
+
 	return (FXival)scalebox->getItemData(item);	// item data is scale
 }
 
@@ -83,7 +83,7 @@ int FXExportDlg::getColor() const
 	int item = colorbox->getCurrentItem();
 	if (item < 0)
 		return 1;	// no current item?
-	
+
 	return (FXival)colorbox->getItemData(item);	// item data is color index (0=black, 1=white)
 }
 

@@ -6,12 +6,12 @@
 // *** FXMessages implementation
 
 FXDEFMAP(FXMessages) MessageMap[]=
-{ 
-	//________Message_Type_____________________ID_______________Message_Handler_______ 
-	FXMAPFUNC(SEL_COMMAND,			FXMessages::ID_UPDATE,			FXMessages::onMapChange), 
+{
+	//________Message_Type_____________________ID_______________Message_Handler_______
+	FXMAPFUNC(SEL_COMMAND,			FXMessages::ID_UPDATE,			FXMessages::onMapChange),
 
-	FXMAPFUNC(SEL_DOUBLECLICKED,	0,								FXMessages::onDoubleClick), 
-}; 
+	FXMAPFUNC(SEL_DOUBLECLICKED,	0,								FXMessages::onDoubleClick),
+};
 
 FXIMPLEMENT(FXMessages,FXTreeList,MessageMap, ARRAYNUMBER(MessageMap))
 
@@ -26,7 +26,7 @@ FXMessages::FXMessages(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 
 	setSelTextColor(getTextColor());
 	setSelBackColor(getBackColor());
-	
+
 	groups.effects = appendItem(NULL, "Effekte");
 	groups.travel = appendItem(NULL, "Durchreise");
 	groups.other = appendItem(NULL, "Sonstiges");
@@ -67,7 +67,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 	{
 		selection.selChange = state->selChange;
 		selection.selected = state->selected;
-		
+
 		selection.region = state->region;
 		selection.faction = state->faction;
 		selection.building = state->building;
@@ -109,7 +109,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 					100;prozent
 					*/
 
-					char* directions[] = { "Nordwesten", "Nordosten", "Osten", "Südosten", "Südwesten", "Westen", "-unknown-" };
+					const char* directions[] = { "Nordwesten", "Nordosten", "Osten", "Südosten", "Südwesten", "Westen", "-unknown-" };
 
 					FXint dir = 0;
 					if (block->value("richtung").length())
@@ -117,7 +117,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 
 					if (dir < 0 || dir > 6)
 						dir = 6;
-					
+
 					FXString typ = block->value("typ");
 
 					FXint procent = 0;
@@ -156,9 +156,9 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 					MESSAGE 324149248
 					"von Figo (g351): 'KABUMM *kicher*'";rendered
 					*/
-					
+
 					FXTreeItem* item = appendItem(groups.other, block->value("rendered"));
-					
+
 					FXival unit = block->valueInt("unit");
 					if (!unit)
 						unit = block->valueInt("mage");
@@ -193,7 +193,7 @@ long FXMessages::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 
 		datablock::itor unit = files->front().unit(id);
 		if (unit != files->front().blocks().end())
-		{		
+		{
 			state.unit = unit;
 			state.selected |= state.UNIT;
 		}

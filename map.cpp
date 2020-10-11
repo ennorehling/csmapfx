@@ -16,40 +16,40 @@
 // *** FXCSMap implementation
 
 FXDEFMAP(FXCSMap) MessageMap[]=
-{ 
-	//________Message_Type_____________________ID_______________Message_Handler_______ 
-	FXMAPFUNC(SEL_MOTION,				FXCSMap::ID_MAP,				FXCSMap::onMotion), 
-	FXMAPFUNC(SEL_LEFTBUTTONPRESS,		FXCSMap::ID_MAP,				FXCSMap::onLeftButtonPress), 
-	FXMAPFUNC(SEL_LEFTBUTTONRELEASE,	FXCSMap::ID_MAP,				FXCSMap::onLeftButtonRelease), 
-	FXMAPFUNC(SEL_RIGHTBUTTONPRESS,		FXCSMap::ID_MAP,				FXCSMap::onRightButtonPress), 
-	FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	FXCSMap::ID_MAP,				FXCSMap::onRightButtonRelease), 
-	FXMAPFUNC(SEL_MOUSEWHEEL,			FXCSMap::ID_MAP,				FXCSMap::onWheel), 
-	FXMAPFUNC(SEL_PAINT,				FXCSMap::ID_MAP,				FXCSMap::onPaint), 
+{
+	//________Message_Type_____________________ID_______________Message_Handler_______
+	FXMAPFUNC(SEL_MOTION,				FXCSMap::ID_MAP,				FXCSMap::onMotion),
+	FXMAPFUNC(SEL_LEFTBUTTONPRESS,		FXCSMap::ID_MAP,				FXCSMap::onLeftButtonPress),
+	FXMAPFUNC(SEL_LEFTBUTTONRELEASE,	FXCSMap::ID_MAP,				FXCSMap::onLeftButtonRelease),
+	FXMAPFUNC(SEL_RIGHTBUTTONPRESS,		FXCSMap::ID_MAP,				FXCSMap::onRightButtonPress),
+	FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	FXCSMap::ID_MAP,				FXCSMap::onRightButtonRelease),
+	FXMAPFUNC(SEL_MOUSEWHEEL,			FXCSMap::ID_MAP,				FXCSMap::onWheel),
+	FXMAPFUNC(SEL_PAINT,				FXCSMap::ID_MAP,				FXCSMap::onPaint),
 
-	FXMAPFUNC(SEL_KEYPRESS,				FXCSMap::ID_MAP,				FXCSMap::onKeyPress), 
+	FXMAPFUNC(SEL_KEYPRESS,				FXCSMap::ID_MAP,				FXCSMap::onKeyPress),
 
-	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_POPUP_CLICKED,		FXCSMap::onPopupClicked), 
+	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_POPUP_CLICKED,		FXCSMap::onPopupClicked),
 
-	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_UPDATE,				FXCSMap::onMapChange), 
+	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_UPDATE,				FXCSMap::onMapChange),
 	FXMAPFUNC(SEL_QUERY_HELP,			0,								FXCSMap::onQueryHelp),
 
-	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_TOGGLESTREETS,		FXCSMap::onToggleStreets), 
+	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_TOGGLESTREETS,		FXCSMap::onToggleStreets),
 	FXMAPFUNC(SEL_UPDATE,				FXCSMap::ID_TOGGLESTREETS,		FXCSMap::onUpdateStreets),
-	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_TOGGLEVISIBILITYSYMBOL,	FXCSMap::onToggleVisibility), 
+	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_TOGGLEVISIBILITYSYMBOL,	FXCSMap::onToggleVisibility),
 	FXMAPFUNC(SEL_UPDATE,				FXCSMap::ID_TOGGLEVISIBILITYSYMBOL,	FXCSMap::onUpdateVisibility),
-	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_TOGGLESHIPTRAVEL,	FXCSMap::onToggleShipTravel), 
+	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_TOGGLESHIPTRAVEL,	FXCSMap::onToggleShipTravel),
 	FXMAPFUNC(SEL_UPDATE,				FXCSMap::ID_TOGGLESHIPTRAVEL,	FXCSMap::onUpdateShipTravel),
-	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_TOGGLESHADOWREGIONS,	FXCSMap::onToggleShadowRegions), 
+	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_TOGGLESHADOWREGIONS,	FXCSMap::onToggleShadowRegions),
 	FXMAPFUNC(SEL_UPDATE,				FXCSMap::ID_TOGGLESHADOWREGIONS,	FXCSMap::onUpdateShadowRegions),
-	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_TOGGLEISLANDS,		FXCSMap::onToggleIslands), 
+	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_TOGGLEISLANDS,		FXCSMap::onToggleIslands),
 	FXMAPFUNC(SEL_UPDATE,				FXCSMap::ID_TOGGLEISLANDS,		FXCSMap::onUpdateIslands),
 
-	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_SETMODUS,			FXCSMap::onSetModus), 
+	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_SETMODUS,			FXCSMap::onSetModus),
 	FXMAPFUNC(SEL_UPDATE,				FXCSMap::ID_SETMODUS,			FXCSMap::onUpdSetModus),
 
-	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_SETVISIBLEPLANE,	FXCSMap::onSetVisiblePlane), 
+	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_SETVISIBLEPLANE,	FXCSMap::onSetVisiblePlane),
 	FXMAPFUNC(SEL_UPDATE,				FXCSMap::ID_SETVISIBLEPLANE,	FXCSMap::onUpdVisiblePlane),
-}; 
+};
 
 FXIMPLEMENT(FXCSMap,FXScrollArea,MessageMap, ARRAYNUMBER(MessageMap))
 
@@ -63,7 +63,7 @@ FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbo
 	// createing resources
 	font.reset(new FXFont(getApp(), "helvetica", 8));
 	islandfont.reset(new FXFont(getApp(), "helvetica", 5*8, FXFont::Bold));
-	
+
 	// create client area
 	map = new FXCSMapCanvas(this, this,FXCSMap::ID_MAP, FRAME_SUNKEN|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 	map->setBackColor(FXRGB(0,0,0));
@@ -117,19 +117,19 @@ void scaleTransformIcon(FXIcon* icon, const unsigned char data[], FXint w, FXint
 void FXCSMap::create()
 {
 	FXScrollArea::create();
-	
+
 	// create fonts and image buffers
 	font->create();
 	islandfont->create();
 	backbuffer->create();
 	if (imagebuffer)
 		imagebuffer->create();
-	
+
 	// create all registered images
 	for (std::vector<IconRecord>::iterator it = iconRecords.begin(); it != iconRecords.end(); ++it)
 	{
 		IconRecord& icon = *it;
-		
+
 		(*icon.icon)->create();	// create image
 
 		// load image data and resize
@@ -170,7 +170,7 @@ void FXCSMap::calculateContentSize()
 	// auf 'unm�gliche' Werte initialisieren
 	FXint min_x =  0x0FFFFFFF;
 	FXint max_x = -0x0FFFFFFF;
-	
+
 	FXint min_y =  0x0FFFFFFF;
 	FXint max_y = -0x0FFFFFFF;
 
@@ -235,7 +235,7 @@ long FXCSMap::onToggleStreets(FXObject* /* sender */, FXSelector, void*)
 	show_streets = !show_streets;
 
 	map->update();
-	return 1;  
+	return 1;
 }
 
 long FXCSMap::onUpdateStreets(FXObject* sender, FXSelector, void*)
@@ -249,7 +249,7 @@ long FXCSMap::onToggleVisibility(FXObject* /* sender */, FXSelector, void*)
 	show_visibility_symbol = !show_visibility_symbol;
 
 	map->update();
-	return 1;  
+	return 1;
 }
 
 long FXCSMap::onUpdateVisibility(FXObject* sender, FXSelector, void*)
@@ -263,7 +263,7 @@ long FXCSMap::onToggleShipTravel(FXObject* /* sender */, FXSelector, void*)
 	show_ship_travel = !show_ship_travel;
 
 	map->update();
-	return 1;  
+	return 1;
 }
 
 long FXCSMap::onUpdateShipTravel(FXObject* sender, FXSelector, void*)
@@ -277,7 +277,7 @@ long FXCSMap::onToggleShadowRegions(FXObject* /* sender */, FXSelector, void*)
 	show_shadow_regions = !show_shadow_regions;
 
 	map->update();
-	return 1;  
+	return 1;
 }
 
 long FXCSMap::onUpdateShadowRegions(FXObject* sender, FXSelector, void*)
@@ -294,7 +294,7 @@ long FXCSMap::onToggleIslands(FXObject* /* sender */, FXSelector, void*)
 		paintMap(imagebuffer.get());
 
 	map->update();
-	return 1;  
+	return 1;
 }
 
 long FXCSMap::onUpdateIslands(FXObject* sender, FXSelector, void*)
@@ -441,7 +441,7 @@ void FXCSMap::moveContents(FXint x,FXint y)
 	//FXint dy=y-pos_y;
 	//scroll(0,0,viewport_w,viewport_h,dx,dy);
 
-	// set new position and update map    
+	// set new position and update map
 	pos_x=x;
 	pos_y=y;
 
@@ -462,7 +462,7 @@ void FXCSMap::scrollTo(FXint x, FXint y)
 {
 	// calculate 'screen' position of region coordinates
 	FXint scr_x = -(GetScreenFromHexX(x, y) + offset_x + FXint(32*scale)) + getWidth()/2;
-	FXint scr_y = -(GetScreenFromHexY(x, y) + offset_y + FXint(32*scale)) + getHeight()/2;		
+	FXint scr_y = -(GetScreenFromHexY(x, y) + offset_y + FXint(32*scale)) + getHeight()/2;
 
 	if (getWidth() > image_w)	scr_x -= (getWidth() - image_w)/2;
 	if (getHeight() > image_h)	scr_y -= (getHeight() - image_h)/2;
@@ -555,7 +555,7 @@ void scaleTransformIcon(FXIcon* icon, const unsigned char data[], FXint w, FXint
 void FXCSMap::registerImages()
 {
 	// register overlay colors
-	FXColor colors[] = 
+	FXColor colors[] =
 	{
 		FXRGB(255,0,0),		// red
 		FXRGB(0,255,0),		// green
@@ -621,7 +621,7 @@ void FXCSMap::registerImages()
 		&street_undone[3], data::street_undone_so, 64, 64, scaleable, no_transform,
 		&street_undone[4], data::street_undone_sw, 64, 64, scaleable, no_transform,
 		&street_undone[5], data::street_undone_w, 64, 64, scaleable, no_transform,
-		
+
 		// traveller arrows
 		&redarrows[0], data::redarrow_nw, 35, 35, scaleable, no_transform,
 		&redarrows[1], data::redarrow_no, 35, 35, scaleable, no_transform,
@@ -800,7 +800,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 
 		// set mark cursor
 		datafile::SelectionState state;
-		
+
 		if (!files->empty())
 		{
 			state.selected = 0;
@@ -992,7 +992,7 @@ long FXCSMap::onWheel(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 				x += offset;
 		else
 				y += offset;
-		
+
 		setPosition(x, y);
 		map->update();
 
@@ -1044,15 +1044,15 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 
 			cmd = new FXMenuCommand(menu, "&Insel benennen...", NULL, this,ID_POPUP_CLICKED);
 			cmd->setUserData((void*)POPUP_SETISLAND);
-			
+
 			FXMenuPane* terraform = new FXMenuPane(this);
 
 			datablock terrainRegion;
-			for (int i = 1; i < datablock::TERRAIN_LASTPUBLIC+1; i++)
+			for (FXuval i = 1; i < datablock::TERRAIN_LASTPUBLIC+1; i++)
 			{
 				terrainRegion.terrain(i);
 				cmd = new FXMenuCommand(terraform, terrainRegion.terrainString(), terrainIcons[i], this,ID_POPUP_CLICKED);
-				cmd->setUserData((void*)MKUINT(POPUP_TERRAFORM, i));
+				cmd->setUserData((void*)(FXuval)MKUINT(POPUP_TERRAFORM, i));
 			}
 
 			//new FXMenuSeparatorEx(terraform);
@@ -1119,16 +1119,16 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 			FXMenuPane* terraform = new FXMenuPane(this);
 
 			datablock terrainRegion;
-			for (int i = 1; i < datablock::TERRAIN_LASTPUBLIC+1; i++)
+			for (FXuval i = 1; i < datablock::TERRAIN_LASTPUBLIC+1; i++)
 			{
 				terrainRegion.terrain(i);
 				cmd = new FXMenuCommand(terraform, terrainRegion.terrainString(), terrainIcons[i], this,ID_POPUP_CLICKED);
-				cmd->setUserData((void*)MKUINT(POPUP_TERRAFORM, i));
+				cmd->setUserData((void*)(FXuval)MKUINT(POPUP_TERRAFORM, i));
 			}
 
 			new FXMenuSeparatorEx(terraform);
 			cmd = new FXMenuCommand(terraform, iso2utf("L�schen"), terrainIcons[0], this,ID_POPUP_CLICKED);
-			cmd->setUserData((void*)MKUINT(POPUP_TERRAFORM, 0));
+			cmd->setUserData((void*)(FXuval)MKUINT(POPUP_TERRAFORM, 0));
 
 			new FXMenuCascade(menu, "&Terraformen", terrainIcons[region->terrain()], terraform);
 
@@ -1158,11 +1158,11 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 	FXMenuCommand *cmd;
 
 	datablock terrainRegion;
-	for (int i = 1; i < datablock::TERRAIN_LASTPUBLIC+1; i++)
+	for (FXuval i = 1; i < datablock::TERRAIN_LASTPUBLIC+1; i++)
 	{
 		terrainRegion.terrain(i);
 		cmd = new FXMenuCommand(terraform, terrainRegion.terrainString(), terrainIcons[i], this,ID_POPUP_CLICKED);
-		cmd->setUserData((void*)MKUINT(POPUP_TERRAFORM, i));
+		cmd->setUserData((void*)(FXuval)MKUINT(POPUP_TERRAFORM, i));
 	}
 
 	new FXMenuCascade(menu, "&Neue Region", terrainIcons[0], terraform);
@@ -1250,7 +1250,7 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 
 					// map changed
 					files->begin()->createHashTables();
-					
+
 					datafile::SelectionState state = selection;
 					state.map |= state.MAPCHANGED;
 					getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
@@ -1394,7 +1394,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint terrain)
 	// don't use hash table only since it might be out-of-date
 	datablock::itor end = files->begin()->blocks().end();
 	datablock::itor region = end;
-	
+
 	if (terrain)			// speeds things up but only works when we don't delete
 		region = files->begin()->region(x, y, plane);
 
@@ -1555,8 +1555,8 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 	// create DC and empty buffer
 	FXDCWindow dc(buffer);
 
-	dc.setForeground(map->getBackColor()); 
-	dc.fillRectangle(0, 0, buffer->getWidth(), buffer->getHeight()); 
+	dc.setForeground(map->getBackColor());
+	dc.fillRectangle(0, 0, buffer->getWidth(), buffer->getHeight());
 
 	// init vars and set font
 	FXString label;
@@ -1701,11 +1701,11 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 						float val = stats->people[i];
 						if (val < 0) val = 0;
 						if (val > 1) val = 1;
-						dc.setForeground(colors[i]); 
+						dc.setForeground(colors[i]);
 						dc.fillRectangle(rl+i*rw_part, rt+rh-int(val*rh), rw_part, int(val*rh));
 					}
 
-					dc.setForeground(map->getBackColor()); 
+					dc.setForeground(map->getBackColor());
 
 					for (size_t i = 0; i < stats->people.size(); i++)
 					{
@@ -1862,7 +1862,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 		{
 			scr_x = GetScreenFromHexX(arrow->x, arrow->y) + scr_offset_x + FXint(arrow_offset_x[arrow->dir]*scale);
 			scr_y = GetScreenFromHexY(arrow->x, arrow->y) + scr_offset_y + FXint(arrow_offset_y[arrow->dir]*scale);
-			
+
 			FXIcon **iconSet;
 			if (arrow->color == arrow::ARROW_RED)
 				iconSet = redarrows;
@@ -1872,7 +1872,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 				iconSet = bluearrows;
 			else /*if (arrow->color == arrow::ARROW_GREY)*/ // catch-all
 				iconSet = greyarrows;
-			
+
 			dc.drawIcon(iconSet[arrow->dir], scr_x,scr_y);
 		}
 	}
@@ -1884,7 +1884,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 		scr_y = GetScreenFromHexY(sel_x, sel_y) + scr_offset_y;
 		dc.drawIcon(activeRegion, scr_x,scr_y);
 	}
-		
+
 	return true;
 }
 
@@ -1897,8 +1897,8 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 	// create DC and empty buffer
 	FXDCWindow dc(buffer);
 
-	dc.setForeground(getBackColor()); 
-	dc.fillRectangle(0, 0, buffer->getWidth(), buffer->getHeight()); 
+	dc.setForeground(getBackColor());
+	dc.fillRectangle(0, 0, buffer->getWidth(), buffer->getHeight());
 
 	// init vars and set font
 	FXString label;
@@ -1909,7 +1909,7 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 	FXint regionSize = FXint(64*scale);
 
 	dc.setFont(font.get());
-	dc.setForeground(map->getBackColor()); 
+	dc.setForeground(map->getBackColor());
 
 	// auf 'unm�gliche' Werte initialisieren
 	FXint min_x =  0x0FFFFFFF, max_x = -0x0FFFFFFF;
@@ -2078,8 +2078,8 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 
 // Paint the map
 long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
-{ 
-	FXEvent *ev = (FXEvent*)ptr; 
+{
+	FXEvent *ev = (FXEvent*)ptr;
 
 	if (minimap)
 	{
@@ -2087,8 +2087,8 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 		// so copy imagebuffer to backbuffer
 
 		FXDCWindow dc(backbuffer.get());
-		dc.setForeground(map->getBackColor()); 
-		dc.fillRectangle(0, 0, backbuffer->getWidth(), backbuffer->getHeight()); 
+		dc.setForeground(map->getBackColor());
+		dc.fillRectangle(0, 0, backbuffer->getWidth(), backbuffer->getHeight());
 
 		FXint center_x = pos_x;
 		FXint center_y = pos_y;
@@ -2125,10 +2125,10 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 			points[0].x = left, points[0].y = top;
 			points[1].x = right, points[1].y = top;
 			points[2].x = right, points[2].y = bottom;
-			points[3].x = left, points[3].y = bottom;			
+			points[3].x = left, points[3].y = bottom;
 			points[4].x = left, points[4].y = top;
 
-			dc.setForeground(FXRGB(255,255,255));		
+			dc.setForeground(FXRGB(255,255,255));
 			dc.drawLines(points, 5);
 		}
 	}
@@ -2136,7 +2136,7 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 		paintMap(backbuffer.get());		// paint the map onto the backbuffer
 
 	// copy backbuffer to screen
-	FXDCWindow screendc(map, ev); 
+	FXDCWindow screendc(map, ev);
 	screendc.drawImage(backbuffer.get(), 0, 0);
 
 	return 1;
@@ -2156,7 +2156,7 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 	{
 		selection.fileChange = state->fileChange;
 		selection.map = state->map;
-		
+
 		datachanged = true;
 	}
 
@@ -2164,7 +2164,7 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 	{
 		selection.selChange = state->selChange;
 		selection.selected = state->selected;
-		
+
 		selection.region = state->region;
 		selection.faction = state->faction;
 		selection.building = state->building;
@@ -2190,7 +2190,7 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 				visiblePlane = sel_plane;
 				datachanged = true;
 			}
-			
+
 			scroll = true;
 		}
 
@@ -2220,7 +2220,7 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 					FXString line = itor->value();
 					FXString cmd = line.before(' ');
 					cmd.upper();
-					
+
 					if (cmd != "NACH" && cmd != "ROUTE")
 						continue;
 
@@ -2307,7 +2307,7 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
             // resize (& layout() & calculateContentSize())
 			float sc = scale;
-			scale = 0;			
+			scale = 0;
 			scaleChange(sc);	// sc must be != scale
 
 			// paint map into buffer
@@ -2350,7 +2350,7 @@ FXint FXCSMap::sendRouteCmds(const FXString& str, int which)
 
 	FXString line = str;
 	FXString cmd = line.before(' ').upper();
-	
+
 	if (cmd != "NACH" && cmd != "ROUTE")
 	{
 		arrows.clear();
@@ -2418,7 +2418,7 @@ FXint FXCSMap::sendRouteCmds(const FXString& str, int which)
 		arrow.dir = dir;
 		arrow.color = paused ? arrow::ARROW_GREY : (which ? arrow::ARROW_RED : arrow::ARROW_BLUE);
 		routeArrows[which].push_back(arrow);
-		
+
 		length++;
 
 		x += offset_x[dir]; y += offset_y[dir];
@@ -2558,7 +2558,7 @@ long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
 		if (selection.selected & selection.MULTIPLE_REGIONS)
 		{
 			state.regionsSelected = selection.regionsSelected;
-			if (state.regionsSelected.size())		
+			if (state.regionsSelected.size())
 				state.selected |= selection.MULTIPLE_REGIONS;
 		}
 
@@ -2605,7 +2605,7 @@ long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
 
 		if (offy)
 			y += offy * map->getHeight() / 5;
-			
+
 		setPosition(x, y);
 		map->update();
 		return 1;
@@ -2615,7 +2615,7 @@ long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
 }
 
 long FXCSMap::onQueryHelp(FXObject* sender, FXSelector, void*)
-{ 
+{
 	// connected to a datafile list?
 	if (!files)
 		return 0;
