@@ -39,7 +39,8 @@
 
 #include <functional>   // std::less
 #include <memory>       // std::auto_ptr
-#include <assert.h>     // assert
+#include <cassert>     // assert
+#include <cstddef>
 
 /**
  * doubly linked list implementation
