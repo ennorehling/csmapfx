@@ -61,7 +61,6 @@ protected:
 	void clearInfo();
 
 	void collectData(std::list<Info>& info, datablock::itor region);
-	void collectData_Ruby(std::list<Info>& info, datablock::itor region);	// collect by calling ruby
 	void updateData();
 
 protected:

@@ -1,5 +1,3 @@
-#include <stdexcept>
-
 #include "version.h"
 #include "main.h"
 #include "fxhelper.h"
@@ -14,13 +12,7 @@
 #include <FXRex.h>
 #include <FXICOIcon.h>
 
-#include <boost/signal.hpp>
-
-// command signals
-// ---------------
-typedef boost::signal<void()> command_signal_t;
-typedef boost::signal<int()> update_signal_t;		// allowed: true, false, -1
-
+#include <stdexcept>
 
 FXDEFMAP(CSMap) MessageMap[]=
 {

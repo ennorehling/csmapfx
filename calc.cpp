@@ -6,36 +6,6 @@
 #include "calc.h"
 #include "symbols.h"
 
-#undef strcasecmp
-#include <ruby.h>
-#undef bind
-#include "csruby.h"
-#include "bindings.h"
-
-// *********************************************************************************************************
-
-namespace Script
-{
-	struct ScriptValues
-	{
-		Ruby::Value region, faction, building, ship, unit;
-
-		ScriptValues()
-		{
-			bindings::define_ro_variable("region", region);
-			bindings::define_ro_variable("faction", faction);
-			bindings::define_ro_variable("building", building);
-			bindings::define_ro_variable("ship", ship);
-			bindings::define_ro_variable("unit", unit);
-		}
-	};
-}
-
-void linked_ptr_deleter<Script::ScriptValues>::operator()(Script::ScriptValues* ptr) const
-{
-	delete ptr;
-}
-
 // *********************************************************************************************************
 // *** FXCalculator implementation
 
@@ -72,14 +42,15 @@ FXCalculator::FXCalculator(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	setBorderColor(getApp()->getShadowColor());
 
 	// close button icon
-	if (p && p->getParent())
-		if (p->getParent()->getParent())
-		{
-			closeIcon = new FXGIFIcon(getApp(), data::small_x, FXRGB(255,255,255), IMAGE_ALPHACOLOR);
+    if (p && p->getParent()) {
+        if (p->getParent()->getParent())
+        {
+            closeIcon = new FXGIFIcon(getApp(), data::small_x, FXRGB(255, 255, 255), IMAGE_ALPHACOLOR);
             new FXButton(this,
                 L"\t\tTaschenrechnerleiste schliessen",
                 closeIcon, this, FXCalculator::ID_CLOSE, BUTTON_TOOLBAR);
-		}
+        }
+    }
 
 	new FXLabel(this, "Rechner ", 0, LAYOUT_CENTER_Y);
 
@@ -99,8 +70,6 @@ FXCalculator::FXCalculator(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	longresult = new FXTextField(secondline, 13, NULL,0, TEXTFIELD_READONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 	longresult->setBackColor(getBackColor());
 
-	// init Ruby script variables
-	values.reset(new Script::ScriptValues);
 }
 
 void FXCalculator::create()
@@ -212,26 +181,6 @@ long FXCalculator::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 	if (needUpdate)
 	{
-		using Ruby::Value;
-
-		// set ruby bindings
-		values->region = Value();
-		values->faction = Value();
-		values->building = Value();
-		values->ship = Value();
-		values->unit = Value();
-
-		if (selection.selected & selection.REGION)
-			values->region = bindings::bind_block(*files, selection.region);
-		if (selection.selected & selection.FACTION)
-			values->faction = bindings::bind_block(*files, selection.faction);
-		if (selection.selected & selection.BUILDING)
-			values->building = bindings::bind_block(*files, selection.building);
-		if (selection.selected & selection.SHIP)
-			values->ship = bindings::bind_block(*files, selection.ship);
-		if (selection.selected & selection.UNIT)
-			values->unit = bindings::bind_block(*files, selection.unit);
-
 		onChanged(this, 0, NULL);
 	}
     
@@ -283,19 +232,15 @@ long FXCalculator::onChanged(FXObject*, FXSelector, void*)
 
 	// ruby parsing
 	std::string resultstr;
-	try
-	{
-		Ruby::Value val = Ruby::Evaluate( utf2iso(exp).text() );
-		resultstr = val.to_s();
+    /*
+	Ruby::Value val = Ruby::Evaluate( utf2iso(exp).text() );
+	resultstr = val.to_s();
 
-		for (std::string::iterator it = resultstr.begin(); it != resultstr.end(); it++)
-			if (*it == '\n' || *it == '\r' || *it == '\t')
-				*it = ' ';
-	}
-	catch (const Ruby::Error& err)
-	{
-		resultstr = err.str();
-	}
+	for (std::string::iterator it = resultstr.begin(); it != resultstr.end(); it++)
+		if (*it == '\n' || *it == '\r' || *it == '\t')
+			*it = ' ';
+    */
+    resultstr.assign("not implementd");
 
 	if (resultstr.size() > 15)
 	{

@@ -6,7 +6,6 @@
 #include "fxhelper.h"
 #include "map.h"
 #include "symbols.h"
-#include "bindings.h"
 
 #include <fxkeys.h>
 #include <boost/bind.hpp>
@@ -1540,13 +1539,6 @@ struct island
 	FXint left, top, right, bottom;
 };
 
-struct puts_ignore
-{
-	void operator()(const bindings::variant_t&)
-	{
-	}
-};
-
 FXbool FXCSMap::paintMap(FXDrawable* buffer)
 {
 	// connected to a datafile list?
@@ -1613,10 +1605,8 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 				icons = terrainShadow;
 
 			/*-------------------------*/
-
-			try
-			{
-				bindings::variant_t val = bindings::call_globalproc("$overlay", puts_ignore(), bindings::bind_block(*files, block));
+            /*
+            bindings::variant_t val = bindings::call_globalproc("$overlay", puts_ignore(), bindings::bind_block(*files, block));
 				int* ptr;
 				if ((ptr = boost::get<int>(&val)) && *ptr >= 0 && (size_t)*ptr < overlays.size())
 					dc.drawIcon(overlays[*ptr].at(block->terrain()), scr_x,scr_y);
@@ -1627,8 +1617,9 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 			{
 				dc.drawIcon(icons[block->terrain()], scr_x,scr_y);
 			}
-
-			/*-------------------------*/
+            */
+            dc.drawIcon(icons[block->terrain()], scr_x, scr_y);
+            /*-------------------------*/
 
 			//dc.drawIcon(icons[block->terrain()], scr_x,scr_y);
 
@@ -1962,7 +1953,7 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 			if (scr_x < -regionSize || scr_y < -regionSize || scr_x > width || scr_y > height)
 				continue;
 
-			/*-------------------------*/
+			/*
 
 			try
 			{
@@ -1977,7 +1968,8 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 			{
 				dc.drawIcon(terrain[block->terrain()], scr_x,scr_y);
 			}
-
+            */
+            dc.drawIcon(terrain[block->terrain()], scr_x, scr_y);
 			/*-------------------------*/
 
 			// draw terrain image
