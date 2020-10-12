@@ -5,18 +5,6 @@
 #include <list>
 #include "datafile.h"
 #include "map.h"
-#include "linked_ptr.h"
-
-namespace Script
-{
-	struct ScriptValues;
-}
-
-template <>
-struct linked_ptr_deleter<Script::ScriptValues>
-{
-	void operator()(Script::ScriptValues* ptr) const;
-};
 
 class FXCalculator : public FXHorizontalFrame
 {
@@ -66,8 +54,6 @@ protected:
 	FXIcon				*closeIcon;
 
 	FXCSMap				*map;				// map to send ROUTE commands to
-
-	linked_ptr<Script::ScriptValues> values;		// Ruby values
 
 protected:
 	FXCalculator(){}

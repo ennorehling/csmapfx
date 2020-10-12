@@ -3,6 +3,8 @@
 #include "regioninfos.h"
 #include "symbols.h"
 
+#include <algorithm>
+
 // *********************************************************************************************************
 // *** FXRegionInfos implementation
 

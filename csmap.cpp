@@ -1,5 +1,3 @@
-#include <stdexcept>
-
 #include "version.h"
 #include "main.h"
 #include "fxhelper.h"
@@ -13,6 +11,8 @@
 #include "FXFileDialogEx.h"
 #include <FXRex.h>
 #include <FXICOIcon.h>
+
+#include <stdexcept>
 
 FXDEFMAP(CSMap) MessageMap[]=
 {
@@ -495,8 +495,6 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	commands = new FXCommands(commandframe, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
 	commands->mapfiles(&files);
 	commands->connectMap(map);
-
-	update_signal_t::slot_function_type whenCommandable = boost::bind(&FXCommands::isEnabled, commands);
 
 	// commands editor tools
 	FXHorizontalFrame *cmdBottomFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
@@ -1919,21 +1917,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
 	handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &title);
 
-	// trigger signals
-	if (state->map & selection.MAPCHANGED)
-		signals.map_change();
-	signals.selection_change();
 	return 1;
-}
-
-connection_t CSMap::register_selection_change(command_signal_t::slot_function_type slot)
-{
-    return signals.selection_change.connect(slot);
-}
-
-connection_t CSMap::register_map_change(command_signal_t::slot_function_type slot)
-{
-	return signals.map_change.connect(slot);
 }
 
 long CSMap::onQueryMap(FXObject* sender, FXSelector, void*)

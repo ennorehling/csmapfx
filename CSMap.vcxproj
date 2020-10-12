@@ -122,7 +122,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;legacy_stdio_definitions.lib;FOX-1.6.lib;vcruntime140-ruby270.lib;wsock32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;legacy_stdio_definitions.lib;FOX-1.6.lib;wsock32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)CsMapFX.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -150,11 +150,9 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bindings.cpp" />
     <ClCompile Include="calc.cpp" />
     <ClCompile Include="commands.cpp" />
     <ClCompile Include="csmap.cpp" />
-    <ClCompile Include="csruby.cpp" />
     <ClCompile Include="datafile.cpp" />
     <ClCompile Include="exportdlg.cpp" />
     <ClCompile Include="FXFileDialogEx.cpp" />
@@ -179,11 +177,9 @@
     <ClCompile Include="unitlist.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bindings.h" />
     <ClInclude Include="calc.h" />
     <ClInclude Include="commands.h" />
     <ClInclude Include="csmap.h" />
-    <ClInclude Include="csruby.h" />
     <ClInclude Include="datafile.h" />
     <ClInclude Include="exportdlg.h" />
     <ClInclude Include="FXFileDialogEx.h" />

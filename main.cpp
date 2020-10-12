@@ -18,8 +18,6 @@
 #include <string>
 #include <fx.h>
 
-#include "csruby.h"
-
 #define CSMAP_MAIN
 #include "fxwin.h"
 
@@ -28,7 +26,6 @@
 #include "fxhelper.h"
 #include "translator.h"
 #include "csmap.h"
-#include "bindings.h"
 
 #include "calc.h"
 
@@ -80,9 +77,6 @@ void showVersion()
 int main(int argc, char *argv[])
 {
 	initSystems();		// inits COM under windows
-	Ruby::initialize();	// inits ruby command interpreter
-	bindings::initialize();	// inits ruby <-> csmap bindings
-	atexit(Ruby::finalize);
 
 	// Make application 
 	FXApp CSApp("CSMap", "DraigSoft"); 

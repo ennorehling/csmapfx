@@ -3,6 +3,8 @@
 #include "statistics.h"
 #include "FXMenuSeparatorEx.h"
 
+#include <algorithm>
+
 // *********************************************************************************************************
 // *** FXStatistics implementation
 

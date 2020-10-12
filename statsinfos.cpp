@@ -1,9 +1,9 @@
-#include <exception>
-
 #include "main.h"
 #include "fxhelper.h"
 #include "statsinfos.h"
-#include "bindings.h"
+
+#include <algorithm>
+#include <exception>
 
 // *********************************************************************************************************
 // *** FXStatsInfos implementation
@@ -267,61 +267,6 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
 	if (learncost) addEntry(info, "Lernkosten", -learncost, 0, 0, "Ausgaben zum Lernen von Talenten");
 }
 
-struct line_collector
-{
-	std::list<bindings::variant_t>* lines;
-
-	line_collector(std::list<bindings::variant_t>& lines_) : lines(&lines_) {}
-
-	void operator()(const bindings::variant_t& line)
-	{
-		lines->push_back(line);
-	}
-};
-
-void FXStatsInfos::collectData_Ruby(std::list<Info>& info, datablock::itor region)
-{
-	std::list<bindings::variant_t> lines;
-	line_collector handler(lines);
-
-	try
-	{
-		bindings::call_globalproc("$statistics", handler, bindings::bind_block(*files, region));
-        
-		for (std::list<bindings::variant_t>::iterator line = lines.begin(); line != lines.end(); line++)
-		{
-			FXString text = "...";
-			int values[3] = {};
-
-			// first line: a string
-			if (const std::string* str = boost::get<std::string>(&*line))
-				text = iso2utf(str->c_str());
-
-			// second line: an integer value, or a vector
-			if (++line != lines.end())
-			{
-				if (int* ptr = boost::get<int>(&*line))
-					values[0] = *ptr;
-				else if (std::vector<bindings::value_t>* ptr = boost::get<std::vector<bindings::value_t> >(&*line))
-					for (size_t i = 0; i < 3 && i < ptr->size(); i++)
-					{
-						bindings::value_t& val = (*ptr)[i];
-						if (int* ptr = boost::get<int>(&val))
-							values[i] = *ptr;
-					}
-			}
-			else
-				--line;		// output entry even if line count is odd
-
-			addEntry(info, text, values[0], values[2], values[1]);
-		}
-	}
-	catch(const std::exception&)
-	{
-		addEntry(info, "#Ruby Error", 0, 0, 0);
-	}
-}
-
 void FXStatsInfos::updateData()
 {
 	//if (files->empty())
@@ -364,8 +309,6 @@ void FXStatsInfos::updateData()
 
 		// bla
 		collectData(info, selection.region);
-
-		collectData_Ruby(info, selection.region);
 
 		// apply information entries (Bauern, Silber, Pferde...)
 		setInfo(info);

@@ -1,24 +1,14 @@
-#include <cctype>
-#include <cctype>
-#include <sstream>
-#include <fstream>
-
 #include "main.h"
 #include "fxhelper.h"
 #include "infodlg.h"
 #include "symbols.h"
 #include "FXMenuSeparatorEx.h"
 
-#include "bindings.h"
-
-// *********************************************************************************************************
-
-// stub function
-bindings::value_t infodlg_parseTableFile(FXInfoDlg* dlg, const bindings::variant_t& arg)
-{
-	//dlg->parseTableFile();
-	return bindings::nil;
-}
+#include <cctype>
+#include <cctype>
+#include <sstream>
+#include <fstream>
+#include <algorithm>
 
 // *********************************************************************************************************
 // *** FXMessages implementation
