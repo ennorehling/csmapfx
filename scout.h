@@ -1,15 +1,13 @@
 #ifndef CSMAP_SCOUT_H_
 #define CSMAP_SCOUT_H_
 
-#include <boost/function.hpp>
-
 class Scout
 {
 public:
 	Scout();
 	~Scout();
 
-	void step(boost::function<bool(int x, int y)> cond);
+	void step(bool(*cond)(int x, int y));
 	void show();
 	void get(std::ostream& out, size_t which) const;
 

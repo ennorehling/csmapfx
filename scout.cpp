@@ -2,7 +2,6 @@
 #define NOMINMAX
 #include <windows.h>
 #endif
-#include <boost/random.hpp>
 #include <ctime>
 #include <vector>
 #include <ostream>
@@ -36,7 +35,7 @@ public:
 	}
 
 	void mutate();
-	void rate(const boost::function<bool(int x, int y)>& isOcean);
+	void rate(bool(*isOcean)(int x, int y));
 	void random_rate();
 
 private:	
@@ -49,21 +48,19 @@ private:
 
 Phenotype::Phenotype() : genom(GENOM_SIZE)
 {
-	static boost::rand48 rnd(static_cast<boost::rand48::result_type>(std::time(0)));
-
+    srand(time(0));
 	for (size_t i = 0; i < genom.size(); i++)
 	{
-		genom[i] = rnd() % Phenotype::MAX_DIRECTION;
+		genom[i] = rand() % Phenotype::MAX_DIRECTION;
 	}
 }
 
 Phenotype::Phenotype(const Phenotype& parent1, const Phenotype& parent2) : genom(GENOM_SIZE)
 {
-	static boost::rand48 rnd(static_cast<boost::rand48::result_type>(std::time(0)));
-
-	// generate new genom by recombination of parent1 and parent2
-	size_t crossover = rnd() % Phenotype::GENOM_SIZE;
-	//size_t crossover2 = rnd() % Phenotype::GENOM_SIZE;
+    srand(time(0));
+    // generate new genom by recombination of parent1 and parent2
+	size_t crossover = rand() % Phenotype::GENOM_SIZE;
+	//size_t crossover2 = rand() % Phenotype::GENOM_SIZE;
 
 	//if (crossover > crossover2)
 		//std::swap(crossover, crossover2);
@@ -83,26 +80,26 @@ Phenotype::Phenotype(const Phenotype& parent1, const Phenotype& parent2) : genom
 
 void Phenotype::mutate()
 {
-	static boost::rand48 rnd(static_cast<boost::rand48::result_type>(std::time(0)));
-
+    srand(time(0));
+    
 	const double mutation = mutation_probability/100.0;
 
 	// mutate every gen by mutation_probability %
 	for (size_t i = 0; i < GENOM_SIZE; i++)
-		if (rnd()/(double)rnd.max() < mutation)
-			genom[i] = rnd() % Phenotype::MAX_DIRECTION;
+		if (rand()/(double)RAND_MAX < mutation)
+			genom[i] = rand() % Phenotype::MAX_DIRECTION;
 }
 
 void Phenotype::random_rate()
 {
-	static boost::rand48 rnd(static_cast<boost::rand48::result_type>(std::time(0)));
+    srand(time(0));
 
-	fitness = std::floor(fitness) + rnd() / (double)rnd.max();
+	fitness = std::floor(fitness) + rand() / (double)RAND_MAX;
 }
 
-void Phenotype::rate(const boost::function<bool(int x, int y)>& isOcean)
+void Phenotype::rate(bool(*isOcean)(int x, int y))
 {
-	static boost::rand48 rnd(static_cast<boost::rand48::result_type>(std::time(0)));
+    srand(time(0));
 
 	// NO, O, SO, SW, W, NW
 	const int offset_x[6] = {  0, +1, +1,  0, -1, -1 };
@@ -137,7 +134,7 @@ void Phenotype::rate(const boost::function<bool(int x, int y)>& isOcean)
 			}
 
 			// check if ship leaves coast to an ocean region
-			if (coast != MAX_DIRECTION && !isOcean(x+offset_x[dir],y+offset_y[dir]))
+			if (coast != MAX_DIRECTION && !isOcean(x+offset_x[dir], y+offset_y[dir]))
 			{
 				//fit -= 2*(end - i);
 				break;
@@ -181,9 +178,9 @@ class Scout::ScoutData
 {
 public:
 	ScoutData();
-	void rate_all(const boost::function<bool(int x, int y)>& cond);
-	void select_best(const boost::function<bool(int x, int y)>& cond);
-	void mutate_some(const boost::function<bool(int x, int y)>& cond);
+	void rate_all(bool(*cond)(int x, int y));
+	void select_best(bool(*cond)(int x, int y));
+	void mutate_some(bool(*cond)(int x, int y));
 
 	void get_genom(std::ostream& out, size_t which) const;
 	void show(std::ostream& out) const;
@@ -206,7 +203,7 @@ Scout::ScoutData::ScoutData() : rated(false)
 		generation.push_back(Phenotype());
 }
 
-void Scout::ScoutData::rate_all(const boost::function<bool(int x, int y)>& cond)
+void Scout::ScoutData::rate_all(bool(*cond)(int x, int y))
 {
 	if (!rated)
 	{
@@ -227,9 +224,9 @@ void Scout::ScoutData::rate_all(const boost::function<bool(int x, int y)>& cond)
 	generation.sort();
 }
 
-void Scout::ScoutData::select_best(const boost::function<bool(int x, int y)>& cond)
+void Scout::ScoutData::select_best(bool(*cond)(int x, int y))
 {
-	static boost::rand48 rnd(static_cast<boost::rand48::result_type>(std::time(0)));
+    srand(time(0));
 
 	while (generation.size() > elite_count + survivor_count)
 		generation.pop_back();
@@ -243,10 +240,10 @@ void Scout::ScoutData::select_best(const boost::function<bool(int x, int y)>& co
 	// fill population with siblings from the elite until pop is up to population_count again
 	while (generation.size() < population_count)
 	{
-		size_t parent1 = rnd() % elite_count;
-		size_t parent2 = rnd() % elite_count;
+		size_t parent1 = rand() % elite_count;
+		size_t parent2 = rand() % elite_count;
 		while (parent1 == parent2)
-			parent2 = rnd() % elite_count;
+			parent2 = rand() % elite_count;
 
 		generation.push_back( Phenotype(*elite[parent1], *elite[parent2]) );
 		generation.back().rate(cond);
@@ -332,7 +329,7 @@ void Scout::get(std::ostream& out, size_t which) const
 	data->get_genom(out, which);
 }
 
-void Scout::step(boost::function<bool(int x, int y)> cond)
+void Scout::step(bool(*cond)(int x, int y))
 {
 	data->rate_all(cond);
 	data->select_best(cond);
