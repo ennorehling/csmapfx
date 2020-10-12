@@ -5,9 +5,6 @@
 #include <ostream>
 #include <fx.h>
 
-#include <boost/signal.hpp>
-#include <boost/bind.hpp>
-
 // array begin() / end() template
 // ------------------------------
 template <typename T, std::size_t size>
@@ -49,12 +46,5 @@ inline std::ostream& operator<<(std::ostream& out, const FX::FXString& str)
 {
     return out << utf2iso(str).text();
 }
-
-// command signals
-// ---------------
-typedef boost::signal<void ()> command_signal_t;
-typedef boost::signal<int ()> update_signal_t;		// allowed: true, false, -1
-
-typedef boost::signals::connection connection_t;
 
 #endif //_CSMAP_FXHELPER_H

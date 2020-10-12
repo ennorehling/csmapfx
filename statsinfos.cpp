@@ -1,9 +1,9 @@
-#include <exception>
-
 #include "main.h"
 #include "fxhelper.h"
 #include "statsinfos.h"
-#include "bindings.h"
+
+#include <algorithm>
+#include <exception>
 
 // *********************************************************************************************************
 // *** FXStatsInfos implementation

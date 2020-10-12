@@ -31,9 +31,6 @@ public:
 
     static CSMap* getInstance();
 
-    connection_t register_selection_change(command_signal_t::slot_function_type slot);
-    connection_t register_map_change(command_signal_t::slot_function_type slot);
-
 	void mapChange(bool newfile = false);
 	bool haveActiveFaction() const;
 	bool loadFile(FXString filename);
@@ -281,13 +278,6 @@ private:
 		FXIcon *terrain[datablock::TERRAIN_LAST];
 
 	} icons;
-
-	// map change / selection change signals
-	struct
-	{
-		command_signal_t		selection_change;
-		command_signal_t		map_change;
-	} signals;
 
     // some data
 	std::list<datafile>			files;

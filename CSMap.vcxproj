@@ -150,7 +150,6 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bindings.cpp" />
     <ClCompile Include="calc.cpp" />
     <ClCompile Include="commands.cpp" />
     <ClCompile Include="csmap.cpp" />
@@ -179,7 +178,6 @@
     <ClCompile Include="unitlist.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bindings.h" />
     <ClInclude Include="calc.h" />
     <ClInclude Include="commands.h" />
     <ClInclude Include="csmap.h" />

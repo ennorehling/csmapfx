@@ -9,6 +9,7 @@
 #include "bindings.h"
 
 #include <fxkeys.h>
+#include <boost/bind.hpp>
 
 #include "FXMenuSeparatorEx.h"
 
