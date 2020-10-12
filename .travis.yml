@@ -8,7 +8,7 @@ addons:
   apt:
     packages:
       - libfox-1.6
-      - ruby 
+      - ruby-dev
       - libboost-dev
       - cppcheck
 os:
