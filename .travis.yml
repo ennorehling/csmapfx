@@ -1,5 +1,5 @@
 sudo: false
-language: c
+language: c++
 compiler:
   - gcc
   - clang
@@ -11,6 +11,3 @@ addons:
       - libboost-dev
 os:
   - linux
-notifications:
-  slack:
-    secure: F89aXLWaE125PaJIlETv12jT4EfH6wLXJmGCPZzrN3OcLn2ahDWqjwuzR7lOEDf2nAISmeMPyDZMhEHXLNHAE5qP6lg9yliYQw5hzGmDK9m1xUq/pPEne/b2Y7K3my1mkRZ6n3asbHgSmBWAfCIk1JN8R5Rv+rmbLuWLc+zofts=
