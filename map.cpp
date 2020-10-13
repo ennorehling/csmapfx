@@ -1037,7 +1037,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 			FXMenuPane *menu = new FXMenuPane(this);
 
 			FXString label;
-			label.format("%d Regionen", selection.regionsSelected.size());
+			label.format("%lu Regionen", selection.regionsSelected.size());
 
 			new FXMenuSeparatorEx(menu, label);
 			FXMenuCommand *cmd;
