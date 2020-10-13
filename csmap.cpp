@@ -819,7 +819,7 @@ bool CSMap::loadFile(FXString filename)
 	{
 		files.pop_back();
 		recentFiles.removeFile(filename);
-		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, iso2utf(err.what()).text());
+		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, err.what());
 		return false;
 	}
 
@@ -827,7 +827,7 @@ bool CSMap::loadFile(FXString filename)
 	{
 		files.pop_back();
 		recentFiles.removeFile(filename);
-		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, iso2utf("Die Datei konnte nicht gelesen werden.\nMöglicherweise wird das Format nicht unterstützt.").text());
+		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, L"Die Datei konnte nicht gelesen werden.\nMöglicherweise wird das Format nicht unterstützt.");
 		return false;
 	}
 
@@ -835,7 +835,7 @@ bool CSMap::loadFile(FXString filename)
 	{
 		files.pop_back();
 		recentFiles.removeFile(filename);
-		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei hat das falsche Format.");
+		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, L"Die Datei hat das falsche Format.");
         return false;
 	}
 

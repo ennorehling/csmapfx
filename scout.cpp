@@ -250,7 +250,7 @@ void Scout::ScoutData::select_best(bool(*cond)(int x, int y))
 	}
 }
 
-void Scout::ScoutData::mutate_some(const boost::function<bool(int x, int y)>& cond)
+void Scout::ScoutData::mutate_some(bool(*cond)(int x, int y) )
 {
 	generation_t::iterator itor = generation.begin();
 	generation_t::iterator end = generation.end();
