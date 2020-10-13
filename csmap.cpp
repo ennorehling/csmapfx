@@ -70,7 +70,7 @@ FXDEFMAP(CSMap) MessageMap[]=
 
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_SETORIGIN,	CSMap::onSetOrigin),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_MAKEMAP,		CSMap::onMakeMap),
-	
+
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_VISIBLEPLANE,	CSMap::onSetVisiblePlane),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_MAP_VISIBLEPLANE,	CSMap::onUpdVisiblePlane),
 
@@ -89,11 +89,11 @@ FXDEFMAP(CSMap) MessageMap[]=
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_SELECTION,		CSMap::onQueryMap),
 
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_CALCULATOR,		CSMap::onCalculator),
-	
+
 	FXMAPFUNC(SEL_CLIPBOARD_REQUEST, 0,						CSMap::onClipboardRequest),
 	FXMAPFUNC(SEL_CLIPBOARD_LOST, 0,						CSMap::onClipboardLost),
 	FXMAPFUNC(SEL_CLIPBOARD_REQUEST, CSMap::ID_SETSTRINGVALUE,	CSMap::onSetClipboard),
-	
+
 	FXMAPFUNC(SEL_QUERY_HELP,	CSMap::ID_SETSTRINGVALUE,	CSMap::onSearchInfo),
 };
 
@@ -241,7 +241,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	new FXMenuCommand(
 		filemenu,
 		iso2utf("Ö&ffnen...\tCtrl-O\tEine neue Datei öffnen."),
-		NULL, 
+		NULL,
 		this,
 		ID_FILE_OPEN);
 	new FXMenuCommand(
@@ -260,7 +260,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 		filemenu,
 		iso2utf("Sch&liessen\t\tDie aktuelle Datei schliessen."),
 		NULL, this, ID_FILE_CLOSE);
-	
+
 	new FXMenuSeparatorEx(filemenu);
 	new FXMenuCommand(
         filemenu,
@@ -382,7 +382,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	new FXMenuCommand(mapmenu,"Nach Osten\tCtrl-L\tRegionsmarker eins nach Osten setzen.",NULL,this,ID_MAP_MARKEREAST,0);
 	new FXMenuCommand(mapmenu,iso2utf("Nach Südwesten\tCtrl-J\tRegionsmarker eins nach Südwesten setzen."),NULL,this,ID_MAP_MARKERSOUTHWEST,0);
 	new FXMenuCommand(mapmenu,"Nach Nordosten\tCtrl-K\tRegionsmarker eins nach Nordosten setzen.",NULL,this,ID_MAP_MARKERNORTHEAST,0);
-	
+
 	getAccelTable()->addAccel(MKUINT(KEY_KP_5,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_SELECTMARKED));
 	getAccelTable()->addAccel(MKUINT(KEY_KP_7,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_MARKERNORTHWEST));
 	getAccelTable()->addAccel(MKUINT(KEY_KP_9,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_MARKERNORTHEAST));
@@ -418,7 +418,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	// Middle splitter
 	middle = new FXVerticalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0,0,0,0,0,0,2);
 	content->setStretcher(middle);
-	
+
 	FXSplitterEx *mapsplit = new FXSplitterEx(middle, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
 	// Map window
@@ -675,7 +675,7 @@ void CSMap::create()
 	FXint coll_tradeinfos = getApp()->reg().readUnsignedEntry("TABS", "TRADEINFOS", 0);
 	if (coll_tradeinfos)
 		tiTab->collapse(true);
-	
+
 	// Make the main window appear
 	show(PLACEMENT_DEFAULT);
 
@@ -708,7 +708,7 @@ void CSMap::create()
 		FXint regionsWidth = leftframe->getWidth();
 		FXint mapWidth = middle->getWidth();
 		FXint infoWidth = rightframe->getWidth();
-		
+
 		FXint msgHeight = msgBorder->getHeight();
 		FXint cmdHeight = commandframe->getHeight();
 
@@ -807,7 +807,7 @@ bool CSMap::loadFile(FXString filename)
 
 	files.push_back(datafile());
 	datafile &file = files.back();
-	
+
 	FXString title = CSMAP_APP_TITLE " - lade " + filename;
 	handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &title);
 
@@ -819,7 +819,7 @@ bool CSMap::loadFile(FXString filename)
 	{
 		files.pop_back();
 		recentFiles.removeFile(filename);
-		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, err.what());
+		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", err.what());
 		return false;
 	}
 
@@ -855,7 +855,7 @@ bool CSMap::mergeFile(FXString filename)
 	// zuerst: Datei normal laden
 	files.push_back(datafile());
 	datafile &file = files.back();
-	
+
 	FXString title = CSMAP_APP_TITLE " - lade " + filename;
 	handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &title);
 
@@ -867,7 +867,7 @@ bool CSMap::mergeFile(FXString filename)
 	{
 		files.pop_back();
 		recentFiles.removeFile(filename);
-		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, (filename + ": " + iso2utf(err.what())).text());
+		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", (filename + ": " + iso2utf(err.what())).text());
 		return false;
 	}
 
@@ -875,7 +875,8 @@ bool CSMap::mergeFile(FXString filename)
 	{
 		files.pop_back();
 		recentFiles.removeFile(filename);
-		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, iso2utf("Die Datei konnte nicht gelesen werden.\nMöglicherweise wird das Format nicht unterstützt.").text());
+		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s",
+		iso2utf("Die Datei konnte nicht gelesen werden.\nMöglicherweise wird das Format nicht unterstützt.").text());
 		return false;
 	}
 
@@ -972,7 +973,7 @@ bool CSMap::saveFile(FXString filename, bool merge_commands /*= false*/)
 		FXString text;
 		text = "Die Datei " + filename + iso2utf(" existiert bereits.\n\nMöchten Sie sie ersetzen?");
 
-		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", text.text());
+		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
 		if (MBOX_CLICKED_YES == answ)
 			res = file.save(filename.text(), true, true);	// überschreiben, mit Befehlen
 	}
@@ -1000,7 +1001,7 @@ bool CSMap::loadCommands(FXString filename)
 		return false;
 
 	datafile &file = files.front();
-	
+
 	try
 	{
 		FXint res = file.loadCmds(filename.text());
@@ -1013,7 +1014,7 @@ bool CSMap::loadCommands(FXString filename)
 	}
 	catch(const std::runtime_error& err)
 	{
-		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, iso2utf(err.what()).text());
+		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", iso2utf(err.what()).text());
 		mapChange(false);
 		return false;
 	}
@@ -1041,7 +1042,7 @@ bool CSMap::saveCommands(FXString filename, bool stripped)
 		FXString text;
 		text = "Die Datei " + filename + iso2utf(" existiert bereits.\n\nMöchten Sie sie ersetzen?");
 
-		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", text.text());
+		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
 		if (MBOX_CLICKED_YES == answ)
 			res = file.saveCmds(filename.text(), stripped, true);	// überschreiben
 	}
@@ -1071,7 +1072,7 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
 	map->hide();
 	map->mapfiles(&files);
 	map->create();
-	
+
 	// options
 	if (scale == 64)
 		map->scaleChange(16/64.0f);	// bugfix: scaleChange(1.0); doesn't work without previous scaleing
@@ -1360,7 +1361,7 @@ long CSMap::onSetOrigin(FXObject*, FXSelector, void*)
 		if (name.empty())
 			name = region.terrainString();
 	}
-	
+
 	if (name.empty())
 		name = "Unbekannt";
 
@@ -1479,9 +1480,9 @@ long CSMap::onMapMoveMarker(FXObject*, FXSelector sel, void*)
 
 	// move mark cursor
 	FXint x = 0, y = 0, plane = 0;
-	
+
 	if (selection.selected & selection.REGION)
-	{	
+	{
 		datablock &region = *selection.region;
 
 		x = region.x();
@@ -1521,7 +1522,7 @@ long CSMap::onMapMoveMarker(FXObject*, FXSelector sel, void*)
 	if (selection.selected & selection.MULTIPLE_REGIONS)
 	{
 		state.regionsSelected = selection.regionsSelected;
-		if (state.regionsSelected.size())		
+		if (state.regionsSelected.size())
 			state.selected |= selection.MULTIPLE_REGIONS;
 	}
 
@@ -1635,7 +1636,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 					label = "Weihnachtsinsel";
 					break;
 				default:
-					label.format("Ebene %d", item);
+					label.format("Ebene %lu", item);
 				}
 				planes->appendItem(label, NULL, (void*)item);
 
@@ -1886,7 +1887,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
 	if (selection.selected & selection.MULTIPLE_REGIONS)
 	{
-		title.append(FXString().format(" - [%d Regionen markiert]", selection.regionsSelected.size()));
+		title.append(FXString().format(" - [%lu Regionen markiert]", selection.regionsSelected.size()));
 	}
 
 
@@ -1900,7 +1901,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
 			name = region.value(datakey::TYPE_NAME);
 			terrain = region.terrainString();
-		}		
+		}
 
 		if (name.empty())
 			label.format(" - %s (%d,%d)", terrain.text(), selection.sel_x,selection.sel_y);
@@ -2091,7 +2092,8 @@ void CSMap::closeFile()
 	// ask if modified commands should be safed
 	if (!files.empty() && files.front().modifiedCmds())
 	{
-		FXuint res = FXMessageBox::question(this, MBOX_SAVE_CANCEL_DONTSAVE, CSMAP_APP_TITLE, iso2utf("Die Änderungen an den Befehlen speichern?").text());
+		FXuint res = FXMessageBox::question(this, MBOX_SAVE_CANCEL_DONTSAVE, CSMAP_APP_TITLE, "%s",
+		iso2utf("Die Änderungen an den Befehlen speichern?").text());
 
 		if (res == MBOX_CLICKED_CANCEL)
 			return;					// don't close, cancel clicked
@@ -2569,7 +2571,7 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 	for (itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
 	{
 		datablock* region = *itor;
-		
+
 		// what could store zero-pointer regions?
 		if (!region)
 			continue;
