@@ -240,7 +240,7 @@ long FXCalculator::onChanged(FXObject*, FXSelector, void*)
 		if (*it == '\n' || *it == '\r' || *it == '\t')
 			*it = ' ';
     */
-    resultstr.assign("not implementd");
+    resultstr.assign("ERROR");
 
 	if (resultstr.size() > 15)
 	{

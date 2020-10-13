@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 	initSystems();		// inits COM under windows
 
 	// Make application 
-	FXApp CSApp("CSMap", "DraigSoft"); 
+	FXApp CSApp("CSMap", "Eressea"); 
 
 	// Open display
 	//CSApp.reg().setAsciiMode(true);
