@@ -8,9 +8,7 @@ addons:
   apt:
     packages:
       - libfox-1.6
-      - ruby-dev
       - libboost-dev
-      - cppcheck
 os:
   - linux
 notifications:
