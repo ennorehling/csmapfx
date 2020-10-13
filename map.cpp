@@ -82,7 +82,7 @@ FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbo
 		corner = (FXScrollCorner*)new FXToggleButton(this, "\t\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.", "", 0,0, this,ID_TOGGLESHADOWREGIONS, TOGGLEBUTTON_NORMAL|TOGGLEBUTTON_KEEPSTATE);
 	}
 
-	// register and allocate all images
+	// and allocate all images
 	registerImages();
 
 	for (std::vector<IconRecord>::iterator it = iconRecords.begin(); it != iconRecords.end(); ++it)
@@ -554,7 +554,7 @@ void scaleTransformIcon(FXIcon* icon, const unsigned char data[], FXint w, FXint
 
 void FXCSMap::registerImages()
 {
-	// register overlay colors
+	// overlay colors
 	FXColor colors[] =
 	{
 		FXRGB(255,0,0),		// red
@@ -1623,7 +1623,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 
 			//dc.drawIcon(icons[block->terrain()], scr_x,scr_y);
 
-			// register island names
+			// island names
 			if (show_islands)
 			{
 				if (att_region* stats = dynamic_cast<att_region*>(block->attachment()))
@@ -1975,7 +1975,7 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 			// draw terrain image
 			//dc.drawIcon(terrain[block->terrain()], scr_x,scr_y);
 
-			// register island names
+			// island names
 			if (show_islands)
 			{
 				if (att_region* stats = dynamic_cast<att_region*>(block->attachment()))

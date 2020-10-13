@@ -48,7 +48,7 @@ using namespace FX;
 
 // Length of narrow character string
 static inline FXint strlen(const FXnchar *src){
-  register FXint i=0;
+  FXint i=0;
   while(src[i]) i++;
   return i;
   }

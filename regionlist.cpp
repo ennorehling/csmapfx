@@ -58,12 +58,12 @@ FXIMPLEMENT(FXRegionItem,FXTreeItem,NULL,0)
 
 // Draw item
 void FXRegionItem::draw(const FXTreeList* list,FXDC& dc,FXint xx,FXint yy,FXint,FXint hh) const
-{
-  register FXIcon *icon=(state&OPENED)?openIcon:closedIcon;
-  register FXFont *font=list->getFont();
+
+  FXIcon *icon=(state&OPENED)?openIcon:closedIcon;
+  FXFont *font=list->getFont();
   if (isBold() && boldfont)
 		dc.setFont(font = boldfont);
-  register FXint th=0,tw=0,ih=0,iw=0;
+  FXint th=0,tw=0,ih=0,iw=0;
   xx+=SIDE_SPACING/2;
   if(icon){
     iw=icon->getWidth();
@@ -98,8 +98,8 @@ void FXRegionItem::draw(const FXTreeList* list,FXDC& dc,FXint xx,FXint yy,FXint,
 // See if item got hit, and where:- 1 is icon, 2 is text
 FXint FXRegionItem::hitItem(const FXTreeList* list,FXint xx,FXint yy) const
 {
-  register FXint oiw=0,ciw=0,oih=0,cih=0,tw=0,th=0,iw,ih,ix,iy,tx,ty,h;
-  register FXFont *font=list->getFont();
+  FXint oiw=0,ciw=0,oih=0,cih=0,tw=0,th=0,iw,ih,ix,iy,tx,ty,h;
+  FXFont *font=list->getFont();
   if (isBold() && boldfont)
 		font = boldfont;
 
@@ -137,8 +137,8 @@ FXint FXRegionItem::hitItem(const FXTreeList* list,FXint xx,FXint yy) const
 // Get item width
 FXint FXRegionItem::getWidth(const FXTreeList* list) const
 {
-  register FXint w=0,oiw=0,ciw=0;
-  register FXFont *font=list->getFont();
+  FXint w=0,oiw=0,ciw=0;
+  FXFont *font=list->getFont();
   if (isBold() && boldfont)
 		font = boldfont;
 
@@ -155,8 +155,8 @@ FXint FXRegionItem::getWidth(const FXTreeList* list) const
 // Get item height
 FXint FXRegionItem::getHeight(const FXTreeList* list) const
 {
-  register FXint th=0,oih=0,cih=0;
-  register FXFont *font=list->getFont();
+  FXint th=0,oih=0,cih=0;
+  FXFont *font=list->getFont();
   if (isBold() && boldfont)
 		font = boldfont;
 

@@ -494,9 +494,9 @@ const FXString datablock::string() const
 FXString datablock::id() const
 {
 	FXchar buf[35], b36[] = "0123456789abcdefghijkLmnopqrstuvwxyz";
-	register FXchar *p=buf+34;
-	register FXint nn=(FXint)info();
-	register FXbool negativ = false;
+	FXchar *p=buf+34;
+	FXint nn=(FXint)info();
+	FXbool negativ = false;
 	if (nn < 0)
 	{
         nn = -nn;

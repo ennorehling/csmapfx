@@ -125,8 +125,8 @@ FXWindow* FXSplitterEx::getStretcher()
 
 // Get default width
 FXint FXSplitterEx::getDefaultWidth(){
-  register FXWindow* child;
-  register FXint wmax,w,numc;
+  FXWindow* child;
+  FXint wmax,w,numc;
   wmax=numc=0;
   if(options&SPLITTER_VERTICAL){
     for(child=getFirst(); child; child=child->getNext()){
@@ -151,8 +151,8 @@ FXint FXSplitterEx::getDefaultWidth(){
 
 // Get default height
 FXint FXSplitterEx::getDefaultHeight(){
-  register FXWindow* child;
-  register FXint hmax,h,numc;
+  FXWindow* child;
+  FXint hmax,h,numc;
   hmax=numc=0;
   if(options&SPLITTER_VERTICAL){
     for(child=getFirst(); child; child=child->getNext()){
@@ -412,7 +412,7 @@ void FXSplitterEx::adjustVLayout(){
 
 // Find child just before split
 FXWindow* FXSplitterEx::findHSplit(FXint pos){
-  register FXWindow* child=getFirst();
+  FXWindow* child=getFirst();
   if(options&SPLITTER_REVERSED){
     while(child){
       if(child->shown()){
@@ -435,7 +435,7 @@ FXWindow* FXSplitterEx::findHSplit(FXint pos){
 
 // Find child just before split
 FXWindow* FXSplitterEx::findVSplit(FXint pos){
-  register FXWindow* child=getFirst();
+  FXWindow* child=getFirst();
   if(options&SPLITTER_REVERSED){
     while(child){
       if(child->shown()){
@@ -458,8 +458,8 @@ FXWindow* FXSplitterEx::findVSplit(FXint pos){
 
 // Move the horizontal split intelligently
 void FXSplitterEx::moveHSplit(FXint pos){
-  register FXint smin,smax;
-  register FXuint hints;
+  FXint smin,smax;
+  FXuint hints;
   FXASSERT(window);
   hints=window->getLayoutHints();
   if(options&SPLITTER_REVERSED){
@@ -489,8 +489,8 @@ void FXSplitterEx::moveHSplit(FXint pos){
 
 // Move the vertical split intelligently
 void FXSplitterEx::moveVSplit(FXint pos){
-  register FXint smin,smax;
-  register FXuint hints;
+  FXint smin,smax;
+  FXuint hints;
   FXASSERT(window);
   hints=window->getLayoutHints();
   if(options&SPLITTER_REVERSED){
