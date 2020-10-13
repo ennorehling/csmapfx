@@ -48,7 +48,7 @@ BEGIN
             VALUE "FileDescription", CSMAP_APP_TITLE_VERSION
             VALUE "FileVersion", MACROTOSTR(CSMAP_APP_VERSION)
             VALUE "InternalName", "CsMapFX"
-            VALUE "LegalCopyright", CSMAP_APP_COPYRIGHT " <" CSMAP_APP_EMAIL ">"
+            VALUE "LegalCopyright", CSMAP_APP_COPYRIGHT
             VALUE "OriginalFilename", "CsMapFX.exe"
             VALUE "ProductName", CSMAP_APP_TITLE
             VALUE "ProductVersion", "2, 0, 0, 0"

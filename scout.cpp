@@ -49,7 +49,7 @@ private:
 
 Phenotype::Phenotype() : genom(GENOM_SIZE)
 {
-    srand(time(0));
+    srand((unsigned int)time(0));
 	for (size_t i = 0; i < genom.size(); i++)
 	{
 		genom[i] = rand() % Phenotype::MAX_DIRECTION;
@@ -58,7 +58,7 @@ Phenotype::Phenotype() : genom(GENOM_SIZE)
 
 Phenotype::Phenotype(const Phenotype& parent1, const Phenotype& parent2) : genom(GENOM_SIZE)
 {
-    srand(time(0));
+    srand((unsigned int)time(0));
     // generate new genom by recombination of parent1 and parent2
 	size_t crossover = rand() % Phenotype::GENOM_SIZE;
 	//size_t crossover2 = rand() % Phenotype::GENOM_SIZE;
@@ -81,7 +81,7 @@ Phenotype::Phenotype(const Phenotype& parent1, const Phenotype& parent2) : genom
 
 void Phenotype::mutate()
 {
-    srand(time(0));
+    srand((unsigned int)time(0));
     
 	const double mutation = mutation_probability/100.0;
 
@@ -93,14 +93,14 @@ void Phenotype::mutate()
 
 void Phenotype::random_rate()
 {
-    srand(time(0));
+    srand((unsigned int)time(0));
 
-	fitness = floorf(fitness) + rand() / (double)RAND_MAX;
+	fitness = floor(fitness) + rand() / (double)RAND_MAX;
 }
 
 void Phenotype::rate(bool(*isOcean)(int x, int y))
 {
-    srand(time(0));
+    srand((unsigned int)time(0));
 
 	// NO, O, SO, SW, W, NW
 	const int offset_x[6] = {  0, +1, +1,  0, -1, -1 };
@@ -227,7 +227,7 @@ void Scout::ScoutData::rate_all(bool(*cond)(int x, int y))
 
 void Scout::ScoutData::select_best(bool(*cond)(int x, int y))
 {
-    srand(time(0));
+    srand((unsigned int)time(0));
 
 	while (generation.size() > elite_count + survivor_count)
 		generation.pop_back();

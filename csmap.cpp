@@ -503,18 +503,22 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
     FXHorizontalFrame *cmdOptFrame = new FXHorizontalFrame(cmdBottomFrame,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 3,3,1,1);
 	cmdOptFrame->setBorderColor(getApp()->getShadowColor());
-    FXCheckButton* confirmCmd = new FXCheckButton(cmdOptFrame,
-        L"bestätigt\tBefehle bestätigen (Ctrl-Y)\tBefehle für diese Einheit bestätigen",
+    new FXCheckButton(cmdOptFrame,
+        iso2utf("bestätigt\tBefehle bestätigen (Ctrl-Y)\tBefehle für diese Einheit bestätigen"),
         commands, FXCommands::ID_UNIT_CONFIRM, CHECKBUTTON_NORMAL);
     new FXButton(cmdOptFrame,
-        L"<\tVorherige Einheit (Ctrl-,)\tZur vorhergehenden unbestätigten Einheit", NULL,
+        iso2utf("<\tVorherige Einheit (Ctrl-<)\tZur vorhergehenden unbestätigten Einheit"), NULL,
         commands, FXCommands::ID_UNIT_PREV, BUTTON_TOOLBAR);
     new FXButton(cmdOptFrame,
-        L">\tNächste Einheit (Ctrl-.)\tZur nächsten unbestätigten Einheit", NULL,
+        iso2utf(">\tNächste Einheit (Ctrl->)\tZur nächsten unbestätigten Einheit"), NULL,
         commands, FXCommands::ID_UNIT_NEXT, BUTTON_TOOLBAR);
 
+    getAccelTable()->addAccel(MKUINT(KEY_less, CONTROLMASK), commands, FXCommands::ID_UNIT_NEXT);
+    getAccelTable()->addAccel(MKUINT(KEY_greater, CONTROLMASK), commands, FXCommands::ID_UNIT_PREV);
+    getAccelTable()->addAccel(MKUINT(KEY_y, CONTROLMASK), commands, FXCommands::ID_UNIT_CONFIRM);
+
     new FXButton(cmdOptFrame,
-        L"+temp\tNeue Temp-Einheit\tTemp-Einheit erstellen", NULL,
+        "+temp\tNeue Temp-Einheit\tTemp-Einheit erstellen", NULL,
         commands, FXCommands::ID_UNIT_ADD, BUTTON_TOOLBAR);
 
 	FXTextField* rowcol = new FXTextField(cmdOptFrame, 5, commands,FXCommands::ID_ROWCOL, TEXTFIELD_READONLY|JUSTIFY_RIGHT|LAYOUT_FILL_X|LAYOUT_RIGHT);
@@ -2618,11 +2622,12 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 long CSMap::onHelpAbout(FXObject*, FXSelector, void*)
 {
 	FXString abouttext = CSMAP_APP_TITLE_VERSION;
-	abouttext.append("\n   build: " __DATE__ " " __TIME__ ", revision: " CSMAP_SVN_REV_DATE);
+	abouttext.append("\n   build: " __DATE__ " " __TIME__);
 
-	abouttext.append("\n\n" CSMAP_APP_COPYRIGHT "\nMail: " CSMAP_APP_EMAIL "\nWeb: " CSMAP_APP_URL);
+	abouttext.append("\n\n" CSMAP_APP_COPYRIGHT "\nWeb: " CSMAP_APP_URL);
 	abouttext.append("\n\nSpecial thanks to Xolgrim for assembling Eressea rules information.\nThanks to all users for suggesting features and finding bugs.");
 	abouttext.append("\n\nThis software uses the FOX Toolkit Library (http://www.fox-toolkit.org).");
+	abouttext.append("\nThis software uses the TinyExpr library (https://github.com/codeplea/tinyexpr).");
 	abouttext.append("\nThis software is based in part on the work of the Independent JPEG Group.");
 
 	FXMessageBox about(this, "Wer mich schuf...", abouttext, getIcon(), MBOX_OK);

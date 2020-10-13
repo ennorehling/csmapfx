@@ -33,8 +33,9 @@ FXExportDlg::FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	new FXLabel(regionsize, iso2utf("Regionsgröße"));
 
 	scalebox = new FXComboBox(regionsize, 0, NULL,0, COMBOBOX_STATIC|FRAME_NORMAL);
-	for (FXuval i = 1; i <= 128; i*=2)
-		scalebox->appendItem(FXStringVal(i), (void*)i);
+    for (FXint i = 1; i <= 128; i *= 2) {
+        scalebox->appendItem(FXStringVal(i), (void*)(FXival)i);
+    }
 	scalebox->setCurrentItem(4);
 	scalebox->setNumVisible(scalebox->getNumItems());
 

@@ -7,7 +7,6 @@
 	// subversion revision data
 #define CSMAP_SVN_REV        134
 #define CSMAP_SVN_REVSTR     "134"
-#define CSMAP_SVN_REV_DATE   "2020/10/08 10:54:00"
 
 	// global application title string
 #define CSMAP_APP_TITLE      "Coast'n'Sea Mapper"
@@ -26,7 +25,6 @@
 #define CSMAP_APP_COPYRIGHT  "Copyright (c) 2004-2010 Thomas J. Gritzan\nCopyright (c) 2020 Enno Rehling"
 	// used as company name (version.rc) and in the About Box (csmap.cpp)
 #define CSMAP_APP_URL        "https://github.com/ennorehling/csmapfx"
-#define CSMAP_APP_EMAIL      "Phygon@gmx.de"
 
 #endif //CSMAP_VERSION_H_
 

@@ -32,6 +32,9 @@ set (SOURCES
 	tradeinfos.cpp
 	translator.cpp
 	unitlist.cpp
+	tinyjs/TinyJS.cpp
+	tinyjs/TinyJS_Functions.cpp
+	tinyjs/TinyJS_MathFunctions.cpp
 )
 include_directories(
 	${PNG_INCLUDE_DIRS}
