@@ -3,6 +3,7 @@
 #include <windows.h>
 #endif
 #include <ctime>
+#include <cmath>
 #include <vector>
 #include <ostream>
 #include <sstream>
@@ -94,7 +95,7 @@ void Phenotype::random_rate()
 {
     srand(time(0));
 
-	fitness = std::floor(fitness) + rand() / (double)RAND_MAX;
+	fitness = floorf(fitness) + rand() / (double)RAND_MAX;
 }
 
 void Phenotype::rate(bool(*isOcean)(int x, int y))
