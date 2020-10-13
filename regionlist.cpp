@@ -58,7 +58,7 @@ FXIMPLEMENT(FXRegionItem,FXTreeItem,NULL,0)
 
 // Draw item
 void FXRegionItem::draw(const FXTreeList* list,FXDC& dc,FXint xx,FXint yy,FXint,FXint hh) const
-
+{
   FXIcon *icon=(state&OPENED)?openIcon:closedIcon;
   FXFont *font=list->getFont();
   if (isBold() && boldfont)

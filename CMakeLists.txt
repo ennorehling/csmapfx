@@ -33,7 +33,6 @@ set (SOURCES
 	translator.cpp
 	unitlist.cpp
 )
-message(STATUS "png ${PNG_INCLUDE_DIR}")
 include_directories(
 	${PNG_INCLUDE_DIRS}
 	${FOX_INCLUDE_DIRS}
