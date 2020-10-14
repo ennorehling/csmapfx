@@ -272,7 +272,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
         NULL, this, ID_FILE_SAVE_ORDERS);
     new FXMenuCommand(
         filemenu,
-        L"Befehle mit &CR speichern...\t\tSpeichert den aktuellen Report zusammen mit den geänderten Befehlen.",
+        display(L"Befehle mit &CR speichern...\t\tSpeichert den aktuellen Report zusammen mit den geänderten Befehlen."),
         NULL, this, ID_FILE_SAVE_ALL);
 
 	new FXMenuSeparatorEx(filemenu);
@@ -503,19 +503,20 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
     FXHorizontalFrame *cmdOptFrame = new FXHorizontalFrame(cmdBottomFrame,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 3,3,1,1);
 	cmdOptFrame->setBorderColor(getApp()->getShadowColor());
-    new FXCheckButton(cmdOptFrame,
+    FXCheckButton * chk = new FXCheckButton(cmdOptFrame,
         iso2utf("bestätigt\tBefehle bestätigen (Ctrl-Y)\tBefehle für diese Einheit bestätigen"),
         commands, FXCommands::ID_UNIT_CONFIRM, CHECKBUTTON_NORMAL);
-    new FXButton(cmdOptFrame,
+    getAccelTable()->addAccel(MKUINT(KEY_y, CONTROLMASK), chk, FXSEL(SEL_COMMAND, ID_ACCEL));
+
+    FXButton * btn;
+    btn = new FXButton(cmdOptFrame,
         iso2utf("<\tVorherige Einheit (Ctrl-<)\tZur vorhergehenden unbestätigten Einheit"), NULL,
         commands, FXCommands::ID_UNIT_PREV, BUTTON_TOOLBAR);
-    new FXButton(cmdOptFrame,
+    getAccelTable()->addAccel(MKUINT(KEY_less, CONTROLMASK), btn, FXSEL(SEL_COMMAND, ID_ACCEL));
+    btn = new FXButton(cmdOptFrame,
         iso2utf(">\tNächste Einheit (Ctrl->)\tZur nächsten unbestätigten Einheit"), NULL,
         commands, FXCommands::ID_UNIT_NEXT, BUTTON_TOOLBAR);
-
-    getAccelTable()->addAccel(MKUINT(KEY_less, CONTROLMASK), commands, FXCommands::ID_UNIT_NEXT);
-    getAccelTable()->addAccel(MKUINT(KEY_greater, CONTROLMASK), commands, FXCommands::ID_UNIT_PREV);
-    getAccelTable()->addAccel(MKUINT(KEY_y, CONTROLMASK), commands, FXCommands::ID_UNIT_CONFIRM);
+    getAccelTable()->addAccel(MKUINT(KEY_greater, CONTROLMASK), btn, FXSEL(SEL_COMMAND, ID_ACCEL));
 
     new FXButton(cmdOptFrame,
         "+temp\tNeue Temp-Einheit\tTemp-Einheit erstellen", NULL,

@@ -11,6 +11,25 @@
 #include "version.h"
 #include "fxhelper.h"
 
+FX::FXString display(wchar_t *wstr)
+{
+    char buffer[256];
+    int n = 0;
+#ifdef WIN32
+    n = WideCharToMultiByte(CP_ACP, 0, wstr, -1, buffer, sizeof(buffer), NULL, NULL);
+#else
+    /* really terrible solution, use ICU or iconv */
+    for (int i = 0; wstr[i]; ++i) {
+        wchar_t wc = wstr[i];
+        if (wc < 128) {
+            buffer[n++] = (char)wc;
+        }
+    }
+#endif
+    buffer[n] = 0;
+    return FXString(buffer, n);
+}
+
 // FXString converter: iso8859-1 <-> utf8
 // --------------------------------------
 FX::FXString iso2utf(const FX::FXString& s)

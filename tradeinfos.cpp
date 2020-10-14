@@ -172,7 +172,7 @@ void FXTradeInfos::collectData(std::list<Info>& info, datablock::itor region)
 	{
 		/*	PREISE
 			96;Balsam		// wird angekauft
-			-5;Gewürz		// wird verkauft
+			-5;GewÃ¼rz		// wird verkauft
 		*/
 
 		for (datakey::itor goods = block->data().begin(); goods != block->data().end(); goods++)
@@ -219,7 +219,7 @@ void FXTradeInfos::updateData()
 			goods_at_price = atoi(peasants.text()) / 100;	// one unit of goods for every 100 peasants
 
 		// -1 == topmatrix
-		createLabels(iso2utf("Luxusgüter zum angegebenen Preis"), thousandsPoints(goods_at_price), "", -1);
+		createLabels(iso2utf("LuxusgÃ¼ter zum angegebenen Preis"), thousandsPoints(goods_at_price), "", -1);
 
 		// collect information about luxury goods
 		std::list<Info> info;
