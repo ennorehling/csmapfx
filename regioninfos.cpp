@@ -9,15 +9,15 @@
 // *** FXRegionInfos implementation
 
 FXDEFMAP(FXRegionInfos) MessageMap[]=
-{ 
-	//________Message_Type_____________________ID_______________Message_Handler_______ 
-	FXMAPFUNC(SEL_COMMAND,		FXRegionInfos::ID_UPDATE,				FXRegionInfos::onMapChange), 
+{
+	//________Message_Type_____________________ID_______________Message_Handler_______
+	FXMAPFUNC(SEL_COMMAND,		FXRegionInfos::ID_UPDATE,				FXRegionInfos::onMapChange),
 
-	FXMAPFUNC(SEL_COMMAND,		FXRegionInfos::ID_TOGGLEDESCRIPTION,	FXRegionInfos::onToggleDescription), 
-	FXMAPFUNC(SEL_UPDATE,		FXRegionInfos::ID_TOGGLEDESCRIPTION,	FXRegionInfos::onUpdateToggleDescription), 
+	FXMAPFUNC(SEL_COMMAND,		FXRegionInfos::ID_TOGGLEDESCRIPTION,	FXRegionInfos::onToggleDescription),
+	FXMAPFUNC(SEL_UPDATE,		FXRegionInfos::ID_TOGGLEDESCRIPTION,	FXRegionInfos::onUpdateToggleDescription),
 
-	FXMAPFUNC(SEL_UPDATE,		FXRegionInfos::ID_DESCRIPTION,			FXRegionInfos::onUpdateDescription), 
-}; 
+	FXMAPFUNC(SEL_UPDATE,		FXRegionInfos::ID_DESCRIPTION,			FXRegionInfos::onUpdateDescription),
+};
 
 FXIMPLEMENT(FXRegionInfos,FXVerticalFrame,MessageMap, ARRAYNUMBER(MessageMap))
 
@@ -135,7 +135,7 @@ void FXRegionInfos::setInfo(const std::list<Info>& info)
 	{
 		FXString value = thousandsPoints(itor->value);
 		FXString offset = "";
-		if (itor->offset)		
+		if (itor->offset)
 			offset = thousandsPoints(itor->offset, true);
 
 		if (itor->skill)
@@ -279,7 +279,7 @@ void FXRegionInfos::updateData()
 	if (selection.selected & selection.MULTIPLE_REGIONS)
 	{
 		FXString label;
-		tags.name->setText(label.format("%d Regionen", selection.regionsSelected.size()));
+		tags.name->setText(label.format("%lu Regionen", selection.regionsSelected.size()));
 		tags.name->setIcon(terrainIcons[0]);				// Symbol für unbekanntes Terrain, da mehrere Regionen
 		tags.name->setHelpText(label + " markiert");
 		tags.name->setTipText(label + " markiert");
@@ -309,7 +309,7 @@ void FXRegionInfos::updateData()
 	{
 		// show information of newly selected region
 		datablock &region = *selection.region;
-		
+
 		FXString name = region.value(datakey::TYPE_NAME);
 
 		if (name.empty())
@@ -425,7 +425,7 @@ long FXRegionInfos::onMapChange(FXObject*, FXSelector, void* ptr)
 			needUpdate = true;
 
 		selection.selected = state->selected;
-		
+
 		selection.region = state->region;
 		selection.faction = state->faction;
 		selection.building = state->building;

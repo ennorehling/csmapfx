@@ -11,7 +11,7 @@
 #include "version.h"
 #include "fxhelper.h"
 
-FX::FXString display(wchar_t *wstr)
+FX::FXString display(const wchar_t *wstr)
 {
     char buffer[256];
     int n = 0;
