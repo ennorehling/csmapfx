@@ -166,22 +166,22 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 	// Buttons
 	new FXButton(toolbar,
-		iso2utf("\tDatei öffnen...\tEine neue Datei öffnen."),
+		display(L"\tDatei öffnen...\tEine neue Datei öffnen."),
 		icons.open,
 		this,
 		ID_FILE_OPEN, BUTTON_TOOLBAR);
 	new FXButton(toolbar,
-		iso2utf("\tDatei hinzufügen...\tLädt einen Karten-Report in den aktuellen Report."),
+		display(L"\tDatei hinzufügen...\tLädt einen Karten-Report in den aktuellen Report."),
 		icons.merge,
 		this,
 		ID_FILE_MERGE, BUTTON_TOOLBAR);
 	new FXButton(toolbar,
-		iso2utf("\tDatei speichern unter...\tDie aktuelle Datei als neue Datei speichern."),
+		display(L"\tDatei speichern unter...\tDie aktuelle Datei als neue Datei speichern."),
 		icons.save,
 		this,
 		ID_FILE_SAVE_AS, BUTTON_TOOLBAR);
 	new FXButton(toolbar,
-		iso2utf("\tDatei schliessen\tDie aktuelle Datei schliessen."),
+		display(L"\tDatei schliessen\tDie aktuelle Datei schliessen."),
 		icons.close,
 		this,
 		ID_FILE_CLOSE, BUTTON_TOOLBAR);
