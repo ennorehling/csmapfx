@@ -221,13 +221,13 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	}
 
 	new FXMenuSeparatorEx(terrainPopup);
-	FXMenuCommand *cmd = new FXMenuCommand(terrainPopup, iso2utf("Löschen\t\tZeichnen-Modus: Lösche Regionen"), icons.terrain[0], this,ID_MAP_SETMODUS);
+	FXMenuCommand *cmd = new FXMenuCommand(terrainPopup, FXString(L"Löschen\t\tZeichnen-Modus: Lösche Regionen"), icons.terrain[0], this,ID_MAP_SETMODUS);
 	cmd->setUserData((void*)(FXCSMap::MODUS_SETTERRAIN));
 
 	FXHorizontalFrame *terrainFrame = new FXHorizontalFrame(toolbar, LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0, 0,0);
-	terrainSelect = new FXButton(terrainFrame, iso2utf("\tZeichnen-Modus: Erstelle oder Lösche Regionen"), icons.terrain[0], this,ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
+	terrainSelect = new FXButton(terrainFrame, FXString(L"\tZeichnen-Modus: Erstelle oder Lösche Regionen"), icons.terrain[0], this,ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
 	terrainSelect->setUserData((void*)FXCSMap::MODUS_SETTERRAIN);
-	new FXMenuButton(terrainFrame, iso2utf("\tZeichnen-Modus: Erstelle oder Lösche Regionen"), NULL, terrainPopup, FRAME_RAISED|BUTTON_TOOLBAR|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|MENUBUTTON_DOWN, 0,0,12,0);
+	new FXMenuButton(terrainFrame, FXString(L"\tZeichnen-Modus: Erstelle oder Lösche Regionen"), NULL, terrainPopup, FRAME_RAISED|BUTTON_TOOLBAR|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|MENUBUTTON_DOWN, 0,0,12,0);
 
 	// Recent file list
 	recentFiles.setTarget(this);
@@ -240,35 +240,35 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	new FXMenuTitle(menubar,"&Datei",NULL,filemenu);
 	new FXMenuCommand(
 		filemenu,
-		iso2utf("Ö&ffnen...\tCtrl-O\tEine neue Datei öffnen."),
+		FXString(L"Ö&ffnen...\tCtrl-O\tEine neue Datei öffnen."),
 		NULL,
 		this,
 		ID_FILE_OPEN);
 	new FXMenuCommand(
 		filemenu,
-		iso2utf("&Hinzufügen...\tCtrl-I\tLädt einen Karten-Report in den aktuellen Report."),
+		FXString(L"&Hinzufügen...\tCtrl-I\tLädt einen Karten-Report in den aktuellen Report."),
 		NULL, this, ID_FILE_MERGE);
 	new FXMenuCommand(
 		filemenu,
-		iso2utf("&Speichern\tCtrl-S\tDie Änderungen speichern."),
+		FXString(L"&Speichern\tCtrl-S\tDie Änderungen speichern."),
 		NULL, this, ID_FILE_SAVE);
 	new FXMenuCommand(
 		filemenu,
-		iso2utf("Speichern &unter...\tF12\tDie aktuelle Datei als neue Datei speichern."),
+		FXString(L"Speichern &unter...\tF12\tDie aktuelle Datei als neue Datei speichern."),
 		NULL, this, ID_FILE_SAVE_AS);
 	new FXMenuCommand(
 		filemenu,
-		iso2utf("Sch&liessen\t\tDie aktuelle Datei schliessen."),
+		FXString(L"Sch&liessen\t\tDie aktuelle Datei schliessen."),
 		NULL, this, ID_FILE_CLOSE);
 
 	new FXMenuSeparatorEx(filemenu);
 	new FXMenuCommand(
         filemenu,
-        iso2utf("&Befehle laden...\tCtrl-Shift-O\tDie Befehle aus Textdatei laden."),
+        FXString(L"&Befehle laden...\tCtrl-Shift-O\tDie Befehle aus Textdatei laden."),
         NULL, this, ID_FILE_LOAD_ORDERS);
     new FXMenuCommand(
         filemenu,
-        iso2utf("Be&fehle speichern...\tF11\tDie Befehle als Textdatei speichern."),
+        FXString(L"Be&fehle speichern...\tF11\tDie Befehle als Textdatei speichern."),
         NULL, this, ID_FILE_SAVE_ORDERS);
     new FXMenuCommand(
         filemenu,
@@ -290,7 +290,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	for (int i = 0; i < 6; i++)
 		new FXMenuCommand(recentmenu, "", NULL, &recentFiles,FXRecentFiles::ID_FILE_1+i);
 
-	new FXMenuCascade(filemenu, iso2utf("&Zuletzt geöffnet"), NULL, recentmenu, 0);
+	new FXMenuCascade(filemenu, FXString(L"&Zuletzt geöffnet"), NULL, recentmenu, 0);
 	new FXMenuSeparatorEx(filemenu);
 	new FXMenuCommand(filemenu,
 		L"B&eenden\tCtrl-Q\tDas Programm beenden.", NULL,
@@ -303,13 +303,13 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	menu.maponly = new FXMenuCheck(viewmenu,"&Nur Karte anzeigen\tCtrl-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this,ID_VIEW_MAPONLY,0);
 	menu.messages = new FXMenuCheck(viewmenu,"&Meldungen\tCtrl-V\tRegionsmeldungen ein- bzw. ausblenden.", this,ID_VIEW_MESSAGES);
 	menu.calc = new FXMenuCheck(viewmenu,"&Taschenrechner\tCtrl-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
-	menu.minimap = new FXMenuCheck(viewmenu,iso2utf("Übersichts&karte\tCtrl-N\tÜbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
+	menu.minimap = new FXMenuCheck(viewmenu,FXString(L"Übersichts&karte\tCtrl-N\tÜbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
 	menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tCtrl-B\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
 	new FXMenuSeparatorEx(viewmenu, "Liste");
 	menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tAlt-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
 	new FXMenuSeparatorEx(viewmenu, "Karte");
 	menu.streets = new FXMenuCheck(viewmenu,"&Strassen zeigen\tAlt-S\tStrassen auf der Karte anzeigen.");
-	menu.visibility = new FXMenuCheck(viewmenu,iso2utf("&Sichtbarkeit zeigen\tAlt-V\tSymbole für Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise)."));
+	menu.visibility = new FXMenuCheck(viewmenu,FXString(L"&Sichtbarkeit zeigen\tAlt-V\tSymbole für Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise)."));
 	menu.shiptravel = new FXMenuCheck(viewmenu,"&Durchschiffung\tAlt-T\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
 	menu.shadowRegions = new FXMenuCheck(viewmenu,"Regionen ab&dunkeln\tAlt-F\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.");
 	menu.islands = new FXMenuCheck(viewmenu,"&Inselnamen zeigen\tAlt-I\tInselnamen auf der Karte zeigen.");
@@ -321,16 +321,16 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	new FXMenuCommand(regionmenu,"&Suchen...\tCtrl-F\tEine Region, Einheit, Schiff, etc. suchen.",NULL, this,ID_VIEW_SEARCHDLG);
 	menu.regdescription = new FXMenuCheck(regionmenu,"&Beschreibung zeigen\t\tRegionsbeschreibung anzeigen.");
 	new FXMenuSeparatorEx(regionmenu, "Markieren");
-	new FXMenuCommand(regionmenu,iso2utf("&Alle markieren\tCtrl-A\tAlle Regionen auswählen."),NULL,this,ID_REGION_SELALL);
-	new FXMenuCommand(regionmenu,iso2utf("Alle &Inseln auswählen\t\tAlle Landregionen auswählen (Ozean, Feuerwand und Eisberg zählen nicht als Land)."),NULL,this,ID_REGION_SELALLISLANDS);
-	new FXMenuCommand(regionmenu,iso2utf("&Keine markieren\t\tKeine Region auswählen."),NULL,this,ID_REGION_UNSEL);
-	new FXMenuCommand(regionmenu,iso2utf("Auswahl &invertieren\t\tAusgewählte Regionen abwählen und umgekehrt."),NULL,this,ID_REGION_INVERTSEL);
+	new FXMenuCommand(regionmenu,FXString(L"&Alle markieren\tCtrl-A\tAlle Regionen auswählen."),NULL,this,ID_REGION_SELALL);
+	new FXMenuCommand(regionmenu,FXString(L"Alle &Inseln auswählen\t\tAlle Landregionen auswählen (Ozean, Feuerwand und Eisberg zählen nicht als Land)."),NULL,this,ID_REGION_SELALLISLANDS);
+	new FXMenuCommand(regionmenu,FXString(L"&Keine markieren\t\tKeine Region auswählen."),NULL,this,ID_REGION_UNSEL);
+	new FXMenuCommand(regionmenu,FXString(L"Auswahl &invertieren\t\tAusgewählte Regionen abwählen und umgekehrt."),NULL,this,ID_REGION_INVERTSEL);
 		selectionmenu = new FXMenuPane(this);
 		new FXMenuCommand(selectionmenu,"Auswahl &erweitern\tCtrl-Shift-F7\tAuswahl mit dem Radius von einer Region erweitern.",NULL,this,ID_REGION_EXTENDSEL);
-		new FXMenuCommand(selectionmenu,iso2utf("&Inseln auswählen\tCtrl-Shift-F9\tAuswahl auf komplette Inseln erweitern."),NULL,this,ID_REGION_SELISLANDS);
+		new FXMenuCommand(selectionmenu,FXString(L"&Inseln auswählen\tCtrl-Shift-F9\tAuswahl auf komplette Inseln erweitern."),NULL,this,ID_REGION_SELISLANDS);
 	new FXMenuCascade(regionmenu, "&Erweitern", NULL, selectionmenu);
 	new FXMenuSeparatorEx(regionmenu, "Bearbeiten");
-	new FXMenuCommand(regionmenu,iso2utf("Markierte &löschen\t\t"),NULL,this,ID_REGION_REMOVESEL);
+	new FXMenuCommand(regionmenu,FXString(L"Markierte &löschen\t\t"),NULL,this,ID_REGION_REMOVESEL);
 
 	// Faction menu
 	factionmenu = new FXMenuPane(this);
@@ -339,8 +339,8 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 	new FXMenuSeparatorEx(factionmenu, "Parteiinfo");
 	menu.name = new FXMenuCommand(factionmenu, "Parteiname\t\tName der Partei");
-	menu.type = new FXMenuCommand(factionmenu, iso2utf("Rasse (Silber)\t\tRasse und Typpräfix der Partei, Rekrutierungskosten"));
-	menu.magic = new FXMenuCommand(factionmenu, iso2utf("Magiegebiet\t\tgewähltes Magiegebiet"));
+	menu.type = new FXMenuCommand(factionmenu, FXString(L"Rasse (Silber)\t\tRasse und Typpräfix der Partei, Rekrutierungskosten"));
+	menu.magic = new FXMenuCommand(factionmenu, FXString(L"Magiegebiet\t\tgewähltes Magiegebiet"));
 	menu.email = new FXMenuCommand(factionmenu, "eMail\t\teMail-Adresse der Partei");
 
 	new FXMenuSeparatorEx(factionmenu, "Statistik");
@@ -348,9 +348,9 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	menu.points = new FXMenuCommand(factionmenu, "Punkte (Durchschnitt)\t\tPunkte der Partei und Durchschnitt gleichaltriger Parteien");
 	menu.age = new FXMenuCommand(factionmenu, "Parteialter\t\tAlter der Partei in Runden");
 
-	new FXMenuSeparatorEx(factionmenu, iso2utf("Gegenstände"));
+	new FXMenuSeparatorEx(factionmenu, FXString(L"Gegenstände"));
 		menu.factionpool = new FXMenuPane(this);
-		menu.poolnoitems = new FXMenuCommand(menu.factionpool,iso2utf("Keine Gegenstände\t\tDer Parteipool enthält keine Gegenstände."),NULL);
+		menu.poolnoitems = new FXMenuCommand(menu.factionpool,FXString(L"Keine Gegenstände\t\tDer Parteipool enthält keine Gegenstände."),NULL);
 		menu.poolnoitems->disable();
 	new FXMenuCascade(factionmenu, "&Parteipool", NULL, menu.factionpool, 0);
 
@@ -362,9 +362,9 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 		radio->setCheck();
 	new FXMenuCascade(mapmenu, "&Ebene", NULL, planemenu, 0);
 		zoommenu = new FXMenuPane(this);
-		new FXMenuCommand(zoommenu,iso2utf("Vergrößern\tCtrl-+\tKarte vergrößern."),NULL,this,ID_MAP_ZOOM,0);
+		new FXMenuCommand(zoommenu,FXString(L"Vergrößern\tCtrl-+\tKarte vergrößern."),NULL,this,ID_MAP_ZOOM,0);
 		new FXMenuCommand(zoommenu,"Verkleinern\tCtrl--\tKarte verkleinern.",NULL,this,ID_MAP_ZOOM,0);
-		new FXMenuSeparatorEx(zoommenu, iso2utf("Größe"));
+		new FXMenuSeparatorEx(zoommenu, FXString(L"Größe"));
 		new FXMenuRadio(zoommenu,"&1 Pixel\tCtrl-8\t1.6%",this,ID_MAP_ZOOM,0);
 		new FXMenuRadio(zoommenu,"&2 Pixel\tCtrl-7\t3.1%",this,ID_MAP_ZOOM,0);
 		new FXMenuRadio(zoommenu,"&4 Pixel\tCtrl-6\t6.3%",this,ID_MAP_ZOOM,0);
@@ -373,14 +373,14 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 		new FXMenuRadio(zoommenu,"&32 Pixel\tCtrl-3\t50%",this,ID_MAP_ZOOM,0);
 		new FXMenuRadio(zoommenu,"&64 Pixel\tCtrl-2\t100%",this,ID_MAP_ZOOM,0);
 		new FXMenuRadio(zoommenu,"128 Pixel\tCtrl-1\t200%",this,ID_MAP_ZOOM,0);
-	new FXMenuCascade(mapmenu,iso2utf("&Größe"), NULL, zoommenu, 0);
+	new FXMenuCascade(mapmenu,FXString(L"&Größe"), NULL, zoommenu, 0);
 	new FXMenuCommand(mapmenu,"&Ursprung setzen\tCtrl-U\tDen Kartenursprung (0/0) auf die markierte Region setzen.",NULL,this,ID_MAP_SETORIGIN,0);
-	new FXMenuCommand(mapmenu,iso2utf("&Kartenreport erzeugen\t\tLöscht alle Informationen außer Regionsnamen und -terrain und Inseln."),NULL,this,ID_MAP_MAKEMAP,0);
+	new FXMenuCommand(mapmenu,FXString(L"&Kartenreport erzeugen\t\tLöscht alle Informationen außer Regionsnamen und -terrain und Inseln."),NULL,this,ID_MAP_MAKEMAP,0);
 	new FXMenuSeparatorEx(mapmenu, "Regionsmarker");
-	new FXMenuCommand(mapmenu,iso2utf("Markierte &auswählen\tCtrl-Space\tMarkierte Region auswählen."),NULL,this,ID_MAP_SELECTMARKED,0);
+	new FXMenuCommand(mapmenu,FXString(L"Markierte &auswählen\tCtrl-Space\tMarkierte Region auswählen."),NULL,this,ID_MAP_SELECTMARKED,0);
 	new FXMenuCommand(mapmenu,"Nach Westen\tCtrl-H\tRegionsmarker eins nach Westen setzen.",NULL,this,ID_MAP_MARKERWEST,0);
 	new FXMenuCommand(mapmenu,"Nach Osten\tCtrl-L\tRegionsmarker eins nach Osten setzen.",NULL,this,ID_MAP_MARKEREAST,0);
-	new FXMenuCommand(mapmenu,iso2utf("Nach Südwesten\tCtrl-J\tRegionsmarker eins nach Südwesten setzen."),NULL,this,ID_MAP_MARKERSOUTHWEST,0);
+	new FXMenuCommand(mapmenu,FXString(L"Nach Südwesten\tCtrl-J\tRegionsmarker eins nach Südwesten setzen."),NULL,this,ID_MAP_MARKERSOUTHWEST,0);
 	new FXMenuCommand(mapmenu,"Nach Nordosten\tCtrl-K\tRegionsmarker eins nach Nordosten setzen.",NULL,this,ID_MAP_MARKERNORTHEAST,0);
 
 	getAccelTable()->addAccel(MKUINT(KEY_KP_5,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_SELECTMARKED));
@@ -504,17 +504,17 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
     FXHorizontalFrame *cmdOptFrame = new FXHorizontalFrame(cmdBottomFrame,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 3,3,1,1);
 	cmdOptFrame->setBorderColor(getApp()->getShadowColor());
     FXCheckButton * chk = new FXCheckButton(cmdOptFrame,
-        iso2utf("bestätigt\tBefehle bestätigen (Ctrl-Y)\tBefehle für diese Einheit bestätigen"),
+        FXString(L"bestätigt\tBefehle bestätigen (Ctrl-Y)\tBefehle für diese Einheit bestätigen"),
         commands, FXCommands::ID_UNIT_CONFIRM, CHECKBUTTON_NORMAL);
     getAccelTable()->addAccel(MKUINT(KEY_y, CONTROLMASK), chk, FXSEL(SEL_COMMAND, ID_ACCEL));
 
     FXButton * btn;
     btn = new FXButton(cmdOptFrame,
-        iso2utf("<\tVorherige Einheit (Ctrl-<)\tZur vorhergehenden unbestätigten Einheit"), NULL,
+        FXString(L"<\tVorherige Einheit (Ctrl-<)\tZur vorhergehenden unbestätigten Einheit"), NULL,
         commands, FXCommands::ID_UNIT_PREV, BUTTON_TOOLBAR);
     getAccelTable()->addAccel(MKUINT(KEY_less, CONTROLMASK), btn, FXSEL(SEL_COMMAND, ID_ACCEL));
     btn = new FXButton(cmdOptFrame,
-        iso2utf(">\tNächste Einheit (Ctrl->)\tZur nächsten unbestätigten Einheit"), NULL,
+        FXString(L">\tNächste Einheit (Ctrl->)\tZur nächsten unbestätigten Einheit"), NULL,
         commands, FXCommands::ID_UNIT_NEXT, BUTTON_TOOLBAR);
     getAccelTable()->addAccel(MKUINT(KEY_greater, CONTROLMASK), btn, FXSEL(SEL_COMMAND, ID_ACCEL));
 
@@ -528,7 +528,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	rowcol->setTextColor(getApp()->getShadowColor());
 
 	// minimap
-	minimap_frame = new FXDialogBox(this, iso2utf("Übersichtskarte"), DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100,100, 640,480, 0,0,0,0);
+	minimap_frame = new FXDialogBox(this, FXString(L"Übersichtskarte"), DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100,100, 640,480, 0,0,0,0);
 	minimap_frame->setIcon(icon);
 	minimap_frame->getAccelTable()->addAccel(MKUINT(KEY_N,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_MINIMAP));
 
@@ -881,7 +881,7 @@ bool CSMap::mergeFile(FXString filename)
 		files.pop_back();
 		recentFiles.removeFile(filename);
 		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s",
-		iso2utf("Die Datei konnte nicht gelesen werden.\nMöglicherweise wird das Format nicht unterstützt.").text());
+		FXString(L"Die Datei konnte nicht gelesen werden.\nMöglicherweise wird das Format nicht unterstützt.").text());
 		return false;
 	}
 
@@ -976,7 +976,7 @@ bool CSMap::saveFile(FXString filename, bool merge_commands /*= false*/)
 	if (res == -2)
 	{
 		FXString text;
-		text = "Die Datei " + filename + iso2utf(" existiert bereits.\n\nMöchten Sie sie ersetzen?");
+		text = "Die Datei " + filename + FXString(L" existiert bereits.\n\nMöchten Sie sie ersetzen?");
 
 		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
 		if (MBOX_CLICKED_YES == answ)
@@ -1045,7 +1045,7 @@ bool CSMap::saveCommands(FXString filename, bool stripped)
 	if (res == -2)
 	{
 		FXString text;
-		text = "Die Datei " + filename + iso2utf(" existiert bereits.\n\nMöchten Sie sie ersetzen?");
+		text = "Die Datei " + filename + FXString(L" existiert bereits.\n\nMöchten Sie sie ersetzen?");
 
 		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
 		if (MBOX_CLICKED_YES == answ)
@@ -1290,7 +1290,7 @@ long CSMap::onChangeZoom(FXObject* sender, FXSelector, void*)
 
 	FXfloat scale = map->getScale();
 
-	if (txt == iso2utf("Vergrößern"))
+	if (txt == FXString(L"Vergrößern"))
 	{
 		FXfloat jump = 1.2f;
 
@@ -1405,7 +1405,7 @@ long CSMap::onSetOrigin(FXObject*, FXSelector, void*)
 
 long CSMap::onMakeMap(FXObject*, FXSelector, void*)
 {
-	FXString txt = iso2utf("Alle Informationen außer reine Karteninformationen\naus aktuellem Report löschen?");
+	FXString txt = FXString(L"Alle Informationen außer reine Karteninformationen\naus aktuellem Report löschen?");
 
 	FXMessageBox dlg(this, CSMAP_APP_TITLE, txt, 0, MBOX_YES_NO);
 	FXuint res = dlg.execute(PLACEMENT_SCREEN);
@@ -2012,10 +2012,10 @@ long CSMap::onCalculator(FXObject*, FXSelector, void*)
 
 long CSMap::onFileOpen(FXObject*, FXSelector, void*r)
 {
-	FXFileDialog dlg(this, iso2utf("Öffnen..."));
+	FXFileDialog dlg(this, FXString(L"Öffnen..."));
 	dlg.setIcon(icons.open);
 	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(iso2utf("Mögliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nEressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nAlle Dateien (*)"));
+	dlg.setPatternList(FXString(L"Mögliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nEressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nAlle Dateien (*)"));
 	FXint res = dlg.execute(PLACEMENT_SCREEN);
 	dialogDirectory = dlg.getDirectory();
 	if (res)
@@ -2025,11 +2025,11 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void*r)
 
 long CSMap::onFileMerge(FXObject*, FXSelector, void*r)
 {
-	FXFileDialog dlg(this, iso2utf("Karte hinzufügen..."));
+	FXFileDialog dlg(this, FXString(L"Karte hinzufügen..."));
 	dlg.setIcon(icons.merge);
 	dlg.setSelectMode(SELECTFILE_MULTIPLE);
 	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(iso2utf("Mögliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nEressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nAlle Dateien (*)"));
+	dlg.setPatternList(FXString(L"Mögliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nEressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nAlle Dateien (*)"));
 	FXint res = dlg.execute(PLACEMENT_SCREEN);
 	dialogDirectory = dlg.getDirectory();
 	if (res)
@@ -2053,7 +2053,7 @@ long CSMap::onFileSaveAs(FXObject*, FXSelector, void*)
 	FXFileDialog dlg(this, "Speichern unter...", DLGEX_SAVE);
 	dlg.setIcon(icons.save);
 	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(iso2utf("Eressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nMögliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nAlle Dateien (*)"));
+	dlg.setPatternList(FXString(L"Eressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nMögliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nAlle Dateien (*)"));
 	FXint res = dlg.execute(PLACEMENT_SCREEN);
 	dialogDirectory = dlg.getDirectory();
 	if (res)
@@ -2098,7 +2098,7 @@ void CSMap::closeFile()
 	if (!files.empty() && files.front().modifiedCmds())
 	{
 		FXuint res = FXMessageBox::question(this, MBOX_SAVE_CANCEL_DONTSAVE, CSMAP_APP_TITLE, "%s",
-		iso2utf("Die Änderungen an den Befehlen speichern?").text());
+		FXString(L"Die Änderungen an den Befehlen speichern?").text());
 
 		if (res == MBOX_CLICKED_CANCEL)
 			return;					// don't close, cancel clicked
@@ -2118,10 +2118,10 @@ void CSMap::closeFile()
 
 long CSMap::onFileOpenCommands(FXObject *, FXSelector, void *)
 {
-	FXFileDialog dlg(this, iso2utf("Befehle laden..."));
+	FXFileDialog dlg(this, FXString(L"Befehle laden..."));
 	dlg.setIcon(icons.open);
 	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(iso2utf("Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nMögliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
+	dlg.setPatternList(FXString(L"Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nMögliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
 	FXint res = dlg.execute(PLACEMENT_SCREEN);
 	dialogDirectory = dlg.getDirectory();
     if (res) {
@@ -2150,7 +2150,7 @@ void CSMap::saveCommandsDlg(bool stripped)
 
 	if (files.front().password().empty())
 	{
-		FXInputDialog dlg(this, "Passwort eingeben", iso2utf("Geben Sie das Passwort für die Partei ein:"), NULL,
+		FXInputDialog dlg(this, "Passwort eingeben", FXString(L"Geben Sie das Passwort für die Partei ein:"), NULL,
 			INPUTDIALOG_STRING | INPUTDIALOG_PASSWORD);
 		FXint res = dlg.execute(PLACEMENT_SCREEN);
 		if (res)
@@ -2166,7 +2166,7 @@ void CSMap::saveCommandsDlg(bool stripped)
 	FXFileDialog dlg(this, stripped ? "Versandbefehle speichern unter..." : "Befehle speichern unter...", DLGEX_SAVE);
 	dlg.setIcon(icons.save);
 	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(iso2utf("Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nMögliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
+	dlg.setPatternList(FXString(L"Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nMögliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
 	FXint res = dlg.execute(PLACEMENT_SCREEN);
 	dialogDirectory = dlg.getDirectory();
 	if (res)
@@ -2202,7 +2202,7 @@ long CSMap::onFileSaveWithCmds(FXObject *, FXSelector, void *)
 	FXFileDialog dlg(this, "Befehle mit CR speichern unter...", DLGEX_SAVE);
 	dlg.setIcon(icons.save);
 	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(iso2utf("Eressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nMögliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nAlle Dateien (*)"));
+	dlg.setPatternList(FXString(L"Eressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nMögliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nAlle Dateien (*)"));
 	FXint res = dlg.execute(PLACEMENT_SCREEN);
 	dialogDirectory = dlg.getDirectory();
 	if (res)
@@ -2565,7 +2565,7 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 	}
 
 	FXString txt;
-	txt.format(iso2utf("Wirklich die markierten %d Regionen löschen?").text(), selection.regionsSelected.size());
+	txt.format(FXString(L"Wirklich die markierten %d Regionen löschen?").text(), selection.regionsSelected.size());
 
 	FXMessageBox dlg(this, CSMAP_APP_TITLE, txt, 0, MBOX_YES_NO);
 	FXuint res = dlg.execute(PLACEMENT_SCREEN);

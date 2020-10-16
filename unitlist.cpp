@@ -256,7 +256,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				else if (combatstatus == "3")
 					label = "defensiv";
 				else if (combatstatus == "4")
-					label = iso2utf("kämpft nicht");
+					label = FXString(L"k\u00e4mpft nicht");
 				else if (combatstatus == "5")
 					label = "flieht";
 				else if (!combatstatus.empty())
@@ -307,7 +307,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 			if (spells != end)		// does a SPRUECHE block exist?
 			{
-				FXTreeItem *node = list->appendItem(unititem, iso2utf("Zaubersprüche"));
+				FXTreeItem *node = list->appendItem(unititem, FXString(L"Zauberspr\u00fcche"));
 				//node->setExpanded(true);
 
 				for (datakey::itor key = spells->data().begin(); key != spells->data().end(); key++)
@@ -329,7 +329,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					FXString type, label;
 
                     if (itor->first == 0)
-						type = iso2utf("Präkampfzauber");
+						type = FXString(L"Pr\u00e4kampfzauber");
 					else if (itor->first == 1)
 						type = "Kampfzauber";
 					else if (itor->first == 2)
@@ -369,7 +369,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 			if (items != end)		// does a GEGENSTAENDE block exist?
 			{
-				FXTreeItem *node = list->appendItem(unititem, iso2utf("Gegenstände"));
+				FXTreeItem *node = list->appendItem(unititem, FXString(L"Gegenst\u00e4nde"));
 				node->setExpanded(true);
 
 				for (datakey::itor key = items->data().begin(); key != items->data().end(); key++)
@@ -384,7 +384,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				unhandled.clear();
 
 				FXString name, descr, size, owner;
-				FXString type = iso2utf("Gebäude");
+				FXString type = FXString(L"Geb\u00e4ude");
 				factionId = -1;
 
 				for (datakey::itor key = building->data().begin(); key != building->data().end(); key++)
@@ -412,7 +412,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				if (!type.empty())
 					label += ", " + type;
 				if (!size.empty())
-					label += iso2utf(", Größe ") + size;
+					label += FXString(L", Gr\u00f6\u00dfe ") + size;
 
 				FXTreeItem *node = list->prependItem(NULL, label);
 				node->setExpanded(true);
@@ -486,17 +486,17 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				if (!type.empty())
 					label += ", " + type;
 				if (!size.empty())
-					label += iso2utf(", Größe ") + size;
+					label += FXString(L", Gr\u00f6\u00dfe ") + size;
 
 				FXTreeItem *node = list->prependItem(NULL, label);
 				node->setExpanded(true);
 
 				// Schaden
 				if (!damage.empty())
-					list->appendItem(node, damage + iso2utf("% beschädigt"));
 
-				// Küste
-				const char* coasts[] = { "Nordwest", "Nordost", "Ost", "Südost", "Südwest", "West", "-unknown-" };
+					list->appendItem(node, damage + FXString(L"% besch\u00e4digt"));
+				// Kueste
+				const wchar_t* coasts[] = { L"Nordwest", L"Nordost", L"Ost", L"S\u00fcdost", L"S\u00fcdwest", L"West", L"-unknown-" };
 
 				if (!coast.empty())
 				{
@@ -506,7 +506,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					if (dir < 0 || dir > 6)
 						dir = 6;
 
-					list->appendItem(node, iso2utf(coasts[dir]) + iso2utf("küste"));
+					list->appendItem(node, FXString(coasts[dir]) + FXString(L"k\u00fcste"));
 				}
 
 				// Beladung (cargo/capacity)
