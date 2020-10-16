@@ -55,11 +55,11 @@ FXStatistics::FXStatistics(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	FXToggleButton *btn;		
 	btn = new FXToggleButton(options, "Personen", "Personen", NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_PERSONS);
-	btn = new FXToggleButton(options, iso2utf("Gegenstände"), iso2utf("Gegenstände"), NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
+	btn = new FXToggleButton(options, FXString(L"Gegenst\u00e4nde"), FXString(L"Gegenst\u00e4nde"), NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_ITEMS);
 	btn = new FXToggleButton(options, "Talente", "Talente", NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_TALENTS);
-	btn = new FXToggleButton(options, iso2utf("Gebäude"), iso2utf("Gebäude"), NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
+	btn = new FXToggleButton(options, FXString(L"Geb\u00e4ude"), FXString(L"Geb\u00e4ude"), NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_BUILDINGS);
 	btn = new FXToggleButton(options, "Schiffe", "Schiffe", NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_SHIPS);
@@ -489,7 +489,7 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
             FXString label;
 			label.format("%s (%s): ", name.text(), block->id().text());
 			if (entryType != 0)
-				label += iso2utf("Größe ");
+				label += iso2utf("Gr\u00f6\u00dfe ");
 			label += FXStringVal(itor->second);
 			FXMenuCommand *menuitem = new FXMenuCommand(menu, label, NULL, this,ID_POPUP_CLICKED);
 			menuitem->setUserData((void*)&*block);

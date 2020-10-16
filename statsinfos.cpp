@@ -150,7 +150,7 @@ void FXStatsInfos::addEntry(std::list<Info>& info, FXString name, int value, int
 
 void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
 {
-	int WorkPerRegion[] =	// Arbeitsplätze pro Regionstyp
+	int WorkPerRegion[] =	// Arbeitsplaetze pro Regionstyp
 	{
 		0,	//TERRAIN_UNKNOWN,
 		0,	//TERRAIN_OCEAN,
@@ -176,10 +176,10 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
 	if (workstations < 0) workstations = 0;
 
 	int Lohn = region->valueInt("Lohn");
-	if (Lohn) addEntry(info, "Lohn", Lohn, 0, 0, iso2utf("Lohn für Arbeit"));
+	if (Lohn) addEntry(info, "Lohn", Lohn, 0, 0, iso2utf("Lohn f\u00fcr Arbeit"));
 
 	int earnings = (Lohn+1) * std::min(workstations, peasants) - 10 * peasants;
-	if (earnings) addEntry(info, "Bauernertrag", earnings, 0, 0, iso2utf("Überschuss der Bauerneinnahmen pro Runde. Kann sicher eingetrieben werden."));
+	if (earnings) addEntry(info, "Bauernertrag", earnings, 0, 0, iso2utf("\u00dcberschuss der Bauerneinnahmen pro Runde. Kann sicher eingetrieben werden."));
 
 	// search income messages for this region
 	datablock::itor faction, block, end = files->front().blocks().end();
@@ -249,13 +249,13 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
 
 			if (type == 771334452)	// Einnahmen
 				income[mode] += amount;
-			else if (type == 443066738)	// Ausgaben für teure Talente (+Akademie)
+			else if (type == 443066738)	// Ausgaben fuer teure Talente (+Akademie)
 				learncost += amount;
 		}
 	}
 
 	// display income messages
-	if (income[0]) addEntry(info, "Einnahmen", income[0], 0, 0, iso2utf("Einnahmen durch sonstige Tätigkeiten."));
+	if (income[0]) addEntry(info, "Einnahmen", income[0], 0, 0, FXString(L"Einnahmen durch sonstige T\u00e4tigkeiten."));
 	if (income[1]) addEntry(info, "Unterhaltung", income[1], 0, 0, "Einnahmen durch Unterhaltung");
 	if (income[2]) addEntry(info, "Steuern", income[2], 0, 0, "Einnahmen durch Steuern");
 	if (income[3]) addEntry(info, "Handel", income[3], 0, 0, "Einnahmen durch Handel");
