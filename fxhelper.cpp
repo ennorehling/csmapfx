@@ -80,7 +80,7 @@ std::string flatten(const std::string& str)
 		else if (c == 0xdc || c == 0xfc)
 			out += "ue";
 		else if (isalnum(c))
-			out += std::tolower(c);
+			out += (char)std::tolower(c);
 	}
 
 	return out;
@@ -103,7 +103,7 @@ FXString flatten(const FXString& str)
 		else if (wc == L"\u00dc"[0] || wc == L"\u00fc"[0])
 			out += "ue";
 		else
-			out += std::tolower(wc);
+			out += (char)std::tolower(wc);
 	}
 
 	return out;

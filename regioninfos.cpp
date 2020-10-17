@@ -108,14 +108,14 @@ void FXRegionInfos::clearLabels()
 	tags.entries.clear();
 }
 
-void FXRegionInfos::createLabels(const FXString& name, const FXString& first, const FXString& second, int column)
+void FXRegionInfos::createLabels(const FXString& name, const FXString& first_label, const FXString& second_label, int column)
 {
 	FXMatrix *matrix = (column==0) ? tags.leftmatrix : tags.rightmatrix;
 
 	// create labels
 	FXLabel *lname = new FXLabel(matrix, name, NULL, JUSTIFY_LEFT|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
-	FXLabel *lfirst = new FXLabel(matrix, first, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
-	FXLabel *lsecond = new FXLabel(matrix, second, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
+	FXLabel *lfirst = new FXLabel(matrix, first_label, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
+	FXLabel *lsecond = new FXLabel(matrix, second_label, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
 	lsecond->disable();
 	lname->create(); lfirst->create(); lsecond->create();
 
@@ -253,9 +253,9 @@ void FXRegionInfos::collectData(std::list<Info>& info, datablock::itor region)
 			// Silber der eigenen Partei zum Parteisilber zaehlen
 			if (myfaction)
 			{
-				FXString Silber = block->value("Silber");
-				if (!Silber.empty())
-	                Parteisilber += atoi(Silber.text());
+				FXString silber = block->value("Silber");
+				if (!silber.empty())
+	                Parteisilber += atoi(silber.text());
 			}
 		}
 	}
@@ -326,8 +326,8 @@ void FXRegionInfos::updateData()
 		FXString description = region.value(datakey::TYPE_DESCRIPTION);
 		if (!description.empty())
 		{
-			FXString last = description.right(1);
-			if (last != "." && last != "!" && last != "?" && last != ")")
+			FXchar lastc = description.right(1)[0];
+			if (lastc != '.' && lastc != '!' && lastc != '?' && lastc != ')')
 				description += ".";
 
 			label += ". " + description;

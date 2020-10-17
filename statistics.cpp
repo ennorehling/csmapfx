@@ -50,18 +50,18 @@ FXStatistics::FXStatistics(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
     opTab = new FXToolBarTab(filterboxes, NULL,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
 	opTab->setTipText("Filteroptionen ein- und ausblenden");
 
-	FXMatrix *options = new FXMatrix(filterboxes, 3, MATRIX_BY_COLUMNS|PACK_UNIFORM_HEIGHT, 0,0,0,0, 2,2,2,2, 2,2);
+	FXMatrix *optionmatrix = new FXMatrix(filterboxes, 3, MATRIX_BY_COLUMNS|PACK_UNIFORM_HEIGHT, 0,0,0,0, 2,2,2,2, 2,2);
 
 	FXToggleButton *btn;		
-	btn = new FXToggleButton(options, "Personen", "Personen", NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
+	btn = new FXToggleButton(optionmatrix, "Personen", "Personen", NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_PERSONS);
-	btn = new FXToggleButton(options, FXString(L"Gegenst\u00e4nde"), FXString(L"Gegenst\u00e4nde"), NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
+	btn = new FXToggleButton(optionmatrix, FXString(L"Gegenst\u00e4nde"), FXString(L"Gegenst\u00e4nde"), NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_ITEMS);
-	btn = new FXToggleButton(options, "Talente", "Talente", NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
+	btn = new FXToggleButton(optionmatrix, "Talente", "Talente", NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_TALENTS);
-	btn = new FXToggleButton(options, FXString(L"Geb\u00e4ude"), FXString(L"Geb\u00e4ude"), NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
+	btn = new FXToggleButton(optionmatrix, FXString(L"Geb\u00e4ude"), FXString(L"Geb\u00e4ude"), NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_BUILDINGS);
-	btn = new FXToggleButton(options, "Schiffe", "Schiffe", NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
+	btn = new FXToggleButton(optionmatrix, "Schiffe", "Schiffe", NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
 	btn->setUserData((void*)select.FILTER_SHIPS);
 
 	// create list
@@ -90,7 +90,7 @@ void FXStatistics::loadState(FXRegistry& reg)
 	select.filter = reg.readUnsignedEntry("STATISTICS", "FILTER", select.filter);
 
 	FXint hidefilters = reg.readUnsignedEntry("STATISTICS", "HIDE_FILTERS", 0);
-	opTab->collapse(hidefilters);
+	opTab->collapse(hidefilters != 0);
 }
 
 void FXStatistics::saveState(FXRegistry& reg)
@@ -407,12 +407,12 @@ long FXStatistics::onChangeFilter(FXObject* sender, FXSelector, void* ptr)
 		return 0;
 
 	FXId *item = (FXId*)sender;
-    FXival data = (FXival)item->getUserData();
+    FXival udata = (FXival)item->getUserData();
 
 	if (ptr)	// new button state
-		select.filter |= data;			// set filter
+		select.filter |= udata;			// set filter
 	else
-		select.filter &= ~data;			// unset filter
+		select.filter &= ~udata;			// unset filter
 
 	// change statistics in list
 	updateList();
@@ -426,9 +426,9 @@ long FXStatistics::updChangeFilter(FXObject* sender, FXSelector, void*)
 		return 0;
 
 	FXId *item = (FXId*)sender;
-    FXival data = (FXival)item->getUserData();
+    FXival mask = (FXival)item->getUserData();
 
-	sender->handle(this, FXSEL(SEL_COMMAND, (select.filter & data)?ID_CHECK:ID_UNCHECK), NULL);
+	sender->handle(this, FXSEL(SEL_COMMAND, (select.filter & mask)?ID_CHECK:ID_UNCHECK), NULL);
 	return 1;
 }
 
@@ -463,9 +463,9 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 	std::map<int, entry>::iterator en = entries.find(itemIdx);
 	if (en != entries.end())
 	{
-		entry& list = en->second;
+		entry& entry = en->second;
 
-		for (std::vector<std::pair<int, int> >::iterator itor = list.list.begin(); itor != list.list.end(); itor++)
+		for (std::vector<std::pair<int, int> >::iterator itor = entry.list.begin(); itor != entry.list.end(); itor++)
 		{
 			datablock::itor block;
 
@@ -520,16 +520,16 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 	{
 		FXMenuCommand *cmd = (FXMenuCommand*)sender;
 		
-		datablock* data = (datablock*)cmd->getUserData();
+		datablock* dblock = (datablock*)cmd->getUserData();
 
 		datablock::itor main = files->begin()->blocks().end();
-		datablock::itor parent = files->begin()->blocks().end();
+		datablock::itor iparent = files->begin()->blocks().end();
 
 		for (datafile::itor file = files->begin(); file != files->end(); file++)
 			for (datablock::itor block = file->blocks().begin(); block != file->blocks().end(); block++)
 			{
 				// nothing to search for
-				if (!data)
+				if (!dblock)
 					break;
 
 				// handle only regions, factions (+alliances), buildings, ships and units
@@ -541,26 +541,26 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 					block->type() != datablock::TYPE_UNIT)
 					continue;
 
-				if (data && data == &*block)
+				if (dblock && dblock == &*block)
 				{
 					main = block;
-					data = NULL;		// to indicate that block was found.
+					dblock = NULL;		// to indicate that block was found.
 				}
 				else if (block->type() == datablock::TYPE_REGION)
 				{
-					parent = block;
+					iparent = block;
 				}
 			}
 
 		if (main == files->begin()->blocks().end())
 		{
-			main = files->begin()->dummyToItor(data);
+			main = files->begin()->dummyToItor(dblock);
 		}
 
 		if (main == files->begin()->blocks().end())
 		{
-			main = parent;
-			parent = files->begin()->blocks().end();
+			main = iparent;
+			iparent = files->begin()->blocks().end();
 		}
 
 		if (main != files->begin()->blocks().end())
@@ -578,10 +578,10 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 				state.selected = state.FACTION;
 				state.faction = main;
 
-				if (parent != files->begin()->blocks().end())
+				if (iparent != files->begin()->blocks().end())
 				{
 					state.selected |= state.REGION;
-					state.region = parent;
+					state.region = iparent;
 				}
 			}
 			if (main->type() == datablock::TYPE_BUILDING)
@@ -589,10 +589,10 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 				state.selected = state.BUILDING;
 				state.building = main;
 
-				if (parent != files->begin()->blocks().end())
+				if (iparent != files->begin()->blocks().end())
 				{
 					state.selected |= state.REGION;
-					state.region = parent;
+					state.region = iparent;
 				}
 			}
 			if (main->type() == datablock::TYPE_SHIP)
@@ -600,10 +600,10 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 				state.selected = state.SHIP;
 				state.ship = main;
 
-				if (parent != files->begin()->blocks().end())
+				if (iparent != files->begin()->blocks().end())
 				{
 					state.selected |= state.REGION;
-					state.region = parent;
+					state.region = iparent;
 				}
 			}
 			if (main->type() == datablock::TYPE_UNIT)
@@ -611,10 +611,10 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 				state.selected = state.UNIT;
 				state.unit = main;
 
-				if (parent != files->begin()->blocks().end())
+				if (iparent != files->begin()->blocks().end())
 				{
 					state.selected |= state.FACTION;
-					state.faction = parent;
+					state.faction = iparent;
 				}			
 			}
 
@@ -650,7 +650,7 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 		if (block->type() == datablock::TYPE_UNIT)
 		{
 			FXString fac = block->value(datakey::TYPE_FACTION);
-			FXuval factionId = -1;
+			FXival factionId = -1;
 			if (fac.length())
 				factionId = atoi(fac.text());
 

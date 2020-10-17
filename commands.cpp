@@ -531,16 +531,16 @@ void FXCommands::saveCommands()
 	if (selection.selected & selection.UNIT)
 	{
 		// search for command block of unit
-		datablock::itor end = files->front().end();
-		datablock::itor block = selection.unit;
-		for (block++; block != end && block->depth() > selection.unit->depth(); block++)
-			if (block->type() == datablock::TYPE_COMMANDS)
+		datablock::itor iend = files->front().end();
+		datablock::itor iblock = selection.unit;
+		for (iblock++; iblock != iend && iblock->depth() > selection.unit->depth(); iblock++)
+			if (iblock->type() == datablock::TYPE_COMMANDS)
 				break;				// found
 
-		if (block == end || block->type() != datablock::TYPE_COMMANDS)
+		if (iblock == iend || iblock->type() != datablock::TYPE_COMMANDS)
 			return;
 
-		if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
+		if (att_commands* cmds = dynamic_cast<att_commands*>(iblock->attachment()))
 		{
 			cmds->commands.clear();
 

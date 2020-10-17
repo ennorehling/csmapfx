@@ -567,8 +567,10 @@ void FXFileDialogEx::getWinPattern(FXchar*& pszWinPat, const FXchar* pszFoxPat) 
       }
 
     else if (pMark != NULL && *pSrc != ']') {
-      // only copy unique characters (ignoring case)
-      if (!bIgnore && strchr(pMark, tolower(*pSrc)) == 0) *(pTgt++) = tolower(*pSrc);
+        // only copy unique characters (ignoring case)
+        if (!bIgnore && strchr(pMark, tolower(*pSrc)) == 0) {
+            *(pTgt++) = (FXchar)tolower(*pSrc);
+        }
       }
 
     else if (pMark != NULL && *pSrc == ']') {
@@ -589,7 +591,7 @@ void FXFileDialogEx::getWinPattern(FXchar*& pszWinPat, const FXchar* pszFoxPat) 
       }
 
     else {
-      *(pTgt++) = tolower(*pSrc);
+      *(pTgt++) = (FXchar)tolower(*pSrc);
       nLen++;
       }
     }

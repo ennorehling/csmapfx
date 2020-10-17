@@ -127,9 +127,9 @@ void FXInfoDlg::setGame(const FXString& game)
 	{
 		FXString fileName = fileNames[i];
 		bool fileFound = false;
-		for (size_t i = 0; i < searchPath.size(); i++)
+		for (size_t j = 0; j < searchPath.size(); j++)
 		{
-			std::ifstream infoFile( (searchPath[i] + fileName).text() );
+			std::ifstream infoFile( (searchPath[j] + fileName).text() );
 			fileFound = parseTableData(infoFile) || fileFound;
 		}
 		if (fileFound)
@@ -168,9 +168,9 @@ long FXInfoDlg::onSearch(FXObject*, FXSelector, void* ptr)
 			continue;
 
 		FXint line = 0;
-		for (std::list<infoblock::row>::iterator itor = block.lines.begin(); itor != block.lines.end(); itor++, line++)
+		for (std::list<infoblock::row>::iterator it = block.lines.begin(); it != block.lines.end(); ++it, line++)
 		{
-			for (infoblock::row::iterator entry = itor->begin(); entry != itor->end(); entry++)
+			for (infoblock::row::iterator entry = it->begin(); entry != it->end(); entry++)
 			{
 				FXint pos = flatten(*entry).find(str);
 				if (pos > -1 && (!found_length || pos < found_start || (pos == found_start && entry->length() < found_length)))
@@ -278,12 +278,12 @@ void FXInfoDlg::createTable()
 		std::vector<FXFoldingItem*> fathers;
 		FXival line = 0;
 
-		for (std::list<infoblock::row>::iterator itor = block.lines.begin(); itor != block.lines.end(); itor++)
+		for (std::list<infoblock::row>::iterator it = block.lines.begin(); it != block.lines.end(); it++)
 		{
 			FXString text;
 
 			// count subitem depth
-			infoblock::row::iterator entry = itor->begin();
+			infoblock::row::iterator entry = it->begin();
 			if (entry->left(1) == ">" && entry->find_first_not_of('>') == -1)
 			{
 				fathers.resize(std::min((FXint)fathers.size(), entry->length()));
@@ -297,7 +297,7 @@ void FXInfoDlg::createTable()
 
 			// append item to list
 			FXuint col = 0;
-			for (; entry != itor->end() && col < widths.size(); entry++)
+			for (; entry != it->end() && col < widths.size(); entry++)
 			{
 				text += *entry + "\t";
 				widths[col] = std::max(widths[col], font->getTextWidth(*entry) + indentAdd);

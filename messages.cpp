@@ -49,30 +49,30 @@ void FXMessages::mapfiles(std::list<datafile> *f)
 
 long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 {
-	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
+	datafile::SelectionState *sel_state = (datafile::SelectionState*)ptr;
 
 	// connected to a datafile list?
 	if (!files)
 		return 0;
 
 	// any data changed, so need to update list?
-	if (selection.fileChange != state->fileChange)
+	if (selection.fileChange != sel_state->fileChange)
 	{
-		selection.fileChange = state->fileChange;
-		selection.map = state->map;
-		selection.activefaction = state->activefaction;
+		selection.fileChange = sel_state->fileChange;
+		selection.map = sel_state->map;
+		selection.activefaction = sel_state->activefaction;
 	}
 
-	if (selection.selChange != state->selChange)
+	if (selection.selChange != sel_state->selChange)
 	{
-		selection.selChange = state->selChange;
-		selection.selected = state->selected;
+		selection.selChange = sel_state->selChange;
+		selection.selected = sel_state->selected;
 
-		selection.region = state->region;
-		selection.faction = state->faction;
-		selection.building = state->building;
-		selection.ship = state->ship;
-		selection.unit = state->unit;
+		selection.region = sel_state->region;
+		selection.faction = sel_state->faction;
+		selection.building = sel_state->building;
+		selection.ship = sel_state->ship;
+		selection.unit = sel_state->unit;
 
 		clearSiblings(groups.effects);
 		clearSiblings(groups.streets);
@@ -186,32 +186,32 @@ long FXMessages::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 	// select MESSAGE.unit on double-click
     if (int id = (FXival)item->getData())
 	{
-        datafile::SelectionState state;
+        datafile::SelectionState sel_state;
 
-		state.selected = selection.selected & selection.REGION;
-		state.region = selection.region;
+		sel_state.selected = selection.selected & selection.REGION;
+		sel_state.region = selection.region;
 
 		datablock::itor unit = files->front().unit(id);
 		if (unit != files->front().blocks().end())
 		{
-			state.unit = unit;
-			state.selected |= state.UNIT;
+			sel_state.unit = unit;
+			sel_state.selected |= sel_state.UNIT;
 		}
 
-		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
 		return 1;
 	}
 
 	return FXTreeList::onDoubleClicked(sender, sel, ptr);
 }
 
-void FXMessages::clearSiblings(FXTreeItem* parent)
+void FXMessages::clearSiblings(FXTreeItem* parent_item)
 {
-	FXTreeItem *next, *item = parent->getFirst();
+	FXTreeItem *item = parent_item->getFirst();
 	while (item)
 	{
-		next = item->getNext();
+        FXTreeItem *next_item = item->getNext();
 		removeItem(item);
-		item = next;
+		item = next_item;
 	}
 }

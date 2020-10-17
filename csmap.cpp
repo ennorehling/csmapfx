@@ -108,9 +108,9 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	CSMap_instance = this;
 
 	// create main window icon
-	FXIcon* icon = new FXICOIcon(app, data::csmap);
-    setMiniIcon(icon);
-	setIcon(icon);
+	FXIcon* ico = new FXICOIcon(app, data::csmap);
+    setMiniIcon(ico);
+	setIcon(ico);
 
 	// activate Alt-F4
 	getAccelTable()->addAccel(MKUINT(KEY_F4,ALTMASK),this, FXSEL(SEL_SIGNAL, ID_CLOSE));
@@ -214,10 +214,10 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	{
 		datablock terrainRegion;
 		terrainRegion.terrain(i);
-		FXival data = FXCSMap::MODUS_SETTERRAIN + i;
+		FXival udata = FXCSMap::MODUS_SETTERRAIN + i;
 
 		FXMenuCommand *cmd = new FXMenuCommand(terrainPopup, terrainRegion.terrainString() + "\t\tZeichnen-Modus: Setze Regionen", icons.terrain[i], this,ID_MAP_SETMODUS);
-		cmd->setUserData((void*)data);
+		cmd->setUserData((void*)udata);
 	}
 
 	new FXMenuSeparatorEx(terrainPopup);
@@ -599,17 +599,17 @@ void CSMap::create()
 	FXMainWindow::create();
 
 	// reload window position & size
-	FXint xpos = getApp()->reg().readUnsignedEntry("WINDOW", "XPOS", 100);
-	FXint ypos = getApp()->reg().readUnsignedEntry("WINDOW", "YPOS", 100);
-	FXint width = getApp()->reg().readUnsignedEntry("WINDOW", "WIDTH", 800);
-	FXint height = getApp()->reg().readUnsignedEntry("WINDOW", "HEIGHT", 600);
+	FXint x = getApp()->reg().readUnsignedEntry("WINDOW", "XPOS", 100);
+	FXint y = getApp()->reg().readUnsignedEntry("WINDOW", "YPOS", 100);
+	FXint w = getApp()->reg().readUnsignedEntry("WINDOW", "WIDTH", 800);
+	FXint h = getApp()->reg().readUnsignedEntry("WINDOW", "HEIGHT", 600);
 
-	if (xpos < 0) xpos = 0;
-	if (ypos < 21) ypos = 21;
-	if (width < 10) width = 10;
-	if (height < 10) height = 10;
+	if (x < 0) x = 0;
+	if (y < 21) y = 21;
+	if (w < 10) w = 10;
+	if (h < 10) h = 10;
 
-	position(xpos,ypos, width,height);
+	position(x, y, w, h);
 
 	// reload layout information
 	FXint regionsWidth = getApp()->reg().readUnsignedEntry("WINDOW", "REGIONS_WIDTH", 200);
@@ -813,8 +813,8 @@ bool CSMap::loadFile(FXString filename)
 	files.push_back(datafile());
 	datafile &file = files.back();
 
-	FXString title = CSMAP_APP_TITLE " - lade " + filename;
-	handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &title);
+	FXString app_title = CSMAP_APP_TITLE " - lade " + filename;
+	handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &app_title);
 
 	try
 	{
@@ -861,8 +861,8 @@ bool CSMap::mergeFile(FXString filename)
 	files.push_back(datafile());
 	datafile &file = files.back();
 
-	FXString title = CSMAP_APP_TITLE " - lade " + filename;
-	handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &title);
+	FXString app_title = CSMAP_APP_TITLE " - lade " + filename;
+	handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &app_title);
 
 	try
 	{
@@ -1073,28 +1073,26 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
 	if (!files.size())
 		return false;
 
-        FXCSMap *map = new FXCSMap(this);
-	map->hide();
-	map->mapfiles(&files);
-	map->create();
+    FXCSMap *csmap = new FXCSMap(this);
+    csmap->hide();
+    csmap->mapfiles(&files);
+    csmap->create();
 
 	// options
 	if (scale == 64)
-		map->scaleChange(16/64.0f);	// bugfix: scaleChange(1.0); doesn't work without previous scaleing
+        csmap->scaleChange(16/64.0f);	// bugfix: scaleChange(1.0); doesn't work without previous scaleing
 
-	map->scaleChange(scale/64.0f);
-	map->setShowNames(show_names);
-	map->setShowKoords(show_koords);
-	map->setShowIslands(show_islands);
+    csmap->scaleChange(scale/64.0f);
+    csmap->setShowNames(show_names);
+    csmap->setShowKoords(show_koords);
+    csmap->setShowIslands(show_islands);
 
 	if (color == 1)	// white background
-		map->setBackColor(FXRGB(255, 255, 255));
+        csmap->setBackColor(FXRGB(255, 255, 255));
 	else
-		map->setBackColor(FXRGB(0, 0, 0));
+        csmap->setBackColor(FXRGB(0, 0, 0));
 
-	FXint width = map->getContentWidth();
-
-	FXImage image(getApp(), NULL, 0, width, 500);
+	FXImage image(getApp(), NULL, 0, csmap->getContentWidth(), 500);
 	image.create();
 
 	FXFileStream file;
@@ -1110,10 +1108,10 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
 	getApp()->refresh();
 	progress.show(PLACEMENT_SCREEN);
 
-        csmap_savePNG(file, *map, image, progress);
+        csmap_savePNG(file, *csmap, image, progress);
 	file.close();
 
-	delete map;
+	delete csmap;
 
     mapChange();
     return true;
@@ -1362,9 +1360,9 @@ long CSMap::onSetOrigin(FXObject*, FXSelector, void*)
 	{
 		datablock &region = *selection.region;
 
-		FXString name = region.value(datakey::TYPE_NAME);
-		if (name.empty())
-			name = region.terrainString();
+		FXString rname = region.value(datakey::TYPE_NAME);
+		if (rname.empty())
+			rname = region.terrainString();
 	}
 
 	if (name.empty())
@@ -1540,12 +1538,12 @@ long CSMap::onMapSetModus(FXObject* sender, FXSelector, void* ptr)
 	if (sender && sender->isMemberOf(&FXId::metaClass))
 	{
 		FXId *item = (FXId*)sender;
-		FXuval data = (FXuval)item->getUserData();
+		FXuval udata = (FXuval)item->getUserData();
 
-		if (data >= FXCSMap::MODUS_SETTERRAIN && data < FXCSMap::MODUS_SETTERRAIN+datablock::TERRAIN_LAST)
+		if (udata >= FXCSMap::MODUS_SETTERRAIN && udata < FXCSMap::MODUS_SETTERRAIN+datablock::TERRAIN_LAST)
 		{
-			terrainSelect->setIcon(icons.terrain[data-FXCSMap::MODUS_SETTERRAIN]);
-			terrainSelect->setUserData((void*)data);
+			terrainSelect->setIcon(icons.terrain[udata-FXCSMap::MODUS_SETTERRAIN]);
+			terrainSelect->setUserData((void*)udata);
 		}
 	}
 
@@ -1591,14 +1589,14 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 		planes->appendItem("Standardebene (0)", NULL, (void*)0);
 		planes->setNumVisible(planes->getNumItems());
 
-		FXWindow *next, *item = planemenu->getFirst();
+		FXWindow *nextw, *item = planemenu->getFirst();
 		if (item)
 			item = item->getNext();
 		while (item)
 		{
-			next = item->getNext();
+            nextw = item->getNext();
 			delete item;
-            item = next;
+            item = nextw;
 		}
 
 		if (files.size())
@@ -1623,11 +1621,11 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 			for (std::set<int>::iterator plane = planeSet.begin(); plane != planeSet.end(); plane++)
 			{
 				FXString label;
-				FXuval item = (FXuval)*plane;
+				FXuval p = (FXuval)*plane;
 
-				if (item == 0)
+				if (p == 0)
 					continue;
-				switch (item) {
+				switch (p) {
 				case 1:
 					label = "Astralraum";
 					break;
@@ -1641,12 +1639,12 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 					label = "Weihnachtsinsel";
 					break;
 				default:
-					label.format("Ebene %lu", item);
+					label.format("Ebene %lu", p);
 				}
-				planes->appendItem(label, NULL, (void*)item);
+				planes->appendItem(label, NULL, (void*)p);
 
 				FXMenuRadio *radio = new FXMenuRadio(planemenu,label, this,ID_MAP_VISIBLEPLANE,0);
-				radio->setUserData((void*)item);
+				radio->setUserData((void*)p);
 				radio->create();
 			}
 
@@ -1740,8 +1738,8 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 					{
 						FXString label; label.format("%s %s", itor->value().text(), itor->key().text());
 
-						FXMenuCommand* item = new FXMenuCommand(menu.factionpool,label);
-						item->create();
+						FXMenuCommand* cmd = new FXMenuCommand(menu.factionpool, label);
+                        cmd->create();
 
 						itemsinpool = true;
 					}
@@ -1837,7 +1835,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 	}
 
 	// change window title and status bar
-	FXString title;
+	FXString titlestr;
 
     if (files.size())
 	{
@@ -1858,7 +1856,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 			filenames += ", *";
 
 		// put the filenames in the title
-		title += " - [" + filenames + "]";
+		titlestr += " - [" + filenames + "]";
 
 		// update filename in statusbar
 		status_file->setText(filenames);
@@ -1892,7 +1890,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
 	if (selection.selected & selection.MULTIPLE_REGIONS)
 	{
-		title.append(FXString().format(" - [%lu Regionen markiert]", selection.regionsSelected.size()));
+		titlestr.append(FXString().format(" - [%lu Regionen markiert]", selection.regionsSelected.size()));
 	}
 
 
@@ -1913,15 +1911,15 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 		else
 			label.format(" - %s von %s (%d,%d)", terrain.text(), name.text(), selection.sel_x,selection.sel_y);
 
-		title.append(label);
+		titlestr.append(label);
 	}
 
-	if (title.empty())
-		title = CSMAP_APP_TITLE_VERSION;
+	if (titlestr.empty())
+		titlestr = CSMAP_APP_TITLE_VERSION;
 	else
-		title = CSMAP_APP_TITLE + title;
+		titlestr = CSMAP_APP_TITLE + titlestr;
 
-	handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &title);
+	handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &titlestr);
 
 	return 1;
 }
@@ -2097,8 +2095,8 @@ void CSMap::closeFile()
 	// ask if modified commands should be safed
 	if (!files.empty() && files.front().modifiedCmds())
 	{
-		FXuint res = FXMessageBox::question(this, MBOX_SAVE_CANCEL_DONTSAVE, CSMAP_APP_TITLE, "%s",
-		FXString(L"Die \u00c4nderungen an den Befehlen speichern?").text());
+		FXuint res = FXMessageBox::question(this, (FXuint)MBOX_SAVE_CANCEL_DONTSAVE, CSMAP_APP_TITLE, "%s",
+            FXString(L"Die \u00c4nderungen an den Befehlen speichern?").text());
 
 		if (res == MBOX_CLICKED_CANCEL)
 			return;					// don't close, cancel clicked

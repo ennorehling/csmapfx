@@ -3,6 +3,11 @@
 
 #include "png.h"
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4611)
+// interaction between '_setjmp' and C++ object destruction is non-portable
+#endif
+
 // Custom read function, which will read from the stream in our case
 /* not used
 static void user_read_fn(png_structp png_ptr, png_bytep buffer, png_size_t size){

@@ -263,13 +263,13 @@ long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* p
 		return 1;
 
 	// map change notify rebuilds treelist
-	datafile::SelectionState state = selection;
+	datafile::SelectionState sel_state = selection;
 	if (files->empty())
-		state.selected = 0,
-		state.map = 0;
+		sel_state.selected = 0,
+		sel_state.map = 0;
 
-	state.map |= state.MAPCHANGED;
-	getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+	sel_state.map |= sel_state.MAPCHANGED;
+	getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
 	return 1;  
 }
 
@@ -293,19 +293,19 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
 	if (!getCurrentItem())	// kein Item markiert.
 		return 0;
 
-	datablock* data = (datablock*)getCurrentItem()->getData();
+	datablock* datablk = (datablock*)getCurrentItem()->getData();
 	datablock* parentdata = NULL;
 	if (getCurrentItem()->getParent())
 		parentdata = (datablock*)getCurrentItem()->getParent()->getData();
 
 	datablock::itor main = files->begin()->blocks().end();
-	datablock::itor parent = files->begin()->blocks().end();
+	datablock::itor iparent = files->begin()->blocks().end();
 
 	for (datafile::itor file = files->begin(); file != files->end(); file++)
 		for (datablock::itor block = file->blocks().begin(); block != file->blocks().end(); block++)
 		{
 			// nothing to search for
-			if (!data && !parentdata)
+			if (!datablk && !parentdata)
 				break;
 
 			// handle only regions, factions (+alliances), buildings, ships and units
@@ -317,85 +317,85 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
 				block->type() != datablock::TYPE_UNIT)
 				continue;
 
-			if (data && data == &*block)
+			if (datablk && datablk == &*block)
 			{
 				main = block;
-				data = NULL;		// to indicate that block was found.
+				datablk = NULL;		// to indicate that block was found.
 			}
 			else if (parentdata && parentdata == &*block)
 			{
-				parent = block;
+				iparent = block;
 				parentdata = NULL;	// found
 			}
 		}
 
 	if (main == files->begin()->blocks().end())
 	{
-        main = files->begin()->dummyToItor(data);
+        main = files->begin()->dummyToItor(datablk);
 	}
 
 	if (main == files->begin()->blocks().end())
 	{
-		main = parent;
-		parent = files->begin()->blocks().end();
+		main = iparent;
+		iparent = files->begin()->blocks().end();
 	}
 
 	if (main != files->begin()->blocks().end())
 	{
 		// send new selection to main window
-		datafile::SelectionState state;
+		datafile::SelectionState sel_state;
 
 		if (main->type() == datablock::TYPE_REGION)
 		{
-			state.selected = state.REGION;
-			state.region = main;
+			sel_state.selected = sel_state.REGION;
+			sel_state.region = main;
 		}
 		if (main->type() == datablock::TYPE_FACTION)
 		{
-			state.selected = state.FACTION;
-			state.faction = main;
+			sel_state.selected = sel_state.FACTION;
+			sel_state.faction = main;
 
-			if (parent != files->begin()->blocks().end())
+			if (iparent != files->begin()->blocks().end())
 			{
-				state.selected |= state.REGION;
-				state.region = parent;
+				sel_state.selected |= sel_state.REGION;
+				sel_state.region = iparent;
 			}
 		}
 		if (main->type() == datablock::TYPE_BUILDING)
 		{
-			state.selected = state.BUILDING;
-			state.building = main;
+			sel_state.selected = sel_state.BUILDING;
+			sel_state.building = main;
 
-			if (parent != files->begin()->blocks().end())
+			if (iparent != files->begin()->blocks().end())
 			{
-				state.selected |= state.FACTION;
-				state.faction = parent;
+				sel_state.selected |= sel_state.FACTION;
+				sel_state.faction = iparent;
 			}
 		}
 		if (main->type() == datablock::TYPE_SHIP)
 		{
-			state.selected = state.SHIP;
-			state.ship = main;
+			sel_state.selected = sel_state.SHIP;
+			sel_state.ship = main;
 
-			if (parent != files->begin()->blocks().end())
+			if (iparent != files->begin()->blocks().end())
 			{
-				state.selected |= state.FACTION;
-				state.faction = parent;
+				sel_state.selected |= sel_state.FACTION;
+				sel_state.faction = iparent;
 			}
 		}
 		if (main->type() == datablock::TYPE_UNIT)
 		{
-			state.selected = state.UNIT;
-			state.unit = main;
+			sel_state.selected = sel_state.UNIT;
+			sel_state.unit = main;
 
-			if (parent != files->begin()->blocks().end())
+			if (iparent != files->begin()->blocks().end())
 			{
-				state.selected |= state.FACTION;
-				state.faction = parent;
+				sel_state.selected |= sel_state.FACTION;
+				sel_state.faction = iparent;
 			}			
 		}
 
-		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
 		return 1;
 	}
 
@@ -536,17 +536,16 @@ long FXRegionList::onPopupClicked(FXObject* sender,FXSelector, void*)
 }
 
 // rekursivly searches item with userdata=data in treeitem list
-FXTreeItem* FXRegionList::findTreeItem(FXTreeItem* first, void* data)
+FXTreeItem* FXRegionList::findTreeItem(FXTreeItem* item, void* udata)
 {
-	FXTreeItem *item = first;
 	while (item)
 	{
-		if (item->getData() == data)
+		if (item->getData() == udata)
 			return item;
 
 		if (item->getFirst())
 		{
-            FXTreeItem* found = findTreeItem(item->getFirst(), data);
+            FXTreeItem* found = findTreeItem(item->getFirst(), udata);
 			if (found)
 				return found;
 		}
@@ -559,59 +558,57 @@ FXTreeItem* FXRegionList::findTreeItem(FXTreeItem* first, void* data)
 
 long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 {
-	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
+	datafile::SelectionState *sel_state = (datafile::SelectionState*)ptr;
 
 	// connected to a datafile list?
 	if (!files)
 		return 0;
 
 	// any data changed, so need to update list?
-	if (selection.fileChange != state->fileChange)
+	if (selection.fileChange != sel_state->fileChange)
 	{
-		selection.fileChange = state->fileChange;
-		selection.map = state->map;
-		selection.activefaction = state->activefaction;
+		selection.fileChange = sel_state->fileChange;
+		selection.map = sel_state->map;
+		selection.activefaction = sel_state->activefaction;
 
 		// clear list and build a new one from data in this->files
 		clearItems();
 
-		FXString label, name, terrainString;
+		FXString label, terrainString;
 
 		for (datafile::itor file = files->begin(); file != files->end(); file++)
 		{
-			datablock::itor end = file->blocks().end();
-
-			for (datablock::itor block = file->blocks().begin(); block != end; block++)
+			for (datablock::itor iblock = file->blocks().begin(); iblock != file->blocks().end(); iblock++)
 			{
 				// handle only regions
-				if (block->type() != datablock::TYPE_REGION)
+				if (iblock->type() != datablock::TYPE_REGION)
 					continue;
 
-				terrainString = block->terrainString();
+				terrainString = iblock->terrainString();
 
-				name = block->value(datakey::TYPE_NAME);
+                FXString name = iblock->value(datakey::TYPE_NAME);
 
 				if (name.empty())
 					name = terrainString;
 				if (name.empty())
 					name = "Unbekannt";
 
-				if (block->info())
-					label.format("%s (%d,%d,%s)", name.text(), block->x(), block->y(), datablock::planeName(block->info()).text());
+				if (iblock->info())
+					label.format("%s (%d,%d,%s)", name.text(), iblock->x(), iblock->y(), datablock::planeName(iblock->info()).text());
 				else
-					label.format("%s (%d,%d)", name.text(), block->x(), block->y());
+					label.format("%s (%d,%d)", name.text(), iblock->x(), iblock->y());
 
 				// select terrain image
-				FXint terrain = block->terrain();
+				FXint terrain = iblock->terrain();
 
 				FXTreeItem* region = NULL;
 				FXString regionlabel = label;
 
 				std::map<FXint,FXTreeItem*> factions;
 
-				datablock::itor end = file->blocks().end();
-				datablock::itor unit = block;
-				for (unit++; unit != end && unit->depth() > block->depth(); unit++)
+				datablock::itor iend = file->blocks().end();
+				datablock::itor unit = iblock;
+				for (unit++; unit != iend && unit->depth() > iblock->depth(); unit++)
 				{
 					// display units until next region
 					if (unit->type() != datablock::TYPE_UNIT)
@@ -685,7 +682,7 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 						// add region only if it has units in it
 						if (!region)
-							region = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain],terrainIcons[terrain], &*block));
+							region = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain],terrainIcons[terrain], &*iblock));
 
 						if (icon == blue)
 							entry = prependItem(region, new FXRegionItem(label, icon,icon, facPtr));
@@ -700,8 +697,8 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					act_faction = factions[selection.activefaction->info()];
 				}
 
-				unit = block;
-				for (unit++; unit != end && unit->depth() > block->depth(); unit++)
+				unit = iblock;
+				for (unit++; unit != iend && unit->depth() > iblock->depth(); unit++)
 				{
 					// display units until next region
 					if (unit->type() != datablock::TYPE_UNIT)
@@ -715,17 +712,17 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 					FXTreeItem* faction = factions[factionId];
 
-					FXString name, number;				
+					FXString uname, number;				
 
 					for (datakey::itor key = unit->data().begin(); key != unit->data().end(); key++)
 					{
 						if (key->type() == datakey::TYPE_NAME)
-							name = key->value();
+                            uname = key->value();
 						if (key->type() == datakey::TYPE_NUMBER)
 							number = key->value();
 					}
 
-					label.format("%s (%s): %s", name.text(), unit->id().text(), number.text());
+					label.format("%s (%s): %s", uname.text(), unit->id().text(), number.text());
 
 					// with active_faction_group not set, units of own faction are inserted
 					// directly as child of region node.
@@ -737,7 +734,7 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 						appendItem(faction, item = new FXRegionItem(label, 0,0, &*unit));
 
 					datablock::itor block = unit;
-					for (block++; block != end && block->depth() > unit->depth(); block++)
+					for (block++; block != iend && block->depth() > unit->depth(); block++)
 					{
 						if (block->type() != datablock::TYPE_COMMANDS)
 							continue;
@@ -766,16 +763,16 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 		}
 	}
 
-	if (selection.selChange != state->selChange)
+	if (selection.selChange != sel_state->selChange)
 	{
-		selection.selChange = state->selChange;
-		selection.selected = state->selected;
+		selection.selChange = sel_state->selChange;
+		selection.selected = sel_state->selected;
 		
-		selection.region = state->region;
-		selection.faction = state->faction;
-		selection.building = state->building;
-		selection.ship = state->ship;
-		selection.unit = state->unit;
+		selection.region = sel_state->region;
+		selection.faction = sel_state->faction;
+		selection.building = sel_state->building;
+		selection.ship = sel_state->ship;
+		selection.unit = sel_state->unit;
 
 		if (selection.selected & selection.REGION)
 		{

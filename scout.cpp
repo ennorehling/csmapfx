@@ -150,11 +150,11 @@ void Phenotype::rate(bool(*isOcean)(int x, int y))
 			// update visited regions
 			visited.insert(std::make_pair(x, y));
 
-			for (int i = 0; i < 6; i++)
+			for (int j = 0; j < 6; j++)
 			{
 				// put all explored ocean on a list
-				int nx = x+offset_x[i];
-				int ny = y+offset_y[i];
+				int nx = x+offset_x[j];
+				int ny = y+offset_y[j];
 
 				if (isOcean(nx,ny))
 					visited.insert(std::make_pair(nx, ny));

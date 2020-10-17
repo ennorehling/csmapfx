@@ -26,9 +26,9 @@ FXExportDlg::FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	new FXHorizontalSeparator(this, SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
 
 	// options
-	FXVerticalFrame* options = new FXVerticalFrame(this, PACK_UNIFORM_HEIGHT);
+	FXVerticalFrame* vfoptions = new FXVerticalFrame(this, PACK_UNIFORM_HEIGHT);
 
-	FXHorizontalFrame* regionsize = new FXHorizontalFrame(options, LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT);
+	FXHorizontalFrame* regionsize = new FXHorizontalFrame(vfoptions, LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT);
 
 	new FXLabel(regionsize, iso2utf("Regionsgr\u00f6\u00dfe"));
 
@@ -40,12 +40,12 @@ FXExportDlg::FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	scalebox->setNumVisible(scalebox->getNumItems());
 
 	// what to show in the picture?
-	shownamesbox = new FXCheckButton(options, "Regions&namen anzeigen", NULL,0, CHECKBUTTON_NORMAL);
-	showkoordsbox = new FXCheckButton(options, "&Koordinaten anzeigen", NULL,0, CHECKBUTTON_NORMAL);
-	showislandsbox = new FXCheckButton(options, "&Inselnamen anzeigen", NULL,0, CHECKBUTTON_NORMAL);
+	shownamesbox = new FXCheckButton(vfoptions, "Regions&namen anzeigen", NULL,0, CHECKBUTTON_NORMAL);
+	showkoordsbox = new FXCheckButton(vfoptions, "&Koordinaten anzeigen", NULL,0, CHECKBUTTON_NORMAL);
+	showislandsbox = new FXCheckButton(vfoptions, "&Inselnamen anzeigen", NULL,0, CHECKBUTTON_NORMAL);
 
 	// background color
-	FXHorizontalFrame* backgrcolor = new FXHorizontalFrame(options, LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT);
+	FXHorizontalFrame* backgrcolor = new FXHorizontalFrame(vfoptions, LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT);
 
 	new FXLabel(backgrcolor, iso2utf("Hintergrundfarbe"));
 

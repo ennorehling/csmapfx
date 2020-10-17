@@ -309,9 +309,9 @@ long FXCSMap::onSetModus(FXObject* sender, FXSelector, void*)
 		return 0;
 
 	FXId *item = (FXId*)sender;
-	FXival data = (FXival)item->getUserData();
+	FXival udata = (FXival)item->getUserData();
 
-	modus = data;		// set new modus
+	modus = udata;		// set new modus
 	return 1;
 }
 
@@ -321,10 +321,10 @@ long FXCSMap::onUpdSetModus(FXObject* sender, FXSelector, void*)
 		return 0;
 
 	FXId *item = (FXId*)sender;
-	FXuval data = (FXuval)item->getUserData();
+	FXival udata = (FXival)item->getUserData();
 
 	// check button, if actual modus is button's modus
-	sender->handle(this, FXSEL(SEL_COMMAND, (data==modus)?ID_CHECK:ID_UNCHECK), NULL);
+	sender->handle(this, FXSEL(SEL_COMMAND, (udata==modus)?ID_CHECK:ID_UNCHECK), NULL);
 	return 1;
 }
 
@@ -453,9 +453,9 @@ void FXCSMap::mapfiles(std::list<datafile> *f)
     files = f;
 }
 
-void FXCSMap::connectMap(FXCSMap* map)
+void FXCSMap::connectMap(FXCSMap* a_map)
 {
-	main_map = map;
+	main_map = a_map;
 }
 
 void FXCSMap::scrollTo(FXint x, FXint y)
@@ -700,7 +700,7 @@ void FXCSMap::scaleChange(FXfloat new_scale)
 		FXFontDesc fontdesc;
 		font->destroy();
 		font->getFontDesc(fontdesc);
-		fontdesc.size = FXint(80*scale);
+		fontdesc.size = (FXushort)(80*scale);
 		if (fontdesc.size < 8)
 			fontdesc.size = 8;	// linux seems to have problems with fontsize smaller 8
 		font->setFontDesc(fontdesc);
@@ -713,7 +713,7 @@ void FXCSMap::scaleChange(FXfloat new_scale)
 		FXFontDesc fontdesc;
 		islandfont->destroy();
 		islandfont->getFontDesc(fontdesc);
-		fontdesc.size = FXint(5*80*std::sqrt(scale));
+		fontdesc.size = (FXushort)(5*80*std::sqrt(scale));
 		if (fontdesc.size < 8)
 			fontdesc.size = 8;	// linux seems to have problems with fontsize smaller 8
 		islandfont->setFontDesc(fontdesc);
@@ -778,10 +778,10 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 		if (minimap && main_map)
 		{
 			// calculate position in main map
-			float scale = main_map->getScale() / getScale();
+			float fscale = main_map->getScale() / getScale();
 
-			cursor_x = -int(cursor_x * scale) - main_map->offset_x + main_map->getWidth()/2;
-			cursor_y = -int(cursor_y * scale) - main_map->offset_y + main_map->getHeight()/2;
+			cursor_x = -int(cursor_x * fscale) - main_map->offset_x + main_map->getWidth()/2;
+			cursor_y = -int(cursor_y * fscale) - main_map->offset_y + main_map->getHeight()/2;
 
 			main_map->setPosition(cursor_x, cursor_y);
 			return 1;
@@ -1345,12 +1345,12 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 	return 0;
 }
 
-void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint terrain)
+void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 {
 	// create empty file if none exists
 	if (files->empty())
 	{
-		if (!terrain)	// don't create file, if region should be deleted anyway.
+		if (!new_terrain)	// don't create file, if region should be deleted anyway.
 			return;
 
 		files->push_back(datafile());
@@ -1379,7 +1379,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint terrain)
 			datablock* region = *itor;
 
 			// terraform: change terrain of region
-			region->terrain(terrain);
+			region->terrain(new_terrain);
 
 			// delete ;terrain tags (they are for special terrain names)
 			for (datakey::itor key = region->data().begin(); key != region->data().end(); key++)
@@ -1393,36 +1393,36 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint terrain)
 
 	// don't use hash table only since it might be out-of-date
 	datablock::itor end = files->begin()->blocks().end();
-	datablock::itor region = end;
+	datablock::itor iregion = end;
 
-	if (terrain)			// speeds things up but only works when we don't delete
-		region = files->begin()->region(x, y, plane);
+	if (new_terrain)			// speeds things up but only works when we don't delete
+        iregion = files->begin()->region(x, y, plane);
 
-	if (region == end)
+	if (iregion == end)
 	{
-		for (region = files->begin()->blocks().begin(); region != end; region++)
+		for (iregion = files->begin()->blocks().begin(); iregion != end; iregion++)
 		{
-			if (region->type() != datablock::TYPE_REGION)
+			if (iregion->type() != datablock::TYPE_REGION)
 				continue;
 
-			if (region->x() == x && region->y() == y && region->info() == plane)
+			if (iregion->x() == x && iregion->y() == y && iregion->info() == plane)
 				break;		// found!
 		}
 	}
 
-	if (region != end)
+	if (iregion != end)
 	{
 		// found another region. change or delete
-		if (terrain)
+		if (new_terrain)
 		{
 			// terraform: change terrain of region
-			region->terrain(terrain);
+            iregion->terrain(new_terrain);
 
 			// delete ;terrain tags (they are for special terrain names)
-			for (datakey::itor key = region->data().begin(); key != region->data().end(); key++)
+			for (datakey::itor key = iregion->data().begin(); key != iregion->data().end(); key++)
 				if (key->type() == datakey::TYPE_TERRAIN)
 				{
-					region->data().erase(key);
+                    iregion->data().erase(key);
 					break;
 				}
 		}
@@ -1439,19 +1439,19 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint terrain)
 					if (block->type() != datablock::TYPE_REGION)
 						continue;
 
-					if (region != block)
+					if (iregion != block)
 						continue;
 
 					// gefunden. nun loeschen
-					datablock::itor end = file->blocks().end();
 					datablock::itor srch = block;
-					for (srch++; srch != end && srch->depth() > block->depth(); srch++)
+					for (srch++; srch != file->blocks().end() && srch->depth() > block->depth(); srch++)
 					{
 						// block is part of the region
 					}
 
-					datablock::itor next = block; next++;
-					/*if (srch != next)
+                    /*
+                    datablock::itor next = block; next++;
+					if (srch != next)
 					{
 						// Wenn die Region Unterbloecke hat (Einheiten, Schiffe...) besser nachfragen...
 						FXString name = region->value(datakey::TYPE_NAME);
@@ -1489,7 +1489,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint terrain)
 				if (selection.selected & selection.REGION)
 				{
 					// deleted region should not be selected
-					if (selection.region == region)
+					if (selection.region == iregion)
 						selection.selected &= ~selection.REGION;
 				}
 				if (selection.selected & selection.MULTIPLE_REGIONS)
@@ -1508,14 +1508,14 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint terrain)
 	}
 	else
 	{
-		if (!terrain)	// don't add new region if it should be deleted.
+		if (!new_terrain)	// don't add new region if it should be deleted.
 			return;
 
         // append new region of given terrain
 		datablock region;
 		region.string("REGION");
 		region.infostr(FXString().format("%d %d %d", x, y, plane));
-		region.terrain(terrain);
+		region.terrain(new_terrain);
 
 		files->begin()->blocks().push_back(region);
 	}
@@ -1553,9 +1553,9 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 
 	// init vars and set font
 	FXString label;
-	FXRectangle clip(0, 0, FXint(64*scale), FXint(64*scale));
-	FXint width = buffer->getWidth(), height = buffer->getHeight();
-	FXint scr_x,scr_y, label_x,label_y;
+	FXRectangle clip(0, 0, FXshort(64*scale), FXshort(64*scale));
+	FXint w = buffer->getWidth(), h = buffer->getHeight();
+	FXint scr_x,scr_y;
 
 	FXint regionSize = FXint(64*scale);
 
@@ -1595,7 +1595,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 			scr_y = GetScreenFromHexY(block->x(), block->y()) + scr_offset_y;
 
 			// clip regions outside of view
-			if (scr_x < -regionSize || scr_y < -regionSize || scr_x > width || scr_y > height)
+			if (scr_x < -regionSize || scr_y < -regionSize || scr_x > w || scr_y > h)
 				continue;
 
 			// draw terrain image
@@ -1630,19 +1630,19 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 				{
 					if (!stats->island.empty())
 					{
-						const FXString& label = stats->island;
+						const FXString& lbl = stats->island;
 
-						std::map<FXString, island>::iterator itor = islands.find(label);
+						std::map<FXString, island>::iterator itor = islands.find(lbl);
 						if (itor == islands.end())
 						{
 							island is;
 							is.left = scr_x; is.top = scr_y;
 							is.right = scr_x+regionSize; is.bottom = scr_y+regionSize;
-							islands[label] = is;
+							islands[lbl] = is;
 						}
 						else
 						{
-							island& is = islands[label];
+							island& is = islands[lbl];
 							is.left = std::min(is.left, scr_x); is.top = std::min(is.top, scr_y);
 							is.right = std::max(is.right, scr_x+regionSize); is.bottom = std::max(is.bottom, scr_y+regionSize);
 						}
@@ -1793,8 +1793,9 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 			// clip label to region
 			if (!label.empty())
 			{
-				clip.x = scr_x;
-				clip.y = scr_y;
+                FXint label_x, label_y;
+				clip.x = (FXshort)scr_x;
+				clip.y = (FXshort)scr_y;
 				dc.setClipRectangle(clip);
 
 				// draw region label
@@ -1829,12 +1830,12 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 
 		for (std::map<FXString, island>::iterator itor = islands.begin(); itor != islands.end(); itor++)
 		{
-			const FXString& label = itor->first;
+			const FXString& lbl = itor->first;
 			const island& is = itor->second;
 
-			FXint label_x = is.left + (is.right-is.left)/2 - islandfont->getTextWidth(label.text(), label.length())/2;
-			FXint label_y = is.top + (is.bottom-is.top)/2 + islandfont->getTextHeight(label.text(), label.length())/3;
-			dc.drawText(label_x, label_y, label.text(), label.length());
+			FXint label_x = is.left + (is.right-is.left)/2 - islandfont->getTextWidth(lbl.text(), lbl.length())/2;
+			FXint label_y = is.top + (is.bottom-is.top)/2 + islandfont->getTextHeight(lbl.text(), lbl.length())/3;
+			dc.drawText(label_x, label_y, lbl.text(), lbl.length());
 		}
 
 		dc.setFont(font.get());
@@ -1893,10 +1894,8 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 	dc.fillRectangle(0, 0, buffer->getWidth(), buffer->getHeight());
 
 	// init vars and set font
-	FXString label;
-	FXRectangle clip(0, 0, FXint(64*scale), FXint(64*scale));
-	FXint width = buffer->getWidth(), height = buffer->getHeight();
-	FXint scr_x,scr_y, label_x,label_y;
+	FXRectangle clip(0, 0, FXshort(64*scale), FXshort(64*scale));
+	FXint w = buffer->getWidth(), h = buffer->getHeight();
 
 	FXint regionSize = FXint(64*scale);
 
@@ -1946,11 +1945,11 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 				continue;
 
 			// map coordinates to screen
-			scr_x = GetScreenFromHexX(block->x(), block->y()) - min_x;
-			scr_y = GetScreenFromHexY(block->x(), block->y()) - min_y - ystart;
+            FXint scr_x = GetScreenFromHexX(block->x(), block->y()) - min_x;
+            FXint scr_y = GetScreenFromHexY(block->x(), block->y()) - min_y - ystart;
 
 			// clip regions outside of view
-			if (scr_x < -regionSize || scr_y < -regionSize || scr_x > width || scr_y > height)
+			if (scr_x < -regionSize || scr_y < -regionSize || scr_x > w || scr_y > h)
 				continue;
 
 			/*
@@ -2006,7 +2005,8 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 			if (regionSize < 30)
 				continue;
 
-			if (show_names)
+            FXString label;
+            if (show_names)
 				label = block->value(datakey::TYPE_NAME);
 			else
 				label.clear();
@@ -2021,8 +2021,9 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 			// clip label to region
 			if (!label.empty())
 			{
-				clip.x = scr_x;
-				clip.y = scr_y;
+                FXint label_x, label_y;
+                clip.x = (FXshort)scr_x;
+				clip.y = (FXshort)scr_y;
 				dc.setClipRectangle(clip);
 
 				// draw region label
@@ -2094,16 +2095,16 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 		if (main_map)
 		{
 			// paint rect of view of connected main map
-			float scale = getScale() / main_map->getScale();
+			float map_scale = getScale() / main_map->getScale();
 
-			FXint left = center_x + offset_x - int((main_map->offset_x + main_map->pos_x)*scale);
-			FXint top = center_y + offset_y - int((main_map->offset_y + main_map->pos_y)*scale);
+			FXint left = center_x + offset_x - int((main_map->offset_x + main_map->pos_x)*map_scale);
+			FXint top = center_y + offset_y - int((main_map->offset_y + main_map->pos_y)*map_scale);
 
-			if (main_map->getWidth() > main_map->image_w)	left -= int((main_map->getWidth() - main_map->image_w)*0.5*scale);
-			if (main_map->getHeight() > main_map->image_h)	top -= int((main_map->getHeight() - main_map->image_h)*0.5*scale);
+			if (main_map->getWidth() > main_map->image_w)	left -= int((main_map->getWidth() - main_map->image_w)*0.5*map_scale);
+			if (main_map->getHeight() > main_map->image_h)	top -= int((main_map->getHeight() - main_map->image_h)*0.5*map_scale);
 
-			FXint right = left + int(main_map->getWidth()*scale);
-			FXint bottom = top + int(main_map->getHeight()*scale);
+			FXint right = left + int(main_map->getWidth()*map_scale);
+			FXint bottom = top + int(main_map->getHeight()*map_scale);
 
 			// check if rect is visible
 			if (left < center_x) left = center_x;
@@ -2115,11 +2116,11 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 				bottom = top + imagebuffer->getHeight();
 
 			FXPoint points[5];
-			points[0].x = left, points[0].y = top;
-			points[1].x = right, points[1].y = top;
-			points[2].x = right, points[2].y = bottom;
-			points[3].x = left, points[3].y = bottom;
-			points[4].x = left, points[4].y = top;
+			points[0].x = (FXshort)left, points[0].y = (FXshort)top;
+			points[1].x = (FXshort)right, points[1].y = (FXshort)top;
+			points[2].x = (FXshort)right, points[2].y = (FXshort)bottom;
+			points[3].x = (FXshort)left, points[3].y = (FXshort)bottom;
+			points[4].x = (FXshort)left, points[4].y = (FXshort)top;
 
 			dc.setForeground(FXRGB(255,255,255));
 			dc.drawLines(points, 5);
@@ -2338,8 +2339,8 @@ FXint FXCSMap::sendRouteCmds(const FXString& str, int which)
 	}
 
 	// NW, NO, O, SO, SW, W
-	int offset_x[6] = { -1,  0, +1, +1,  0, -1 };
-	int offset_y[6] = { +1, +1,  0, -1, -1,  0 };
+	int x_offset[6] = { -1,  0, +1, +1,  0, -1 };
+	int y_offset[6] = { +1, +1,  0, -1, -1,  0 };
 
 	FXString line = str;
 	FXString cmd = line.before(' ').upper();
@@ -2414,7 +2415,7 @@ FXint FXCSMap::sendRouteCmds(const FXString& str, int which)
 
 		length++;
 
-		x += offset_x[dir]; y += offset_y[dir];
+		x += x_offset[dir]; y += y_offset[dir];
 	}
 
 	arrows.clear();

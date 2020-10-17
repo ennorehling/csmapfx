@@ -993,12 +993,12 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 
 		// Datakeys ausgeben
 		datakey::itor tags = block->data().begin();
-		datakey::itor end = block->data().end();
+		datakey::itor iend = block->data().end();
 
 		if (hideKeys)
-			tags = end;		// don't save keys of this block
+			tags = iend;		// don't save keys of this block
 
-		for (; tags != end; tags++)
+		for (; tags != iend; tags++)
 		{
 			// ;Terrain ignorieren. Wird an ;Name angehangen... (s.u.)
 			if (block->type() == datablock::TYPE_REGION)
@@ -1649,9 +1649,9 @@ FXint datafile::saveCmds(const FXchar* filename, bool stripped, bool replace)
 			out << " " << *itor << "\n";
 
 		// output units in order
-		std::vector<int>& unit_order = regord->second;
+		std::vector<int>& order = regord->second;
 
-		for (std::vector<int>::iterator uid = unit_order.begin(); uid != unit_order.end(); uid++)
+		for (std::vector<int>::iterator uid = order.begin(); uid != order.end(); uid++)
 		{
 			datablock::itor unit = this->unit(*uid);
 			if (unit == end())
@@ -1676,9 +1676,9 @@ FXint datafile::saveCmds(const FXchar* filename, bool stripped, bool replace)
 			// unit has command block
 			//  EINHEIT wz5t;  Botschafter des Konzils [1,146245$,Beqwx(1/3)] k\u00e4mpft nicht
 
-			att_commands* cmds = dynamic_cast<att_commands*>(cmdb->attachment());
-			if (cmds && !cmds->header.empty())
-				out << "  " << cmds->header << "\n";
+			att_commands* attcmds = dynamic_cast<att_commands*>(cmdb->attachment());
+			if (attcmds && !attcmds->header.empty())
+				out << "  " << attcmds->header << "\n";
 			else
 			{
 				// get amount of silber from GEGENSTAENDE block
@@ -1705,9 +1705,9 @@ FXint datafile::saveCmds(const FXchar* filename, bool stripped, bool replace)
 			//out << "  ; Debug: EINHEIT ist in Zeile: " << out.row() << "\n";
 
 			// output attachment (changed) or default commands
-			if (cmds)
+			if (attcmds)
 			{
-				if (cmds->confirmed)
+				if (attcmds->confirmed)
 					out << "  ; bestaetigt\n";
 
 				// *** SOME DEBUGGING ***
@@ -1732,7 +1732,7 @@ FXint datafile::saveCmds(const FXchar* filename, bool stripped, bool replace)
 				//}
 
 				// output prefix lines
-				for (att_commands::cmdlist_t::iterator itor = cmds->prefix_lines.begin(); itor != cmds->prefix_lines.end(); itor++)
+				for (att_commands::cmdlist_t::iterator itor = attcmds->prefix_lines.begin(); itor != attcmds->prefix_lines.end(); itor++)
 					out << "  " << *itor << "\n";
 
 				// output changed commands
@@ -1748,12 +1748,12 @@ FXint datafile::saveCmds(const FXchar* filename, bool stripped, bool replace)
 				//}
 				//else
 				{
-					for (att_commands::cmdlist_t::iterator itor = cmds->commands.begin(); itor != cmds->commands.end(); itor++)
+					for (att_commands::cmdlist_t::iterator itor = attcmds->commands.begin(); itor != attcmds->commands.end(); itor++)
 						out << "    " << *itor << "\n";
 				}
 
 				// output postfix lines
-				for (att_commands::cmdlist_t::iterator itor = cmds->postfix_lines.begin(); itor != cmds->postfix_lines.end(); itor++)
+				for (att_commands::cmdlist_t::iterator itor = attcmds->postfix_lines.begin(); itor != attcmds->postfix_lines.end(); itor++)
 					out << "  " << *itor << "\n";
 			}		
 			else
@@ -1985,7 +1985,7 @@ void datafile::createHashTables()
 		}
 	}
 
-	for (datablock::itor block = blocks().begin(); block != end(); block++)
+	for (block = blocks().begin(); block != end(); block++)
 	{
         // add region to region list
         if (block->type() == datablock::TYPE_REGION)
@@ -2243,7 +2243,7 @@ void datafile::createHashTables()
 	// islands
 	std::list<datablock::itor> floodislands;		// regions whose island names flood the island
 
-	for (datablock::itor block = blocks().begin(); block != end(); block++)
+	for (block = blocks().begin(); block != end(); block++)
 	{
         if (block->type() != datablock::TYPE_REGION)
 			continue;

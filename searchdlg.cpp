@@ -98,9 +98,9 @@ void FXSearchDlg::create()
 	FXDialogBox::create();
 
 	// resize table headers
-	int width = (getWidth() - getPadLeft() - getPadRight() - 20) / results->getNumHeaders();
+	int w = (getWidth() - getPadLeft() - getPadRight() - 20) / results->getNumHeaders();
 	for (int i = 0; i < results->getNumHeaders(); i++)
-		results->setHeaderSize(i, width);
+		results->setHeaderSize(i, w);
 }
 
 FXSearchDlg::~FXSearchDlg()
@@ -128,21 +128,21 @@ void FXSearchDlg::loadState(FXRegistry& reg)
 	FXint regardcase = reg.readUnsignedEntry("SEARCHDLG", "REGARDCASE", 0);
 	FXint regexp = reg.readUnsignedEntry("SEARCHDLG", "REGEXP", 0);
 	FXint descriptions = reg.readUnsignedEntry("SEARCHDLG", "DESCRIPTIONS", 0);
-	options.regardcase->setCheck(regardcase);
-	options.regexp->setCheck(regexp);
-	options.descriptions->setCheck(descriptions);
+	options.regardcase->setCheck(regardcase!=0);
+	options.regexp->setCheck(regexp != 0);
+	options.descriptions->setCheck(descriptions != 0);
 	
 	FXint domain = reg.readUnsignedEntry("SEARCHDLG", "DOMAIN", 0);
 	if (domain >= 0 && domain < options.domain->getNumItems())
 		options.domain->setCurrentItem(domain);
 
 	FXint hideoptions = reg.readUnsignedEntry("SEARCHDLG", "HIDEOPTIONS", 1);
-	detailsTab->collapse(hideoptions);
+	detailsTab->collapse(hideoptions != 0);
 
 	FXint searchdirectly = reg.readUnsignedEntry("SEARCHDLG", "SEARCHDIRECTLY", 1);
 	FXint limitresults = reg.readUnsignedEntry("SEARCHDLG", "LIMITRESULTS", 1);
-	options.searchdirectly->setCheck(searchdirectly);
-	options.limitresults->setCheck(limitresults);
+	options.searchdirectly->setCheck(searchdirectly != 0);
+	options.limitresults->setCheck(limitresults != 0);
 }
 
 void FXSearchDlg::saveState(FXRegistry& reg)
