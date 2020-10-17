@@ -1,0 +1,4 @@
+csmapfx.xpm usr/share/games/
+obj-x86_64-linux-gnu/csmapfx usr/bin
+csmapfx.desktop usr/share/applications
+

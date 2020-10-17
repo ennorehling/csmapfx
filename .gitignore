@@ -1,4 +1,9 @@
 cblocks
+debian/csmapfx/
+debian/.debhelper/
+debian/csmapfx.substvars
+debian/debhelper-build-stamp
+debian/files
 build
 Debug
 Release
