@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=csmapfx
+Exec=csmapfx
+Icon=/usr/share/games/csmapfx.xpm
+Terminal=false
+MimeType=application/x-pyromod+zip;
+Type=Application
+StartupNotify=false
+Categories=Game;StrategyGame;
+Comment=Coast'n'See Mapper for Eressea
+Comment[de]=Kartenanzeige für Eressea
+Keywords=RPG;Strategy;Economic Simulation Game;History;Warfare;Infantry;Cavalry
