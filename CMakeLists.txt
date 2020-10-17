@@ -48,9 +48,7 @@ include_directories(
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
 set_target_properties(${PROJECT_NAME} PROPERTIES
-	CXX_STANDARD 11
-	COMPILE_DEFINITIONS
-	BOOST_USER_CONFIG=${CMAKE_SOURCE_DIR}/boost/nodynlibs.hpp)
+	CXX_STANDARD 11)
 target_link_libraries(${PROJECT_NAME}
 	${PNG_LIBRARIES}
 	${FOX_LIBRARIES}
