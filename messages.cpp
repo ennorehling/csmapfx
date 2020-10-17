@@ -30,7 +30,7 @@ FXMessages::FXMessages(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 	groups.effects = appendItem(NULL, "Effekte");
 	groups.travel = appendItem(NULL, "Durchreise");
 	groups.other = appendItem(NULL, "Sonstiges");
-	groups.streets = appendItem(NULL, iso2utf("Stra\u00dfen"));
+	groups.streets = appendItem(NULL, FXString("Stra\u00dfen"));
 }
 
 void FXMessages::create()
@@ -127,7 +127,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 					FXString artikel = "eine ";
 
 					FXString label;
-					label = FXString("Im ") + iso2utf(directions[dir]) + " befindet sich ";
+					label = FXString("Im ") + FXString(directions[dir]) + " befindet sich ";
 
 					if (procent == 100)
 						label += artikel + typ + ".";

@@ -98,7 +98,7 @@ GermanTranslation::GermanTranslation(FXApp* app) : FXTranslator(app)
 	m_trans[std::make_pair("FXFileSelector", "Link File")] = L"Datei verlinken";
 
 	for (translation_t::iterator itor = m_trans.begin(); itor != m_trans.end(); itor++)
-		itor->second = iso2utf(itor->second);
+		itor->second = FXString(itor->second);
 }
 
 /*virtual*/ const FXchar* GermanTranslation::tr(const FXchar* context,const FXchar* message,const FXchar* hint /*=NULL*/) const

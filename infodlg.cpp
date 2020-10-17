@@ -331,7 +331,7 @@ bool FXInfoDlg::parseTableData(std::istream& input)
 	std::string sline;
 	while (std::getline(input, sline))
 	{
-		FXString line = iso2utf(sline.c_str()).trim();
+		FXString line = FXString(sline.c_str()).trim();
 
 		// parse line
 		if (line.left(1) == ";")		// comment lines start with a semikolon

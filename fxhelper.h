@@ -21,9 +21,8 @@ T* end(T (&array)[size])
 
 // FXString converter: iso8859-1 <-> utf8
 // --------------------------------------
-FX::FXString iso2utf(const FX::FXString& s);
 FX::FXString utf2iso(const FX::FXString& s);
-FX::FXString display(const wchar_t *wstr);
+FX::FXString iso2utf(const FX::FXString& s);
 
 // flatten strings: Removed spaces,
 // german umlauts to ae,oe,ue,ss and

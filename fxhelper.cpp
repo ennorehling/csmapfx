@@ -6,57 +6,23 @@
 
 #ifdef WIN32
 #include "shlobj.h"		// SHGetSpecialFolderPath
-#else
-#include <iconv.h>
 #endif
 
 #include "version.h"
 #include "fxhelper.h"
-
-FX::FXString display(const wchar_t *wstr)
-{
-    char buffer[256];
-    int n = 0;
-#ifdef WIN32
-    n = WideCharToMultiByte(CP_ACP, 0, wstr, -1, buffer, sizeof(buffer), NULL, NULL);
-#else
-    char * inbuf = (char *)wstr;
-    char * outbuf = buffer;
-    size_t outlen = sizeof(buffer);
-    size_t inlen = wcslen(wstr) * sizeof(wchar_t);
-    iconv_t ic = iconv_open("", "WCHAR_T");
-    size_t bytes = iconv(ic, &inbuf, &inlen, &outbuf, &outlen);
-    n = (int)bytes;
-    /* really terrible solution, use ICU or iconv
-    for (int i = 0; wstr[i]; ++i) {
-        wchar_t wc = wstr[i];
-        if (wc < 128) {
-            buffer[n++] = (char)wc;
-        }
-    }*/
-    iconv_close(ic);
-#endif
-    buffer[n] = 0;
-    return FXString(buffer, n);
-}
-
-// FXString converter: iso8859-1 <-> utf8
-// --------------------------------------
-FX::FXString iso2utf(const FX::FXString& s)
-{
-	/*
-	static FX::FX88591Codec codec;
-
-	return codec.mb2utf(s);
-	 */
-	 return s;
-}
 
 FX::FXString utf2iso(const FX::FXString& s)
 {
 	static FX::FX88591Codec codec;
 
 	return codec.utf2mb(s);
+}
+
+FX::FXString iso2utf(const FX::FXString& s)
+{
+	static FX::FX88591Codec codec;
+
+	return codec.mb2utf(s);
 }
 
 // flatten strings: Removed spaces,
@@ -123,7 +89,7 @@ void showError(const FXString& str)
 void showError(const std::string& str)
 {
 #ifdef WIN32
-	showError((FXString)iso2utf(str.c_str()));	// caution: cross forwarding!
+	showError((FXString)FXString(str.c_str()));	// caution: cross forwarding!
 #else
 	std::cerr << str << std::endl;
 #endif

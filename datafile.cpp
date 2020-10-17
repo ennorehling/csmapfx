@@ -349,7 +349,7 @@ const FXString datablock::terrainString() const
 		return TERRAIN_SWAMP;
 	if (terrain == "Ebene")
 		return TERRAIN_PLAINS;
-	if (terrain == "Wueste" || terrain == "W\u00fcste" || terrain == ::FXString(L"W\u00fcste"))
+	if (terrain == "Wueste" || terrain == "W\u00fcste" || terrain == FXString(L"W\u00fcste"))
 		return TERRAIN_DESERT;
 	if (terrain == "Wald")
 		return TERRAIN_FOREST;
@@ -614,7 +614,7 @@ const datakey* datablock::valueKey(FXint key) const
 
 void datablock::iso2utf()
 {
-	m_string = ::iso2utf(m_string);
+	m_string = ::FXString(m_string);
 }
 
 void datablock::utf2iso()
@@ -1135,7 +1135,7 @@ FXint datafile::loadCmds(const FXchar* filename)
 		throw std::runtime_error("Keine g\u00fcltige Befehlsdatei.");
 
 	if (!utf8mode)
-		line = iso2utf(line);
+		line = FXString(line);
 
 	// parse header line:
 	// ERESSEA ioen "PASSWORT"
@@ -1170,7 +1170,7 @@ FXint datafile::loadCmds(const FXchar* filename)
 		// check if line is REGION or EINHEIT command
 		line = ptr;
 		if (!utf8mode)
-			line = iso2utf(line);
+			line = FXString(line);
 
 		line.substitute("\t", "    ");
 		indent = line.find_first_not_of(' ');
@@ -1314,7 +1314,7 @@ FXint datafile::loadCmds(const FXchar* filename)
 		// check if line is REGION oder EINHEIT command
 		line = ptr;
 		if (!utf8mode)
-			line = iso2utf(line);
+			line = FXString(line);
 
 		line.substitute("\t", "    ");
 		indent = line.find_first_not_of(' ');

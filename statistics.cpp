@@ -489,7 +489,7 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
             FXString label;
 			label.format("%s (%s): ", name.text(), block->id().text());
 			if (entryType != 0)
-				label += iso2utf("Gr\u00f6\u00dfe ");
+				label += FXString("Gr\u00f6\u00dfe ");
 			label += FXStringVal(itor->second);
 			FXMenuCommand *menuitem = new FXMenuCommand(menu, label, NULL, this,ID_POPUP_CLICKED);
 			menuitem->setUserData((void*)&*block);

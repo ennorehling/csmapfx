@@ -166,22 +166,22 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 	// Buttons
 	new FXButton(toolbar,
-		display(L"\tDatei \u00f6ffnen...\tEine neue Datei \u00f6ffnen."),
+		FXString(L"\tDatei \u00f6ffnen...\tEine neue Datei \u00f6ffnen."),
 		icons.open,
 		this,
 		ID_FILE_OPEN, BUTTON_TOOLBAR);
 	new FXButton(toolbar,
-		display(L"\tDatei hinzuf\u00fcgen...\tL\u00e4dt einen Karten-Report in den aktuellen Report."),
+		FXString(L"\tDatei hinzuf\u00fcgen...\tL\u00e4dt einen Karten-Report in den aktuellen Report."),
 		icons.merge,
 		this,
 		ID_FILE_MERGE, BUTTON_TOOLBAR);
 	new FXButton(toolbar,
-		display(L"\tDatei speichern unter...\tDie aktuelle Datei als neue Datei speichern."),
+		FXString(L"\tDatei speichern unter...\tDie aktuelle Datei als neue Datei speichern."),
 		icons.save,
 		this,
 		ID_FILE_SAVE_AS, BUTTON_TOOLBAR);
 	new FXButton(toolbar,
-		display(L"\tDatei schliessen\tDie aktuelle Datei schliessen."),
+		FXString(L"\tDatei schliessen\tDie aktuelle Datei schliessen."),
 		icons.close,
 		this,
 		ID_FILE_CLOSE, BUTTON_TOOLBAR);
@@ -272,7 +272,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
         NULL, this, ID_FILE_SAVE_ORDERS);
     new FXMenuCommand(
         filemenu,
-        display(L"Befehle mit &CR speichern...\t\tSpeichert den aktuellen Report zusammen mit den ge\u00e4nderten Befehlen."),
+        FXString(L"Befehle mit &CR speichern...\t\tSpeichert den aktuellen Report zusammen mit den ge\u00e4nderten Befehlen."),
         NULL, this, ID_FILE_SAVE_ALL);
 
 	new FXMenuSeparatorEx(filemenu);
@@ -872,7 +872,7 @@ bool CSMap::mergeFile(FXString filename)
 	{
 		files.pop_back();
 		recentFiles.removeFile(filename);
-		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", (filename + ": " + iso2utf(err.what())).text());
+		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", (filename + ": " + FXString(err.what())).text());
 		return false;
 	}
 
@@ -1019,7 +1019,7 @@ bool CSMap::loadCommands(FXString filename)
 	}
 	catch(const std::runtime_error& err)
 	{
-		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", iso2utf(err.what()).text());
+		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", FXString(err.what()).text());
 		mapChange(false);
 		return false;
 	}
@@ -1938,7 +1938,7 @@ long CSMap::onClipboardRequest(FXObject*, FXSelector, void* ptr)
     // Return clipped text as as UTF-8
 	if(event->target == utf8Type)
 	{
-		setDNDData(FROM_CLIPBOARD, event->target, iso2utf(clipboard));
+		setDNDData(FROM_CLIPBOARD, event->target, FXString(clipboard));
 		return 1;
 	}
 

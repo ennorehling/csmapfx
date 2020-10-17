@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
 	}
 	catch (const std::exception& e)
 	{
-		FXMessageBox::error(&CSApp, MBOX_OK, "CSMap - Fehler", "CSMap konnte nicht gestartet werden:\n%s", iso2utf(e.what()).text());
+		FXMessageBox::error(&CSApp, MBOX_OK, "CSMap - Fehler", "CSMap konnte nicht gestartet werden:\n%s", FXString(e.what()).text());
 		return -1;
 	}
 
@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
 					{
 						arg++;
 						if (csmap)
-							csmap->saveFile(iso2utf(argv[arg]));
+							csmap->saveFile(FXString(argv[arg]));
 						startgui = false;
 						break;
 					}
@@ -247,9 +247,9 @@ int main(int argc, char *argv[])
 				continue;
 
 			if (!numfiles)			
-				csmap->loadFile(iso2utf(argv[arg]));
+				csmap->loadFile(FXString(argv[arg]));
 			else
-				csmap->mergeFile(iso2utf(argv[arg]));
+				csmap->mergeFile(FXString(argv[arg]));
 
 			numfiles++;
 			startgui = true;

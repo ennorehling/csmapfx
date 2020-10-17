@@ -258,12 +258,12 @@ long FXCalculator::onChanged(FXObject*, FXSelector, void*)
     if (resultstr.size() > 15)
     {
         result->setText("");
-        longresult->setText( iso2utf(resultstr.c_str()) );
+        longresult->setText( FXString(resultstr.c_str()) );
         secondline->show();
     }
     else
     {
-        result->setText( iso2utf(resultstr.c_str()) );
+        result->setText( FXString(resultstr.c_str()) );
         secondline->hide();
     }
     recalc();
