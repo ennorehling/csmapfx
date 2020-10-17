@@ -30,7 +30,7 @@ FXMessages::FXMessages(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 	groups.effects = appendItem(NULL, "Effekte");
 	groups.travel = appendItem(NULL, "Durchreise");
 	groups.other = appendItem(NULL, "Sonstiges");
-	groups.streets = appendItem(NULL, iso2utf("Straßen"));
+	groups.streets = appendItem(NULL, iso2utf("Stra\u00dfen"));
 }
 
 void FXMessages::create()
@@ -94,7 +94,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 				{
 					/*
 					EFFECTS
-					"Untote schrecken vor dieser Region zurück. (njr4)"
+					"Untote schrecken vor dieser Region zurueck. (njr4)"
 					*/
 
 					for (datakey::itor msg = block->data().begin(); msg != block->data().end(); msg++)
@@ -104,12 +104,12 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 				{
 					/*
 					GRENZE 1
-					"Straße";typ
+					"Stra\u00dfe";typ
 					1;richtung
 					100;prozent
 					*/
 
-					const char* directions[] = { "Nordwesten", "Nordosten", "Osten", "Südosten", "Südwesten", "Westen", "-unknown-" };
+					const char* directions[] = { "Nordwesten", "Nordosten", "Osten", "S\u00fcdosten", "S\u00fcdwesten", "Westen", "-unknown-" };
 
 					FXint dir = 0;
 					if (block->value("richtung").length())
@@ -145,7 +145,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 					FXString prefix;
 
 					if (block->type() == datablock::TYPE_DURCHSCHIFFUNG)
-						prefix = "Die ";	// für Schiffe
+						prefix = "Die ";	// fuer Schiffe
 
 					for (datakey::itor msg = block->data().begin(); msg != block->data().end(); msg++)
 						appendItem(groups.travel, prefix+msg->value());

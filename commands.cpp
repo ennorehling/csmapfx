@@ -52,8 +52,8 @@ FXCommands::FXCommands(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 														// [0] no style (normal text)
 
 	textStyles[0].normalForeColor = FXRGB(0,0,0);		// [1] schwarz (dunkel)
-	textStyles[1].normalForeColor = FXRGB(0,0,0x80);	// [2] blau
-	textStyles[2].normalForeColor = FXRGB(0,0x80,0);	// [3] grün
+	textStyles[1].normalForeColor = FXRGB(0,0,0x80);	// [2] blue
+	textStyles[2].normalForeColor = FXRGB(0,0x80,0);	// [3] green
 	textStyles[3].normalForeColor = FXRGB(0,0x80,0x80);	// [4] cyan
 	textStyles[4].normalForeColor = FXRGB(0x80,0,0);	// [5] rot
 	textStyles[5].normalForeColor = FXRGB(0x80,0,0x80);	// [6] violett
@@ -61,8 +61,8 @@ FXCommands::FXCommands(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 	textStyles[7].normalForeColor = FXRGB(0x80,0x80,0x80);	// [8] grau
 
 	textStyles[8].normalForeColor = FXRGB(0xc0,0xc0,0xc0);	// [9] grau (hell)
-	textStyles[9].normalForeColor = FXRGB(0,0,0xff);		// [10] blau
-	textStyles[10].normalForeColor = FXRGB(0,0xff,0);		// [11] grün
+	textStyles[9].normalForeColor = FXRGB(0,0,0xff);		// [10] blue
+	textStyles[10].normalForeColor = FXRGB(0,0xff,0);		// [11] green
 	textStyles[11].normalForeColor = FXRGB(0,0xff,0xff);	// [12] cyan
 	textStyles[12].normalForeColor = FXRGB(0xff,0,0);		// [13] rot
 	textStyles[13].normalForeColor = FXRGB(0xff,0,0xff);	// [14] violett
@@ -72,7 +72,7 @@ FXCommands::FXCommands(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 	textStyles[16].style = STYLE_BOLD;						// [17] fett
 	textStyles[17].style = STYLE_UNDERLINE;					// [18] unterstrichen
 
-	textStyles[18].normalForeColor = FXRGB(0,0x80,0);		// [19] fett dunkel-grün
+	textStyles[18].normalForeColor = FXRGB(0,0x80,0);		// [19] bold dark green
 	textStyles[18].style = STYLE_BOLD;
 
 	setStyled();
@@ -630,8 +630,8 @@ void FXCommands::mapShowRoute()
 void FXCommands::highlightText()
 {
 	const int color_normal = 0;
-	const int color_comment = 3;		// Kommentare: dunkel-grün
-	const int color_comment_bold = 19;	// Kommentare: fett dunkel-grün
+	const int color_comment = 3;		// Kommentare: dark green
+	const int color_comment_bold = 19;	// Kommentare: bold dark green
 	const int color_error = 13;			// Fehler: hell-rot
 	const int color_command = 10;		// Befehl: hell-blau
 

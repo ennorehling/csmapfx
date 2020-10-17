@@ -167,7 +167,7 @@ void FXCSMap::calculateContentSize()
 		return;
 	}
 
-	// auf 'unm�gliche' Werte initialisieren
+	// auf 'unmoegliche' Werte initialisieren
 	FXint min_x =  0x0FFFFFFF;
 	FXint max_x = -0x0FFFFFFF;
 
@@ -409,7 +409,7 @@ FXint FXCSMap::GetHexFromScreenY(FXint scrx, FXint scry)
 	float fy = (scry) / 48.0f/scale;
 	FXint y = (FXint)floorf(fy);
 
-    // Pr�fe, ob Koordinate an schr�ger Kante eines Hexfeldes
+    // Pruefe, ob Koordinate an schraeger Kante eines Hexfeldes
     float fx = (scrx) / 64.0f/scale + y/2.0f + 0.5f;
 
 	if (fy - y < 0.3f - 0.6f * fabs(fx - floorf(fx) - 0.5f))
@@ -805,7 +805,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 		{
 			state.selected = 0;
 
-			// Strg gedr�ckt? -> multiple selected regions!
+			// Strg gedrueckt? -> multiple selected regions!
 			if (event->state&CONTROLMASK || modus == MODUS_SELECT)
 			{
 				if (selection.selected & selection.MULTIPLE_REGIONS)
@@ -1033,7 +1033,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 	{
 		if (selection.selected & selection.MULTIPLE_REGIONS)
 		{
-			// Popup-Men� f�r mehrere Regionen
+			// Popup-Menu fuer mehrere Regionen
 			FXMenuPane *menu = new FXMenuPane(this);
 
 			FXString label;
@@ -1056,7 +1056,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 			}
 
 			//new FXMenuSeparatorEx(terraform);
-			//cmd = new FXMenuCommand(terraform, iso2utf("L�schen"), terrainIcons[0], this,ID_POPUP_CLICKED);
+			//cmd = new FXMenuCommand(terraform, iso2utf("L\u00f6schen"), terrainIcons[0], this,ID_POPUP_CLICKED);
 			//cmd->setUserData((void*)MKUINT(POPUP_TERRAFORM, 0));
 
 			new FXMenuCascade(menu, "&Terraformen", terrainIcons[0], terraform);
@@ -1127,7 +1127,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 			}
 
 			new FXMenuSeparatorEx(terraform);
-			cmd = new FXMenuCommand(terraform, iso2utf("L�schen"), terrainIcons[0], this,ID_POPUP_CLICKED);
+			cmd = new FXMenuCommand(terraform, iso2utf("L\u00f6schen"), terrainIcons[0], this,ID_POPUP_CLICKED);
 			cmd->setUserData((void*)(FXuval)MKUINT(POPUP_TERRAFORM, 0));
 
 			new FXMenuCascade(menu, "&Terraformen", terrainIcons[region->terrain()], terraform);
@@ -1442,7 +1442,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint terrain)
 					if (region != block)
 						continue;
 
-					// gefunden. nun l�schen
+					// gefunden. nun loeschen
 					datablock::itor end = file->blocks().end();
 					datablock::itor srch = block;
 					for (srch++; srch != end && srch->depth() > block->depth(); srch++)
@@ -1453,7 +1453,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint terrain)
 					datablock::itor next = block; next++;
 					/*if (srch != next)
 					{
-						// Wenn die Region Unterbl�cke hat (Einheiten, Schiffe...) besser nachfragen...
+						// Wenn die Region Unterbloecke hat (Einheiten, Schiffe...) besser nachfragen...
 						FXString name = region->value(datakey::TYPE_NAME);
 						if (name.empty())
 							name = region->terrainString();
@@ -1461,14 +1461,14 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint terrain)
 							name = "Unbekannt";
 
 						FXString label;
-						label.format("Die Region %s (%d,%d)\nund alle dazugeh�rigen Daten wirklich l�schen?", name.text(), region->x(), region->y());
+						label.format("Die Region %s (%d,%d)\nund alle dazugehoerigen Daten wirklich loeschen?", name.text(), region->x(), region->y());
 
 						FXMessageBox dlg(this, CSMAP_APP_TITLE_VERSION, label, 0, MBOX_YES_NO);
 						FXuint res = dlg.execute(PLACEMENT_SCREEN);
 
 						if (res == MBOX_CLICKED_YES)
 						{
-							// ok, l�schen
+							// ok, loeschen
 							file->blocks().erase(block, srch);
 							file->createHashTables();
 							deleted = true;
@@ -1476,7 +1476,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint terrain)
 					}
 					else*/
 					{
-						// sofort l�schen
+						// sofort loeschen
 						file->blocks().erase(block, srch);
 						file->createHashTables();
 						deleted = true;
@@ -1903,7 +1903,7 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 	dc.setFont(font.get());
 	dc.setForeground(map->getBackColor());
 
-	// auf 'unm�gliche' Werte initialisieren
+	// auf 'unmoegliche' Werte initialisieren
 	FXint min_x =  0x0FFFFFFF, max_x = -0x0FFFFFFF;
 	FXint min_y =  0x0FFFFFFF, max_y = -0x0FFFFFFF;
 
@@ -2249,9 +2249,9 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 						//	dir = 1;
 						else if (!strncmp(cmd.text(), "OSTEN", cmd.length()))
 							dir = 2;
-						//else if (!strncmp(cmd.text(), "S�DOSTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDOSTEN", cmd.length()))
+						//else if (!strncmp(cmd.text(), "S\u00dcDOSTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDOSTEN", cmd.length()))
 						//	dir = 3;
-						//else if (!strncmp(cmd.text(), "S�DWESTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDWESTEN", cmd.length()))
+						//else if (!strncmp(cmd.text(), "S\u00dcDWESTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDWESTEN", cmd.length()))
 						//	dir = 4;
 						else if (!strncmp(cmd.text(), "WESTEN", cmd.length()))
 							dir = 5;
@@ -2386,9 +2386,9 @@ FXint FXCSMap::sendRouteCmds(const FXString& str, int which)
 			dir = 1;*/
 		else if (!strncmp(cmd.text(), "OSTEN", cmd.length()))
 			dir = 2;
-		/*else if (!strncmp(cmd.text(), "S�DOSTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDOSTEN", cmd.length()))
+		/*else if (!strncmp(cmd.text(), "S\u00dcDOSTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDOSTEN", cmd.length()))
 			dir = 3;
-		else if (!strncmp(cmd.text(), "S�DWESTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDWESTEN", cmd.length()))
+		else if (!strncmp(cmd.text(), "S\u00dcDWESTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDWESTEN", cmd.length()))
 			dir = 4;*/
 		else if (!strncmp(cmd.text(), "WESTEN", cmd.length()))
 			dir = 5;

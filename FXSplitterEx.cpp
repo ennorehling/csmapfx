@@ -20,7 +20,7 @@
   - added public getter and setter for this member
   - removed all local variables *stretcher
 
-  - layout() und adjustHLayout(), adjustVLayout() geändert
+  - layout() und adjustHLayout(), adjustVLayout() changed
 */
 
 /*

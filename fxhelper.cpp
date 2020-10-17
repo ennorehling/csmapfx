@@ -94,13 +94,13 @@ FXString flatten(const FXString& str)
 	{
 		FXwchar wc = str.wc(i);
 
-		if (wc == L"ß"[0])
+		if (wc == L"\u00df"[0])
 			out += "ss";
-		else if (wc == L"Ä"[0] || wc == L"ä"[0])
+		else if (wc == L"\u00c4"[0] || wc == L"\u00e4"[0])
 			out += "ae";
-		else if (wc == L"Ö"[0] || wc == L"ö"[0])
+		else if (wc == L"\u00d6"[0] || wc == L"\u00f6"[0])
 			out += "oe";
-		else if (wc == L"Ü"[0] || wc == L"ü"[0])
+		else if (wc == L"\u00dc"[0] || wc == L"\u00fc"[0])
 			out += "ue";
 		else
 			out += std::tolower(wc);

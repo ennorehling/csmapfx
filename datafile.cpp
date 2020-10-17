@@ -318,7 +318,7 @@ const FXString datablock::terrainString() const
 	if (terrain() == TERRAIN_PLAINS)
 		return "Ebene";
 	if (terrain() == TERRAIN_DESERT)
-		return ::iso2utf("Wüste");
+		return ::FXString(L"W\u00fcste");
 	if (terrain() == TERRAIN_FOREST)
 		return "Wald";
 	if (terrain() == TERRAIN_HIGHLAND)
@@ -349,7 +349,7 @@ const FXString datablock::terrainString() const
 		return TERRAIN_SWAMP;
 	if (terrain == "Ebene")
 		return TERRAIN_PLAINS;
-	if (terrain == "Wueste" || terrain == "Wüste" || terrain == ::iso2utf("Wüste"))
+	if (terrain == "Wueste" || terrain == "W\u00fcste" || terrain == ::FXString(L"W\u00fcste"))
 		return TERRAIN_DESERT;
 	if (terrain == "Wald")
 		return TERRAIN_FOREST;
@@ -671,7 +671,7 @@ FXint datafile::load(const FXchar* filename)
 		if (file.status() != FXStreamOK)
 		{
 			this->filename("");
-			throw std::runtime_error("Datei konnte nicht geöffnet werden.");
+			throw std::runtime_error("Datei konnte nicht ge\u00f6ffnet werden.");
 		}
 
 		FXString buffer;
@@ -701,7 +701,7 @@ FXint datafile::load(const FXchar* filename)
 		if (file.status() != FXStreamOK)
 		{
 			this->filename("");
-			throw std::runtime_error("Datei konnte nicht geöffnet werden.");
+			throw std::runtime_error("Datei konnte nicht ge\u00f6ffnet werden.");
 		}
 
 		FXString buffer;
@@ -739,7 +739,7 @@ FXint datafile::load(const FXchar* filename)
 		// strip the line
 		next = getNextLine(ptr);
 
-		// erster versuch: enthält die Zeile einen datakey?
+		// erster versuch: enth\u00e4lt die Zeile einen datakey?
 		if (key.parse(ptr))
 		{
 			if (!utf8mode)
@@ -777,7 +777,7 @@ FXint datafile::load(const FXchar* filename)
 				}
 			}
 		}
-		// zweiter versuch: enthält die Zeile einen datablock-header?
+		// zweiter versuch: enth\u00e4lt die Zeile einen datablock-header?
 		else if (newblock.parse(ptr))
 		{
 			if (!utf8mode)
@@ -800,7 +800,7 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 	if (!filename)
 		return 0;
 
-	// Soll überschrieben werden? Wenn nicht, prüfen, ob Datei vorhanden
+	// Soll \u00fcberschrieben werden? Wenn nicht, pr\u00fcfen, ob Datei vorhanden
 	if (replace == false)
 	{
 		FXFileStream filestr;
@@ -812,7 +812,7 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 		}
 	}
 
-	// Datei zum Schreiben öffnen
+	// Datei zum Schreiben \u00f6ffnen
 	std::ostringstream file;
 
 	FXFileStream plainfile;
@@ -1084,7 +1084,7 @@ FXint datafile::loadCmds(const FXchar* filename)
 	FXFileStream file;
 	file.open(filename,FXStreamLoad);
 	if (file.status() != FXStreamOK)
-		throw std::runtime_error("Datei konnte nicht geöffnet werden.");
+		throw std::runtime_error("Datei konnte nicht ge\u00f6ffnet werden.");
 
 	// load file into 'data'
 	FXString data;
@@ -1132,7 +1132,7 @@ FXint datafile::loadCmds(const FXchar* filename)
 	// found first non-empty line
 	FXString line = ptr;
 	if (!*ptr || (line.section(' ', 0) != "ERESSEA" && line.section(' ', 0) != "PARTEI"))
-		throw std::runtime_error("Keine gültige Befehlsdatei.");
+		throw std::runtime_error("Keine g\u00fcltige Befehlsdatei.");
 
 	if (!utf8mode)
 		line = iso2utf(line);
@@ -1146,11 +1146,11 @@ FXint datafile::loadCmds(const FXchar* filename)
 	int factionId = strtol(id36.text(), &endptr, 36);
 
     if (endptr && *endptr)		// id36 string has to be consumed by strtol
-		throw std::runtime_error(("Keine gültige Parteinummer: " + id36).text());
+		throw std::runtime_error(("Keine g\u00fcltige Parteinummer: " + id36).text());
 	if (factionId != activefaction()->info())
-		throw std::runtime_error(("Die Befehle sind für eine andere Partei: " + id36).text());
+		throw std::runtime_error(("Die Befehle sind f\u00fcr eine andere Partei: " + id36).text());
 	if (passwd.length() < 2 || passwd.left(1) != "\"" || passwd.right(1) != "\"")
-		throw std::runtime_error(("Das Passwort muss in Anführungszeichen gesetzt werden: " + passwd).text());
+		throw std::runtime_error(("Das Passwort muss in Anf\u00fchrungszeichen gesetzt werden: " + passwd).text());
 
     // consider command file as correct, read in commands
 	m_cmds.prefix_lines.clear();
@@ -1501,7 +1501,7 @@ FXint datafile::saveCmds(const FXchar* filename, bool stripped, bool replace)
     if (activefaction() == end())
 		return -1;
 
-	// Soll überschrieben werden? Wenn nicht, prüfen, ob Datei vorhanden
+	// Soll \u00fcberschrieben werden? Wenn nicht, pr\u00fcfen, ob Datei vorhanden
 	if (replace == false)
 	{
 		FXFileStream filestr;
@@ -1513,7 +1513,7 @@ FXint datafile::saveCmds(const FXchar* filename, bool stripped, bool replace)
 		}
 	}
 
-	// Datei zum Schreiben öffnen
+	// Datei zum Schreiben \u00f6ffnen
 	std::ofstream file(filename);
 	if (!file.is_open())
 		return -1;
@@ -1674,7 +1674,7 @@ FXint datafile::saveCmds(const FXchar* filename, bool stripped, bool replace)
 			}
 
 			// unit has command block
-			//  EINHEIT wz5t;  Botschafter des Konzils [1,146245$,Beqwx(1/3)] kämpft nicht
+			//  EINHEIT wz5t;  Botschafter des Konzils [1,146245$,Beqwx(1/3)] k\u00e4mpft nicht
 
 			att_commands* cmds = dynamic_cast<att_commands*>(cmdb->attachment());
 			if (cmds && !cmds->header.empty())
@@ -1945,7 +1945,7 @@ void datafile::createHashTables()
 	/*
 	MESSAGE <id>
 	1264208711;type
-	"$unit (zzz) treibt in $region (x,y) Steuern in Höhe von $amount Silber ein.";rendered
+	"$unit (zzz) treibt in $region (x,y) Steuern in H\u00f6he von $amount Silber ein.";rendered
 	*/
 
 	datablock::itor block;
@@ -2005,7 +2005,7 @@ void datafile::createHashTables()
 				while (region_enemy)
 					enemy_log++, region_enemy /= 2;
 
-				if (own_log) own_log++;		// für stärkere Ausprägung
+				if (own_log) own_log++;		// f\u00fcr st\u00e4rkere Auspr\u00e4gung
 				if (ally_log) ally_log++;
 				if (enemy_log) enemy_log++;
 
@@ -2200,7 +2200,7 @@ void datafile::createHashTables()
 							block->value(datakey::TYPE_TYPE) == "Ghaste" ||
 							block->value(datakey::TYPE_TYPE) == "Ents" ||
 							block->value(datakey::TYPE_TYPE) == "Bauern" ||
-							block->value(datakey::TYPE_TYPE) == iso2utf("Hirntöter"))
+							block->value(datakey::TYPE_TYPE) == FXString(L"Hirnt\u00f6ter"))
 						region->setFlags(datablock::FLAG_MONSTER);		// monsters in the region
 					else if (block->value(datakey::TYPE_TYPE) == "Seeschlangen")
 						region->setFlags(datablock::FLAG_SEASNAKE);		// sea snake in region
@@ -2225,7 +2225,7 @@ void datafile::createHashTables()
 			{
 				const FXString& type = block->value("typ");
 
-				if (type == "Strasse" || type == "Straße" || type == iso2utf("Straße"))	// TO FIX!
+				if (type == "Strasse" || type == "Stra\u00dfe" || type == FXString(L"Stra\u00dfe"))	// TO FIX!
 				{												// region has street in some direction
 					int direction = block->valueInt("richtung");
 					if (direction >= 0 && direction <= 5)

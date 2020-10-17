@@ -6,6 +6,12 @@ pkg_search_module(FOX REQUIRED fox>=1.6)
 find_package(Boost REQUIRED)
 find_package(PNG REQUIRED)
 
+if (WIN32)
+# vcpkg install gettext
+    find_package(unofficial-gettext CONFIG REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE unofficial::gettext::libintl)
+endif (WIN32)
+
 set (SOURCES
 	calc.cpp
 	commands.cpp

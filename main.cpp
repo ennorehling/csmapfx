@@ -40,22 +40,22 @@ void showHelpText()
 		"\n"
 		"Syntax: csmapfx [--help] [-hc] <Haupt-CR> <Karten-CRs> [--makemap] [-o <CR>]\n"
 		"\n"
-		"CsMapFX ist ein Kartenbetrachter für das Spiel Eressea (www.eressea.de).\n"
-		"Das Programm öffnet Eressea-Computer-Reporte (*.cr) und\n"
+		"CsMapFX ist ein Kartenbetrachter f\u00fcr das Spiel Eressea (www.eressea.de).\n"
+		"Das Programm \u00f6ffnet Eressea-Computer-Reporte (*.cr) und\n"
 		"mit bzip2 gepackte CRs (*.cr.bz2).\n"
 		"\n"
 		"Optionen:\n"
 		"  -h, --help                  Zeigt diesen Text an.\n"
 		"  -v, --version               Zeigt Versionsinformationen.\n"
 		"  -c                          Startet ein kleines Fenster mit Taschenrechner.\n"
-		"Diese Optionen müssen hinter einem CR stehen:\n"
+		"Diese Optionen m\u00fcssen hinter einem CR stehen:\n"
 		"  --makemap                   Filtert nur die Karteninfos aus den CRs heraus.\n"
 		"  -o <Datei>                  Schreibt einen CR aus den aktuellen Daten.\n"
 		"\n"
 		"  <Haupt-CR> <Karten-CRs...>\n"
 		"Die erste Datei in der Liste wird komplett geladen.\n"
 		"Alle weiteren Dateien werden als Karten-CRs angesehen und\n"
-		"nur die Regionsdaten werden aus dem CR geladen und zum Report hinzugefügt.\n"
+		"nur die Regionsdaten werden aus dem CR geladen und zum Report hinzugef\u00fcgt.\n"
 		"Gibt man keine Parameter an, wird CsMapFX mit einer leeren Karte gestartet."
 	;
 
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 					}
 					else
 					{
-						showError((std::string)"csmapfx: Ungültige Option: --" + (argv[arg]+i+1) + "\nProbier 'csmapfx --help\' für mögliche Optionen");
+						showError((std::string)"csmapfx: Ung\u00fcltige Option: --" + (argv[arg]+i+1) + "\nProbier 'csmapfx --help\' f\u00fcr m\u00f6gliche Optionen");
 						startgui = false;
 					}
 
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 				}
 				else
 				{
-					showError((std::string)"csmapfx: Ungültige Option: -" + c + "\nProbier 'csmapfx --help\' für mögliche Optionen");
+					showError((std::string)"csmapfx: Ung\u00fcltige Option: -" + c + "\nProbier 'csmapfx --help\' f\u00fcr m\u00f6gliche Optionen");
 					startgui = false;
 				}
 			}
@@ -233,12 +233,12 @@ int main(int argc, char *argv[])
 							csmap->stripReportToMap();
 					}
 					else
-						showError((std::string)"csmapfx: Ungültige Option: --" + (argv[arg]+i+1) + "\nProbier 'csmapfx --help\' für mögliche Optionen");
+						showError((std::string)"csmapfx: Ung\u00fcltige Option: --" + (argv[arg]+i+1) + "\nProbier 'csmapfx --help\' f\u00fcr m\u00f6gliche Optionen");
 
 					break;
 				}
 				else
-					showError((std::string)"csmapfx: Ungültige Option: -" + c + "\nProbier 'csmapfx --help\' für mögliche Optionen");
+					showError((std::string)"csmapfx: Ung\u00fcltige Option: -" + c + "\nProbier 'csmapfx --help\' f\u00fcr m\u00f6gliche Optionen");
 			}
 		}
 		else if (argv[arg][0])		// stop here if a filename was found
