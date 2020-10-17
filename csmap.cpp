@@ -784,7 +784,7 @@ long CSMap::updOpenFile(FXObject *sender, FXSelector, void *)
 long CSMap::updActiveFaction(FXObject *sender, FXSelector, void *)
 {
     FXWindow *wnd = (FXWindow *)sender;
-    haveActiveFaction() ? wnd->disable() : wnd->enable();
+    haveActiveFaction() ? wnd->enable() : wnd->disable();
     return 1;
 }
 
