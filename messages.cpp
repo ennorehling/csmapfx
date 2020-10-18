@@ -30,7 +30,7 @@ FXMessages::FXMessages(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 	groups.effects = appendItem(NULL, "Effekte");
 	groups.travel = appendItem(NULL, "Durchreise");
 	groups.other = appendItem(NULL, "Sonstiges");
-	groups.streets = appendItem(NULL, FXString("Stra\u00dfen"));
+	groups.streets = appendItem(NULL, FXString(L"Stra\u00dfen"));
 }
 
 void FXMessages::create()

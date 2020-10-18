@@ -13,7 +13,7 @@ FXDEFMAP(FXCommands) MessageMap[]=
     FXMAPFUNC(SEL_COMMAND,          FXCommands::ID_UNIT_CONFIRM,    FXCommands::onConfirmUnit),
     FXMAPFUNC(SEL_COMMAND,          FXCommands::ID_UNIT_ADD,        FXCommands::onCreateUnit),
 
-    // FXMAPFUNC(SEL_UPDATE,			FXCommands::ID_UNIT_CONFIRM,    FXCommands::updCommandable),
+    FXMAPFUNC(SEL_UPDATE,			FXCommands::ID_UNIT_CONFIRM,    FXCommands::updConfirmed),
     FXMAPFUNC(SEL_UPDATE,			FXCommands::ID_UNIT_ADD,       FXCommands::updCommandable),
 
     FXMAPFUNC(SEL_KEYPRESS,			0,								FXCommands::onKeyPress),
@@ -322,8 +322,9 @@ int FXCommands::getConfirmed()
 			if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
 				return cmds->confirmed;
 
-			return false;	// no changed commands, so not confirmed
+			return 0;	// no changed commands, so not confirmed
 		}
+        return 1;
 	}
 
 	return -1;	// no unit with command block
@@ -485,6 +486,19 @@ long FXCommands::onUpdate(FXObject* sender,FXSelector sel,void* ptr)
 	}
 	mapShowRoute();
 	return FXText::onUpdate(sender, sel, ptr);
+}
+
+long FXCommands::updConfirmed(FXObject* sender, FXSelector, void*) {
+    FXCheckButton * btn = (FXCheckButton *)sender;
+    int conf = getConfirmed();
+    if (conf == -1) {
+        btn->disable();
+    }
+    else {
+        btn->enable();
+    }
+    btn->setCheck(conf == 1);
+    return 1;
 }
 
 long FXCommands::updCommandable(FXObject* sender, FXSelector, void*) {

@@ -39,6 +39,7 @@ public:
 
 	long updRowCol(FXObject*,FXSelector,void*);	// set row and col for this command
 	long updCommandable(FXObject*,FXSelector,void*);
+	long updConfirmed(FXObject*,FXSelector,void*);
 	
 public: 
 	enum
