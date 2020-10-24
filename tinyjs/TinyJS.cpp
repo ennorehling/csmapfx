@@ -1775,7 +1775,7 @@ CScriptVarLink *CTinyJS::expression(bool &execute) {
             }
         } else {
             CScriptVarLink *b = term(execute);
-            if (execute) {
+            if (b && execute) {
                 // not in-place, so just replace
                 CScriptVar *res = a->var->mathsOp(b->var, op);
                 CREATE_LINK(a, res);

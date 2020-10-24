@@ -197,7 +197,7 @@ namespace data
 	  0x00,0x88,0x06,0x8c,0x8d,0x13,0x07,0x91,0x14,0x11,0x00,0x3b
 	  };
 
-	const unsigned char *terrainSymbols[13] =
+	const unsigned char *terrainSymbols[] =
 	{
 		sym_undefined,
 		sym_ocean,
@@ -209,6 +209,9 @@ namespace data
 		sym_mountain,
 		sym_glacier,
 		sym_volcano,
+		sym_volcano,
+		sym_iceberg,
+		sym_iceberg,
 		sym_iceberg,
 		sym_firewall,
 		sym_mahlstrom

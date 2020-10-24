@@ -311,31 +311,38 @@ const FXString datablock::terrainString() const
 	if (!type.empty())
 		return type;
 
-	if (terrain() == TERRAIN_OCEAN)
-		return "Ozean";
-	if (terrain() == TERRAIN_SWAMP)
-		return "Sumpf";
-	if (terrain() == TERRAIN_PLAINS)
-		return "Ebene";
-	if (terrain() == TERRAIN_DESERT)
-		return ::FXString(L"W\u00fcste");
-	if (terrain() == TERRAIN_FOREST)
-		return "Wald";
-	if (terrain() == TERRAIN_HIGHLAND)
-		return "Hochland";
-	if (terrain() == TERRAIN_MOUNTAIN)
-		return "Berge";
-	if (terrain() == TERRAIN_GLACIER)
-		return "Gletscher";
-	if (terrain() == TERRAIN_VOLCANO)
-		return "Vulkan";
-	if (terrain() == TERRAIN_ICEBERG)
-		return "Eisberg";
-	if (terrain() == TERRAIN_FIREWALL)
-		return "Feuerwand";
-	if (terrain() == TERRAIN_MAHLSTROM)
-		return "Mahlstrom";
-
+    switch (terrain()) {
+    case TERRAIN_OCEAN:
+        return "Ozean";
+    case TERRAIN_SWAMP:
+        return "Sumpf";
+    case TERRAIN_PLAINS:
+        return "Ebene";
+    case TERRAIN_DESERT:
+        return FXString(L"W\u00fcste");
+    case TERRAIN_FOREST:
+        return "Wald";
+    case TERRAIN_HIGHLAND:
+        return "Hochland";
+    case TERRAIN_MOUNTAIN:
+        return "Berge";
+    case TERRAIN_GLACIER:
+        return "Gletscher";
+    case TERRAIN_VOLCANO:
+        return "Vulkan";
+    case TERRAIN_VOLCANO_ACTIVE:
+        return "Aktiver Vulkan";
+    case TERRAIN_ICEBERG:
+        return "Eisberg";
+    case TERRAIN_ICEFLOE:
+        return "Eisscholle";
+    case TERRAIN_PACKICE:
+        return "Packeis";
+    case TERRAIN_FIREWALL:
+        return "Feuerwand";
+    case TERRAIN_MAHLSTROM:
+        return "Mahlstrom";
+    }
     return "Unbekannt";
 }
 
@@ -367,6 +374,12 @@ const FXString datablock::terrainString() const
 		return TERRAIN_FIREWALL;
 	if (terrain == "Mahlstrom")
 		return TERRAIN_MAHLSTROM;
+    if (terrain == "Aktiver Vulkan")
+        return TERRAIN_VOLCANO_ACTIVE;
+    if (terrain == "Packeis")
+        return TERRAIN_PACKICE;
+    if (terrain == "Eisscholle")
+        return TERRAIN_ICEFLOE;
 
 	return TERRAIN_UNKNOWN;
 }
@@ -379,15 +392,15 @@ const FXString datablock::terrainString() const
 	// so if you resave the file, it's exact terrain type (_Aktiver_ Vulkan) 
 	// could be saved.
 
-	if (terrain == "Aktiver Vulkan")
-		return TERRAIN_VOLCANO;
-	else if (terrain == "Rauchender Vulkan")
-		return TERRAIN_VOLCANO;
-	else if (terrain == "Eis")
-		return TERRAIN_GLACIER;
+	if (terrain == "Rauchender Vulkan")
+        return TERRAIN_VOLCANO_ACTIVE;
 	else if (terrain == "Nebel")
 		return TERRAIN_GLACIER;
+	else if (terrain == "Gang")
+		return TERRAIN_GLACIER;
 	else if (terrain == "Dichter Nebel")
+		return TERRAIN_FIREWALL;
+	else if (terrain == "Wand")
 		return TERRAIN_FIREWALL;
 
 	return TERRAIN_UNKNOWN;
