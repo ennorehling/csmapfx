@@ -336,6 +336,10 @@ const FXString datablock::terrainString() const
         return "Eisberg";
     case TERRAIN_ICEFLOE:
         return "Eisscholle";
+    case TERRAIN_FLOOR:
+        return "Gang";
+    case TERRAIN_WALL:
+        return "Wand";
     case TERRAIN_PACKICE:
         return "Packeis";
     case TERRAIN_FIREWALL:
@@ -380,6 +384,12 @@ const FXString datablock::terrainString() const
         return TERRAIN_PACKICE;
     if (terrain == "Eisscholle")
         return TERRAIN_ICEFLOE;
+    if (terrain == "Wand")
+        return TERRAIN_WALL;
+    if (terrain == "Gang")
+        return TERRAIN_FLOOR;
+    if (terrain == "Rauchender Vulkan")
+        return TERRAIN_VOLCANO_ACTIVE;
 
 	return TERRAIN_UNKNOWN;
 }
@@ -392,15 +402,9 @@ const FXString datablock::terrainString() const
 	// so if you resave the file, it's exact terrain type (_Aktiver_ Vulkan) 
 	// could be saved.
 
-	if (terrain == "Rauchender Vulkan")
-        return TERRAIN_VOLCANO_ACTIVE;
-	else if (terrain == "Nebel")
-		return TERRAIN_GLACIER;
-	else if (terrain == "Gang")
+	if (terrain == "Nebel")
 		return TERRAIN_GLACIER;
 	else if (terrain == "Dichter Nebel")
-		return TERRAIN_FIREWALL;
-	else if (terrain == "Wand")
 		return TERRAIN_FIREWALL;
 
 	return TERRAIN_UNKNOWN;

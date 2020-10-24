@@ -1127,7 +1127,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 			}
 
 			new FXMenuSeparatorEx(terraform);
-			cmd = new FXMenuCommand(terraform, FXString("L\u00f6schen"), terrainIcons[0], this,ID_POPUP_CLICKED);
+			cmd = new FXMenuCommand(terraform, FXString(L"L\u00f6schen"), terrainIcons[0], this,ID_POPUP_CLICKED);
 			cmd->setUserData((void*)(FXuval)MKUINT(POPUP_TERRAFORM, 0));
 
 			new FXMenuCascade(menu, "&Terraformen", terrainIcons[region->terrain()], terraform);

@@ -24,4 +24,27 @@ namespace data
 {
 	const unsigned int infodlg_data_size = sizeof(infodlg_data);
 	const unsigned int infodlg_data_e3_size = sizeof(infodlg_data_e3);
+
+    const unsigned char *terrains[] =
+    {
+        undefined,
+        ocean,
+        swamp,
+        plains,
+        desert,
+        forest,
+        highland,
+        mountain,
+        glacier,
+        volcano,
+        activevolcano,
+        packice,
+        iceberg,
+        icefloe,
+        floor,
+        wall,
+        firewall,
+        mahlstrom
+    };
+
 }

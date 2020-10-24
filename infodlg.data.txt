@@ -7,39 +7,39 @@ Stufe	Trankname				Beschreibung (Zutaten)
 _		_						(Blauer Baumringel, Windbeutel)
 _		Goliathwasser			10 Leute Tragkraft wie Pferde 
 _		_						(Gurgelkraut, Fjordwuchs)
-_		Wasser des Lebens		Macht aus 10 Holz/Mallorn 10 Schößlinge/Mallornschösslinge 
+_		Wasser des Lebens		Macht aus 10 Holz/Mallorn 10 SchÃ¶ÃŸlinge/MallornschÃ¶sslinge 
 _		_						(Elfenlieb, Knotiger Saugwurz)
 _		Trank der Wahrheit		Anwender durchschaut Illusionen 
 _		_						(Flachwurz, Fjordwuchs)
 _
-2		Schaffenstrunk			Verdoppelt Produktivität von 10 Leuten (nur bei MACHE) 
-_		_						(Alraune, Spaltwachs, Würziger Wagemut)
-_		Wundsalbe				Bringt bis zu 400 Trefferpunkte zurück 
-_		_						(Weißer Wüterich, Blauer Baumringel, Würziger Wagemut)
-_		Bauernblut				Bis zu 100 Dämonen in einer Region brauchen keinen Bauern zum Fraß 
-_		_						(Höhlenglimm, Fjordwuchs, Blauer Baumringel, Bauer)
+2		Schaffenstrunk			Verdoppelt ProduktivitÃ¤t von 10 Leuten (nur bei MACHE) 
+_		_						(Alraune, Spaltwachs, WÃ¼rziger Wagemut)
+_		Wundsalbe				Bringt bis zu 400 Trefferpunkte zurÃ¼ck 
+_		_						(WeiÃŸer WÃ¼terich, Blauer Baumringel, WÃ¼rziger Wagemut)
+_		Bauernblut				Bis zu 100 DÃ¤monen in einer Region brauchen keinen Bauern zum FraÃŸ 
+_		_						(HÃ¶hlenglimm, Fjordwuchs, Blauer Baumringel, Bauer)
 _
-3		Gehirnschmalz			Erhöhte Lernchance für 10 Personen 
-_		_						(Wasserfinder, Steinbeißer, Windbeutel, Gurgelkraut)
+3		Gehirnschmalz			ErhÃ¶hte Lernchance fÃ¼r 10 Personen 
+_		_						(Wasserfinder, SteinbeiÃŸer, Windbeutel, Gurgelkraut)
 _		Dumpfbackenbrot			Bringt der Zieleinheit Lernzeitverlust
-_		_						(Eulenauge, Grüner Spinnerich, Höhlenglimm, Fjordwuchs)
-_		Nestwärme				Insekten können auch im Winter in jeder Region rekrutieren 
-_		_						(Eisblume, Grüner Spinnerich, Spaltwachs, Kakteenschwitz)
-_		Pferdeglück				50 Pferde vermehren sich bis zu vier mal 
-_		_						(Blauer Baumringel, Sandfäule, Kakteenschwitz, Knotiger Saugwurz)
+_		_						(Eulenauge, GrÃ¼ner Spinnerich, HÃ¶hlenglimm, Fjordwuchs)
+_		NestwÃ¤rme				Insekten kÃ¶nnen auch im Winter in jeder Region rekrutieren 
+_		_						(Eisblume, GrÃ¼ner Spinnerich, Spaltwachs, Kakteenschwitz)
+_		PferdeglÃ¼ck				50 Pferde vermehren sich bis zu vier mal 
+_		_						(Blauer Baumringel, SandfÃ¤ule, Kakteenschwitz, Knotiger Saugwurz)
 _		Berserkerblut			10 Leute im Kampf Angriff +1 
-_		_						(Weißer Wüterich, Alraune, Flachwurz, Sandfäule)
+_		_						(WeiÃŸer WÃ¼terich, Alraune, Flachwurz, SandfÃ¤ule)
 _
 4		Bauernlieb				Gibt bis zu 1000 Bauern die zehnfache Chance, sich zu vermehren 
-_		_						(Alraune, Schneekristall, Steinbeißer, Blasenmorchel, Elfenlieb)
-_		Elixier der Macht		Gibt 10 Personen fünffache Trefferpunkte 
-_		_						(Elfenlieb, Wasserfinder, Windbeutel, Grüner Spinnerich, Blasenmorchel, Drachenblut)
-_		Heiltrank				4 Personen überleben sonst tödlichen Treffer mit einer Chance von 50% 
+_		_						(Alraune, Schneekristall, SteinbeiÃŸer, Blasenmorchel, Elfenlieb)
+_		Elixier der Macht		Gibt 10 Personen fÃ¼nffache Trefferpunkte 
+_		_						(Elfenlieb, Wasserfinder, Windbeutel, GrÃ¼ner Spinnerich, Blasenmorchel, Drachenblut)
+_		Heiltrank				4 Personen Ã¼berleben sonst tÃ¶dlichen Treffer mit einer Chance von 50% 
 _		_						(Gurgelkraut, Windbeutel, Eisblume, Elfenlieb, Spaltwachs)
 
 
 [Burgen]
-Typ				ab Größe	Burgenbau	Bonus/Orks			Erlösanteil 
+Typ				ab GrÃ¶ÃŸe	Burgenbau	Bonus/Orks			ErlÃ¶santeil 
 
 Grundmauern		1			1			0/0 Silber			nichts 
 Handelsposten	2			1			0/0 Silber			6% 
@@ -50,38 +50,38 @@ Festung			1250		5			4/2 Silber			30%
 Zitadelle		6250		6			5/3 Silber			36% 
 
 
-[Gebäude]
-Gebäude				Baukosten													Talente		Unterhalt				Max.	Kapazität
+[GebÃ¤ude]
+GebÃ¤ude				Baukosten													Talente		Unterhalt				Max.	KapazitÃ¤t
 
-Akademie			5 Stein, 5 Holz, 1 Eisen, 500 Silber						3			1000 Silber				25		Größe 
-Bergwerk			5 Steine, 10 Holz, 1 Eisen, 250 Silber						4			500 Silber				_		Größe
-Damm				5 Stein, 10 Holz, 1 Eisen, 500 Silber						4			1000 Silber, 3 Holz 	50		Größe
-Hafen				5 Stein, 5 Holz, 250 Silber									3			250 Silber				25		Größe 
-Karawanserei		1 Stein, 5 Holz, 1 Eisen, 500 Silber						2			3000 Silber, 2 Pferde	10		Größe 
+Akademie			5 Stein, 5 Holz, 1 Eisen, 500 Silber						3			1000 Silber				25		GrÃ¶ÃŸe 
+Bergwerk			5 Steine, 10 Holz, 1 Eisen, 250 Silber						4			500 Silber				_		GrÃ¶ÃŸe
+Damm				5 Stein, 10 Holz, 1 Eisen, 500 Silber						4			1000 Silber, 3 Holz 	50		GrÃ¶ÃŸe
+Hafen				5 Stein, 5 Holz, 250 Silber									3			250 Silber				25		GrÃ¶ÃŸe 
+Karawanserei		1 Stein, 5 Holz, 1 Eisen, 500 Silber						2			3000 Silber, 2 Pferde	10		GrÃ¶ÃŸe 
 Leuchtturm			2 Stein, 1 Holz, 1 Eisen 100 Silber							3			100 Silber				_		4 Personen 
 Magierturm			5 Stein, 3 Holz, 3 Eisen, 2 Mallorn, 2 Laen, 500 Silber		5			1000 Silber				50		2 Personen
-Monument			1 Stein, 1 Holz, 1 Eisen, 400 Silber						4			_						_		Größe 
-Pferdezucht			2 Stein, 4 Holz, 1 Eisen, 100 Silber						2			150 Silber				_		Größe 
-Sägewerk			5 Stein, 5 Holz, 3 Eisen, 200 Silber						3			250 Silber				_		Größe 
-Schmiede			5 Stein, 5 Holz, 2 Eisen, 200 Silber						3			300 Silber, 1 Holz		_		Größe 
-Steinbruch 			1 Stein, 5 Holz, 1 Eisen, 250 Silber						2			250 Silber				_		Größe 
+Monument			1 Stein, 1 Holz, 1 Eisen, 400 Silber						4			_						_		GrÃ¶ÃŸe 
+Pferdezucht			2 Stein, 4 Holz, 1 Eisen, 100 Silber						2			150 Silber				_		GrÃ¶ÃŸe 
+SÃ¤gewerk			5 Stein, 5 Holz, 3 Eisen, 200 Silber						3			250 Silber				_		GrÃ¶ÃŸe 
+Schmiede			5 Stein, 5 Holz, 2 Eisen, 200 Silber						3			300 Silber, 1 Holz		_		GrÃ¶ÃŸe 
+Steinbruch 			1 Stein, 5 Holz, 1 Eisen, 250 Silber						2			250 Silber				_		GrÃ¶ÃŸe 
 Steinkreis			5 Stein, 5 Holz												5			_						100		3
-Taverne				4 Stein, 3 Holz, 1 Eisen, 200 Silber						2			5*Größe					_		Größe 
-Tunnel				10 Stein, 5 Holz, 1 Eisen, 300 Silber						6			100 Silber, 2 Stein		100		Größe
+Taverne				4 Stein, 3 Holz, 1 Eisen, 200 Silber						2			5*GrÃ¶ÃŸe					_		GrÃ¶ÃŸe 
+Tunnel				10 Stein, 5 Holz, 1 Eisen, 300 Silber						6			100 Silber, 2 Stein		100		GrÃ¶ÃŸe
 
 
 [Kalender]
 Monat					Jahreszeit	Anmerkung
 
-Feldsegen				Sommer		Bäume werfen Samen 
-Nebeltage				Herbst		Bäume werfen Samen ; Sturmwarnung 
-Sturmmond				Herbst		Bäume werfen Samen ; Sturmwarnung 
-Herdfeuer				Winter		Insekten: Eingeschränktes Rekrutieren 
-Eiswind					Winter		Insekten: Eingeschränktes Rekrutieren 
-Schneebann				Winter		Insekten: Eingeschränktes Rekrutieren 
-Blütenregen				Frühling	Baumwachstum 
-Mond der milden Winde	Frühling	Baumwachstum 
-Sonnenfeuer				Sommer		Bäume werfen Samen
+Feldsegen				Sommer		BÃ¤ume werfen Samen 
+Nebeltage				Herbst		BÃ¤ume werfen Samen ; Sturmwarnung 
+Sturmmond				Herbst		BÃ¤ume werfen Samen ; Sturmwarnung 
+Herdfeuer				Winter		Insekten: EingeschrÃ¤nktes Rekrutieren 
+Eiswind					Winter		Insekten: EingeschrÃ¤nktes Rekrutieren 
+Schneebann				Winter		Insekten: EingeschrÃ¤nktes Rekrutieren 
+BlÃ¼tenregen				FrÃ¼hling	Baumwachstum 
+Mond der milden Winde	FrÃ¼hling	Baumwachstum 
+Sonnenfeuer				Sommer		BÃ¤ume werfen Samen
 
 
 [Kampfmodifikatoren]
@@ -90,44 +90,44 @@ Person																					Angriff		Verteidigung
 Unbewaffneter																			-2			-2 
 Bewaffneter ohne Talent																	-2			-2 
 Person in einer Burg																	-			+1 bis +5 
-Reiter mit Reiten 2 (nur in Ebenen, Wüsten    											+2			+2 
-und Hochländern; nicht in einer Burg)													_			_
+Reiter mit Reiten 2 (nur in Ebenen, WÃ¼sten    											+2			+2 
+und HochlÃ¤ndern; nicht in einer Burg)													_			_
 Lanze/Speer zu Pferd mit Reiten 2														+1			-
 Speer/Hellebarde gegen Reiter															-			+1 
 
 
 [Rassen]
 
-Talent					Zwerge	Orks	Elfen	Katzen	Dämonen	Halblinge	Menschen	Goblins	Insekten	Trolle	Meermenschen 
+Talent					Zwerge	Orks	Elfen	Katzen	DÃ¤monen	Halblinge	Menschen	Goblins	Insekten	Trolle	Meermenschen 
 Rekrutierungskosten		110		70		130		90		150		80			75			40		80			90		80 
 Trefferpunkte			24		24		18		20		50		18			20			16		24			30		20 
-nat. Rüstung			0		0		0		0		2		0			0			0		2			1		0 
+nat. RÃ¼stung			0		0		0		0		2		0			0			0		2			1		0 
 Magieresistenz			5		-5		10		0		15		5			0			-5		5			10		0 
 Gewicht					10		10		10		10		10		10			10			6		10			20		10
 Traglast				5,4		5,4		5,4		5,4		5,4		5,4			5,4			4,4		5,4			10,8	5,4
 _
 Alchemie				0		+1		-1		-1		+2		0			0			+1		0			0		0 
-Armbrustschießen		0		0		0		0		0		+1			0			0		+1			0		0 
+ArmbrustschieÃŸen		0		0		0		0		0		+1			0			0		+1			0		0 
 Ausdauer				0		0		0		0		0		0			0			0		0			0		0 
 Bergbau					+2		+1		-2		-2		0		+1			0			+1		+1			+2		-2 
-Bogenschießen			-1		0		+2		0		0		-1			0			0		-2			-2		0 
+BogenschieÃŸen			-1		0		+2		0		0		-1			0			0		-2			-2		0 
 Burgenbau				+2		+1		-1		-1		0		+1			0			+1		+2			+2		-1 
 Handeln					+1		-3		0		0		-3		+2			+1			-1		-1			0		+2 
 Hiebwaffen				+1		0		0		0		+1		-1			0			0		-1			+1		0 
-Holzfällen				-1		+1		0 		0		+1		0			0			0		+1			0		0 
+HolzfÃ¤llen				-1		+1		0 		0		+1		0			0			0		+1			0		0 
 Katapultbedienung		+2		0		-2		-1		0		-1			0			+1		0			+2		0 
-Kräuterkunde			-2		-2		+2		+1		-3		+2			-1			0		+1			-1		0 
+KrÃ¤uterkunde			-2		-2		+2		+1		-3		+2			-1			0		+1			-1		0 
 Magie					-2		-1		+1		0		+1		0			0			-1		0			0		0 
 Pferdedressur			-2		-1		+1		0		-3		-1			0			0		-3			-1		0 
 Reiten					-2		0		0		0		-1		-1			0			0		-3			-2		0 
-Rüstungsbau				+2		+1		-1		-1		0		0			0			0		+2			+2		-1 
+RÃ¼stungsbau				+2		+1		-1		-1		0		0			0			0		+2			+2		-1 
 Schiffbau				-1		-1		-1		-1		-1		-1			+1			-2		0			-1		+3 
 Segeln					-2		-1		-1		-2		-1		-2			+1			-2		0			-1		+3 
 Spionage				0		-1		0		+2		0		+1			0			0		0			-3		0 
 Stangenwaffen 			0		0		0		0		+1		-1			0			0		+1			0		0 
 Steinbau				+2		+1		-1		-1		0		0			0			0		0			+2		0 
 Steuereintreiben		+1		+1		0		+1		+1		-1			0			0		0			+1		0 
-Straßenbau				+2		0		-1		-1		0		+1			0			-2		-1			+2		-1 
+StraÃŸenbau				+2		0		-1		-1		0		+1			0			-2		-1			+2		-1 
 Taktik					0		+1		0		0		-1		0			0			-2		-1			-1		0 
 Tarnung					-1		0		+1		+1		+1		+1			0			+1		-1			-3		0 
 Unterhaltung			-1		-2		0		0		-3		+1			0			-1		-2			-1		0 
@@ -136,19 +136,19 @@ Wagenbau				0		-1		0		0		-2		+2			0			-1		0			0		0
 Wahrnehmung				0		0		+1		+2		+1		+1			0			0		+1			-1		0 
 
 
-[Rüstungen]
+[RÃ¼stungen]
 Name		Gewicht		Talent			Talentstufe		Rohstoffe		Panzerung			+Trefferchance/Nahkampf
 
-Kettenhemd		2		Rüstungsbau		3				3 Eisen			3					* 15% 
-Plattenpanzer	4		Rüstungsbau		4				5 Eisen			5					* 30% 
-Laenkettenhemd	1		Rüstungsbau		9				3 Laen			6					- 
-Schild			1		Rüstungsbau		2				1 Eisen			1					* -15% 
-Laenschild		0		Rüstungsbau		7				1 Laen			2					* -25% 
+Kettenhemd		2		RÃ¼stungsbau		3				3 Eisen			3					* 15% 
+Plattenpanzer	4		RÃ¼stungsbau		4				5 Eisen			5					* 30% 
+Laenkettenhemd	1		RÃ¼stungsbau		9				3 Laen			6					- 
+Schild			1		RÃ¼stungsbau		2				1 Eisen			1					* -15% 
+Laenschild		0		RÃ¼stungsbau		7				1 Laen			2					* -25% 
 
 
 [Schiffe]
 
-Typ				Reichweite	Kapazität	Kapitän	Gesamttalent	Bauholz 
+Typ				Reichweite	KapazitÃ¤t	KapitÃ¤n	Gesamttalent	Bauholz 
 Boot			2			50			1		2				5
 Langboot		3			500			1		10				50 
 Drachenschiff	5			1000		2		50				100				 
@@ -158,15 +158,15 @@ Trireme			7			2000		4		120				200
 
 [Regionen]
 
-Gelände		Arbeitsplätze	Steine für Straße	Kräuter 
+GelÃ¤nde		ArbeitsplÃ¤tze	Steine fÃ¼r StraÃŸe	KrÃ¤uter 
 Ebene/Wald	10000			50					Blauer Baumringel, Eulenauge, Elfenlieb, 
-_			_				_					Flachwurz, Grüner Spinnerich, Würziger Wagemut 
+_			_				_					Flachwurz, GrÃ¼ner Spinnerich, WÃ¼rziger Wagemut 
 Hochland	4000			100					Alraune, Fjordwuchs, Windbeutel 
 Sumpf		2000			75					Blasenmorchel, Gurgelkraut, Knotiger Saugwurz  
-Gebirge		1000			250					Höhlenglimm, Spaltwachs, Steinbeißer 
-Wüste		500				100					Kakteenschwitz, Sandfäule, Wasserfinder 
-Vulkan		500				250					Keine Kräuter bekannt
-Gletscher	100				250					Eisblume, Schneekristall, Weißer Wüterich 
+Gebirge		1000			250					HÃ¶hlenglimm, Spaltwachs, SteinbeiÃŸer 
+WÃ¼ste		500				100					Kakteenschwitz, SandfÃ¤ule, Wasserfinder 
+Vulkan		500				250					Keine KrÃ¤uter bekannt
+Gletscher	100				250					Eisblume, Schneekristall, WeiÃŸer WÃ¼terich 
 
 
 [Waffen]
@@ -174,7 +174,7 @@ Name					Gewicht	Talent	Talentstufe	Rohstoffe	Schaden			zu Pferd	OB	DB	Hieb/Stan
 
 Schwert					1	Waffenbau	3	1 Eisen				1d9+2			_			0	0		H	
 Kriegsaxt				2	Waffenbau	3	1 Eisen, 1 Holz		2d6+4			_			+1	-2		H
-Bihänder				2	Waffenbau	4	2 Eisen				2d8+3			_			-1	-2		H
+BihÃ¤nder				2	Waffenbau	4	2 Eisen				2d8+3			_			-1	-2		H
 Laenschwert				1	Waffenbau	8	1 Laen				3d6+10			_			+1	+1		H
 Speer					1	Waffenbau	2	1 Holz				1d10			1d12+2		0	0 		S
 Mallornspeer			1	Waffenbau	2	1 Mallorn			1d10+1			1d12+3		0	0		S 
@@ -195,21 +195,21 @@ Name				Gewicht		Talent			Talenstufe		Rohstoffe
 
 Eisen				5			Bergbau			1				_
 Laen				2			Bergbau			7				_
-Holz				5			Holzfällen		1				_
-Mallorn				5			Holzfällen		2				_
+Holz				5			HolzfÃ¤llen		1				_
+Mallorn				5			HolzfÃ¤llen		2				_
 Stein				60			Steinbau		1				_
 Pferd				50			Pferdedressur	1 				_
 Silber				0,01		_				_				_
-Kräuter				0			Kräuterkunde	1				_
-Samen				0,1			Kräuterkunde	3				_
-Mallornsamen		0,1			Kräuterkunde	4				_
-Tränke				0			Alchemie		2				Kräuter 
+KrÃ¤uter				0			KrÃ¤uterkunde	1				_
+Samen				0,1			KrÃ¤uterkunde	3				_
+Mallornsamen		0,1			KrÃ¤uterkunde	4				_
+TrÃ¤nke				0			Alchemie		2				KrÃ¤uter 
 Wagen				40			Wagenbau		1				5 Holz 
 Katapultmunition	10			Steinbau		3				1 Stein 
-Öl					3			Handeln			1				min. 3 Silber
+Ã–l					3			Handeln			1				min. 3 Silber
 Balsam				2			Handeln			1				min. 4 Silber		
 Weihrauch			2			Handeln			1				min. 4 Silber		
-Gewürz				2			Handeln			1				min. 5 Silber		
+GewÃ¼rz				2			Handeln			1				min. 5 Silber		
 Myrrhe				2			Handeln			1				min. 5 Silber		
 Seide				3			Handeln			1				min. 6 Silber		
 Juwelen				1			Handeln			1				min. 7 Silber	
