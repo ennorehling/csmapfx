@@ -1534,11 +1534,6 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 	map->update();
 }
 
-struct island
-{
-	FXint left, top, right, bottom;
-};
-
 FXbool FXCSMap::paintMap(FXDrawable* buffer)
 {
 	// connected to a datafile list?
@@ -1548,6 +1543,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 	// create DC and empty buffer
 	FXDCWindow dc(buffer);
 
+	dc.setFont(font.get());
 	dc.setForeground(map->getBackColor());
 	dc.fillRectangle(0, 0, buffer->getWidth(), buffer->getHeight());
 
@@ -1555,11 +1551,8 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 	FXString label;
 	FXRectangle clip(0, 0, FXshort(64*scale), FXshort(64*scale));
 	FXint w = buffer->getWidth(), h = buffer->getHeight();
-	FXint scr_x,scr_y;
 
 	FXint regionSize = FXint(64*scale);
-
-	dc.setFont(font.get());
 
 	FXint scr_offset_x = offset_x;
 	FXint scr_offset_y = offset_y;
@@ -1573,26 +1566,22 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 		if (getHeight() > image_h)	scr_offset_y += (getHeight() - image_h)/2;
 	}
 
-	std::map<FXString, island> islands;
+	std::map<FXString, IslandPos> islands;
 
-	// now iterate throu all datafiles and all regions
-	for (datafile::itor file = files->begin(); file != files->end(); file++)
+	// iterate throu all datafiles and all regions
+	for (datafile& file : *files)
 	{
-		datablock::itor end = file->blocks().end();
-
-		for (datablock::itor block = file->blocks().begin(); block != end; block++)
+		for (datablock& block : file.blocks())
 		{
 			// handle only regions
-			if (block->type() != datablock::TYPE_REGION)
-				continue;
-
-			// handle only the actually selected plane
-			if (block->info() != visiblePlane)
+			// handle only the actually visible plain
+			if (block.type() != datablock::TYPE_REGION ||
+				block.info() != visiblePlane)
 				continue;
 
 			// map coordinates to screen
-			scr_x = GetScreenFromHexX(block->x(), block->y()) + scr_offset_x;
-			scr_y = GetScreenFromHexY(block->x(), block->y()) + scr_offset_y;
+			FXint scr_x = GetScreenFromHexX(block.x(), block.y()) + scr_offset_x;
+			FXint scr_y = GetScreenFromHexY(block.x(), block.y()) + scr_offset_y;
 
 			// clip regions outside of view
 			if (scr_x < -regionSize || scr_y < -regionSize || scr_x > w || scr_y > h)
@@ -1601,66 +1590,47 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 			// draw terrain image
 			FXIcon **icons = terrain;
 
-			if (show_shadow_regions && !(block->flags() & datablock::FLAG_REGION_SEEN))
+			if (show_shadow_regions && !(block.flags() & datablock::FLAG_REGION_SEEN))
 				icons = terrainShadow;
 
-			/*-------------------------*/
-            /*
-            bindings::variant_t val = bindings::call_globalproc("$overlay", puts_ignore(), bindings::bind_block(*files, block));
-				int* ptr;
-				if ((ptr = boost::get<int>(&val)) && *ptr >= 0 && (size_t)*ptr < overlays.size())
-					dc.drawIcon(overlays[*ptr].at(block->terrain()), scr_x,scr_y);
-				else
-					dc.drawIcon(icons[block->terrain()], scr_x,scr_y);
-			}
-			catch(const std::exception&)
-			{
-				dc.drawIcon(icons[block->terrain()], scr_x,scr_y);
-			}
-            */
-            dc.drawIcon(icons[block->terrain()], scr_x, scr_y);
-            /*-------------------------*/
-
-			//dc.drawIcon(icons[block->terrain()], scr_x,scr_y);
+			dc.drawIcon(icons[block.terrain()], scr_x, scr_y);
 
 			// island names
 			if (show_islands)
 			{
-				if (att_region* stats = dynamic_cast<att_region*>(block->attachment()))
+				if (att_region* stats = dynamic_cast<att_region*>(block.attachment()))
 				{
 					if (!stats->island.empty())
 					{
-						const FXString& lbl = stats->island;
-
-						std::map<FXString, island>::iterator itor = islands.find(lbl);
+						std::map<FXString, IslandPos>::iterator itor = islands.find(stats->island);
 						if (itor == islands.end())
 						{
-							island is;
+							IslandPos is{};
 							is.left = scr_x; is.top = scr_y;
-							is.right = scr_x+regionSize; is.bottom = scr_y+regionSize;
-							islands[lbl] = is;
+							is.right = scr_x + regionSize; is.bottom = scr_y + regionSize;
+							islands[stats->island] = is;
 						}
 						else
 						{
-							island& is = islands[lbl];
+							IslandPos& is = itor->second;
 							is.left = std::min(is.left, scr_x); is.top = std::min(is.top, scr_y);
-							is.right = std::max(is.right, scr_x+regionSize); is.bottom = std::max(is.bottom, scr_y+regionSize);
+							is.right = std::max(is.right, scr_x + regionSize); is.bottom = std::max(is.bottom, scr_y + regionSize);
 						}
 					}
 				}
 			}
 
-            // don't draw special icons on minimap
+			// don't draw special icons on minimap
 			if (minimap)
 				continue;
 
 			// draw region troop icon
-			/*if (block->flags() & datablock::FLAG_TROOPS)
+			/*if (block.flags() & datablock::FLAG_TROOPS)
 			{
 				dc.drawIcon(troopsunknown, scr_x+FXint(regionSize/1.7), scr_y+FXint(regionSize/2.3));
 
-				int number_ally = (block->flags() & (datablock::FLAG_ALLY1|datablock::FLAG_ALLY2|datablock::FLAG_ALLY3)) / datablock::FLAG_ALLY1;
-				int number_enemy = (block->flags() & (datablock::FLAG_ENEMY1|datablock::FLAG_ENEMY2|datablock::FLAG_ENEMY3)) / datablock::FLAG_ENEMY1;
+				int number_ally = (block.flags() & (datablock::FLAG_ALLY1|datablock::FLAG_ALLY2|datablock::FLAG_ALLY3)) / datablock::FLAG_ALLY1;
+				int number_enemy = (block.flags() & (datablock::FLAG_ENEMY1|datablock::FLAG_ENEMY2|datablock::FLAG_ENEMY3)) / datablock::FLAG_ENEMY1;
 
 				int i = 0;
                 for (; i < number_ally && i < 4; i++)
@@ -1672,9 +1642,9 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 			}//*/
 
 			// draw diagramm
-			if (block->flags() & datablock::FLAG_TROOPS && block->attachment())
+			if (block.flags() & datablock::FLAG_TROOPS && block.attachment())
 			{
-				if (att_region* stats = dynamic_cast<att_region*>(block->attachment()))
+				if (att_region* stats = dynamic_cast<att_region*>(block.attachment()))
 				{
 					static FXColor colors[] = { FXRGB(64,64,255), FXRGB(64,255,64), FXRGB(255,64,64), FXRGB(255,255,64), FXRGB(64,255,255), FXRGB(255,255,255), FXRGB(0,0,0) };
 
@@ -1710,68 +1680,68 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 			}
 
 			// draw region icons (ship, castle...)
-			if (block->flags() & datablock::FLAG_REGION_OWN)
+			if (block.flags() & datablock::FLAG_REGION_OWN)
 				dc.drawIcon(castleown, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
-			else if (block->flags() & datablock::FLAG_REGION_ALLY)
+			else if (block.flags() & datablock::FLAG_REGION_ALLY)
 				dc.drawIcon(castleally, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
-			else if (block->flags() & datablock::FLAG_REGION_ENEMY)
+			else if (block.flags() & datablock::FLAG_REGION_ENEMY)
 				dc.drawIcon(castleenemy, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
-			else if (block->flags() & datablock::FLAG_CASTLE)
+			else if (block.flags() & datablock::FLAG_CASTLE)
 				dc.drawIcon(castle, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
 
-			if (block->flags() & datablock::FLAG_REGION_TAXES)
+			if (block.flags() & datablock::FLAG_REGION_TAXES)
 				dc.drawIcon(castlecoins, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
 
 			// draw guarded icons
-			if ((block->flags() & (datablock::FLAG_GUARD_OWN|datablock::FLAG_GUARD_ALLY))
-				&& (block->flags() & datablock::FLAG_GUARD_ENEMY))
+			if ((block.flags() & (datablock::FLAG_GUARD_OWN|datablock::FLAG_GUARD_ALLY))
+				&& (block.flags() & datablock::FLAG_GUARD_ENEMY))
 				dc.drawIcon(guardmixed, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/18));
-			else if (block->flags() & datablock::FLAG_GUARD_OWN)
+			else if (block.flags() & datablock::FLAG_GUARD_OWN)
 				dc.drawIcon(guardown, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/18));
-			else if (block->flags() & datablock::FLAG_GUARD_ALLY)
+			else if (block.flags() & datablock::FLAG_GUARD_ALLY)
 				dc.drawIcon(guardally, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/18));
-			else if (block->flags() & datablock::FLAG_GUARD_ENEMY)
+			else if (block.flags() & datablock::FLAG_GUARD_ENEMY)
 				dc.drawIcon(guardenemy, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/18));
 
-			if (block->flags() & datablock::FLAG_SHIP)
+			if (block.flags() & datablock::FLAG_SHIP)
 				dc.drawIcon(ship, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/2.5));
-			else if ((block->flags() & datablock::FLAG_SHIPTRAVEL) && show_ship_travel)
+			else if ((block.flags() & datablock::FLAG_SHIPTRAVEL) && show_ship_travel)
 				dc.drawIcon(shiptravel, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/2.5));
 
 			// draw region "seen by" icons
 			if (show_visibility_symbol)
 			{
-				if (block->flags() & datablock::FLAG_LIGHTHOUSE)
+				if (block.flags() & datablock::FLAG_LIGHTHOUSE)
 					dc.drawIcon(lighthouse, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/18));
-				if (block->flags() & datablock::FLAG_TRAVEL)
+				if (block.flags() & datablock::FLAG_TRAVEL)
 					dc.drawIcon(travel, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/18));
 			}
 
 			// show symbol for dragon, seasnake or any other monster by priority
-			if (block->flags() & datablock::FLAG_DRAGON)
+			if (block.flags() & datablock::FLAG_DRAGON)
 				dc.drawIcon(dragon, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/2));
-			else if (block->flags() & datablock::FLAG_SEASNAKE)
+			else if (block.flags() & datablock::FLAG_SEASNAKE)
 				dc.drawIcon(seasnake, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/2));
-			else if (block->flags() & datablock::FLAG_MONSTER)
+			else if (block.flags() & datablock::FLAG_MONSTER)
 				dc.drawIcon(monster, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/2));
 
 			// show symbol for wormhole
-			if (block->flags() & datablock::FLAG_WORMHOLE)
+			if (block.flags() & datablock::FLAG_WORMHOLE)
 				dc.drawIcon(wormhole, scr_x+FXint(regionSize/4), scr_y);
 
 			// draw street symbols
 			if (show_streets)
 				for (int i = 0; i < 6; i++)
 				{
-					if (block->flags() & (datablock::FLAG_STREET << i))
+					if (block.flags() & (datablock::FLAG_STREET << i))
 						dc.drawIcon(street[i], scr_x, scr_y);
-					else if (block->flags() & (datablock::FLAG_STREET_UNDONE << i))
+					else if (block.flags() & (datablock::FLAG_STREET_UNDONE << i))
 						dc.drawIcon(street_undone[i], scr_x, scr_y);
 				}
 
 			// draw selection mark if region is in multiple selection
 			if (selection.selected & selection.MULTIPLE_REGIONS)
-				if (selection.regionsSelected.find(&*block) != selection.regionsSelected.end())
+				if (selection.regionsSelected.find(&block) != selection.regionsSelected.end())
 					dc.drawIcon(selectedRegion, scr_x,scr_y);
 
 			// skip label
@@ -1779,7 +1749,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 				continue;
 
 			if (show_names)
-				label = block->value(datakey::TYPE_NAME);
+				label = block.value(datakey::TYPE_NAME);
 			else
 				label.clear();
 
@@ -1787,7 +1757,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 			{
 				if (!label.empty())
 					label += "\r";
-				label += FXStringVal(block->x()) + ":" + FXStringVal(block->y());
+				label += FXStringVal(block.x()) + ":" + FXStringVal(block.y());
 			}
 
 			// clip label to region
@@ -1824,25 +1794,12 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 		}
 	}
 
-	if (show_islands) // island names
-	{
-		dc.setFont(islandfont.get());
-
-		for (std::map<FXString, island>::iterator itor = islands.begin(); itor != islands.end(); itor++)
-		{
-			const FXString& lbl = itor->first;
-			const island& is = itor->second;
-
-			FXint label_x = is.left + (is.right-is.left)/2 - islandfont->getTextWidth(lbl.text(), lbl.length())/2;
-			FXint label_y = is.top + (is.bottom-is.top)/2 + islandfont->getTextHeight(lbl.text(), lbl.length())/3;
-			dc.drawText(label_x, label_y, lbl.text(), lbl.length());
-		}
-
-		dc.setFont(font.get());
-	}
+	paintIslandNames(buffer, LeftTop{0, 0}, islands);
 
 	if (minimap)
+	{
 		return true;			// minimap only draws regions and island names
+	}
 
 	// draw traveller arrows
 	if (arrows.size())
@@ -1853,10 +1810,10 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 
 		for (std::vector<FXCSMap::arrow>::const_iterator arrow = arrows.begin(); arrow != arrows.end(); arrow++)
 		{
-			scr_x = GetScreenFromHexX(arrow->x, arrow->y) + scr_offset_x + FXint(arrow_offset_x[arrow->dir]*scale);
-			scr_y = GetScreenFromHexY(arrow->x, arrow->y) + scr_offset_y + FXint(arrow_offset_y[arrow->dir]*scale);
+			FXint scr_x = GetScreenFromHexX(arrow->x, arrow->y) + scr_offset_x + FXint(arrow_offset_x[arrow->dir]*scale);
+			FXint scr_y = GetScreenFromHexY(arrow->x, arrow->y) + scr_offset_y + FXint(arrow_offset_y[arrow->dir]*scale);
 
-			FXIcon **iconSet;
+			FXIcon **iconSet = nullptr;
 			if (arrow->color == arrow::ARROW_RED)
 				iconSet = redarrows;
 			else if (arrow->color == arrow::ARROW_GREEN)
@@ -1873,25 +1830,26 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 	// draw selection mark
 	if ((selection.selected & (selection.REGION|selection.UNKNOWN_REGION)) && (sel_plane == visiblePlane))
 	{
-		scr_x = GetScreenFromHexX(sel_x, sel_y) + scr_offset_x;
-		scr_y = GetScreenFromHexY(sel_x, sel_y) + scr_offset_y;
+		FXint scr_x = GetScreenFromHexX(sel_x, sel_y) + scr_offset_x;
+		FXint scr_y = GetScreenFromHexY(sel_x, sel_y) + scr_offset_y;
 		dc.drawIcon(activeRegion, scr_x,scr_y);
 	}
 
 	return true;
 }
 
-void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
+void FXCSMap::paintMapLines(FXDrawable* buffer, LeftTop offset)
 {
 	// connected to a datafile list?
-	if (!files)
-		return;
+	if (!files) return;
 
 	// create DC and empty buffer
 	FXDCWindow dc(buffer);
 
+	dc.setFont(font.get());
 	dc.setForeground(getBackColor());
 	dc.fillRectangle(0, 0, buffer->getWidth(), buffer->getHeight());
+	dc.setForeground(map->getBackColor());
 
 	// init vars and set font
 	FXRectangle clip(0, 0, FXshort(64*scale), FXshort(64*scale));
@@ -1899,107 +1857,27 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 
 	FXint regionSize = FXint(64*scale);
 
-	dc.setFont(font.get());
-	dc.setForeground(map->getBackColor());
-
-	// auf 'unmoegliche' Werte initialisieren
-	FXint min_x =  0x0FFFFFFF, max_x = -0x0FFFFFFF;
-	FXint min_y =  0x0FFFFFFF, max_y = -0x0FFFFFFF;
-
-	for (datafile::itor file = files->begin(); file != files->end(); file++)
-		for (datablock::itor block = file->blocks().begin(); block != file->blocks().end(); block++)
-		{
-			// handle only regions
-			if (block->type() != datablock::TYPE_REGION)
-				continue;
-
-			// handle only the actually visible plain
-			if (block->info() != visiblePlane)
-				continue;
-
-			FXint scr_x = GetScreenFromHexX(block->x(), block->y());
-			FXint scr_y = GetScreenFromHexY(block->x(), block->y());
-
-			if (scr_x < min_x) min_x = scr_x;
-			if (scr_x+regionSize > max_x) max_x = scr_x+regionSize;
-
-			if (scr_y < min_y) min_y = scr_y;
-			if (scr_y+regionSize > max_y) max_y = scr_y+regionSize;
-		}
-
-	std::map<FXString, island> islands;
-
-	// now iterate throu all datafiles and all regions
-	for (datafile::itor file = files->begin(); file != files->end(); file++)
+	// iterate throu all datafiles and all regions
+	for (datafile& file : *files)
 	{
-		datablock::itor end = file->blocks().end();
-
-		for (datablock::itor block = file->blocks().begin(); block != end; block++)
+		for (datablock& block : file.blocks())
 		{
 			// handle only regions
-			if (block->type() != datablock::TYPE_REGION)
-				continue;
-
-			// handle only the actually selected plane
-			if (block->info() != visiblePlane)
+			// handle only the actually visible plain
+			if (block.type() != datablock::TYPE_REGION ||
+				block.info() != visiblePlane)
 				continue;
 
 			// map coordinates to screen
-            FXint scr_x = GetScreenFromHexX(block->x(), block->y()) - min_x;
-            FXint scr_y = GetScreenFromHexY(block->x(), block->y()) - min_y - ystart;
+			FXint scr_x = GetScreenFromHexX(block.x(), block.y()) - offset.left;
+			FXint scr_y = GetScreenFromHexY(block.x(), block.y()) - offset.top;
 
 			// clip regions outside of view
 			if (scr_x < -regionSize || scr_y < -regionSize || scr_x > w || scr_y > h)
 				continue;
 
-			/*
-
-			try
-			{
-				bindings::variant_t val = bindings::call_globalproc("$overlay", puts_ignore(), bindings::bind_block(*files, block));
-				int* ptr;
-				if ((ptr = boost::get<int>(&val)) && *ptr >= 0 && (size_t)*ptr < overlays.size())
-					dc.drawIcon(overlays[*ptr].at(block->terrain()), scr_x,scr_y);
-				else
-					dc.drawIcon(terrain[block->terrain()], scr_x,scr_y);
-			}
-			catch(const std::exception&)
-			{
-				dc.drawIcon(terrain[block->terrain()], scr_x,scr_y);
-			}
-            */
-            dc.drawIcon(terrain[block->terrain()], scr_x, scr_y);
-			/*-------------------------*/
-
 			// draw terrain image
-			//dc.drawIcon(terrain[block->terrain()], scr_x,scr_y);
-
-			// island names
-			if (show_islands)
-			{
-				if (att_region* stats = dynamic_cast<att_region*>(block->attachment()))
-				{
-					if (!stats->island.empty())
-					{
-						const FXString& label = stats->island;
-
-						std::map<FXString, island>::iterator itor = islands.find(label);
-						if (itor == islands.end())
-						{
-							island is;
-							is.left = scr_x; is.top = scr_y;
-							is.right = scr_x+regionSize; is.bottom = scr_y+regionSize;
-							islands[label] = is;
-						}
-						else
-						{
-							island& is = islands[label];
-							is.left = std::min(is.left, scr_x); is.top = std::min(is.top, scr_y);
-							is.right = std::max(is.right, scr_x+regionSize); is.bottom = std::max(is.bottom, scr_y+regionSize);
-						}
-					}
-				}
-			}
+			dc.drawIcon(terrain[block.terrain()], scr_x, scr_y);
 
 			// skip label
 			if (regionSize < 30)
@@ -2007,7 +1885,7 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 
             FXString label;
             if (show_names)
-				label = block->value(datakey::TYPE_NAME);
+				label = block.value(datakey::TYPE_NAME);
 			else
 				label.clear();
 
@@ -2015,7 +1893,7 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 			{
 				if (!label.empty())
 					label += "\r";
-				label += FXStringVal(block->x()) + ":" + FXStringVal(block->y());
+				label += FXStringVal(block.x()) + ":" + FXStringVal(block.y());
 			}
 
 			// clip label to region
@@ -2051,22 +1929,120 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, FXint ystart)
 			}
 		}
 	}
+}
 
-	if (show_islands) // island names
+LeftTop FXCSMap::getMapLeftTop()
+{
+	// connected to a datafile list?
+	if (!files) return LeftTop{0, 0};
+
+	FXint regionSize = FXint(64*scale);
+
+	// initialize to 'impossible' values
+	FXint min_x = 0x0FFFFFFF, min_y = 0x0FFFFFFF;
+
+	// iterate throu all datafiles and all regions
+	for (datafile& file : *files)
 	{
-		dc.setFont(islandfont.get());
-
-		for (std::map<FXString, island>::iterator itor = islands.begin(); itor != islands.end(); itor++)
+		for (datablock& block : file.blocks())
 		{
-			const FXString& label = itor->first;
-			const island& is = itor->second;
+			// handle only regions
+			// handle only the actually visible plain
+			if (block.type() != datablock::TYPE_REGION ||
+				block.info() != visiblePlane)
+				continue;
 
-			FXint label_x = is.left + (is.right-is.left)/2 - islandfont->getTextWidth(label.text(), label.length())/2;
-			FXint label_y = is.top + (is.bottom-is.top)/2 + islandfont->getTextHeight(label.text(), label.length())/3;
-			dc.drawText(label_x, label_y, label.text(), label.length());
+			FXint scr_x = GetScreenFromHexX(block.x(), block.y());
+			FXint scr_y = GetScreenFromHexY(block.x(), block.y());
+
+			if (scr_x < min_x) min_x = scr_x;
+			if (scr_y < min_y) min_y = scr_y;
+		}
+	}
+
+	return LeftTop{min_x, min_y};
+}
+
+std::map<FXString, IslandPos> FXCSMap::collectIslandNames()
+{
+	std::map<FXString, IslandPos> islands;
+
+	// connected to a datafile list?
+	if (!files) return islands;
+
+	FXint regionSize = FXint(64*scale);
+
+	// iterate throu all datafiles and all regions
+	for (datafile& file : *files)
+	{
+		for (datablock& block : file.blocks())
+		{
+			// handle only regions
+			// handle only the actually visible plain
+			if (block.type() != datablock::TYPE_REGION ||
+				block.info() != visiblePlane)
+				continue;
+
+			FXint scr_x = GetScreenFromHexX(block.x(), block.y());
+			FXint scr_y = GetScreenFromHexY(block.x(), block.y());
+
+			//  calculate island rect
+			if (att_region* stats = dynamic_cast<att_region*>(block.attachment()))
+			{
+				if (!stats->island.empty())
+				{
+					std::map<FXString, IslandPos>::iterator itor = islands.find(stats->island);
+					if (itor == islands.end())
+					{
+						IslandPos is{};
+						is.left = scr_x; is.top = scr_y;
+						is.right = scr_x + regionSize; is.bottom = scr_y + regionSize;
+						islands[stats->island] = is;
+					}
+					else
+					{
+						IslandPos& is = itor->second;
+						is.left = std::min(is.left, scr_x); is.top = std::min(is.top, scr_y);
+						is.right = std::max(is.right, scr_x + regionSize); is.bottom = std::max(is.bottom, scr_y + regionSize);
+					}
+				}
+			}
+		}
+	}
+
+	return islands;
+}
+
+void FXCSMap::paintIslandNames(FXDrawable* buffer, LeftTop offset, std::map<FXString, IslandPos> const& islands)
+{
+	if (!show_islands) return;
+
+	FXint width = buffer->getWidth(), height = buffer->getHeight();
+
+	// create DC and setup font
+	FXDCWindow dc(buffer);
+
+	dc.setFont(islandfont.get());
+	dc.setForeground(map->getBackColor());
+
+	for (std::map<FXString, IslandPos>::value_type const& entry : islands)
+	{
+		const FXString& label = entry.first;
+		const IslandPos& is = entry.second;
+
+		//  skip islands outside of view
+		if (is.right - offset.left < 0 || is.left - offset.left > width ||
+			is.bottom - offset.top < 0 || is.top - offset.top > height) {
+			continue;
 		}
 
-		dc.setFont(font.get());
+		FXint textWidth = islandfont->getTextWidth(label.text(),  label.length());
+		FXint textHeight = islandfont->getTextHeight(label.text(), label.length());
+
+		FXint label_x = is.left + (is.right - is.left) / 2 - textWidth / 2 - offset.left;
+		FXint label_y = is.top  + (is.bottom - is.top) / 2 + textHeight / 3 - offset.top;
+
+		dc.drawText(label_x, label_y, label.text(), label.length());
 	}
 }
 
