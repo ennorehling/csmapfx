@@ -1,3 +1,9 @@
+csmapfx (0.6.5) UNRELEASED; urgency=low
+
+  * avoid printing island names twice when exporting map (phygon)
+
+  -- Enno Rehling <enno@eressea.de> Thu, 05 Nov. 2020 10:30:00 +0200
+
 csmapfx (0.6.4) UNRELEASED; urgency=low
 
   * new terrain images 
