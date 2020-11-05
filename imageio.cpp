@@ -45,30 +45,33 @@ static void user_warning_fn(png_structp,png_const_charp message){
 // Save a PNG image
 FXbool csmap_savePNG(FXStream& store, FXCSMap& map, FXImage& image, FXProgressDialog& dlg)
 {
-	png_structp png_ptr;
-	png_infop info_ptr;
-	png_bytep *row_pointers;
+	png_structp png_ptr = nullptr;
+	png_infop info_ptr = nullptr;
+	png_bytep *row_pointers = nullptr;
 
 	// what size the image is?
 	int width = map.getContentWidth();
 	int height = map.getContentHeight();
 	int stepsize = image.getHeight();
 
+	LeftTop mapOffset = map.getMapLeftTop();
+	std::map<FXString, IslandPos> islands = map.collectIslandNames();
+
 	// Create and initialize the png_struct with the desired error handler functions.
-	png_ptr=png_create_write_struct(PNG_LIBPNG_VER_STRING,&store,user_error_fn,user_warning_fn);
+	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,&store,user_error_fn,user_warning_fn);
 	if(!png_ptr) return FALSE;
 
 	// Allocate/initialize the image information data.
 	info_ptr=png_create_info_struct(png_ptr);
 	if(!info_ptr){
-	png_destroy_write_struct(&png_ptr,(png_infopp)NULL);
-	return FALSE;
+		png_destroy_write_struct(&png_ptr,(png_infopp)NULL);
+		return FALSE;
 	}
 
 	// Set error handling.
 	if(setjmp(png_jmpbuf(png_ptr))){
-	png_destroy_write_struct(&png_ptr,&info_ptr);
-	return FALSE;
+		png_destroy_write_struct(&png_ptr,&info_ptr);
+		return FALSE;
 	}
 
 	// Using replacement read functions
@@ -89,10 +92,12 @@ FXbool csmap_savePNG(FXStream& store, FXCSMap& map, FXImage& image, FXProgressDi
 	dlg.setTotal(height);
 	dlg.getApp()->runModalWhileEvents(&dlg);
 
-	// do it line by line
+	// paint it slice by slice
 	for (int y = 0; y < height && !dlg.isCancelled(); y+=stepsize)
 	{
-		map.paintMapLines(&image, y);
+		LeftTop sliceOffset{mapOffset.left, mapOffset.top + y};
+		map.paintMapLines(&image, sliceOffset);
+		map.paintIslandNames(&image, sliceOffset, islands);
 		image.restore();
 
 		FXColor* data = image.getData();

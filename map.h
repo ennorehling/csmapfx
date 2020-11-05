@@ -4,11 +4,22 @@
 #include <fx.h>
 #include <vector>
 #include <list>
+#include <map>
 #include <boost/function.hpp>
 #include "datafile.h"
 #include "mapcanvas.h"
 #include "linked_ptr.h"
 //#include "scout.h"
+
+struct LeftTop
+{
+	FXint left, top;
+};
+
+struct IslandPos
+{
+	FXint left, top, right, bottom;
+};
 
 class FXCSMap : public FXScrollArea
 {
@@ -20,7 +31,10 @@ public:
 	void create();
 	virtual ~FXCSMap();
 
-	void paintMapLines(FXDrawable* buffer, FXint ystart);
+	LeftTop getMapLeftTop();
+	std::map<FXString, IslandPos> collectIslandNames();
+	void paintIslandNames(FXDrawable* buffer, LeftTop offset, std::map<FXString, IslandPos> const& islands);
+	void paintMapLines(FXDrawable* buffer, LeftTop offset);
 
 	virtual void moveContents(FXint x,FXint y);
 
