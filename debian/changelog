@@ -1,5 +1,13 @@
+csmapfx (0.6.4) UNRELEASED; urgency=low
+
+  * new terrain images 
+  * fixing the information dialog
+
+  -- Enno Rehling <enno@eressea.de> Sat, 17 Oct. 2020 22:00:00 +0200
+
 csmapfx (0.6.2) UNRELEASED; urgency=low
 
   * Initial release
 
   -- Enno Rehling <enno@eressea.de> Sat, 17 Oct. 2020 22:00:00 +0200
+
