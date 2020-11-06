@@ -504,23 +504,22 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
     FXHorizontalFrame *cmdOptFrame = new FXHorizontalFrame(cmdBottomFrame,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 3,3,1,1);
 	cmdOptFrame->setBorderColor(getApp()->getShadowColor());
     FXCheckButton * chk = new FXCheckButton(cmdOptFrame,
-        FXString(L"best\u00e4tigt\tBefehle best\u00e4tigen (Ctrl-Y)\tBefehle f\u00fcr diese Einheit best\u00e4tigen"),
+        FXString(L"&best\u00e4tigt\tBefehle best\u00e4tigen\tBefehle f\u00fcr diese Einheit best\u00e4tigen"),
         commands, FXCommands::ID_UNIT_CONFIRM, CHECKBUTTON_NORMAL);
-    getAccelTable()->addAccel(MKUINT(KEY_y, CONTROLMASK), chk, FXSEL(SEL_COMMAND, ID_ACCEL));
-
     FXButton * btn;
     btn = new FXButton(cmdOptFrame,
-        FXString(L"<\tVorherige Einheit (Ctrl-<)\tZur vorhergehenden unbest\u00e4tigten Einheit"), NULL,
+        FXString(L"<\tVorherige Einheit\tZur vorhergehenden unbest\u00e4tigten Einheit"), NULL,
         commands, FXCommands::ID_UNIT_PREV, BUTTON_TOOLBAR);
-    getAccelTable()->addAccel(MKUINT(KEY_less, CONTROLMASK), btn, FXSEL(SEL_COMMAND, ID_ACCEL));
+    btn->addHotKey(FXHotKey(MKUINT(KEY_comma, CONTROLMASK)));
     btn = new FXButton(cmdOptFrame,
-        FXString(L">\tN\u00e4chste Einheit (Ctrl->)\tZur n\u00e4chsten unbest\u00e4tigten Einheit"), NULL,
+        FXString(L">\tN\u00e4chste Einheit\tZur n\u00e4chsten unbest\u00e4tigten Einheit"), NULL,
         commands, FXCommands::ID_UNIT_NEXT, BUTTON_TOOLBAR);
-    getAccelTable()->addAccel(MKUINT(KEY_greater, CONTROLMASK), btn, FXSEL(SEL_COMMAND, ID_ACCEL));
+    btn->addHotKey(FXHotKey(MKUINT(KEY_period, CONTROLMASK)));
 
     new FXButton(cmdOptFrame,
-        "+temp\tNeue Temp-Einheit\tTemp-Einheit erstellen", NULL,
+        "+&temp\tNeue Temp-Einheit\tTemp-Einheit erstellen", NULL,
         commands, FXCommands::ID_UNIT_ADD, BUTTON_TOOLBAR);
+    btn->addHotKey(FXHotKey(MKUINT(KEY_t, CONTROLMASK)));
 
 	FXTextField* rowcol = new FXTextField(cmdOptFrame, 5, commands,FXCommands::ID_ROWCOL, TEXTFIELD_READONLY|JUSTIFY_RIGHT|LAYOUT_FILL_X|LAYOUT_RIGHT);
 	rowcol->disable();
