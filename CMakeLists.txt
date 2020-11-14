@@ -43,9 +43,18 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${BOOST_TUPLE_INCLUDE_DIRS})
 
 find_package(PNG REQUIRED)
 
+find_library(LEGACY_STDIO_LIBRARY NAMES legacy_stdio_definitions)
+if (LEGACY_STDIO_LIBRARY)
+target_link_libraries(${PROJECT_NAME} ${LEGACY_STDIO_LIBRARY})
+endif ()
+
 if (WIN32)
 find_path(FOX_INCLUDE_DIRS "fxkeys.h" PATHS c:/usrlocal/fox-1.6.57/include)
-find_library(FOX_LIBRARIES NAMES FOX-1.6 FOXD-1.6 PATHS c:/usrlocal/fox-1.6.57/lib)
+find_library(FOX_LIBRARIES NAMES FOX-1.6 PATHS c:/usrlocal/fox-1.6.57/lib)
+add_compile_definitions(
+BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE
+BOOST_SIGNALS_NO_DEPRECATION_WARNING
+FLOAT_MATH_FUNCTIONS)
 else (WIN32)
 include (FindPkgConfig)
 if (PKG_CONFIG_EXECUTABLE)
