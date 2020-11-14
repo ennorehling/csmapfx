@@ -48,16 +48,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>Debug\</OutDir>
     <IntDir>Debug\</IntDir>
-    <IncludePath>C:\local\fox-1.6.57\include;C:\local\ruby27\include\ruby-2.7.0\i386-mswin32_140;C:\local\ruby27\include\ruby-2.7.0;C:\local\boost_1_66_0;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>C:\usrlocal\fox-1.6.57\include;C:\usrlocal\boost_1_66_0;$(ProjectDir);$(IncludePath)</IncludePath>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
-    <LibraryPath>C:\local\fox-1.6.57\lib;C:\local\Ruby27\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\usrlocal\fox-1.6.57\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>Release\</OutDir>
     <IntDir>Release\</IntDir>
-    <IncludePath>C:\local\fox-1.6.57\include;c:\usr\include\ruby-2.7.0\i386-mswin32_140;C:\usr\include\ruby-2.7.0;C:\local\boost_1_66_0;C:\vcpkg\installed\x86-windows\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\usrlocal\fox-1.6.57\include;C:\usrlocal\boost_1_66_0;C:\vcpkg\installed\x86-windows\include;$(IncludePath)</IncludePath>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
-    <LibraryPath>C:\local\fox-1.6.57\lib;C:\usr\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\usrlocal\fox-1.6.57\lib;$(LibraryPath)</LibraryPath>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -69,17 +69,17 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE;BOOST_SIGNALS_NO_DEPRECATION_WARNING;FLOAT_MATH_FUNCTIONS;WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
-      <AdditionalIncludeDirectories>C:\local\ruby-2.7.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;FOX-1.6.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;FOXD-1.6.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)CsMapFX.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)CSMap.pdb</ProgramDatabaseFile>
@@ -130,7 +130,7 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX86</TargetMachine>
-      <ShowProgress>NotSet</ShowProgress>
+      <ShowProgress>LinkVerbose</ShowProgress>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
