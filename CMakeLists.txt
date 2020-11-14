@@ -34,20 +34,24 @@ set (SOURCES
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-#find_package(Boost REQUIRED)
 find_path(BOOST_CORE_INCLUDE_DIRS "boost/checked_delete.hpp")
 target_include_directories(${PROJECT_NAME} PRIVATE ${BOOST_CORE_INCLUDE_DIRS})
 find_path(BOOST_FUNCTION_INCLUDE_DIRS "boost/function.hpp")
 target_include_directories(${PROJECT_NAME} PRIVATE ${BOOST_FUNCTION_INCLUDE_DIRS})
+find_path(BOOST_TUPLE_INCLUDE_DIRS "boost/tuple/detail/tuple_basic.hpp")
+target_include_directories(${PROJECT_NAME} PRIVATE ${BOOST_TUPLE_INCLUDE_DIRS})
+
 find_package(PNG REQUIRED)
 
+if (WIN32)
+find_path(FOX_INCLUDE_DIRS "fxkeys.h" PATHS c:/usrlocal/fox-1.6.57/include)
+find_library(FOX_LIBRARIES NAMES FOX-1.6 FOXD-1.6 PATHS c:/usrlocal/fox-1.6.57/lib)
+else (WIN32)
 include (FindPkgConfig)
 if (PKG_CONFIG_EXECUTABLE)
 pkg_search_module(FOX REQUIRED fox>=1.6)
-else (PKG_CONFIG_EXECUTABLE)
-find_path(FOX_INCLUDE_DIRS "fxkeys.h" PATHS c:/usrlocal/fox-1.6.57/include)
-find_library(FOX_LIBRARIES NAMES FOX-1.6 FOXD-1.6 PATHS c:/usrlocal/fox-1.6.57/lib)
 endif (PKG_CONFIG_EXECUTABLE)
+endif (WIN32)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	CXX_STANDARD 11)
