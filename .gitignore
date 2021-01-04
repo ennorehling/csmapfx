@@ -1,11 +1,11 @@
 obj-*/
-**/cblocks
+**/cblocks/
 debian/csmapfx/
 debian/.debhelper/
 debian/csmapfx.substvars
 debian/debhelper-build-stamp
 debian/files
-**/build
+**/build/
 Debug
 Release
 .vscode
