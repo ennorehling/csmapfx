@@ -1,19 +1,19 @@
-csmapfx (0.6.5) UNRELEASED; urgency=low
+csmapfx (0.6.5-1) stable; urgency=low
 
   * avoid printing island names twice when exporting map (phygon)
 
-  -- Enno Rehling <enno@eressea.de> Thu, 05 Nov. 2020 10:30:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Thu, 05 Nov 2020 10:30:00 +0200
 
-csmapfx (0.6.4) UNRELEASED; urgency=low
+csmapfx (0.6.4-1) stable; urgency=low
 
   * new terrain images 
   * fixing the information dialog
 
-  -- Enno Rehling <enno@eressea.de> Sat, 17 Oct. 2020 22:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sat, 17 Oct 2020 22:00:00 +0200
 
-csmapfx (0.6.2) UNRELEASED; urgency=low
+csmapfx (0.6.2-1) stable; urgency=low
 
   * Initial release
 
-  -- Enno Rehling <enno@eressea.de> Sat, 17 Oct. 2020 22:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sat, 17 Oct 2020 22:00:00 +0200
 

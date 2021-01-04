@@ -1,0 +1,9 @@
+#!/bin/sh
+version=0.6.5
+tar c --exclude-vcs-ignores \
+	--exclude-vcs \
+	--exclude=s \
+	--exclude=debian \
+	-Jvf ../csmapfx_$version.orig.tar.xz --xform='s/./csmapfx-$version/' .
+dpkg-buildpackage -rfakeroot -D -us -uc
+

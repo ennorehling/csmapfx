@@ -1,5 +1,5 @@
 obj-*/
-cblocks
+cblocks/
 debian/csmapfx/
 debian/.debhelper/
 debian/csmapfx.substvars
