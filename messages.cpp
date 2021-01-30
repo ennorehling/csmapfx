@@ -109,7 +109,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 					100;prozent
 					*/
 
-					const char* directions[] = { "Nordwesten", "Nordosten", "Osten", "S\u00fcdosten", "S\u00fcdwesten", "Westen", "-unknown-" };
+					const wchar_t* directions[] = { L"Nordwesten", L"Nordosten", L"Osten", L"S\u00fcdosten", L"S\u00fcdwesten", L"Westen", L"-unknown-" };
 
 					FXint dir = 0;
 					if (block->value("richtung").length())

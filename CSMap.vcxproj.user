@@ -4,4 +4,8 @@
     <LocalDebuggerWorkingDirectory>..\..\..\Dropbox\Eressea\CSMapFX</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoOptimization|Win32'">
+    <LocalDebuggerWorkingDirectory>..\..\..\Dropbox\Eressea\CSMapFX</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>
