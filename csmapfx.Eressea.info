@@ -1,0 +1,302 @@
+; (c) Xolgrim, v0.980   mit Magie Gwyrrd und Cerddor +Galeone und Adamantium
+
+[Alchemie]
+Stufe	Trankname				Beschreibung (Zutaten)
+
+1		Siebenmeilentee			10 Leute schnell wie Pferde 
+_		_						(Blauer Baumringel, Windbeutel)
+_		Goliathwasser			10 Leute Tragkraft wie Pferde 
+_		_						(Gurgelkraut, Fjordwuchs)
+_		Wasser des Lebens		Macht aus 10 Holz/Mallorn 10 Schößlinge/Mallornschösslinge 
+_		_						(Elfenlieb, Knotiger Saugwurz)
+_		Trank der Wahrheit		Anwender durchschaut Illusionen 
+_		_						(Flachwurz, Fjordwuchs)
+_
+2		Schaffenstrunk			Verdoppelt Produktivität von 10 Leuten (nur bei MACHE) 
+_		_						(Alraune, Spaltwachs, Würziger Wagemut)
+_		Wundsalbe				Bringt bis zu 400 Trefferpunkte zurück 
+_		_						(Weißer Wüterich, Blauer Baumringel, Würziger Wagemut)
+_		Bauernblut				Bis zu 100 Dämonen in einer Region brauchen keinen Bauern zum Fraß 
+_		_						(Höhlenglimm, Fjordwuchs, Blauer Baumringel, Bauer)
+_
+3		Gehirnschmalz			Erhöhte Lernchance für 10 Personen 
+_		_						(Wasserfinder, Steinbeißer, Windbeutel, Gurgelkraut)
+_		Dumpfbackenbrot			Bringt der Zieleinheit Lernzeitverlust
+_		_						(Eulenauge, Grüner Spinnerich, Höhlenglimm, Fjordwuchs)
+_		Nestwärme				Insekten können auch im Winter in jeder Region rekrutieren 
+_		_						(Eisblume, Grüner Spinnerich, Spaltwachs, Kakteenschwitz)
+_		Pferdeglück				50 Pferde vermehren sich bis zu vier mal 
+_		_						(Blauer Baumringel, Sandfäule, Kakteenschwitz, Knotiger Saugwurz)
+_		Berserkerblut			10 Leute im Kampf Angriff +1 
+_		_						(Weißer Wüterich, Alraune, Flachwurz, Sandfäule)
+_
+4		Bauernlieb				Gibt bis zu 1000 Bauern die zehnfache Chance, sich zu vermehren 
+_		_						(Alraune, Schneekristall, Steinbeißer, Blasenmorchel, Elfenlieb)
+_		Elixier der Macht		Gibt 10 Personen fünffache Trefferpunkte 
+_		_						(Elfenlieb, Wasserfinder, Windbeutel, Grüner Spinnerich, Blasenmorchel, Drachenblut)
+_		Heiltrank				4 Personen überleben sonst tödlichen Treffer mit einer Chance von 50% 
+_		_						(Gurgelkraut, Windbeutel, Eisblume, Elfenlieb, Spaltwachs)
+
+
+[Burgen]
+Typ			ab Größe	Burgenbau	Bonus/Orks			Erlösanteil 
+
+Grundmauern		1			1			0/0 Silber			nichts 
+Handelsposten		2			1			0/0 Silber			6% 
+Befestigung		10			2			1/1 Silber			12% 
+Turm			50			3			2/1 Silber			18% 
+Burg			250			4			3/2 Silber			24% 
+Festung			1250			5			4/2 Silber			30% 
+Zitadelle		6250			6			5/3 Silber			36% 
+
+
+[Gebäude]
+Gebäude				Baukosten													Talente		Unterhalt				Max.	Kapazität
+
+Akademie			5 Stein, 5 Holz, 1 Eisen, 500 Silber					3			1000 Silber				25		Größe 
+Bergwerk			5 Steine, 10 Holz, 1 Eisen, 250 Silber					4			500 Silber				_		Größe
+Damm				5 Stein, 10 Holz, 1 Eisen, 500 Silber					4			1000 Silber, 3 Holz 	50		Größe
+Hafen				5 Stein, 5 Holz, 250 Silber						3			250 Silber				25		Größe 
+Karawanserei			1 Stein, 5 Holz, 1 Eisen, 500 Silber					2			3000 Silber, 2 Pferde	10		Größe 
+Leuchtturm			2 Stein, 1 Holz, 1 Eisen 100 Silber					3			100 Silber				_		4 Personen 
+Magierturm			5 Stein, 3 Holz, 3 Eisen, 2 Mallorn, 2 Laen, 500 Silber			5			1000 Silber				50		2 Personen
+Monument			1 Stein, 1 Holz, 1 Eisen, 400 Silber					4			_					_		Größe 
+Pferdezucht			2 Stein, 4 Holz, 1 Eisen, 100 Silber					2			150 Silber				_		Größe 
+Sägewerk			5 Stein, 5 Holz, 3 Eisen, 200 Silber					3			250 Silber				_		Größe 
+Schmiede			5 Stein, 5 Holz, 2 Eisen, 200 Silber					3			300 Silber, 1 Holz			_		Größe 
+Steinbruch 			1 Stein, 5 Holz, 1 Eisen, 250 Silber					2			250 Silber				_		Größe 
+Steinkreis			5 Stein, 5 Holz								5			_					100		3
+Taverne				4 Stein, 3 Holz, 1 Eisen, 200 Silber					2			5*Größe					_		Größe 
+Tunnel				10 Stein, 5 Holz, 1 Eisen, 300 Silber					6			100 Silber, 2 Stein			100		Größe
+
+
+[Kalender]
+Monat					Jahreszeit	Anmerkung
+
+Feldsegen				Sommer		Bäume werfen Samen 
+Nebeltage				Herbst		Bäume werfen Samen ; Sturmwarnung 
+Sturmmond				Herbst		Bäume werfen Samen ; Sturmwarnung 
+Herdfeuer				Winter		Insekten: Eingeschränktes Rekrutieren 
+Eiswind					Winter		Insekten: Eingeschränktes Rekrutieren 
+Schneebann				Winter		Insekten: Eingeschränktes Rekrutieren 
+Blütenregen				Frühling	Baumwachstum 
+Mond der milden Winde	Frühling	Baumwachstum 
+Sonnenfeuer				Sommer		Bäume werfen Samen
+
+
+[Kampfmodifikatoren]
+Person																Angriff		Verteidigung 
+
+Unbewaffneter															-2			-2 
+Bewaffneter ohne Talent														-2			-2 
+Person in einer Burg														-			+1 bis +5 
+Reiter mit Reiten 2 (nur in Ebenen, Wüsten    											+2			+2 
+und Hochländern; nicht in einer Burg)												_			_
+Lanze/Speer zu Pferd mit Reiten 2												+1			-
+Speer/Hellebarde gegen Reiter													-			+1 
+
+
+[Rassen]
+
+Talent				Zwerge		Orks		Elfen		Katzen		Dämonen		Halblinge		Menschen		Goblins		Insekten		Trolle		Meermenschen 
+Rekrutierungskosten		110		70		130		90		150		80			75			40		80			90		80 
+Trefferpunkte			24		24		18		20		50		18			20			16		24			30		20 
+nat. Rüstung			0		0		0		0		2		0			0			0		2			1		0 
+Magieresistenz			5		-5		10		0		15		5			0			-5		5			10		0 
+Gewicht				10		10		10		10		10		10			10			6		10			20		10
+Traglast			5,4		5,4		5,4		5,4		5,4		5,4			5,4			4,4		5,4			10,8		5,4
+_
+Alchemie			0		+1		-1		-1		+2		0			0			+1		0			0		0 
+Armbrustschießen		0		0		0		0		0		+1			0			0		+1			0		0 
+Ausdauer			0		0		0		0		0		0			0			0		0			0		0 
+Bergbau				+2		+1		-2		-2		0		+1			0			+1		+1			+2		-2 
+Bogenschießen			-1		0		+2		0		0		-1			0			0		-2			-2		0 
+Burgenbau			+2		+1		-1		-1		0		+1			0			+1		+2			+2		-1 
+Handeln				+1		-3		0		0		-3		+2			+1			-1		-1			0		+2 
+Hiebwaffen			+1		0		0		0		+1		-1			0			0		-1			+1		0 
+Holzfällen			-1		+1		0 		0		+1		0			0			0		+1			0		0 
+Katapultbedienung		+2		0		-2		-1		0		-1			0			+1		0			+2		0 
+Kräuterkunde			-2		-2		+2		+1		-3		+2			-1			0		+1			-1		0 
+Magie				-2		-1		+1		0		+1		0			0			-1		0			0		0 
+Pferdedressur			-2		-1		+1		0		-3		-1			0			0		-3			-1		0 
+Reiten				-2		0		0		0		-1		-1			0			0		-3			-2		0 
+Rüstungsbau			+2		+1		-1		-1		0		0			0			0		+2			+2		-1 
+Schiffbau			-1		-1		-1		-1		-1		-1			+1			-2		0			-1		+3 
+Segeln				-2		-1		-1		-2		-1		-2			+1			-2		0			-1		+3 
+Spionage			0		-1		0		+2		0		+1			0			0		0			-3		0 
+Stangenwaffen 			0		0		0		0		+1		-1			0			0		+1			0		0 
+Steinbau			+2		+1		-1		-1		0		0			0			0		0			+2		0 
+Steuereintreiben		+1		+1		0		+1		+1		-1			0			0		0			+1		0 
+Straßenbau			+2		0		-1		-1		0		+1			0			-2		-1			+2		-1 
+Taktik				0		+1		0		0		-1		0			0			-2		-1			-1		0 
+Tarnung				-1		0		+1		+1		+1		+1			0			+1		-1			-3		0 
+Unterhaltung			-1		-2		0		0		-3		+1			0			-1		-2			-1		0 
+Waffenbau			+2		+2		0		0		+1		0			0			0		0			0		0 
+Wagenbau			0		-1		0		0		-2		+2			0			-1		0			0		0 
+Wahrnehmung			0		0		+1		+2		+1		+1			0			0		+1			-1		0 
+
+
+[Rüstungen]
+Name			Gewicht		Talent			Talentstufe		Rohstoffe		Panzerung		+Trefferchance/Nahkampf
+
+Kettenhemd		2		Rüstungsbau		3			3 Eisen			3			* 15% 
+Plattenpanzer		4		Rüstungsbau		4			5 Eisen			5			* 30% 
+Laenkettenhemd		1		Rüstungsbau		9			3 Laen			6			- 
+Adamantiumrüstung	1		Rüstungsbau		10			3 Adamantium		7			* 10%			
+Schild			1		Rüstungsbau		2			1 Eisen			1			* -15% 
+Laenschild		0		Rüstungsbau		7			1 Laen			2			* -25% 
+
+
+[Schiffe]
+
+Typ			Reichweite	Kapazität	Kapitän	Gesamttalent	Bauholz 
+Boot			2			50			1		2				5
+Langboot		3			500			1		10				50 
+Drachenschiff		5			1000			2		50				100				 
+Karavelle		5			3000			3		30				250 
+Trireme			7			2000			4		120				200
+Galeone			5			20000			5		250(2)				2000
+
+
+[Regionen]
+
+Gelände		Arbeitsplätze	Steine für Straße	Kräuter 
+Ebene/Wald	10000			50					Blauer Baumringel, Eulenauge, Elfenlieb, 
+_		_			_					Flachwurz, Grüner Spinnerich, Würziger Wagemut 
+Hochland	4000			100					Alraune, Fjordwuchs, Windbeutel 
+Sumpf		2000			75					Blasenmorchel, Gurgelkraut, Knotiger Saugwurz  
+Gebirge		1000			250					Höhlenglimm, Spaltwachs, Steinbeißer 
+Wüste		500			100					Kakteenschwitz, Sandfäule, Wasserfinder 
+Vulkan		500			250					Keine Kräuter bekannt
+Gletscher	100			250					Eisblume, Schneekristall, Weißer Wüterich 
+
+
+[Waffen]
+Name					Gewicht	Talent	Talentstufe	Rohstoffe			Schaden			zu Pferd	OB	DB	Hieb/Stange 
+
+Schwert					1	Waffenbau	3	1 Eisen				1d9+2			_		0	0		H	
+Kriegsaxt				2	Waffenbau	3	1 Eisen, 1 Holz			2d6+4			_		+1	-2		H
+Bihänder				2	Waffenbau	4	2 Eisen				2d8+3			_		-1	-2		H
+Laenschwert				1	Waffenbau	8	1 Laen				3d6+10			_		+1	+1		H
+Adamantiumaxt				1	Waffenbau	8	1 Adamantium 1 Holz		3d4+15			3d4+15		+2	-2		H
+Speer					1	Waffenbau	2	1 Holz				1d10			1d12+2		0	0 		S
+Mallornspeer				1	Waffenbau	2	1 Mallorn			1d10+1			1d12+3		0	0		S 
+Lanze					2	Waffenbau	2	2 Holz				1d5			2d6+5		0	-2		S
+Mallornlanze				2	Waffenbau	2	2 Mallorn			1d5+1			2d6+6		0	-2		S
+Hellebarde				2	Waffenbau	3	1 Eisen, 2 Holz			2d6+3			_		-1	+2		S 
+Armbrust				1	Waffenbau	3	1 Holz				3d3+5			_		0	0 
+Mallornarmbrust				1	Waffenbau	3	1 Mallorn			3d3+6			_		0	0 
+Bogen					1	Waffenbau	2	1 Holz				1d11+1			_		-2	0 
+Mallornbogen				1	Waffenbau	5	1 Mallorn			1d11+2			_		-2	0 
+Elfenbogen				1	Waffenbau	5	2 Mallorn			2d6+4			_		-2	0
+Katapult				100	Wagenbau	5	10 Holz				6mal, 3d10+5 	_			-4	0
+Unbewaffnet				_	_			_	_			1d5			1d6		0	0
+Unbewaffnet (Troll)			_	_			_	_			1d5+1			_		0	0
+
+[Waren]
+Name				Gewicht			Talent			Talenstufe		Rohstoffe
+
+Eisen				5			Bergbau			1				_
+Laen				2			Bergbau			7				_
+Adamantium			2			Bergbau			8				_
+Holz				5			Holzfällen		1				_
+Mallorn				5			Holzfällen		2				_
+Stein				60			Steinbau		1				_
+Pferd				50			Pferdedressur		1 				_
+Silber				0,01			_			_				_
+Kräuter				0			Kräuterkunde		1				_
+Samen				0,1			Kräuterkunde		3				_
+Mallornsamen			0,1			Kräuterkunde		4				_
+Tränke				0			Alchemie		2				Kräuter 
+Wagen				40			Wagenbau		1				5 Holz 
+Katapultmunition		10			Steinbau		3				1 Stein 
+Öl				3			Handeln			1				min. 3 Silber
+Balsam				2			Handeln			1				min. 4 Silber		
+Weihrauch			2			Handeln			1				min. 4 Silber		
+Gewürz				2			Handeln			1				min. 5 Silber		
+Myrrhe				2			Handeln			1				min. 5 Silber		
+Seide				3			Handeln			1				min. 6 Silber		
+Juwelen				1			Handeln			1				min. 7 Silber	
+
+
+[.Gwyrrd]
+Stufe			Zaubername						Aurakosten						Modifikation				Rang		Wirkung
+Stufe 1			Viehheilung						1 Aura * Stufe						Schiffszauber				x		Magier erhält Stufe*50 Silber				
+_			Segen der Erde						1 Aura * Stufe						Fern-, Schiffszauber			x		Lohn +1 Silber für Stufe-Wochen
+_			Erschaffe Steingolems					2 Aura + 1 Stein * Stufe; 1 WdL				Keine					x		Erschafft Golems welche pro Golem 4 Steine verbauen								
+Stufe 2			Erschaffe Eisengolems					2 Aura + 1 Eisen * Stufe; 1 WdL				Keine					x		Erschafft Golems welche pro Golem 4 Eisen verbauen	
+_			Hainzauber						4 Aura + 1 Holz * Stufe; 1 WdL				Fernzauber				x		Erschafft 4 Schösslinge pro Stufe
+Stufe 3			Rostregen						2 Aura * Stufe						Fernzauber				x		Für jede Stufe werden bis zu 10 Eisenwaffen zerstört
+_			Firuns Fell						2 Aura * Stufe 						Schiffszauber				x		Stufe*10 Insekten können Gletscher betreten								
+_			Hagel							1 Aura * Stufe						Keine					x		Der Gegner wird mit Hagelkörnern und Eisbrocken bombardiert
+_			Bergwächter						3 Aura * Stufe						Fernzauber				x		Bewacht Berge und Gletscher
+Stufe 4			Magischer Pfad						1 Aura * Stufe; 1 Steine, 1 Holz			Fern-, Schiffszauber			x		Die Zielregion hat Stufe*Wochen eine Straße in jede Richtung
+_			Windschild						2 Aura * Stufe						Keine					x		Wirbelwinde behindern die gegnerischen Schützen
+_			Segne Mallornstecken					6 Aura + 1 Mallorn * Stufe; 1 WdL			Fernzauber				x		Erschafft 3 Mallornschösslinge pro Stufe
+_			Beschwörung eines Wasserelementar			1 Aura * Stufe 						Schiffszauber				x		+1 Region für Stufe*Wochen
+Stufe 5			Heilung							1 Aura * Stufe						Keine 					x		Der Magier heilt seine Kampfgefährten nach der Schlacht 
+_			Erschaffe einen magischen Kräuterbeutel			30/1 Aura; 1 WdL					Schiffszauber				x		Kräuter zerfallen in diesem Beutel nur halb so schnell 
+_			Wirbelwind						15 Aura							Keine					x		Stürme behindern alle Schützen der Schlacht
+_			Astralschutzgeister					5 Aura * Stufe 						Keine					x		Feindliche Magier werden beim Zaubern während der Schlacht behindert
+Stufe 6			Meditation						2 Aura							Schiffszauber				x		Der Magier überträgt Aura im Verhältnis 2:1 auf einen anderen Magier								
+_			Beschwöre einen Erdelementar				25 Aura, 2 Laen						Fernzauber 				x		Alle Gebäude der Region werden beschädigt
+_			Beschwöre einen Sturmelementar				6 Aura * Stufe 						See-, Schiffszauber			x		Pro Stufe wird ein Schiff in der Geschwindigkeit verdoppelt
+_			Erschaffe ein Amulett des wahren Sehens			50/1 Aura, 3000 Silber					Schiffszauber				x		Erschafft ein AdW mit welchen RdU getarnte Einheiten entdeckt werden
+_			Erschaffe einen Ring der Unsichtbarkeit			50/1 Aura, 3000 Silber					Schiffszauber				x		Erschafft ein RdU mit welchem man jedweden blicken entschwinden kann
+Stufe 7			Heimstein						50 Aura/1						Keine 					x		Das Gebäude ist gegen Waffengewalt und Magie besser geschützt
+_			Wolfsgeheul						2 Aura * Stufe						Keine					x		Der Magier ruft Wölfe herbei die ihm im Kampf unterstützen
+Stufe 8			Blick des Basilisken					1 Aura * Stufe						Keine					x		Versteinert einige Gegner für die Dauer des Kampfes
+_			Starkes Tor und feste Mauer				2 Aura * Stufe						Keine					x		Anfang der Woche wird das Gebäude gegen Magie und Schwert gesichert
+_			Geister bannen						6 Aura * Stufe 						Fern-, Schiffszauber			x		Der Magus bannt einen Zauber
+Stufe 9			Weg der Bäume						3 Aura * Stufe						Keine					x		Der Geode kann Stufe*5 GE in den Astralraum senden
+_			Sog des Lebens						2 Aura * Stufe						Keine					x		Der Geode kann Stufe*5 GE aus dem Astralraum zurückholen
+_			Heiliger Boden						80/3 Aura						Keine					x		Untote schrecken vor dieser Region zurück
+Stufe 10		Erwecke Ents						6 Aura * Stufe						Keine					x		Einige Bäume der Region erheben sich zu Ents
+_			Vertrauten binden					100/5 Aura						Vertraute nicht zaubern			x		Ein Vertrautentier schließt sich dem Magier an
+Stufe 11		Segne Steinkreis					350/5 Aura						Keine					x		Dieses Ritual segnet einen Steinkreis
+Stufe 12		Rindenhaut						4 Aura * Stufe						Keine					x		Eigene Truppen werden von einer natürlichen Rüstung geschützt
+Stufe 13		Beschwörung eines Hitzeelementar			600 Aura						Fernzauber				x		Eine ganze Region verdorrt
+Stufe 14		Nebel der Verwirrung					8 Aura * Stufe						Fernzauber				x		Ein Nebel zieht auf der jedem in der Region die Orientierung raubt
+Stufe 15		Mahlstrom						200 Aura; 1 Seeschlangenkopf				See-, Schiffszauber			x		Ein gewaltigen Strudel beschädigt jedes Schiff schwer das ihn passiert
+Stufe 16		Wurzeln der Magie					250/10 Aura; 1 Krötenschleim				Fernzauber				x		Die Region wird zu einer Mallornregion
+Stufe 17		Tor in die Ebene der Hitze				800 Aura						Fernzauber 				x		Die Region wird total verwüstet
+
+
+[.Cerddor]
+Stufe			Zaubername						Aurakosten						Modifikation				Rang		Wirkung
+Stufe 1			Friedenslied						2 Aura							Keine					5		Magier kann nicht attackiert werden.
+_			Gaukeleien						1 Aura * Stufe						Schiffszauber				5		Lohn +1 Silber für Stufe-Wochen
+Stufe 2			Hohes Lied der Gaukelei					2 Aura * Stufe 						Fern-, Schiffszauber			5		Erhöht das Unterhaltungs Maximum
+_			Lied der Heilung 					1 Aura * Stufe 						Keine					5		Heilt nach der Schlacht
+Stufe 3			Gesang der Furcht					1 Aura * Stufe						Keine					5		___
+_			Regentanz						1 Aura * Stufe						Fern-, Schiffszauber			5		Lohn +1 Silber für Stufe-Wochen
+Stufe 4			Gesang der Verwirrung					2 Aura * Stufe						Keine					5		Vertauscht erste und 2. Reihe
+_			Gesang des Werbens					2 Aura * Stufe						Keine					5		Rekrutierungszauber
+Stufe 5			Bannlied						5 Aura * Stufe						Keine					2		Verhindert gegnerische Zauber
+_			Gesang des Auratransfers				2 Aura							Schiffszauber				1		Übertägt Aura 2 zu 1 auf selbes Gebiet
+_			Gesang des Lebens analysieren				10 Aura							Keine					5		Erkennt auf Einheiten liegende Zauber
+_			Heldengesang						2 Aura * Stufe						Keine					4		Einheit flieht nicht und verteidigt besser
+Stufe 6			Erschaffe ein Amulett des wahren Sehens	50/1 Aura, 3000 Silber							Schiffszauber				5		Erschafft ein AdW mit welchen RdU getarnte Einheiten entdeckt werden
+_			Erschaffe einen Ring der Unsichtbarkeit	50/1 Aura, 3000 Silber							Schiffszauber				5		Erschafft ein RdU mit welchem man jedweden blicken entschwinden kann
+_			Lied der Verfuehrung					12 Aura							Keine					5		Zieleinheit übergibt dem Magier Gegenstände
+_			Monster friedlich stimmen				15 Aura							Schiffszauber				5		Reduziert attackiere Wahrscheinlichkeit
+Stufe 7			Aushorchen						4 Aura, 100 Silber					Keine					5		Zieleinheit sagt alles was die Partei sieht.
+_			Kriegsgesang						5 Aura * Stufe						Keine					4		Attacke+ Parrade- kämpft bis zum Tode
+_			Schaler Wein						28 Aura, 3 Kn Saugwurze, 50 Silber			Keine					5		Zieleinheit vergisst vom besten Talent bis zu 2 Wochen
+Stufe 8			Gesang der Angst					5 Aura * Stufe						Keine					5		Senkt Kampftalent der Zieleinheit
+_			Lebenslied festigen					5 Aura * Stufe						Fern-, Schiffszauber			2		Entfernt Magier von Ziel Einheit/Region					
+_			Lies des Ortes analzsieren				3 Aura * Stufe						Schiffszauber				5		Identifiziert Zauber auf Burg/Schiff/Region
+Stufe 9			Ritual der Aufnahme					3/1 Aura * Stufe					Keine					5		Nimmt Immigranten fremder Rassen auf
+Stufe 10		Gesang des wachen Geistes 				2 Aura * Stufe 						Fernzauber				2		15% Magieresistenz für Verbündete (Bewache)
+_			Mob aufwiegeln						2 Aura * Stufe						Keine					5		250& Bauern Pro Stufe erheben sich.
+Stufe 11		Gesang der Melancholie					40 Aura							Fernzauber				5		Bauern werden einige Wochen nicht arbeiten			
+_			Miriams flinke Finger					20/1 Aura, 1000 Silber					Schiffszauber				5		Erschafft einen FF Ring
+Stufe 12		Gesang der Friedfertigkeit				20 Aura * Stufe						Keine					5		Keine Attackiere in der Region m;glich
+_			Gesang des schwachen Geistes 				2 Aura * Stufe 						Fernzauber				2		Magieresistenz -15% für nicht Verbündete
+_			Vertrauten rufen 					100/5 Aura						Keine					5		Ein Vertrautentier schließt sich dem Magier an
+Stufe 13		Gesang der Versklavung					40 Aura							Keine					5		Übernimmt kurzzeitig Gegnerische Einheit
+Stufe 14		Hohe Kunst der Überzeugung				20 Aura * Stufe						Keine					5		Massiver Mob erhebt sich oder Rekrutieren?
+Stufe 15		Aufruhr beschwichtigen					30 Aura							Fernzauber				5		Mob wird beschwichtigt
+Stufe 16		Aufruhr verursachen					40 Aura							Fernzauber				5		Mob erhebt sich
+
+

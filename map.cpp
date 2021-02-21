@@ -8,9 +8,11 @@
 #include "symbols.h"
 
 #include <fxkeys.h>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "FXMenuSeparatorEx.h"
+
+using namespace boost::placeholders;
 
 // *********************************************************************************************************
 // *** FXCSMap implementation
