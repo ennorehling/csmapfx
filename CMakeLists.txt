@@ -49,8 +49,13 @@ target_link_libraries(${PROJECT_NAME} ${LEGACY_STDIO_LIBRARY})
 endif ()
 
 if (WIN32)
-find_path(FOX_INCLUDE_DIRS "fxkeys.h" PATHS c:/usrlocal/fox-1.6.57/include)
-find_library(FOX_LIBRARIES NAMES FOX-1.6 PATHS c:/usrlocal/fox-1.6.57/lib)
+set(FOX_ROOT $ENV{FOX_ROOT})
+if (NOT FOX_ROOT)
+set (FOX_ROOT "c:/homebrew/fox-1.6.57")
+endif (NOT FOX_ROOT)
+find_path(FOX_INCLUDE_DIRS "fxkeys.h" PATHS "${FOX_ROOT}/include" REQUIRED)
+find_library(FOX_LIBRARY NAMES FOX-1.6 PATHS "${FOX_ROOT}/lib" REQUIRED)
+set (FOX_LIBRARIES ${FOX_LIBRARY})
 add_compile_definitions(
 BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE
 BOOST_SIGNALS_NO_DEPRECATION_WARNING
