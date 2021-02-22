@@ -8,11 +8,10 @@
 #include "symbols.h"
 
 #include <fxkeys.h>
-#include <boost/bind/bind.hpp>
-
+#include <functional>
 #include "FXMenuSeparatorEx.h"
 
-using namespace boost::placeholders;
+using namespace std::placeholders;
 
 // *********************************************************************************************************
 // *** FXCSMap implementation
@@ -575,7 +574,7 @@ void FXCSMap::registerImages()
 	IconRecord::transform_t shadow_transform = overlayPixelColor(0.5, FXRGB(0,0,0));
 	IconRecord::transform_t grey_transform = greyPixelColor();
 	IconRecord::transform_t green_transform = rotateHuePixelColor();
-	IconRecord::transform_t blue_transform = boost::bind(rotateHuePixelColor(), boost::bind(rotateHuePixelColor(), _1));
+	IconRecord::transform_t blue_transform = std::bind(rotateHuePixelColor(), std::bind(rotateHuePixelColor(), _1));
 
 	// selection marks image data
 	IconRecord selectionMarks[] = {
