@@ -176,10 +176,10 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
 	if (workstations < 0) workstations = 0;
 
 	int Lohn = region->valueInt("Lohn");
-	if (Lohn) addEntry(info, "Lohn", Lohn, 0, 0, FXString("Lohn f\u00fcr Arbeit"));
+	if (Lohn) addEntry(info, "Lohn", Lohn, 0, 0, FXString(L"Lohn f\u00fcr Arbeit"));
 
 	int earnings = (Lohn+1) * std::min(workstations, peasants) - 10 * peasants;
-	if (earnings) addEntry(info, "Bauernertrag", earnings, 0, 0, FXString("\u00dcberschuss der Bauerneinnahmen pro Runde. Kann sicher eingetrieben werden."));
+	if (earnings) addEntry(info, "Bauernertrag", earnings, 0, 0, FXString(L"\u00dcberschuss der Bauerneinnahmen pro Runde. Kann sicher eingetrieben werden."));
 
 	// search income messages for this region
 	datablock::itor faction, block, end = files->front().blocks().end();
