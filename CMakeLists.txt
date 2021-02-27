@@ -41,6 +41,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${BOOST_FUNCTION_INCLUDE_DIRS
 find_path(BOOST_TUPLE_INCLUDE_DIRS "boost/tuple/detail/tuple_basic.hpp")
 target_include_directories(${PROJECT_NAME} PRIVATE ${BOOST_TUPLE_INCLUDE_DIRS})
 
+find_package(PhysFS REQUIRED)
 find_package(PNG REQUIRED)
 
 find_library(LEGACY_STDIO_LIBRARY NAMES legacy_stdio_definitions)
@@ -70,10 +71,12 @@ endif (WIN32)
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	CXX_STANDARD 11)
 target_link_libraries(${PROJECT_NAME}
+  ${PHYSFS_LIBRARY}
 	${PNG_LIBRARIES}
 	${FOX_LIBRARIES}
 )
 include_directories(
+  ${PHYSFS_INCLUDE_DIR}
 	${PNG_INCLUDE_DIRS}
 	${FOX_INCLUDE_DIRS}
 )

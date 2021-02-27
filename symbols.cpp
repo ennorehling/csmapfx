@@ -121,7 +121,7 @@ namespace data
                         size_t size = (size_t)filesize;
                         unsigned char* data = new unsigned char[size];
                         if (data) {
-                            if (PHYSFS_read(file, data, 1, size) != size) {
+                            if (PHYSFS_readBytes(file, data, size) != size) {
                                 delete[] data;
                                 m_icons[i] = (unsigned char*)sym_undefined;
                             }
@@ -157,7 +157,7 @@ namespace data
                         size_t size = (size_t)filesize;
                         unsigned char* data = new unsigned char[size];
                         if (data) {
-                            if (PHYSFS_read(file, data, 1, size) != size) {
+                            if (PHYSFS_readBytes(file, data, size) != size) {
                                 delete[] data;
                                 m_terrains[i] = (unsigned char *) undefined;
                             }
