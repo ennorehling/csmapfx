@@ -65,14 +65,15 @@ namespace data
 	extern const unsigned char tb_save[];
 	extern const unsigned char tb_select[];
 
-	// 64x64 terrain symbols for map
-	extern const unsigned char *terrains[];
+    // 64x64 terrain symbols for map
+    const unsigned char* terrain_data(int i);
 	extern const unsigned char active[];
 	extern const unsigned char selected[];
 
 	// 16x16 symbols for terrain and factions in regionlist
-	extern const unsigned char *terrainSymbols[];
-	// colored bullets for factions
+    const unsigned char* terrain_icon(int i);
+    
+    // colored bullets for factions
 	extern const unsigned char black[];
 	extern const unsigned char blue[];
 	extern const unsigned char cyan[];

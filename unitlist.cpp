@@ -192,7 +192,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 				if (faction != end)
 				{
-					FXString name = faction->value(datakey::TYPE_FACTIONNAME);
+					name = faction->value(datakey::TYPE_FACTIONNAME);
 					if (name.empty())
 						name = "Partei";
 
@@ -204,7 +204,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					if (!label.empty())
 						label += ", ";
 
-					FXString name = anotherfaction->value(datakey::TYPE_FACTIONNAME);
+					name = anotherfaction->value(datakey::TYPE_FACTIONNAME);
 					if (name.empty())
 						name = "Partei";
 
@@ -299,9 +299,9 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 			}
 
 			// list unhandled keys
-			for (std::vector<datakey::itor>::iterator tag = unhandled.begin(); tag != unhandled.end(); tag++)
+			for (std::vector<datakey::itor>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
 			{
-				label.format("%s: %s", (*tag)->key().text(), (*tag)->value().text());
+				label.format("%s: %s", (*itag)->key().text(), (*itag)->value().text());
 				item = list->appendItem(unititem, label.text());
 			}
 
@@ -310,9 +310,9 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				FXTreeItem *node = list->appendItem(unititem, FXString(L"Zauberspr\u00fcche"));
 				//node->setExpanded(true);
 
-				for (datakey::itor key = spells->data().begin(); key != spells->data().end(); key++)
+				for (datakey::itor key = spells->data().begin(); key != spells->data().end(); ++key)
 				{
-					FXTreeItem *item = list->appendItem(node, key->value());
+					item = list->appendItem(node, key->value());
 					item->setData((void*)1);	// show "info" popup cmd
 				}
 			}
@@ -324,10 +324,9 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 				for (std::map<int,datablock::itor>::iterator itor = combatspells.begin(); itor != combatspells.end(); itor++)
 				{
-					datablock::itor block = itor->second;
+					FXString type;
 
-					FXString type, label;
-
+                    block = itor->second;
                     if (itor->first == 0)
 						type = FXString(L"Pr\u00e4kampfzauber");
 					else if (itor->first == 1)
@@ -361,7 +360,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 				for (datakey::itor key = talents->data().begin(); key != talents->data().end(); key++)
 				{
-					FXTreeItem *item = list->appendItem(node, key->key()+" "+key->value().section(' ',1));
+					item = list->appendItem(node, key->key()+" "+key->value().section(' ',1));
 					item->setData((void*)1);	// show "info" popup cmd
 				}
 
@@ -374,7 +373,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 				for (datakey::itor key = items->data().begin(); key != items->data().end(); key++)
 				{
-					FXTreeItem *item = list->appendItem(node, key->value()+" "+key->key());
+					item = list->appendItem(node, key->value()+" "+key->key());
 					item->setData((void*)1);	// show "info" popup cmd
 				}
 			}
@@ -383,7 +382,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 			{
 				unhandled.clear();
 
-				FXString name, descr, size, owner;
+				FXString size;
 				FXString type = FXString(L"Geb\u00e4ude");
 				factionId = -1;
 
@@ -399,8 +398,6 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 						type = key->value();
 					else if (key->key() == "Groesse")
 						size = key->value();
-					else if (key->key() == "Besitzer")
-						owner = key->value();
 					else
 						unhandled.push_back(key);
 				}
@@ -418,9 +415,9 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				node->setExpanded(true);
 
 				// list unhandled keys
-				for (std::vector<datakey::itor>::iterator tag = unhandled.begin(); tag != unhandled.end(); tag++)
+				for (std::vector<datakey::itor>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
 				{
-					label.format("%s: %s", (*tag)->key().text(), (*tag)->value().text());
+					label.format("%s: %s", (*itag)->key().text(), (*itag)->value().text());
 					item = list->appendItem(node, label.text());
 				}
 
@@ -446,7 +443,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 			{
 				unhandled.clear();
 
-				FXString name, descr, size, captain;
+				FXString size, captain;
 				FXString damage, coast, cargo, capacity;
 				FXString type = "Schiff";
 				factionId = -1;
@@ -533,9 +530,9 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				}
 
 				// list unhandled keys
-				for (std::vector<datakey::itor>::iterator tag = unhandled.begin(); tag != unhandled.end(); tag++)
+				for (std::vector<datakey::itor>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
 				{
-					label.format("%s: %s", (*tag)->key().text(), (*tag)->value().text());
+					label.format("%s: %s", (*itag)->key().text(), (*itag)->value().text());
 					item = list->appendItem(node, label.text());
 				}
 

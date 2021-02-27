@@ -1,0 +1,31 @@
+#pragma once
+
+namespace data {
+    // Terrain types
+    enum
+    {
+        TERRAIN_UNKNOWN,
+        TERRAIN_OCEAN,
+        TERRAIN_SWAMP,
+        TERRAIN_PLAINS,
+        TERRAIN_DESERT,
+        TERRAIN_FOREST,
+        TERRAIN_HIGHLAND,
+        TERRAIN_MOUNTAIN,
+        TERRAIN_GLACIER,
+        TERRAIN_VOLCANO,
+        TERRAIN_VOLCANO_ACTIVE,
+        TERRAIN_PACKICE,
+        TERRAIN_ICEBERG,
+        TERRAIN_ICEFLOE,
+        TERRAIN_CORRIDOR,
+        TERRAIN_WALL,
+        TERRAIN_HALL,
+        TERRAIN_FOG,
+        TERRAIN_THICKFOG,
+        TERRAIN_FIREWALL, TERRAIN_LASTPUBLIC = TERRAIN_FIREWALL,
+        TERRAIN_MAHLSTROM,
+        TERRAIN_LAST
+    };
+
+};

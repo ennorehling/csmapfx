@@ -7,6 +7,7 @@
 #include <map>
 #include <boost/function.hpp>
 #include "datafile.h"
+#include "terrain.h"
 #include "mapcanvas.h"
 #include "linked_ptr.h"
 //#include "scout.h"
@@ -150,9 +151,9 @@ protected:
 
 	FXButton	*button;
 
-	FXIcon		*terrain[datablock::TERRAIN_LAST];
-	FXIcon		*terrainShadow[datablock::TERRAIN_LAST];
-	FXIcon		*terrainIcons[datablock::TERRAIN_LAST];
+	FXIcon		*terrain[data::TERRAIN_LAST];
+	FXIcon		*terrainShadow[data::TERRAIN_LAST];
+	FXIcon		*terrainIcons[data::TERRAIN_LAST];
 	FXIcon		*activeRegion, *selectedRegion;
 	FXIcon		*troopsunknown, *troopally, *troopenemy;
 	FXIcon		*guardown, *guardally, *guardenemy, *guardmixed;

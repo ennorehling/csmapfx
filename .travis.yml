@@ -1,5 +1,6 @@
 sudo: false
 language: c++
+dist: focal
 compiler:
   - gcc
   - clang
@@ -9,5 +10,6 @@ addons:
     packages:
       - libfox-1.6
       - libboost-dev
+      - libphysfs-dev
 os:
   - linux

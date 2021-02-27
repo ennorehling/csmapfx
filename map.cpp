@@ -218,7 +218,7 @@ FXint FXCSMap::getContentHeight()
 void FXCSMap::layout()
 {
 	if (!(flags&FLAG_PRESSED)			// don't relayout when we are painting
-		|| modus < MODUS_SETTERRAIN || modus >= MODUS_SETTERRAIN+datablock::TERRAIN_LAST)
+		|| modus < MODUS_SETTERRAIN || modus >= MODUS_SETTERRAIN+data::TERRAIN_LAST)
 	{
 		calculateContentSize();
 		map->position(0, 0, getWidth(), getHeight());
@@ -659,28 +659,29 @@ void FXCSMap::registerImages()
 	if (!minimap)
 		iconRecords.insert( iconRecords.end(), begin(regionSymbols), end(regionSymbols) );
 
-	// terrain images
-	for (size_t i = 0; i < datablock::TERRAIN_LAST; i++)
+    // terrains with overlay
+    overlays.resize(overlayColors.size(), std::vector<FXIcon*>(data::TERRAIN_LAST));
+
+    // terrain images
+	for (int i = 0; i < data::TERRAIN_LAST; i++)
 	{
-		IconRecord image = { &terrain[i], data::terrains[i], 64, 64, scaleable, no_transform };
-		IconRecord shadow_image = { &terrainShadow[i], data::terrains[i], 64, 64, scaleable, shadow_transform };
-		IconRecord small_image = { &terrainIcons[i], data::terrainSymbols[i], 16, 16, non_scaleable, no_transform };
+        const unsigned char *gif_data = data::terrain_data(i);
+        const unsigned char* gif_icon = data::terrain_icon(i);
+		IconRecord image = { &terrain[i], gif_data, 64, 64, scaleable, no_transform };
+		IconRecord shadow_image = { &terrainShadow[i], gif_data, 64, 64, scaleable, shadow_transform };
+		IconRecord small_image = { &terrainIcons[i], gif_icon, 16, 16, non_scaleable, no_transform };
 
 		iconRecords.push_back(image);
 		iconRecords.push_back(shadow_image);
-		if (!minimap)
-			iconRecords.push_back(small_image);		// terrain symbols for popup menu
-	}
 
-	// terrains with overlay
-	overlays.resize( overlayColors.size(), std::vector<FXIcon*>(datablock::TERRAIN_LAST) );
+        if (!minimap) {
+            iconRecords.push_back(small_image);		// terrain symbols for popup menu
+        }
 
-	for (size_t ov = 0; ov < overlays.size(); ov++)
-	{
-		IconRecord::transform_t colorOverlay = overlayPixelColor(0 /* 0.4 */, overlayColors[ov]);
-		for (size_t i = 0; i < datablock::TERRAIN_LAST; i++)
-		{
-			IconRecord icon = { &overlays[ov][i], data::terrains[i], 64, 64, scaleable, colorOverlay };
+        for (size_t ov = 0; ov < overlays.size(); ov++)
+	    {
+		    IconRecord::transform_t colorOverlay = overlayPixelColor(0, overlayColors[ov]);
+            IconRecord icon = { &overlays[ov][i], gif_data, 64, 64, scaleable, colorOverlay };
 			iconRecords.push_back(icon);
 		}
 	}
@@ -792,7 +793,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 		FXint x = GetHexFromScreenX(cursor_x, cursor_y);
 		FXint y = GetHexFromScreenY(cursor_x, cursor_y);
 
-		if (modus >= MODUS_SETTERRAIN && modus < MODUS_SETTERRAIN+datablock::TERRAIN_LAST)
+		if (modus >= MODUS_SETTERRAIN && modus < MODUS_SETTERRAIN+data::TERRAIN_LAST)
 		{
 			// in SETTERRAIN modus, every click transforms region
             terraform(x, y, visiblePlane, modus-MODUS_SETTERRAIN);
@@ -890,7 +891,7 @@ long FXCSMap::onLeftButtonRelease(FXObject* /*sender*/, FXSelector /*sel*/, void
 		flags &= ~FLAG_PRESSED;
 
 		// when in painting mode, relayout should not be done when button is pressed, so do it on buttonrelease
-		if (modus >= MODUS_SETTERRAIN && modus < MODUS_SETTERRAIN+datablock::TERRAIN_LAST)
+		if (modus >= MODUS_SETTERRAIN && modus < MODUS_SETTERRAIN+ data::TERRAIN_LAST)
 		{
 			files->begin()->createHashTables();	// deferred
 
@@ -1049,7 +1050,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 			FXMenuPane* terraform = new FXMenuPane(this);
 
 			datablock terrainRegion;
-			for (FXuval i = 1; i < datablock::TERRAIN_LASTPUBLIC+1; i++)
+			for (FXuval i = 1; i <  data::TERRAIN_LASTPUBLIC+1; i++)
 			{
 				terrainRegion.terrain(i);
 				cmd = new FXMenuCommand(terraform, terrainRegion.terrainString(), terrainIcons[i], this,ID_POPUP_CLICKED);
@@ -1120,7 +1121,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 			FXMenuPane* terraform = new FXMenuPane(this);
 
 			datablock terrainRegion;
-			for (FXuval i = 1; i < datablock::TERRAIN_LASTPUBLIC+1; i++)
+			for (FXuval i = 1; i <  data::TERRAIN_LASTPUBLIC+1; i++)
 			{
 				terrainRegion.terrain(i);
 				cmd = new FXMenuCommand(terraform, terrainRegion.terrainString(), terrainIcons[i], this,ID_POPUP_CLICKED);
@@ -1159,7 +1160,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 	FXMenuCommand *cmd;
 
 	datablock terrainRegion;
-	for (FXuval i = 1; i < datablock::TERRAIN_LASTPUBLIC+1; i++)
+	for (FXuval i = 1; i <  data::TERRAIN_LASTPUBLIC+1; i++)
 	{
 		terrainRegion.terrain(i);
 		cmd = new FXMenuCommand(terraform, terrainRegion.terrainString(), terrainIcons[i], this,ID_POPUP_CLICKED);
@@ -1522,7 +1523,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 	}
 
 	// map changed
-	if (!(flags&FLAG_PRESSED) || modus < MODUS_SETTERRAIN || modus >= MODUS_SETTERRAIN+datablock::TERRAIN_LAST)
+	if (!(flags&FLAG_PRESSED) || modus < MODUS_SETTERRAIN || modus >= MODUS_SETTERRAIN+ data::TERRAIN_LAST)
 	{
 		files->begin()->createHashTables();			// don't do this in painting mode
 
@@ -1937,8 +1938,6 @@ LeftTop FXCSMap::getMapLeftTop()
 	// connected to a datafile list?
 	if (!files) return LeftTop{0, 0};
 
-	FXint regionSize = FXint(64*scale);
-
 	// initialize to 'impossible' values
 	FXint min_x = 0x0FFFFFFF, min_y = 0x0FFFFFFF;
 
@@ -2018,8 +2017,6 @@ void FXCSMap::paintIslandNames(FXDrawable* buffer, LeftTop offset, std::map<FXSt
 {
 	if (!show_islands) return;
 
-	FXint width = buffer->getWidth(), height = buffer->getHeight();
-
 	// create DC and setup font
 	FXDCWindow dc(buffer);
 
@@ -2032,8 +2029,8 @@ void FXCSMap::paintIslandNames(FXDrawable* buffer, LeftTop offset, std::map<FXSt
 		const IslandPos& is = entry.second;
 
 		//  skip islands outside of view
-		if (is.right - offset.left < 0 || is.left - offset.left > width ||
-			is.bottom - offset.top < 0 || is.top - offset.top > height) {
+		if (is.right - offset.left < 0 || is.left - offset.left > buffer->getWidth() ||
+			is.bottom - offset.top < 0 || is.top - offset.top > buffer->getHeight()) {
 			continue;
 		}
 
@@ -2410,7 +2407,7 @@ struct isOcean
 		datablock::itor itor = m_files->front().region(x,y,0);
 		if (itor != m_files->front().end())
 		{
-			if (itor->terrain() == datablock::TERRAIN_OCEAN)
+			if (itor->terrain() ==  data::TERRAIN_OCEAN)
 				return true;
 		}
 

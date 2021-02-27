@@ -1,6 +1,10 @@
 # Building CSMapFX
 
 
+## Linux
+
+apt pkgconf cmake make g++ install libpng-dev libboost-dev libfox-1.6-dev
+
 ## Windows
 Currently only the Win32 Release build works, only via project file, not with CMake.
 

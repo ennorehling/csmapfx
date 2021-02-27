@@ -13,10 +13,10 @@
 #include "messages.h"
 #include "calc.h"
 #include "map.h"
-#include "datafile.h"
 #include "exportdlg.h"
 #include "infodlg.h"
 #include "searchdlg.h"
+#include "terrain.h"
 
 class CSMap : public FXMainWindow
 { 
@@ -275,7 +275,7 @@ private:
 		FXIcon *info;
 
 		FXIcon *pointer, *select;
-		FXIcon *terrain[datablock::TERRAIN_LAST];
+		FXIcon *terrain[data::TERRAIN_LAST];
 
 	} icons;
 

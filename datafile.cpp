@@ -7,6 +7,7 @@
 #include "main.h"
 #include "fxhelper.h"
 #include "datafile.h"
+#include "terrain.h"
 
 #ifdef HAVE_BZ2LIB_H
 #include <FXBZFileStream.h>
@@ -312,39 +313,45 @@ const FXString datablock::terrainString() const
 		return type;
 
     switch (terrain()) {
-    case TERRAIN_OCEAN:
+    case data::TERRAIN_OCEAN:
         return "Ozean";
-    case TERRAIN_SWAMP:
+    case data::TERRAIN_SWAMP:
         return "Sumpf";
-    case TERRAIN_PLAINS:
+    case data::TERRAIN_PLAINS:
         return "Ebene";
-    case TERRAIN_DESERT:
+    case data::TERRAIN_DESERT:
         return FXString(L"W\u00fcste");
-    case TERRAIN_FOREST:
+    case data::TERRAIN_FOREST:
         return "Wald";
-    case TERRAIN_HIGHLAND:
+    case data::TERRAIN_HIGHLAND:
         return "Hochland";
-    case TERRAIN_MOUNTAIN:
+    case data::TERRAIN_MOUNTAIN:
         return "Berge";
-    case TERRAIN_GLACIER:
+    case data::TERRAIN_GLACIER:
         return "Gletscher";
-    case TERRAIN_VOLCANO:
+    case data::TERRAIN_VOLCANO:
         return "Vulkan";
-    case TERRAIN_VOLCANO_ACTIVE:
+    case data::TERRAIN_VOLCANO_ACTIVE:
         return "Aktiver Vulkan";
-    case TERRAIN_ICEBERG:
+    case data::TERRAIN_ICEBERG:
         return "Eisberg";
-    case TERRAIN_ICEFLOE:
+    case data::TERRAIN_ICEFLOE:
         return "Eisscholle";
-    case TERRAIN_FLOOR:
+    case data::TERRAIN_CORRIDOR:
         return "Gang";
-    case TERRAIN_WALL:
+    case data::TERRAIN_WALL:
         return "Wand";
-    case TERRAIN_PACKICE:
+    case data::TERRAIN_HALL:
+        return "Halle";
+    case data::TERRAIN_FOG:
+        return "Nebel";
+    case data::TERRAIN_THICKFOG:
+        return "Dichter Nebel";
+    case data::TERRAIN_PACKICE:
         return "Packeis";
-    case TERRAIN_FIREWALL:
+    case data::TERRAIN_FIREWALL:
         return "Feuerwand";
-    case TERRAIN_MAHLSTROM:
+    case data::TERRAIN_MAHLSTROM:
         return "Mahlstrom";
     }
     return "Unbekannt";
@@ -355,43 +362,49 @@ const FXString datablock::terrainString() const
 	// this terrain does not need textual representation
 
 	if (terrain == "Ozean")
-		return TERRAIN_OCEAN;
+		return data::TERRAIN_OCEAN;
 	if (terrain == "Sumpf")
-		return TERRAIN_SWAMP;
+		return data::TERRAIN_SWAMP;
 	if (terrain == "Ebene")
-		return TERRAIN_PLAINS;
+		return data::TERRAIN_PLAINS;
 	if (terrain == "Wueste" || terrain == "W\u00fcste" || terrain == FXString(L"W\u00fcste"))
-		return TERRAIN_DESERT;
+		return data::TERRAIN_DESERT;
 	if (terrain == "Wald")
-		return TERRAIN_FOREST;
+		return data::TERRAIN_FOREST;
 	if (terrain == "Hochland")
-		return TERRAIN_HIGHLAND;
+		return data::TERRAIN_HIGHLAND;
 	if (terrain == "Berge")
-		return TERRAIN_MOUNTAIN;
+		return data::TERRAIN_MOUNTAIN;
 	if (terrain == "Gletscher")
-		return TERRAIN_GLACIER;
+		return data::TERRAIN_GLACIER;
 	if (terrain == "Vulkan")
-		return TERRAIN_VOLCANO;
+		return data::TERRAIN_VOLCANO;
 	if (terrain == "Eisberg")
-		return TERRAIN_ICEBERG;
+		return data::TERRAIN_ICEBERG;
 	if (terrain == "Feuerwand")
-		return TERRAIN_FIREWALL;
+		return data::TERRAIN_FIREWALL;
 	if (terrain == "Mahlstrom")
-		return TERRAIN_MAHLSTROM;
+		return data::TERRAIN_MAHLSTROM;
     if (terrain == "Aktiver Vulkan")
-        return TERRAIN_VOLCANO_ACTIVE;
+        return data::TERRAIN_VOLCANO_ACTIVE;
     if (terrain == "Packeis")
-        return TERRAIN_PACKICE;
+        return data::TERRAIN_PACKICE;
     if (terrain == "Eisscholle")
-        return TERRAIN_ICEFLOE;
+        return data::TERRAIN_ICEFLOE;
     if (terrain == "Wand")
-        return TERRAIN_WALL;
+        return data::TERRAIN_WALL;
+    if (terrain == "Halle")
+        return data::TERRAIN_HALL;
     if (terrain == "Gang")
-        return TERRAIN_FLOOR;
+        return data::TERRAIN_CORRIDOR;
     if (terrain == "Rauchender Vulkan")
-        return TERRAIN_VOLCANO_ACTIVE;
+        return data::TERRAIN_VOLCANO_ACTIVE;
+    if (terrain == "Nebel")
+        return data::TERRAIN_FOG;
+    else if (terrain == "Dichter Nebel")
+        return data::TERRAIN_THICKFOG;
 
-	return TERRAIN_UNKNOWN;
+	return data::TERRAIN_UNKNOWN;
 }
 
 /*static*/ FXint datablock::parseSpecialTerrain(const FXString& terrain)
@@ -402,12 +415,7 @@ const FXString datablock::terrainString() const
 	// so if you resave the file, it's exact terrain type (_Aktiver_ Vulkan) 
 	// could be saved.
 
-	if (terrain == "Nebel")
-		return TERRAIN_GLACIER;
-	else if (terrain == "Dichter Nebel")
-		return TERRAIN_FIREWALL;
-
-	return TERRAIN_UNKNOWN;
+	return data::TERRAIN_UNKNOWN;
 }
 
 /*static*/ FXString datablock::planeName(FXint plane)
@@ -470,7 +478,7 @@ FXbool datablock::parse(FXchar* str)
 	string(str);
 
 	// unset all other states
-	terrain(TERRAIN_UNKNOWN);
+	terrain(data::TERRAIN_UNKNOWN);
 	depth(0);
 	attachment(NULL);
 	return true;
@@ -768,7 +776,7 @@ FXint datafile::load(const FXchar* filename)
 				{
 					FXint terrain = datablock::parseTerrain(key.value());
 
-					if (terrain == datablock::TERRAIN_UNKNOWN)
+					if (terrain == data::TERRAIN_UNKNOWN)
 					{
 						block->data().push_back(key);		// need textual representation of terrain type
 					
@@ -839,17 +847,17 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 	FXStream *filestr_ptr;
 
 	FXString filename_str = filename;
-	if (filename_str.length() >= 7 && filename_str.right(7) == ".cr.bz2")
-	{
-#ifdef HAVE_BZ2LIB_H
-            bzip2file.open(filename, FXStreamSave);
-		filestr_ptr = &bzip2file;
-#endif
-	}
-	else if (filename_str.length() >= 4 && filename_str.right(4) == ".xml")
-	{
+    if (filename_str.length() >= 4 && filename_str.right(4) == ".xml")
+    {
         return -1;
-	}
+    }
+#ifdef HAVE_BZ2LIB_H
+    else if (filename_str.length() >= 7 && filename_str.right(7) == ".cr.bz2")
+    {
+        bzip2file.open(filename, FXStreamSave);
+		filestr_ptr = &bzip2file;
+    }
+#endif
 	else
 	{
 		plainfile.open(filename, FXStreamSave);
@@ -2288,9 +2296,8 @@ void datafile::createHashTables()
 			if (name.empty())
 				name = "Unbekannte Insel";
 
-			att_region* stats;
-			if (!(stats = dynamic_cast<att_region*>(block->attachment())))
-			{
+			att_region* stats = dynamic_cast<att_region*>(block->attachment());
+			if (!stats) {
 				stats = new att_region;
 				block->attachment(stats);
 			}
@@ -2319,20 +2326,18 @@ void datafile::createHashTables()
 			if (neighbour != end())
 			{
 				// only flood to "Festland"
-				if (neighbour->terrain() == datablock::TERRAIN_OCEAN ||
-					neighbour->terrain() == datablock::TERRAIN_MAHLSTROM ||
-					neighbour->terrain() == datablock::TERRAIN_FIREWALL)
+				if (neighbour->terrain() == data::TERRAIN_OCEAN ||
+					neighbour->terrain() == data::TERRAIN_MAHLSTROM ||
+					neighbour->terrain() == data::TERRAIN_FIREWALL)
 					continue;
 
-				att_region* stats;
-				if (!(stats = dynamic_cast<att_region*>(neighbour->attachment())))
-				{
+				att_region* stats = dynamic_cast<att_region*>(neighbour->attachment());
+				if (!stats) {
 					stats = new att_region;
 					neighbour->attachment(stats);
 				}
 
-				if (stats->island.empty())
-				{
+				if (stats->island.empty()) {
 					stats->island = name;
 				
 					floodislands.push_back(neighbour);

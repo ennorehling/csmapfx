@@ -4,19 +4,14 @@
 #define MACROTOSTR(STR) MACROTOSTRINGx(STR)
 #define MACROTOSTRINGx(STR) #STR
 
-	// subversion revision data
-#define CSMAP_SVN_REV        139
-#define CSMAP_SVN_REVSTR     "139"
-
 	// global application title string
 #define CSMAP_APP_TITLE      "Coast'n'Sea Mapper"
 
 	// current application version and subversion revision
-#define CSMAP_APP_VERSION    0, 6, 7, CSMAP_SVN_REV
-#define CSMAP_APP_REVISION   "rev " CSMAP_SVN_REVSTR
+#define CSMAP_APP_VERSION    0, 6, 7
 
 	// application version string
-#define CSMAP_APP_VERSIONSTR "v0.6.6 " CSMAP_APP_REVISION
+#define CSMAP_APP_VERSIONSTR "v0.6.7"
 
 	// application title with full version string
 #define CSMAP_APP_TITLE_VERSION CSMAP_APP_TITLE " " CSMAP_APP_VERSIONSTR

@@ -161,9 +161,9 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	icons.pointer = new FXGIFIcon(getApp(), data::tb_pointer, 0, IMAGE_ALPHAGUESS);
 	icons.select = new FXGIFIcon(getApp(), data::tb_select, 0, IMAGE_ALPHAGUESS);
 
-	for (int i = 0; i < datablock::TERRAIN_LAST; i++)
-		icons.terrain[i] = new FXGIFIcon(getApp(), data::terrainSymbols[i], 0, IMAGE_ALPHAGUESS);
-
+    for (int i = 0; i < data::TERRAIN_LAST; i++) {
+        icons.terrain[i] = new FXGIFIcon(getApp(), data::terrain_icon(i), 0, IMAGE_ALPHAGUESS);
+    }
 	// Buttons
 	new FXButton(toolbar,
 		FXString(L"\tDatei \u00f6ffnen...\tEine neue Datei \u00f6ffnen."),
@@ -210,7 +210,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 	terrainPopup = new FXPopup(this);
 
-	for (int i = 1; i < datablock::TERRAIN_LASTPUBLIC+1; i++)
+	for (int i = 1; i < data::TERRAIN_LASTPUBLIC+1; i++)
 	{
 		datablock terrainRegion;
 		terrainRegion.terrain(i);
@@ -503,7 +503,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
     FXHorizontalFrame *cmdOptFrame = new FXHorizontalFrame(cmdBottomFrame,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 3,3,1,1);
 	cmdOptFrame->setBorderColor(getApp()->getShadowColor());
-    FXCheckButton * chk = new FXCheckButton(cmdOptFrame,
+    new FXCheckButton(cmdOptFrame,
         FXString(L"&best\u00e4tigt\tBefehle best\u00e4tigen\tBefehle f\u00fcr diese Einheit best\u00e4tigen"),
         commands, FXCommands::ID_UNIT_CONFIRM, CHECKBUTTON_NORMAL);
     FXButton * btn;
@@ -587,7 +587,7 @@ CSMap::~CSMap()
 	delete icons.pointer;
 	delete icons.select;
 
-	for (int i = 0; i < datablock::TERRAIN_LAST; i++)
+	for (int i = 0; i < data::TERRAIN_LAST; i++)
 		delete icons.terrain[i];
 }
 
@@ -1539,7 +1539,7 @@ long CSMap::onMapSetModus(FXObject* sender, FXSelector, void* ptr)
 		FXId *item = (FXId*)sender;
 		FXuval udata = (FXuval)item->getUserData();
 
-		if (udata >= FXCSMap::MODUS_SETTERRAIN && udata < FXCSMap::MODUS_SETTERRAIN+datablock::TERRAIN_LAST)
+		if (udata >= FXCSMap::MODUS_SETTERRAIN && udata < FXCSMap::MODUS_SETTERRAIN+ data::TERRAIN_LAST)
 		{
 			terrainSelect->setIcon(icons.terrain[udata-FXCSMap::MODUS_SETTERRAIN]);
 			terrainSelect->setUserData((void*)udata);
@@ -2458,7 +2458,7 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
 				continue;
 			}
 
-			if ((*itor)->terrain() == datablock::TERRAIN_OCEAN || (*itor)->terrain() == datablock::TERRAIN_FIREWALL)
+			if ((*itor)->terrain() == data::TERRAIN_OCEAN || (*itor)->terrain() == data::TERRAIN_FIREWALL)
 			{
 				// ignore non-land regions and firewalls
 				continue;
@@ -2471,38 +2471,38 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
 
 			// each of the six hex directions
 			region = files.begin()->region(x, y+1, visiblePlane);
-			if (region != notfound && region->terrain() != datablock::TERRAIN_OCEAN
-				&& region->terrain() != datablock::TERRAIN_FIREWALL)
+			if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
+				&& region->terrain() != data::TERRAIN_FIREWALL)
 				if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
 					state.regionsSelected.insert(&*region), changed = true;
 
 			region = files.begin()->region(x+1, y, visiblePlane);
-			if (region != notfound && region->terrain() != datablock::TERRAIN_OCEAN
-				&& region->terrain() != datablock::TERRAIN_FIREWALL)
+			if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
+				&& region->terrain() != data::TERRAIN_FIREWALL)
 				if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
 					state.regionsSelected.insert(&*region), changed = true;
 
 			region = files.begin()->region(x+1, y-1, visiblePlane);
-			if (region != notfound && region->terrain() != datablock::TERRAIN_OCEAN
-				&& region->terrain() != datablock::TERRAIN_FIREWALL)
+			if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
+				&& region->terrain() != data::TERRAIN_FIREWALL)
 				if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
 					state.regionsSelected.insert(&*region), changed = true;
 
 			region = files.begin()->region(x, y-1, visiblePlane);
-			if (region != notfound && region->terrain() != datablock::TERRAIN_OCEAN
-				&& region->terrain() != datablock::TERRAIN_FIREWALL)
+			if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
+				&& region->terrain() != data::TERRAIN_FIREWALL)
 				if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
 					state.regionsSelected.insert(&*region), changed = true;
 
 			region = files.begin()->region(x-1, y, visiblePlane);
-			if (region != notfound && region->terrain() != datablock::TERRAIN_OCEAN
-				&& region->terrain() != datablock::TERRAIN_FIREWALL)
+			if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
+				&& region->terrain() != data::TERRAIN_FIREWALL)
 				if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
 					state.regionsSelected.insert(&*region), changed = true;
 
 			region = files.begin()->region(x-1, y+1, visiblePlane);
-			if (region != notfound && region->terrain() != datablock::TERRAIN_OCEAN
-				&& region->terrain() != datablock::TERRAIN_FIREWALL)
+			if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
+				&& region->terrain() != data::TERRAIN_FIREWALL)
 				if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
 					state.regionsSelected.insert(&*region), changed = true;
 		}
@@ -2537,8 +2537,8 @@ long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
 				continue;
 
 			// skip ocean, firewall and iceberg
-			if (block->terrain() == datablock::TERRAIN_OCEAN || block->terrain() == datablock::TERRAIN_FIREWALL
-				|| block->terrain() == datablock::TERRAIN_ICEBERG)
+			if (block->terrain() == data::TERRAIN_OCEAN || block->terrain() == data::TERRAIN_FIREWALL
+				|| block->terrain() == data::TERRAIN_ICEBERG)
 				continue;
 
 			state.regionsSelected.insert(&*block);

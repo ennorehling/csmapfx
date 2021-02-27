@@ -81,14 +81,14 @@ void FXStatsInfos::clearLabels()
 	tags.entries.clear();
 }
 
-void FXStatsInfos::createLabels(const FXString& name, const FXString& first, const FXString& second, int column)
+void FXStatsInfos::createLabels(const FXString& name, const FXString& one, const FXString& two, int column)
 {
 	FXMatrix *matrix = (column==0) ? tags.leftmatrix : tags.rightmatrix;
 
 	// create labels
 	FXLabel *lname = new FXLabel(matrix, name, NULL, JUSTIFY_LEFT|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
-	FXLabel *lfirst = new FXLabel(matrix, first, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
-	FXLabel *lsecond = new FXLabel(matrix, second, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
+	FXLabel *lfirst = new FXLabel(matrix, one, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
+	FXLabel *lsecond = new FXLabel(matrix, two, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
 	lsecond->disable();
 	lname->create(); lfirst->create(); lsecond->create();
 
@@ -301,9 +301,6 @@ void FXStatsInfos::updateData()
 	}
 	else if (selection.selected & selection.REGION)
 	{
-		// show information of newly selected region
-		datablock &region = *selection.region;
-
 		// collect information (Bauern, Silber, Pferde...)
 		std::list<Info> info;
 
