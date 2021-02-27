@@ -77,10 +77,9 @@ void showVersion()
 
 int main(int argc, char *argv[])
 {
-    const char* dir;
     PHYSFS_init(argv[0]);
-    dir = PHYSFS_getPrefDir("Eressea", "CsMapFX");
-    PHYSFS_mount(dir, NULL, 0);
+    PHYSFS_mount(PHYSFS_getBaseDir(), NULL, 0);
+    PHYSFS_mount(PHYSFS_getPrefDir("Eressea", "CsMapFX"), NULL, 0);
     initSystems();		// inits COM under windows
 
 	// Make application 
