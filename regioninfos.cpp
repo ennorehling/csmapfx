@@ -186,7 +186,7 @@ void FXRegionInfos::collectData(std::list<Info>& info, datablock::itor region)
 	FXString Pferde = region->value("Pferde");
 
 	if (!Bauern.empty()) addEntry(info, "Bauern", atoi(Bauern.text()), 0, 0, "Anzahl der Bauern");
-	if (!Silber.empty()) addEntry(info, "Silber", atoi(Silber.text()), 0, 0, "Silbervorat der Bauern");
+	if (!Silber.empty()) addEntry(info, "Silber", atoi(Silber.text()), 0, 0, "Silbervorrat der Bauern");
 	if (!Unterh.empty()) addEntry(info, "Unterh.max", atoi(Unterh.text()), 0, 0, "Maximale Anzahl Silber, dass per Unterhaltung eingenommen werden kann");
 	if (!Rekruten.empty()) addEntry(info, "Rekruten", atoi(Rekruten.text()), 0, 0, FXString(L"Anzahl der m\u00f6glichen Rekruten"));
 	if (!Pferde.empty()) addEntry(info, "Pferde", atoi(Pferde.text()), 0, 0, "Anzahl Pferde");
