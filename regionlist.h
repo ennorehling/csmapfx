@@ -4,6 +4,7 @@
 #include <fx.h>
 #include <list>
 #include "datafile.h"
+#include "terrain.h"
 
 class FXRegionList : public FXTreeList
 {
@@ -42,7 +43,7 @@ protected:
 
 	std::list<datafile>	*files;
 
-	FXIcon			*terrainIcons[datablock::TERRAIN_LAST];
+	FXIcon			*terrainIcons[data::TERRAIN_LAST];
 	FXIcon			*green, *red, *blue, *cyan, *yellow, *orange, *gray, *black;
 
 	FXFont			*boldfont;

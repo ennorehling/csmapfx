@@ -13,11 +13,6 @@
 	(c) 2004-2006 Thomas J. Gritzan
 */
 
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <fx.h>
-
 #define CSMAP_MAIN
 #include "fxwin.h"
 
@@ -28,6 +23,12 @@
 #include "csmap.h"
 
 #include "calc.h"
+
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <fx.h>
+#include <physfs.h>
 
 void showHelpText()
 {
@@ -76,7 +77,11 @@ void showVersion()
 
 int main(int argc, char *argv[])
 {
-	initSystems();		// inits COM under windows
+    const char* dir;
+    PHYSFS_init(argv[0]);
+    dir = PHYSFS_getPrefDir("Eressea", "CsMapFX");
+    PHYSFS_mount(dir, NULL, 0);
+    initSystems();		// inits COM under windows
 
 	// Make application 
 	FXApp CSApp("CSMap", "Eressea"); 
@@ -261,5 +266,7 @@ int main(int argc, char *argv[])
 		return 0;
 
 	// Run 
-	return CSApp.run(); 
+	int exitcode = CSApp.run(); 
+    PHYSFS_deinit();
+    return exitcode;
 }

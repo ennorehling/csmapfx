@@ -85,7 +85,7 @@ void FXTradeInfos::clearLabels()
 	tags.entries.clear();
 }
 
-void FXTradeInfos::createLabels(const FXString& name, const FXString& first, const FXString& second, int column)
+void FXTradeInfos::createLabels(const FXString& name, const FXString& one, const FXString& two, int column)
 {
 	FXMatrix *matrix = NULL;
 	
@@ -98,8 +98,8 @@ void FXTradeInfos::createLabels(const FXString& name, const FXString& first, con
 
 	// create labels
 	FXLabel *lname = new FXLabel(matrix, name, NULL, JUSTIFY_LEFT|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
-	FXLabel *lfirst = new FXLabel(matrix, first, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
-	FXLabel *lsecond = new FXLabel(matrix, second, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
+	FXLabel *lfirst = new FXLabel(matrix, one, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
+	FXLabel *lsecond = new FXLabel(matrix, two, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
 	lsecond->disable();
 	lname->create(); lfirst->create(); lsecond->create();
 

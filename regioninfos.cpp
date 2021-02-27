@@ -29,8 +29,9 @@ FXRegionInfos::FXRegionInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuin
 	setSelector(sel);
 
 	// create/load images for terrain types
-	for (int i = 0; i < datablock::TERRAIN_LAST; i++)
-		terrainIcons[i] = new FXGIFIcon(getApp(), data::terrainSymbols[i], 0, IMAGE_ALPHAGUESS);
+    for (int i = 0; i < data::TERRAIN_LAST; i++) {
+        terrainIcons[i] = new FXGIFIcon(getApp(), data::terrain_icon(i), 0, IMAGE_ALPHAGUESS);
+    }
 
 	// set style
 	setBorderColor(getApp()->getShadowColor());
@@ -41,7 +42,7 @@ FXRegionInfos::FXRegionInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuin
 	show_description = false;
 
 	// create layout
-	tags.name = new FXLabel(this, "", terrainIcons[datablock::TERRAIN_UNKNOWN], ICON_BEFORE_TEXT|LAYOUT_FILL_X);
+	tags.name = new FXLabel(this, "", terrainIcons[ data::TERRAIN_UNKNOWN], ICON_BEFORE_TEXT|LAYOUT_FILL_X);
 
 	tags.matrixsep = new FXHorizontalSeparator(this, LAYOUT_FILL_X|SEPARATOR_LINE, 0,0,0,0, 0,0,0,0);
 	tags.matrixsep->setBorderColor(getBorderColor());
@@ -67,14 +68,14 @@ void FXRegionInfos::create()
 	FXVerticalFrame::create();
 
 	// create terrain icons for region list
-	for (int i = 0; i < datablock::TERRAIN_LAST; i++)
+	for (int i = 0; i <  data::TERRAIN_LAST; i++)
 		terrainIcons[i]->create();
 }
 
 FXRegionInfos::~FXRegionInfos()
 {
 	// terrain icons for region list
-	for (int i = 0; i < datablock::TERRAIN_LAST; i++)
+	for (int i = 0; i <  data::TERRAIN_LAST; i++)
 		delete terrainIcons[i];
 }
 
@@ -375,7 +376,7 @@ void FXRegionInfos::updateData()
 			tags.name->setText("");
 
 		tags.name->setHelpText("");
-		tags.name->setIcon(terrainIcons[datablock::TERRAIN_UNKNOWN]);
+		tags.name->setIcon(terrainIcons[ data::TERRAIN_UNKNOWN]);
 
 		tags.matrixsep->hide();
 		tags.matrixframe->hide();

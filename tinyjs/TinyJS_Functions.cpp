@@ -126,7 +126,7 @@ void scStringSplit(CScriptVar *c, void *) {
 
 void scStringFromCharCode(CScriptVar *c, void *) {
     char str[2];
-    str[0] = c->getParameter("char")->getInt();
+    str[0] = (char)c->getParameter("char")->getInt();
     str[1] = 0;
     c->getReturnVar()->setString(str);
 }

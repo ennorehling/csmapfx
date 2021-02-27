@@ -5,6 +5,7 @@
 #include <list>
 #include <vector>
 #include "datafile.h"
+#include "terrain.h"
 
 class FXRegionInfos : public FXVerticalFrame
 {
@@ -38,7 +39,7 @@ protected:
 
 	std::list<datafile>	*files;
 
-	FXIcon			*terrainIcons[datablock::TERRAIN_LAST];
+	FXIcon			*terrainIcons[data::TERRAIN_LAST];
 
 	bool show_description;
 

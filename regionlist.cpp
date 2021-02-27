@@ -198,8 +198,8 @@ FXRegionList::FXRegionList(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	active_faction_group = false;
 
 	// create/load images for terrain types
-	for (int i = 0; i < datablock::TERRAIN_LAST; i++)
-		terrainIcons[i] = new FXGIFIcon(getApp(), data::terrainSymbols[i], 0, IMAGE_ALPHAGUESS);
+	for (int i = 0; i <  data::TERRAIN_LAST; i++)
+		terrainIcons[i] = new FXGIFIcon(getApp(), data::terrain_icon(i), 0, IMAGE_ALPHAGUESS);
 
 	green = new FXGIFIcon(getApp(), data::green, 0, IMAGE_ALPHAGUESS);
 	red = new FXGIFIcon(getApp(), data::red, 0, IMAGE_ALPHAGUESS);
@@ -224,7 +224,7 @@ void FXRegionList::create()
 	FXRegionItem::setBoldFont(boldfont);
 
 	// create icons for region list
-	for (int i = 0; i < datablock::TERRAIN_LAST; i++)
+	for (int i = 0; i <  data::TERRAIN_LAST; i++)
 		terrainIcons[i]->create();
 
 	green->create();
@@ -241,7 +241,7 @@ FXRegionList::~FXRegionList()
 {
 	delete boldfont;
 
-	for (int i = 0; i < datablock::TERRAIN_LAST; i++)
+	for (int i = 0; i <  data::TERRAIN_LAST; i++)
 		delete terrainIcons[i];
 
 	delete green;
