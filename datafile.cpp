@@ -696,7 +696,7 @@ FXint datafile::load(const FXchar* filename)
 		if (file.status() != FXStreamOK)
 		{
 			this->filename("");
-			throw std::runtime_error("Datei konnte nicht ge\u00f6ffnet werden.");
+            throw std::runtime_error(FXString(L"Datei konnte nicht ge\u00f6ffnet werden.").text());
 		}
 
 		FXString buffer;
@@ -726,7 +726,7 @@ FXint datafile::load(const FXchar* filename)
 		if (file.status() != FXStreamOK)
 		{
 			this->filename("");
-			throw std::runtime_error("Datei konnte nicht ge\u00f6ffnet werden.");
+			throw std::runtime_error(FXString(L"Datei konnte nicht ge\u00f6ffnet werden.").text());
 		}
 
 		FXString buffer;
@@ -1109,7 +1109,7 @@ FXint datafile::loadCmds(const FXchar* filename)
 	FXFileStream file;
 	file.open(filename,FXStreamLoad);
 	if (file.status() != FXStreamOK)
-		throw std::runtime_error("Datei konnte nicht ge\u00f6ffnet werden.");
+        throw std::runtime_error(FXString(L"Datei konnte nicht ge\u00f6ffnet werden.").text());
 
 	// load file into 'data'
 	FXString data;
