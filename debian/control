@@ -8,7 +8,7 @@ Homepage: https://www.eressea.de
 
 Package: csmapfx
 Architecture: any
-Depends: libfox-1.6-0 (>=1.6.57), libpng16-16 (>=1.6.36)
+Depends: libfox-1.6-0 (>=1.6.57), libpng16-16 (>=1.6.36), libphysfs1 (>=2.1)
 Description: Coast'n'Sea Mapper client for Eressea
  Coast'n'Sea Mapper GUI client for the E-Mail Role 
  Playing Game Eressea
