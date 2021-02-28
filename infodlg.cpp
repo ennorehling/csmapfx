@@ -135,7 +135,7 @@ void FXInfoDlg::setGame(const FXString& game)
                 size_t count = (size_t)filesize;
                 char* text = new char[count];
                 if (PHYSFS_readBytes(file, text, count) == count) {
-                    std::istringstream input(std::string(text), count);
+                    std::istringstream input(std::string(text, count));
                     if (parseTableData(input)) {
                         delete[] text;
                         break;
