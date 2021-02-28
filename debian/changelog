@@ -1,4 +1,4 @@
-csmpafx (0.6.7.1) stable; urgency=low
+csmapfx (0.6.7-1) stable; urgency=low
 
   * new terrain images
   * use PhysFS to allow modding

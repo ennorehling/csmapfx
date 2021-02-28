@@ -1,5 +1,5 @@
 #!/bin/sh
-version=0.6.5
+version=$(grep 'define CSMAP_APP_VERSION ' version.h | sed 's/,/./g' | awk '{ print $3$4$5 }')
 git clean -d -f -x
 tar c --exclude-vcs-ignores \
 	--exclude-vcs \
