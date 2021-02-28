@@ -4,6 +4,8 @@ csmapfx (0.6.7-1) stable; urgency=low
   * use PhysFS to allow modding
   * several typos and non-ASCII characters fixed.
 
+ -- Enno Rehling <enno@eressea.de>  Thu, 28 Feb 2021 04:56:00 +0200
+
 csmapfx (0.6.5-1) stable; urgency=low
 
   * avoid printing island names twice when exporting map (phygon)
