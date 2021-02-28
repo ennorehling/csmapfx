@@ -75,11 +75,11 @@ namespace data
         sym_iceberg,
         sym_iceberg,
         sym_iceberg,
-        sym_plains,
-        sym_firewall,
-        sym_plains,
-        sym_plains,
-        sym_firewall,
+        sym_corridor,
+        sym_wall,
+        sym_hall,
+        sym_fog,
+        sym_thickfog,
         sym_firewall,
         sym_mahlstrom
     };
