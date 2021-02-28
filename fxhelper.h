@@ -36,10 +36,6 @@ FXString flatten(const FXString& str);
 void showError(const FXString& str);
 void showError(const std::string& str);
 
-// get search path for app config data
-// -----------------------------------
-std::vector<FXString> getSearchPath();
-
 // FXString operator<<
 // -------------------
 inline std::ostream& operator<<(std::ostream& out, const FX::FXString& str)

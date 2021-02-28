@@ -41,7 +41,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${BOOST_FUNCTION_INCLUDE_DIRS
 find_path(BOOST_TUPLE_INCLUDE_DIRS "boost/tuple/detail/tuple_basic.hpp")
 target_include_directories(${PROJECT_NAME} PRIVATE ${BOOST_TUPLE_INCLUDE_DIRS})
 
-find_package(PhysFS REQUIRED)
+find_package(PhysFS VERSION 2.1 REQUIRED)
 find_package(PNG REQUIRED)
 
 find_library(LEGACY_STDIO_LIBRARY NAMES legacy_stdio_definitions)

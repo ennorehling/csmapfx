@@ -4,8 +4,10 @@
 #include "symbols.h"
 #include "FXMenuSeparatorEx.h"
 
+#include <physfs.h>
+
 #include <cctype>
-#include <cctype>
+#include <climits>
 #include <sstream>
 #include <fstream>
 #include <algorithm>
@@ -100,15 +102,14 @@ void FXInfoDlg::setGame(const FXString& game)
 
 	// load internal data for specific game
 	GameInfo* loadInfo = &infoData[0];		// load "default" info by default
-	for (GameInfo* info = begin(infoData); info != end(infoData); ++info)
-		if (game == info->game)
-		{
-			loadInfo = info;
-			break;
-		}
+    for (GameInfo* info = begin(infoData); info != end(infoData); ++info) {
+        if (game == info->game) {
+            loadInfo = info;
+            break;
+        }
+    }
 
-	if (loadInfo && loadInfo->data)
-	{
+	if (loadInfo && loadInfo->data) {
 		std::istringstream stream( std::string(loadInfo->data, loadInfo->size) );
 		parseTableData(stream);
 	}
@@ -117,23 +118,32 @@ void FXInfoDlg::setGame(const FXString& game)
 	// try game specific file first ("csmapfx.Eressea.info"),
 	// then try default file name ("csmapfx.info").
 	// use all files in getSearchPath().
-	std::vector<FXString> fileNames;
-	if (game != "default")
-		fileNames.push_back("csmapfx." + game + ".info");
+	std::vector<std::string> fileNames;
+    std::string prefix("csmapfx.");
+    if (game != "default") {
+        fileNames.push_back(prefix + std::string(game.text()) + ".info");
+    }
 	fileNames.push_back("csmapfx.info");
 
-	std::vector<FXString> searchPath = getSearchPath();
-	for (size_t i = 0; i < fileNames.size(); i++)
-	{
-		FXString fileName = fileNames[i];
-		bool fileFound = false;
-		for (size_t j = 0; j < searchPath.size(); j++)
-		{
-			std::ifstream infoFile( (searchPath[j] + fileName).text() );
-			fileFound = parseTableData(infoFile) || fileFound;
-		}
-		if (fileFound)
-			break;
+	for (auto i = fileNames.begin(); i != fileNames.end(); ++i) {
+        const std::string& filename = *i;
+        PHYSFS_File* file = PHYSFS_openRead(filename.c_str());
+        if (file) {
+            // parse data
+            PHYSFS_sint64 filesize = PHYSFS_fileLength(file);
+            if (filesize > 0 && filesize <= SIZE_MAX) {
+                size_t count = (size_t)filesize;
+                char* text = new char[count];
+                if (PHYSFS_readBytes(file, text, count) == count) {
+                    std::istringstream input(std::string(text), count);
+                    if (parseTableData(input)) {
+                        delete[] text;
+                        break;
+                    }
+                }
+                delete[] text;
+            }
+        }
 	}
 }
 
@@ -322,12 +332,7 @@ void FXInfoDlg::createTable()
 
 bool FXInfoDlg::parseTableData(std::istream& input)
 {
-	if (!input)
-		return false;
-
-	// parse data
-	infoblock* block = NULL;
-
+    infoblock* block = NULL;
 	std::string sline;
 	while (std::getline(input, sline))
 	{
@@ -386,7 +391,6 @@ bool FXInfoDlg::parseTableData(std::istream& input)
 				block->lines.push_back(row);
 		}
 	}
-
 	createTable();
     return true;
 }
