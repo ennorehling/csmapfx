@@ -1428,14 +1428,14 @@ private:
 						m_line.clear();
 				}
 			}
-
+/*
 			// replace 4 spaces by '\t'
 			for (pos = indent.find_first_not_of(' '); (pos == std::string::npos) ? indent.size() > 3 : pos > 3; pos = indent.find_first_not_of(' '))
 				indent.replace(0, 4, "\t");
 
 			for (pos = indent.find('\t'); pos != std::string::npos; pos = indent.find('\t', pos+1))
 				width -= 3;		// count tabs as 4 spaces
-
+*/
 			width -= indent.size();
 		}
 
@@ -1774,7 +1774,7 @@ FXint datafile::saveCmds(const FXchar* filename, bool stripped, bool replace)
 				//else
 				{
 					for (att_commands::cmdlist_t::iterator itor = attcmds->commands.begin(); itor != attcmds->commands.end(); itor++)
-						out << "    " << *itor << "\n";
+						out << "   " << *itor << "\n";
 				}
 
 				// output postfix lines
