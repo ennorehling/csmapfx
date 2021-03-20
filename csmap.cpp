@@ -1764,7 +1764,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 		}
 
 		// automatic map-mode switch on NEWFILE flag
-		if (files.size() && (state->map & selection.NEWFILE))
+		if (files.size() && (state->map & selection.NEWFILE)) {
 			if (selection.map & selection.ACTIVEFACTION)
 			{
 				// faction report: show regionlist/info
@@ -1782,6 +1782,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 				rightframe->hide();
 				map->recalc();
 			}
+		}
 	}
 
 	// save new selection state
