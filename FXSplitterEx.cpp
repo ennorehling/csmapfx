@@ -377,7 +377,8 @@ void FXSplitterEx::adjustVLayout(){
     pos=split-barsize;
     if (!stretcher)
 		stretcher=getFirst();
-	for(; stretcher && !stretcher->shown(); stretcher=stretcher->getNext());
+	for(; stretcher && !stretcher->shown(); stretcher=stretcher->getNext())
+    ;
     for(child=window->getPrev(); child; child=child->getPrev()){
       if(child->shown()){
         w=child->getWidth();

@@ -71,9 +71,10 @@ endif (WIN32)
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	CXX_STANDARD 11)
 target_link_libraries(${PROJECT_NAME}
-  ${PHYSFS_LIBRARY}
+    ${PHYSFS_LIBRARY}
 	${PNG_LIBRARIES}
 	${FOX_LIBRARIES}
+	-L${FOX_LIBRARY_DIRS}
 )
 include_directories(
   ${PHYSFS_INCLUDE_DIR}
