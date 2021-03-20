@@ -2,6 +2,8 @@
 #include "fxhelper.h"
 #include "messages.h"
 
+#include <set>
+
 // *********************************************************************************************************
 // *** FXMessages implementation
 
@@ -31,6 +33,7 @@ FXMessages::FXMessages(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 	groups.travel = appendItem(NULL, "Durchreise");
 	groups.other = appendItem(NULL, "Sonstiges");
 	groups.streets = appendItem(NULL, FXString(L"Stra\u00dfen"));
+	groups.guards = appendItem(NULL, "Bewacher");
 }
 
 void FXMessages::create()
@@ -78,18 +81,43 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 		clearSiblings(groups.streets);
 		clearSiblings(groups.travel);
 		clearSiblings(groups.other);
+		clearSiblings(groups.guards);
 
 		if (selection.selected & selection.REGION)
 		{
+            datafile &file = files->front();
 			datablock::itor region = selection.region;
-
-			datablock::itor end = files->front().blocks().end();
+			datablock::itor end = file.blocks().end();
 			datablock::itor block = region;
+            std::set<FXint> guard_ids;
 			for (block++; block != end && block->depth() > region->depth(); block++)
 			{
-				if (block->type() == datablock::TYPE_UNIT || block->type() == datablock::TYPE_SHIP
-						|| block->type() == datablock::TYPE_BUILDING)
-					break;
+                if (block->type() == datablock::TYPE_MESSAGE) {
+                    /*
+                    MESSAGE 324149248
+                    "von Figo (g351): 'KABUMM *kicher*'";rendered
+                    */
+
+                    FXTreeItem *item = appendItem(groups.other, block->value("rendered"));
+
+                    FXival unit = block->valueInt("unit");
+                    if (!unit)
+                        unit = block->valueInt("mage");
+                    if (!unit)
+                        unit = block->valueInt("teacher");
+
+                    item->setData((void *)unit);
+                }
+                else if (block->depth() > region->depth() + 1) {
+                    continue;
+                }
+                else if (block->type() == datablock::TYPE_UNIT) {
+                    int guard = block->valueInt("bewacht");
+                    if (guard) {
+                        FXint faction = block->valueInt("Partei");
+                        guard_ids.insert(faction);
+                    }
+                }
 				else if (block->type() == datablock::TYPE_EFFECTS)
 				{
 					/*
@@ -150,24 +178,16 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 					for (datakey::itor msg = block->data().begin(); msg != block->data().end(); msg++)
 						appendItem(groups.travel, prefix+msg->value());
 				}
-				else if (block->type() == datablock::TYPE_MESSAGE)
-				{
-					/*
-					MESSAGE 324149248
-					"von Figo (g351): 'KABUMM *kicher*'";rendered
-					*/
-
-					FXTreeItem* item = appendItem(groups.other, block->value("rendered"));
-
-					FXival unit = block->valueInt("unit");
-					if (!unit)
-						unit = block->valueInt("mage");
-					if (!unit)
-						unit = block->valueInt("teacher");
-
-					item->setData((void*)unit);
-				}
 			}
+            if (!guard_ids.empty()) {
+                for (FXint id : guard_ids) {
+                    datablock::itor faction = file.faction(id);
+                    if (faction != file.end()) {
+                        FXString label = faction->value("Parteiname") + " (" + faction->id() + ")";
+                        appendItem(groups.guards, label);
+                    }
+                }
+            }
 		}
 	}
 

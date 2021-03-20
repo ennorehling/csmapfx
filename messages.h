@@ -33,6 +33,7 @@ protected:
 		FXTreeItem *streets;
 		FXTreeItem *travel;
 		FXTreeItem *other;
+		FXTreeItem *guards;
 
 	}groups;
 

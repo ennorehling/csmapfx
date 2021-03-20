@@ -1,3 +1,10 @@
+csmapfx (0.6.8-1) stable; urgency=low
+
+  * display more kinds of messages in a region
+  * show guarding factions
+
+ -- Enno Rehling <enno@eressea.de>  Thu, 20 Mar 2021 14:42:42 +0200
+
 csmapfx (0.6.7-2) stable; urgency=low
 
   * declare missing dependency to libphysfs

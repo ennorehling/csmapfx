@@ -253,7 +253,9 @@
     <ClCompile Include="statistics.cpp" />
     <ClCompile Include="statsinfos.cpp" />
     <ClCompile Include="symbols.cpp" />
-    <ClCompile Include="tinyjs\TinyJS.cpp" />
+    <ClCompile Include="tinyjs\TinyJS.cpp">
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|Win32'">Level3</WarningLevel>
+    </ClCompile>
     <ClCompile Include="tinyjs\TinyJS_Functions.cpp" />
     <ClCompile Include="tinyjs\TinyJS_MathFunctions.cpp" />
     <ClCompile Include="tradeinfos.cpp" />
