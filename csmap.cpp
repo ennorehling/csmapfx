@@ -307,7 +307,8 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tCtrl-B\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
 	new FXMenuSeparatorEx(viewmenu, "Liste");
 	menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tAlt-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
-	new FXMenuSeparatorEx(viewmenu, "Karte");
+    menu.colorizeUnits = new FXMenuCheck(viewmenu, "Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
+    new FXMenuSeparatorEx(viewmenu, "Karte");
 	menu.streets = new FXMenuCheck(viewmenu,"&Strassen zeigen\tAlt-S\tStrassen auf der Karte anzeigen.");
 	menu.visibility = new FXMenuCheck(viewmenu,FXString(L"&Sichtbarkeit zeigen\tAlt-V\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise)."));
 	menu.shiptravel = new FXMenuCheck(viewmenu,"&Durchschiffung\tAlt-T\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
@@ -414,6 +415,9 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 	menu.ownFactionGroup->setTarget(regions);
 	menu.ownFactionGroup->setSelector(FXRegionList::ID_TOGGLEOWNFACTIONGROUP);
+
+	menu.colorizeUnits->setTarget(regions);
+	menu.colorizeUnits->setSelector(FXRegionList::ID_TOGGLEUNITCOLORS);
 
 	// Middle splitter
 	middle = new FXVerticalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0,0,0,0,0,0,2);
@@ -668,7 +672,11 @@ void CSMap::create()
 	if (show_ownFactionGroup)
 		regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLEOWNFACTIONGROUP), NULL);
 
-	FXint coll_regioninfos = getApp()->reg().readUnsignedEntry("TABS", "REGIONINFOS", 0);
+    FXint colorize_units = getApp()->reg().readUnsignedEntry("SHOW", "COLORIZEUNITS", 1);
+    if (colorize_units)
+        regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLEUNITCOLORS), NULL);
+
+    FXint coll_regioninfos = getApp()->reg().readUnsignedEntry("TABS", "REGIONINFOS", 0);
 	if (coll_regioninfos)
 		riTab->collapse(true);
 
@@ -736,6 +744,7 @@ void CSMap::create()
 		getApp()->reg().writeUnsignedEntry("SHOW", "VISIBILITYSYMBOL", menu.visibility->getCheck());
 		getApp()->reg().writeUnsignedEntry("SHOW", "SHIPTRAVEL", menu.shiptravel->getCheck());
 		getApp()->reg().writeUnsignedEntry("SHOW", "SHADOWREGIONS", menu.shadowRegions->getCheck());
+		getApp()->reg().writeUnsignedEntry("SHOW", "COLORIZEUNITS", menu.colorizeUnits->getCheck());
 		getApp()->reg().writeUnsignedEntry("SHOW", "REGDESCRIPTION", menu.regdescription->getCheck());
 		getApp()->reg().writeUnsignedEntry("SHOW", "OWNFACTIONGROUP", menu.ownFactionGroup->getCheck());
 

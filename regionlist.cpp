@@ -18,8 +18,9 @@ protected:
 	static FXFont *boldfont;
 
 	bool bold;
+    FXColor m_textColor;
 
-	FXRegionItem() : FXTreeItem(), bold() {}
+	FXRegionItem() : FXTreeItem(), m_textColor(0), bold(false) {}
 
 	virtual void draw(const FXTreeList* list,FXDC& dc,FXint x,FXint y,FXint w,FXint h) const;
 	virtual FXint hitItem(const FXTreeList* list,FXint xx,FXint yy) const;
@@ -28,7 +29,7 @@ protected:
 
 public:
 	/// Constructor
-	FXRegionItem(const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL) : FXTreeItem(text, oi, ci, ptr), bold() {}
+	FXRegionItem(const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL) : FXTreeItem(text, oi, ci, ptr), m_textColor(0), bold(false) {}
 
 	bool isBold() const
 	{
@@ -45,6 +46,14 @@ public:
 	{
 		boldfont = font;
 	}
+
+    FXColor getTextColor() const {
+        return m_textColor;
+    }
+    void setTextColor(FXColor color) {
+        m_textColor = color;
+    }
+
 };
 
 /*static */ FXFont* FXRegionItem::boldfont;
@@ -59,40 +68,47 @@ FXIMPLEMENT(FXRegionItem,FXTreeItem,NULL,0)
 // Draw item
 void FXRegionItem::draw(const FXTreeList* list,FXDC& dc,FXint xx,FXint yy,FXint,FXint hh) const
 {
-  FXIcon *icon=(state&OPENED)?openIcon:closedIcon;
-  FXFont *font=list->getFont();
-  if (isBold() && boldfont)
-		dc.setFont(font = boldfont);
-  FXint th=0,tw=0,ih=0,iw=0;
-  xx+=SIDE_SPACING/2;
-  if(icon){
-    iw=icon->getWidth();
-    ih=icon->getHeight();
-    dc.drawIcon(icon,xx,yy+(hh-ih)/2);
-    xx+=ICON_SPACING+iw;
+    FXIcon *icon = (state & OPENED) ? openIcon : closedIcon;
+    FXFont *font = list->getFont();
+    if (isBold() && boldfont) {
+        dc.setFont(font = boldfont);
     }
-  if(!label.empty()){
-    tw=4+font->getTextWidth(label.text(),label.length());
-    th=4+font->getFontHeight();
-    yy+=(hh-th)/2;
-    if(isSelected()){
-      dc.setForeground(list->getSelBackColor());
-      dc.fillRectangle(xx,yy,tw,th);
-      }
-    if(hasFocus()){
-      dc.drawFocusRectangle(xx+1,yy+1,tw-2,th-2);
-      }
-    if(!isEnabled())
-      dc.setForeground(makeShadowColor(list->getBackColor()));
-    else if(isSelected())
-      dc.setForeground(list->getSelTextColor());
-    else
-      dc.setForeground(list->getTextColor());
-    dc.drawText(xx+2,yy+font->getFontAscent()+2,label);
+    FXint th = 0, tw = 0, ih = 0, iw = 0;
+    xx += SIDE_SPACING / 2;
+    if (icon) {
+        iw = icon->getWidth();
+        ih = icon->getHeight();
+        dc.drawIcon(icon, xx, yy + (hh - ih) / 2);
+        xx += ICON_SPACING + iw;
+    }
+    if (!label.empty()) {
+        tw = 4 + font->getTextWidth(label.text(), label.length());
+        th = 4 + font->getFontHeight();
+        yy += (hh - th) / 2;
+        if (isSelected()) {
+            dc.setForeground(list->getSelBackColor());
+            dc.fillRectangle(xx, yy, tw, th);
+        }
+        if (hasFocus()) {
+            dc.drawFocusRectangle(xx + 1, yy + 1, tw - 2, th - 2);
+        }
+        if (!isEnabled())
+            dc.setForeground(makeShadowColor(list->getBackColor()));
+        else if (isSelected())
+            dc.setForeground(list->getSelTextColor());
+        else if (((FXRegionList *)list)->colorized()) {
+            FXColor color = getTextColor();
+            if (!color) color = list->getTextColor();
+            dc.setForeground(color);
+        }
+        else {
+            dc.setForeground(list->getTextColor());
+        }
+        dc.drawText(xx + 2, yy + font->getFontAscent() + 2, label);
     }
 
-	if (isBold())
-		dc.setFont(list->getFont());
+    if (isBold())
+        dc.setFont(list->getFont());
 }
 
 // See if item got hit, and where:- 1 is icon, 2 is text
@@ -180,22 +196,23 @@ FXDEFMAP(FXRegionList) MessageMap[]=
 	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_TOGGLEOWNFACTIONGROUP, FXRegionList::onToggleOwnFactionGroup), 
 	FXMAPFUNC(SEL_UPDATE,			FXRegionList::ID_TOGGLEOWNFACTIONGROUP, FXRegionList::onUpdateOwnFactionGroup),
 
+	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_TOGGLEUNITCOLORS, FXRegionList::onToggleUnitColors),
+	FXMAPFUNC(SEL_UPDATE,			FXRegionList::ID_TOGGLEUNITCOLORS, FXRegionList::onUpdateUnitColors),
+
 	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_UPDATE,			FXRegionList::onMapChange), 
 	FXMAPFUNC(SEL_QUERY_HELP,		0,									FXRegionList::onQueryHelp), 
 }; 
 
 FXIMPLEMENT(FXRegionList,FXTreeList,MessageMap, ARRAYNUMBER(MessageMap))
 
-FXRegionList::FXRegionList(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h)
-		: FXTreeList(p, tgt,sel, opts, x, y, w, h)
+FXRegionList::FXRegionList(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h) :
+    FXTreeList(p, tgt,sel, opts, x, y, w, h),
+    active_faction_group(false),
+    colorized_units(false),
+    files(NULL)
 {
 	// modify list style
 	setListStyle(getListStyle()|TREELIST_SINGLESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES);
-
-	// init variables
-	files = NULL;
-
-	active_faction_group = false;
 
 	// create/load images for terrain types
 	for (int i = 0; i <  data::TERRAIN_LAST; i++)
@@ -264,9 +281,10 @@ long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* p
 
 	// map change notify rebuilds treelist
 	datafile::SelectionState sel_state = selection;
-	if (files->empty())
-		sel_state.selected = 0,
-		sel_state.map = 0;
+    if (files->empty()) {
+        sel_state.selected = 0;
+        sel_state.map = 0;
+    }
 
 	sel_state.map |= sel_state.MAPCHANGED;
 	getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
@@ -276,6 +294,31 @@ long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* p
 long FXRegionList::onUpdateOwnFactionGroup(FXObject* sender, FXSelector, void* ptr)
 {
 	sender->handle(this, FXSEL(SEL_COMMAND, active_faction_group?ID_CHECK:ID_UNCHECK), NULL);
+	return 1;
+}
+
+long FXRegionList::onToggleUnitColors(FXObject *sender, FXSelector, void *ptr)
+{
+    colorized_units = !colorized_units;
+
+    // connected to a datafile list?
+    if (!files)
+        return 1;
+
+    // map change notify rebuilds treelist
+    datafile::SelectionState sel_state = selection;
+    if (files->empty()) {
+        sel_state.selected = 0;
+        sel_state.map = 0;
+    }
+
+    getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
+    return 1;
+}
+
+long FXRegionList::onUpdateUnitColors(FXObject* sender, FXSelector, void* ptr)
+{
+	sender->handle(this, FXSEL(SEL_COMMAND, colorized_units?ID_CHECK:ID_UNCHECK), NULL);
 	return 1;
 }
 
@@ -713,13 +756,20 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					FXTreeItem* faction = factions[factionId];
 
 					FXString uname, number;				
+                    FXColor color = 0;
 
 					for (datakey::itor key = unit->data().begin(); key != unit->data().end(); key++)
 					{
 						if (key->type() == datakey::TYPE_NAME)
                             uname = key->value();
-						if (key->type() == datakey::TYPE_NUMBER)
+						else if (key->type() == datakey::TYPE_NUMBER)
 							number = key->value();
+                        else if (key->key() == "Burg") {
+                            color = FXRGB(0, 127, 0);
+                        }
+                        else if (key->key() == "Schiff") {
+                            color = FXRGB(0, 0, 127);
+                        }
 					}
 
 					label.format("%s (%s): %s", uname.text(), unit->id().text(), number.text());
@@ -733,7 +783,11 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					else
 						appendItem(faction, item = new FXRegionItem(label, 0,0, &*unit));
 
-					datablock::itor block = unit;
+                    if (color) {
+                        item->setTextColor(color);
+                    }
+
+                    datablock::itor block = unit;
 					for (block++; block != iend && block->depth() > unit->depth(); block++)
 					{
 						if (block->type() != datablock::TYPE_COMMANDS)

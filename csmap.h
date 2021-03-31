@@ -245,6 +245,7 @@ private:
 		FXMenuCheck *visibility;	// show symbols for visibility of a region
 		FXMenuCheck *shiptravel;	// show a symbol for travelled ships
 		FXMenuCheck *shadowRegions;	// paint unseen regions darker
+		FXMenuCheck *colorizeUnits;	// colorize units in building/ship
 		FXMenuCheck *islands;		// show island names
 		FXMenuCheck *minimap_islands;	// show island names on mini map
 

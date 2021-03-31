@@ -27,15 +27,22 @@ public:
 	long onToggleOwnFactionGroup(FXObject*,FXSelector,void*);
 	long onUpdateOwnFactionGroup(FXObject*,FXSelector,void*);
 
+	long onToggleUnitColors(FXObject*,FXSelector,void*);
+	long onUpdateUnitColors(FXObject*,FXSelector,void*);
+
 	long onMapChange(FXObject*,FXSelector,void*);
 	long onQueryHelp(FXObject*,FXSelector,void*);
 	
+    bool colorized() const {
+        return colorized_units;
+    }
 public: 
 	enum
 	{
 		ID_POPUP_CLICKED = FXTreeList::ID_LAST,
 		ID_TOGGLEOWNFACTIONGROUP,
-		ID_LAST
+        ID_TOGGLEUNITCOLORS,
+        ID_LAST
 	};
 
 protected:
@@ -52,6 +59,7 @@ protected:
 	FXTreeItem* findTreeItem(FXTreeItem* first, void* data);
 
 	bool active_faction_group;
+	bool colorized_units;
 
 protected:
 	FXRegionList(){}
