@@ -65,6 +65,9 @@ FXDEFMAP(CSMap) MessageMap[]=
 
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_HELP_ABOUT,		CSMap::onHelpAbout),
 
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_TAB_UNIT,		CSMap::onViewUnitTab),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_TAB_STATS,		CSMap::onViewStatsTab),
+
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_ZOOM,			CSMap::onChangeZoom),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_MAP_ZOOM,			CSMap::onUpdateZoom),
 
@@ -486,12 +489,14 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 	tabbook = new FXTabBook(commandsplitter, NULL,0, TABBOOK_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
 
-	new FXTabItem(tabbook, "Einheiten");
+    new FXTabItem(tabbook, "Einheiten");
 	unitlist = new FXUnitList(tabbook, this,ID_SELECTION, LAYOUT_FILL_X);
 	unitlist->mapfiles(&files);
-	new FXTabItem(tabbook, "Statistik");
+    new FXTabItem(tabbook, "Statistik");
 	statistics = new FXStatistics(tabbook, this,ID_SELECTION, LAYOUT_FILL_X);
 	statistics->mapfiles(&files);
+    getAccelTable()->addAccel(MKUINT(KEY_F1, 0), this, FXSEL(SEL_COMMAND, ID_TAB_UNIT));
+    getAccelTable()->addAccel(MKUINT(KEY_F2, 0), this, FXSEL(SEL_COMMAND, ID_TAB_STATS));
 
 	// Befehlseditor
 	commandframe = new FXVerticalFrame(commandsplitter,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 0,0,0,0);
@@ -2625,6 +2630,18 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 	state.map |= state.MAPCHANGED;		// Datei wurde ge\u00e4ndert
 	handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 	return 1;
+}
+
+long CSMap::onViewStatsTab(FXObject *, FXSelector, void *)
+{
+    tabbook->setCurrent(1);
+    return 1;
+}
+
+long CSMap::onViewUnitTab(FXObject *, FXSelector, void *)
+{
+    tabbook->setCurrent(0);
+    return 1;
 }
 
 long CSMap::onHelpAbout(FXObject*, FXSelector, void*)
