@@ -495,8 +495,8 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
     new FXTabItem(tabbook, "Statistik");
 	statistics = new FXStatistics(tabbook, this,ID_SELECTION, LAYOUT_FILL_X);
 	statistics->mapfiles(&files);
-    getAccelTable()->addAccel(MKUINT(KEY_F1, 0), this, FXSEL(SEL_COMMAND, ID_TAB_UNIT));
-    getAccelTable()->addAccel(MKUINT(KEY_F2, 0), this, FXSEL(SEL_COMMAND, ID_TAB_STATS));
+    getAccelTable()->addAccel(MKUINT(KEY_1, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_UNIT));
+    getAccelTable()->addAccel(MKUINT(KEY_2, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_STATS));
 
 	// Befehlseditor
 	commandframe = new FXVerticalFrame(commandsplitter,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 0,0,0,0);
