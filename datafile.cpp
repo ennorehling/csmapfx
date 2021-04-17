@@ -13,6 +13,8 @@
 #include <FXBZFileStream.h>
 #endif
 
+#define HELP_GUARD 16
+
 // ===========================
 // === datakey implementation
 
@@ -1965,7 +1967,7 @@ void datafile::createHashTables()
 	int region_ally = 0;
 	int region_enemy = 0;
 
-	std::map<int, bool> allied_status;	// what factions do we have HELP stati set to?
+	std::map<int, FXint> allied_status;	// what factions do we have HELP stati set to?
 	std::set<int> unit_got_taxes;		// units that got taxes (MSG id 1264208711); the regions will get a coins icon
 	/*
 	MESSAGE <id>
@@ -2005,8 +2007,10 @@ void datafile::createHashTables()
 		block = activefaction();
 		for (block++; block != end() && block->depth() > factionDepth; block++)
 		{
-			if (block->type() == datablock::TYPE_ALLIANCE)
-				allied_status[block->info()] = true;
+            if (block->type() == datablock::TYPE_ALLIANCE) {
+                FXint status = block->valueInt("Status", 0);
+                allied_status[block->info()] = status;
+            }
 		}
 	}
 
@@ -2078,9 +2082,10 @@ void datafile::createHashTables()
 				int ownerId = block->valueInt("owner", -1);
 				if (ownerId == activefaction()->info())
 					region->setFlags(datablock::FLAG_REGION_OWN);
-				else if (allied_status[ownerId])
-					region->setFlags(datablock::FLAG_REGION_ALLY);
-				else if (ownerId != -1)
+                else if (allied_status[ownerId] & HELP_GUARD) {
+                    region->setFlags(datablock::FLAG_REGION_ALLY);
+                }
+                else if (ownerId != -1)
 					region->setFlags(datablock::FLAG_REGION_ENEMY);
 			}
 		}
@@ -2185,7 +2190,7 @@ void datafile::createHashTables()
 						region_own += number;
 						owner = UNIT_OWN;
 					}
-					else if (allied_status[factionId])
+					else if (allied_status[factionId] != 0)
 					{
 						region_ally += number;
 						owner = UNIT_ALLY;

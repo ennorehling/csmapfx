@@ -2,6 +2,7 @@ csmapfx (0.7.0-1) stable; urgency=low
 
   * include region id in exported maps
   * fix "Runde" attributes getting exported as strings
+  * guard notifier checks for "HELP GUARD" status
 
  -- Enno Rehling <enno@eressea.de>  Thu, 17 Apr 2021 10:00:00 +0200
 
