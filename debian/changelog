@@ -1,3 +1,10 @@
+csmapfx (0.7.0-1) stable; urgency=low
+
+  * include region id in exported maps
+  * fix "Runde" attributes getting exported as strings
+
+ -- Enno Rehling <enno@eressea.de>  Thu, 17 Apr 2021 10:00:00 +0200
+
 csmapfx (0.6.9-1) stable; urgency=low
 
   * display units in different colors

@@ -44,7 +44,7 @@ void datakey::value(const FXString& s)
 	if (type == "Insel")
 		return TYPE_ISLAND;
 	if (type == "id")
-		return TYPE_ID;
+		return TYPE_ID|TYPE_INTEGER;
 	if (type == "Partei")
 		return TYPE_FACTION;
 	if (type == "Parteiname")
@@ -60,7 +60,7 @@ void datakey::value(const FXString& s)
 	if (type == "visibility")
 		return TYPE_VISIBILITY;
 	if (type == "Runde")
-		return TYPE_TURN;
+		return TYPE_TURN | TYPE_INTEGER;
 	if (type == "Silber")
 		return TYPE_SILVER;
 	if (type == "Rekrutierungskosten")

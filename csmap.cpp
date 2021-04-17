@@ -943,6 +943,7 @@ bool CSMap::mergeFile(FXString filename)
 				FXString terrain = block->value(datakey::TYPE_TERRAIN);
 				FXString island = block->value(datakey::TYPE_ISLAND);
 				FXString turn = block->value(datakey::TYPE_TURN);
+				FXString id = block->value(datakey::TYPE_ID);
 
 				datakey key;
 
@@ -957,6 +958,10 @@ bool CSMap::mergeFile(FXString filename)
                 if (!island.empty())
 				{
 					key.key("Insel"); key.value(island); newblock.data().push_back(key);
+				}
+                if (!id.empty())
+				{
+					key.key("id"); key.value(id); newblock.data().push_back(key);
 				}
 
 				key.key("Runde");
