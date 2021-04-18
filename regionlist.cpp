@@ -768,7 +768,7 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                             color = FXRGB(0, 127, 0);
                         }
                         else if (key->key() == "Schiff") {
-                            color = FXRGB(0, 0, 127);
+                            color = FXRGB(0, 0, 255);
                         }
 					}
 
