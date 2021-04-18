@@ -113,7 +113,7 @@ FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbo
 }
 
 // helper function
-void scaleTransformIcon(FXIcon* icon, const unsigned char data[], FXint w, FXint h, FXfloat scale, boost::function<FXColor(FXColor)> transform);
+void scaleTransformIcon(FXIcon* icon, const unsigned char data[], FXint w, FXint h, FXfloat scale, std::function<FXColor(FXColor)> transform);
 
 void FXCSMap::create()
 {
@@ -526,7 +526,7 @@ struct rotateHuePixelColor : colorTransform {
 };
 
 // transforms all non-transparent pixels of an icon
-void transformIcon(FXIcon& icon, boost::function<FXColor(FXColor)> transform)
+void transformIcon(FXIcon& icon, std::function<FXColor(FXColor)> transform)
 {
 	FXColor transparent = icon.getTransparentColor();
 
@@ -541,7 +541,7 @@ void transformIcon(FXIcon& icon, boost::function<FXColor(FXColor)> transform)
 		}
 }
 
-void scaleTransformIcon(FXIcon* icon, const unsigned char data[], FXint w, FXint h, FXfloat scale, boost::function<FXColor(FXColor)> transform)
+void scaleTransformIcon(FXIcon* icon, const unsigned char data[], FXint w, FXint h, FXfloat scale, std::function<FXColor(FXColor)> transform)
 {
 	FXMemoryStream ms;		// memory stream for loading bitmap data
     ms.open(FXStreamLoad,(FXuchar*)data);

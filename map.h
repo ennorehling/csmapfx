@@ -5,7 +5,8 @@
 #include <vector>
 #include <list>
 #include <map>
-#include <boost/function.hpp>
+#include <functional>
+
 #include "datafile.h"
 #include "terrain.h"
 #include "mapcanvas.h"
@@ -169,7 +170,7 @@ protected:
 
 	// records icon <-> image data link
 	struct IconRecord {
-		typedef boost::function<FXColor(FXColor)> transform_t;
+		typedef std::function<FXColor(FXColor)> transform_t;
 		FXIcon**				icon;
 		const unsigned char*	data;
 		int						width, height;

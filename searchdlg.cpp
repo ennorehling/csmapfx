@@ -4,7 +4,7 @@
 #include "searchdlg.h"
 #include "symbols.h"
 
-#include <boost/function.hpp>
+#include <functional>
 #include <boost/tuple/tuple.hpp>
 
 // *********************************************************************************************************
@@ -182,7 +182,7 @@ long FXSearchDlg::onFocusIn(FXObject* sender, FXSelector sel, void* ptr)
 namespace
 {
 	// compare functions
-	typedef boost::function<bool(const FXString&)> compare_func_t;
+	typedef std::function<bool(const FXString&)> compare_func_t;
 
 	class compare_normal
 	{
@@ -249,7 +249,7 @@ namespace
 	typedef boost::tuple<itor_ref, itor_ref, itor_ref, itor_ref, itor_ref, const compare_func_t&, const compare_func_t&, bool> block_context;
 	// context(search_string, region, building, ship, unit, end, compare_func, compare_func_icase, descriptions);
 
-	typedef boost::function<bool(const datablock::itor&, const block_context&)> search_func_t;
+	typedef std::function<bool(const datablock::itor&, const block_context&)> search_func_t;
 
 	bool search_region(const datablock::itor& block, const block_context& context)
 	{
