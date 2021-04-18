@@ -5,7 +5,7 @@
 #include "symbols.h"
 
 #include <functional>
-#include <boost/tuple/tuple.hpp>
+#include <tuple>
 
 // *********************************************************************************************************
 // *** FXMessages implementation
@@ -246,7 +246,7 @@ namespace
 
 	// search functions
 	typedef const datablock::itor& itor_ref;
-	typedef boost::tuple<itor_ref, itor_ref, itor_ref, itor_ref, itor_ref, const compare_func_t&, const compare_func_t&, bool> block_context;
+	typedef std::tuple<itor_ref, itor_ref, itor_ref, itor_ref, itor_ref, const compare_func_t&, const compare_func_t&, bool> block_context;
 	// context(search_string, region, building, ship, unit, end, compare_func, compare_func_icase, descriptions);
 
 	typedef std::function<bool(const datablock::itor&, const block_context&)> search_func_t;
@@ -256,7 +256,7 @@ namespace
 		if (block->type() != datablock::TYPE_REGION)
 			return false;
 
-		const compare_func_t& compare = context.get<5>();
+		const compare_func_t& compare = std::get<5>(context);
 
 		FXString name = block->value(datakey::TYPE_NAME);
 		if (name.empty())
@@ -272,7 +272,7 @@ namespace
 		if (compare(name))
 			return true;
 
-		if (context.get<7>())		// compare descriptions?
+		if (std::get<7>(context))		// compare descriptions?
 			return compare(block->value(datakey::TYPE_DESCRIPTION));
 
 		return false;
@@ -283,13 +283,13 @@ namespace
 		if (block->type() != datablock::TYPE_UNIT)
 			return false;
 
-		const compare_func_t& compare = context.get<5>();
-		const compare_func_t& compare_icase = context.get<6>();
+		const compare_func_t& compare = std::get<5>(context);
+		const compare_func_t& compare_icase = std::get<6>(context);
 
 		if (compare(block->value(datakey::TYPE_NAME)) || compare_icase(block->id()))
 			return true;
 
-		if (context.get<7>())		// compare descriptions?
+		if (std::get<7>(context))		// compare descriptions?
 			return compare(block->value(datakey::TYPE_DESCRIPTION));
 
 		return false;
@@ -300,13 +300,13 @@ namespace
 		if (block->type() != datablock::TYPE_BUILDING)
 			return false;
 
-		const compare_func_t& compare = context.get<5>();
-		const compare_func_t& compare_icase = context.get<6>();
+		const compare_func_t& compare = std::get<5>(context);
+		const compare_func_t& compare_icase = std::get<6>(context);
 
 		if (compare(block->value(datakey::TYPE_NAME)) || compare_icase(block->id()))
 			return true;
 
-		if (context.get<7>())		// compare descriptions?
+		if (std::get<7>(context))		// compare descriptions?
 			return compare(block->value(datakey::TYPE_DESCRIPTION));
 
 		return false;
@@ -317,13 +317,13 @@ namespace
 		if (block->type() != datablock::TYPE_SHIP)
 			return false;
 
-		const compare_func_t& compare = context.get<5>();
-		const compare_func_t& compare_icase = context.get<6>();
+		const compare_func_t& compare = std::get<5>(context);
+		const compare_func_t& compare_icase = std::get<6>(context);
 
 		if (compare(block->value(datakey::TYPE_NAME)) || compare_icase(block->id()))
 			return true;
 
-		if (context.get<7>())		// compare descriptions?
+		if (std::get<7>(context))		// compare descriptions?
 			return compare(block->value(datakey::TYPE_DESCRIPTION));
 
 		return false;
@@ -334,7 +334,7 @@ namespace
 		if (block->type() != datablock::TYPE_COMMANDS)
 			return false;
 
-		const compare_func_t& compare = context.get<5>();
+		const compare_func_t& compare = std::get<5>(context);
 
 		// search if a command matchs
 		if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
