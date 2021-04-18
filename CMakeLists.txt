@@ -34,13 +34,6 @@ set (SOURCES
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-find_path(BOOST_CORE_INCLUDE_DIRS "boost/checked_delete.hpp")
-target_include_directories(${PROJECT_NAME} PRIVATE ${BOOST_CORE_INCLUDE_DIRS})
-find_path(BOOST_FUNCTION_INCLUDE_DIRS "boost/function.hpp")
-target_include_directories(${PROJECT_NAME} PRIVATE ${BOOST_FUNCTION_INCLUDE_DIRS})
-find_path(BOOST_TUPLE_INCLUDE_DIRS "boost/tuple/detail/tuple_basic.hpp")
-target_include_directories(${PROJECT_NAME} PRIVATE ${BOOST_TUPLE_INCLUDE_DIRS})
-
 find_package(PhysFS 2.1 REQUIRED)
 find_package(PNG REQUIRED)
 
@@ -58,8 +51,6 @@ find_path(FOX_INCLUDE_DIRS "fxkeys.h" PATHS "${FOX_ROOT}/include" REQUIRED)
 find_library(FOX_LIBRARY NAMES FOX-1.6 PATHS "${FOX_ROOT}/lib" REQUIRED)
 set (FOX_LIBRARIES ${FOX_LIBRARY})
 add_compile_definitions(
-BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE
-BOOST_SIGNALS_NO_DEPRECATION_WARNING
 FLOAT_MATH_FUNCTIONS)
 else (WIN32)
 include (FindPkgConfig)
