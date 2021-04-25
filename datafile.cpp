@@ -1571,7 +1571,7 @@ FXint datafile::saveCmds(const FXString& filename, const FXString& password, boo
 	if (!m_cmds.prefix_lines.empty())
 	{
 		for (std::vector<FXString>::iterator itor = m_cmds.prefix_lines.begin(); itor != m_cmds.prefix_lines.end(); itor++)
-			out << " " << *itor << "\n";
+			out << " " << (*itor).text() << "\n";
 	}
 	else
 	{
@@ -1609,7 +1609,7 @@ FXint datafile::saveCmds(const FXString& filename, const FXString& password, boo
 					if (region->info())
 						cmds->header += "," + FXStringVal(region->info());
 
-					cmds->header += " ; " + region->value(datakey::TYPE_NAME);
+                    cmds->header += " ; " + region->value(datakey::TYPE_NAME);
 					cmds->header += " (" + region->terrainString() + ")";
 
 					//  ; ECheck Lohn 13
@@ -1657,19 +1657,19 @@ FXint datafile::saveCmds(const FXString& filename, const FXString& password, boo
 		// output region header + text lines
 		att_commands* cmds = &m_cmds.region_lines[regord->first];
 
-		out << " " << cmds->header << "\n";
+		out << " " << cmds->header.text() << "\n";
 
 		// output prefix lines
 		for (att_commands::cmdlist_t::iterator itor = cmds->prefix_lines.begin(); itor != cmds->prefix_lines.end(); itor++)
-			out << " " << *itor << "\n";
+			out << " " << (*itor).text() << "\n";
 
 		// output changed commands
 		for (att_commands::cmdlist_t::iterator itor = cmds->commands.begin(); itor != cmds->commands.end(); itor++)
-			out << "  " << *itor << "\n";
+			out << "  " << (*itor).text() << "\n";
 
 		// output postfix lines
 		for (att_commands::cmdlist_t::iterator itor = cmds->postfix_lines.begin(); itor != cmds->postfix_lines.end(); itor++)
-			out << " " << *itor << "\n";
+			out << " " << (*itor).text() << "\n";
 
 		// output units in order
 		std::vector<int>& order = regord->second;
@@ -1701,7 +1701,7 @@ FXint datafile::saveCmds(const FXString& filename, const FXString& password, boo
 
 			att_commands* attcmds = dynamic_cast<att_commands*>(cmdb->attachment());
 			if (attcmds && !attcmds->header.empty())
-				out << "  " << attcmds->header << "\n";
+				out << "  " << attcmds->header.text() << "\n";
 			else
 			{
 				// get amount of silber from GEGENSTAENDE block
@@ -1718,7 +1718,7 @@ FXint datafile::saveCmds(const FXString& filename, const FXString& password, boo
 				// output unit header
 				out << "  EINHEIT " << unit->id();
 
-				out << ";  " << unit->value(datakey::TYPE_NAME);
+				out << ";  " << (unit->value(datakey::TYPE_NAME)).text();
 			
 				out << " " << "[" << unit->valueInt(datakey::TYPE_NUMBER) << "," << silver << "$]";
 
@@ -1756,7 +1756,7 @@ FXint datafile::saveCmds(const FXString& filename, const FXString& password, boo
 
 				// output prefix lines
 				for (att_commands::cmdlist_t::iterator itor = attcmds->prefix_lines.begin(); itor != attcmds->prefix_lines.end(); itor++)
-					out << "  " << *itor << "\n";
+					out << "  " << (*itor).text() << "\n";
 
 				// output changed commands
 				//if (EdEKaravelle)
@@ -1772,12 +1772,12 @@ FXint datafile::saveCmds(const FXString& filename, const FXString& password, boo
 				//else
 				{
 					for (att_commands::cmdlist_t::iterator itor = attcmds->commands.begin(); itor != attcmds->commands.end(); itor++)
-						out << "   " << *itor << "\n";
+						out << "   " << (*itor).text() << "\n";
 				}
 
 				// output postfix lines
 				for (att_commands::cmdlist_t::iterator itor = attcmds->postfix_lines.begin(); itor != attcmds->postfix_lines.end(); itor++)
-					out << "  " << *itor << "\n";
+					out << "  " << (*itor).text() << "\n";
 			}		
 			else
 			{
