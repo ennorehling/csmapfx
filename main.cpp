@@ -86,8 +86,7 @@ int main(int argc, char *argv[])
 	FXApp CSApp("CSMap", "Eressea"); 
 
 	// Open display
-	//CSApp.reg().setAsciiMode(true);
-	CSApp.init(argc,argv); 
+	CSApp.init(argc, argv); 
 	CSApp.create();
 
 	CSApp.setTranslator(new GermanTranslation(&CSApp));

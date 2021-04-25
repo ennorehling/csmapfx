@@ -333,9 +333,6 @@ public:
 	bool utf8cr() const { return m_utf8cr; }
 	void utf8cr(bool utf8) { m_utf8cr = utf8; }
 
-	FXString password() const { return m_cmds.password; }
-	void password(const FXString& passwd) { m_cmds.password = passwd; }
-
 	bool modifiedCmds() const { return m_cmds.modified; }
 	void modifiedCmds(bool mod) { m_cmds.modified = mod; }
 
@@ -348,8 +345,8 @@ public:
 	void createHierarchy();
 	void createHashTables();
 
-	FXint loadCmds(const FXchar* filename);
-	FXint saveCmds(const FXchar* filename, bool stripped, bool replace);
+	FXint loadCmds(const FXString &filename);
+	FXint saveCmds(const FXString &filename, const FXString &passwd, bool stripped, bool replace);
 
 	datablock::list_type& blocks() { return m_blocks; }
 
@@ -440,7 +437,6 @@ protected:
 	struct cmds_t
 	{
 		bool modified;
-		FXString password;
 
         // command lines before any units
 		std::vector<FXString> prefix_lines;

@@ -11,7 +11,7 @@
 #include "FXFileDialogEx.h"
 #include <FXRex.h>
 #include <FXICOIcon.h>
-
+#include <FXSocket.h>
 #include <stdexcept>
 
 FXDEFMAP(CSMap) MessageMap[]=
@@ -607,10 +607,15 @@ void CSMap::create()
 	FXMainWindow::create();
 
 	// reload window position & size
-	FXint x = getApp()->reg().readUnsignedEntry("WINDOW", "XPOS", 100);
-	FXint y = getApp()->reg().readUnsignedEntry("WINDOW", "YPOS", 100);
-	FXint w = getApp()->reg().readUnsignedEntry("WINDOW", "WIDTH", 800);
-	FXint h = getApp()->reg().readUnsignedEntry("WINDOW", "HEIGHT", 600);
+    FXRegistry &reg = getApp()->reg();
+    const FXchar *passwd = reg.readStringEntry("WINDOW", "PASSWORD", NULL);
+    if (passwd) {
+        password.assign(passwd);
+    }
+    FXint x = reg.readUnsignedEntry("WINDOW", "XPOS", 100);
+	FXint y = reg.readUnsignedEntry("WINDOW", "YPOS", 100);
+	FXint w = reg.readUnsignedEntry("WINDOW", "WIDTH", 800);
+	FXint h = reg.readUnsignedEntry("WINDOW", "HEIGHT", 600);
 
 	if (x < 0) x = 0;
 	if (y < 21) y = 21;
@@ -620,13 +625,13 @@ void CSMap::create()
 	position(x, y, w, h);
 
 	// reload layout information
-	FXint regionsWidth = getApp()->reg().readUnsignedEntry("WINDOW", "REGIONS_WIDTH", 200);
-	FXint mapWidth = getApp()->reg().readUnsignedEntry("WINDOW", "MAP_WIDTH", 400);
-	FXint infoWidth = getApp()->reg().readUnsignedEntry("WINDOW", "INFO_WIDTH", 200);
-	FXint msgHeight = getApp()->reg().readUnsignedEntry("WINDOW", "MESSAGES_HEIGHT", 100);
-	FXint cmdHeight = getApp()->reg().readUnsignedEntry("WINDOW", "COMMANDS_HEIGHT", 100);
+	FXint regionsWidth = reg.readUnsignedEntry("WINDOW", "REGIONS_WIDTH", 200);
+	FXint mapWidth = reg.readUnsignedEntry("WINDOW", "MAP_WIDTH", 400);
+	FXint infoWidth = reg.readUnsignedEntry("WINDOW", "INFO_WIDTH", 200);
+	FXint msgHeight = reg.readUnsignedEntry("WINDOW", "MESSAGES_HEIGHT", 100);
+	FXint cmdHeight = reg.readUnsignedEntry("WINDOW", "COMMANDS_HEIGHT", 100);
 
-	FXint maximized = getApp()->reg().readUnsignedEntry("WINDOW", "MAXIMIZED", 0);
+	FXint maximized = reg.readUnsignedEntry("WINDOW", "MAXIMIZED", 0);
 
 	leftframe->setWidth(regionsWidth);
 	middle->setWidth(mapWidth);
@@ -636,60 +641,60 @@ void CSMap::create()
 	commandframe->setHeight(cmdHeight);
 
 	// reload InfoDlg/SearchDlg window size
-	searchdlg->loadState(getApp()->reg());
-	infodlg->loadState(getApp()->reg());
-	statistics->loadState(getApp()->reg());
+	searchdlg->loadState(reg);
+	infodlg->loadState(reg);
+	statistics->loadState(reg);
 
 	// reload menu options
-	FXint show_toolbar = getApp()->reg().readUnsignedEntry("SHOW", "TOOLBAR", 1);
+	FXint show_toolbar = reg.readUnsignedEntry("SHOW", "TOOLBAR", 1);
 	if (!show_toolbar)
 		toolbar->handle(this, FXSEL(SEL_COMMAND, FXToolBar::ID_TOGGLESHOWN), NULL);
 
-	FXint show_msg = getApp()->reg().readUnsignedEntry("SHOW", "MESSAGES", 1);
+	FXint show_msg = reg.readUnsignedEntry("SHOW", "MESSAGES", 1);
 	if (!show_msg)
 		handle(this, FXSEL(SEL_COMMAND, ID_VIEW_MESSAGES), NULL);
 
-	FXint show_calc = getApp()->reg().readUnsignedEntry("SHOW", "CALCULATOR", 1);
+	FXint show_calc = reg.readUnsignedEntry("SHOW", "CALCULATOR", 1);
 	if (!show_calc)
 		mathbar->handle(this, FXSEL(SEL_COMMAND, FXCalculator::ID_TOGGLESHOWN), NULL);
 
-	FXint show_streets = getApp()->reg().readUnsignedEntry("SHOW", "STREETS", 1);
+	FXint show_streets = reg.readUnsignedEntry("SHOW", "STREETS", 1);
 	if (show_streets)
 		map->handle(this, FXSEL(SEL_COMMAND, FXCSMap::ID_TOGGLESTREETS), NULL);
 
-	FXint show_visibility = getApp()->reg().readUnsignedEntry("SHOW", "VISIBILITYSYMBOL", 1);
+	FXint show_visibility = reg.readUnsignedEntry("SHOW", "VISIBILITYSYMBOL", 1);
 	if (show_visibility)
 		map->handle(this, FXSEL(SEL_COMMAND, FXCSMap::ID_TOGGLEVISIBILITYSYMBOL), NULL);
 
-	FXint show_shiptravel = getApp()->reg().readUnsignedEntry("SHOW", "SHIPTRAVEL", 1);
+	FXint show_shiptravel = reg.readUnsignedEntry("SHOW", "SHIPTRAVEL", 1);
 	if (show_shiptravel)
 		map->handle(this, FXSEL(SEL_COMMAND, FXCSMap::ID_TOGGLESHIPTRAVEL), NULL);
 
-	FXint show_shadowRegions = getApp()->reg().readUnsignedEntry("SHOW", "SHADOWREGIONS", 1);
+	FXint show_shadowRegions = reg.readUnsignedEntry("SHOW", "SHADOWREGIONS", 1);
 	if (show_shadowRegions)
 		map->handle(this, FXSEL(SEL_COMMAND, FXCSMap::ID_TOGGLESHADOWREGIONS), NULL);
 
-	FXint show_regdescription = getApp()->reg().readUnsignedEntry("SHOW", "REGDESCRIPTION", 1);
+	FXint show_regdescription = reg.readUnsignedEntry("SHOW", "REGDESCRIPTION", 1);
 	if (show_regdescription)
 		regioninfos->handle(this, FXSEL(SEL_COMMAND, FXRegionInfos::ID_TOGGLEDESCRIPTION), NULL);
 
-	FXint show_ownFactionGroup = getApp()->reg().readUnsignedEntry("SHOW", "OWNFACTIONGROUP", 1);
+	FXint show_ownFactionGroup = reg.readUnsignedEntry("SHOW", "OWNFACTIONGROUP", 1);
 	if (show_ownFactionGroup)
 		regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLEOWNFACTIONGROUP), NULL);
 
-    FXint colorize_units = getApp()->reg().readUnsignedEntry("SHOW", "COLORIZEUNITS", 1);
+    FXint colorize_units = reg.readUnsignedEntry("SHOW", "COLORIZEUNITS", 1);
     if (colorize_units)
         regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLEUNITCOLORS), NULL);
 
-    FXint coll_regioninfos = getApp()->reg().readUnsignedEntry("TABS", "REGIONINFOS", 0);
+    FXint coll_regioninfos = reg.readUnsignedEntry("TABS", "REGIONINFOS", 0);
 	if (coll_regioninfos)
 		riTab->collapse(true);
 
-	FXint coll_statsinfos = getApp()->reg().readUnsignedEntry("TABS", "STATSINFOS", 0);
+	FXint coll_statsinfos = reg.readUnsignedEntry("TABS", "STATSINFOS", 0);
 	if (coll_statsinfos)
 		siTab->collapse(true);
 
-	FXint coll_tradeinfos = getApp()->reg().readUnsignedEntry("TABS", "TRADEINFOS", 0);
+	FXint coll_tradeinfos = reg.readUnsignedEntry("TABS", "TRADEINFOS", 0);
 	if (coll_tradeinfos)
 		tiTab->collapse(true);
 
@@ -707,19 +712,25 @@ void CSMap::create()
 
 	if (files.empty())
 	{
+        FXRegistry &reg = getApp()->reg();
+
+        if (!password.empty()) {
+            reg.writeStringEntry("WINDOW", "PASSWORD", password.text());
+        }
+
 		// save configuration
 		if (!isMaximized() && !isMinimized())
 		{
 			FXint x = getX(), y = getY();
 			FXint w = getWidth(), h = getHeight();
 
-			getApp()->reg().writeUnsignedEntry("WINDOW", "XPOS", x);
-			getApp()->reg().writeUnsignedEntry("WINDOW", "YPOS", y);
-			getApp()->reg().writeUnsignedEntry("WINDOW", "WIDTH", w);
-			getApp()->reg().writeUnsignedEntry("WINDOW", "HEIGHT", h);
+            reg.writeUnsignedEntry("WINDOW", "XPOS", x);
+            reg.writeUnsignedEntry("WINDOW", "YPOS", y);
+            reg.writeUnsignedEntry("WINDOW", "WIDTH", w);
+            reg.writeUnsignedEntry("WINDOW", "HEIGHT", h);
 		}
 
-		getApp()->reg().writeUnsignedEntry("WINDOW", "MAXIMIZED", isMaximized());
+        reg.writeUnsignedEntry("WINDOW", "MAXIMIZED", isMaximized());
 
 		// save splitter size
 		FXint regionsWidth = leftframe->getWidth();
@@ -729,34 +740,34 @@ void CSMap::create()
 		FXint msgHeight = msgBorder->getHeight();
 		FXint cmdHeight = commandframe->getHeight();
 
-		getApp()->reg().writeUnsignedEntry("WINDOW", "REGIONS_WIDTH", regionsWidth);
-		getApp()->reg().writeUnsignedEntry("WINDOW", "MAP_WIDTH", mapWidth);
-		getApp()->reg().writeUnsignedEntry("WINDOW", "INFO_WIDTH", infoWidth);
+        reg.writeUnsignedEntry("WINDOW", "REGIONS_WIDTH", regionsWidth);
+        reg.writeUnsignedEntry("WINDOW", "MAP_WIDTH", mapWidth);
+        reg.writeUnsignedEntry("WINDOW", "INFO_WIDTH", infoWidth);
 
-		getApp()->reg().writeUnsignedEntry("WINDOW", "MESSAGES_HEIGHT", msgHeight);
-		getApp()->reg().writeUnsignedEntry("WINDOW", "COMMANDS_HEIGHT", cmdHeight);
+        reg.writeUnsignedEntry("WINDOW", "MESSAGES_HEIGHT", msgHeight);
+        reg.writeUnsignedEntry("WINDOW", "COMMANDS_HEIGHT", cmdHeight);
 
 		// save InfoDlg/SearchDlg window size
-		searchdlg->saveState(getApp()->reg());
-		infodlg->saveState(getApp()->reg());
-		statistics->saveState(getApp()->reg());
+		searchdlg->saveState(reg);
+		infodlg->saveState(reg);
+		statistics->saveState(reg);
 
 		// save menu options state
-		getApp()->reg().writeUnsignedEntry("SHOW", "TOOLBAR", menu.toolbar->getCheck());
-		getApp()->reg().writeUnsignedEntry("SHOW", "MESSAGES", menu.messages->getCheck());
-		getApp()->reg().writeUnsignedEntry("SHOW", "CALCULATOR", menu.calc->getCheck());
-		getApp()->reg().writeUnsignedEntry("SHOW", "STREETS", menu.streets->getCheck());
-		getApp()->reg().writeUnsignedEntry("SHOW", "VISIBILITYSYMBOL", menu.visibility->getCheck());
-		getApp()->reg().writeUnsignedEntry("SHOW", "SHIPTRAVEL", menu.shiptravel->getCheck());
-		getApp()->reg().writeUnsignedEntry("SHOW", "SHADOWREGIONS", menu.shadowRegions->getCheck());
-		getApp()->reg().writeUnsignedEntry("SHOW", "COLORIZEUNITS", menu.colorizeUnits->getCheck());
-		getApp()->reg().writeUnsignedEntry("SHOW", "REGDESCRIPTION", menu.regdescription->getCheck());
-		getApp()->reg().writeUnsignedEntry("SHOW", "OWNFACTIONGROUP", menu.ownFactionGroup->getCheck());
+        reg.writeUnsignedEntry("SHOW", "TOOLBAR", menu.toolbar->getCheck());
+        reg.writeUnsignedEntry("SHOW", "MESSAGES", menu.messages->getCheck());
+        reg.writeUnsignedEntry("SHOW", "CALCULATOR", menu.calc->getCheck());
+        reg.writeUnsignedEntry("SHOW", "STREETS", menu.streets->getCheck());
+        reg.writeUnsignedEntry("SHOW", "VISIBILITYSYMBOL", menu.visibility->getCheck());
+        reg.writeUnsignedEntry("SHOW", "SHIPTRAVEL", menu.shiptravel->getCheck());
+        reg.writeUnsignedEntry("SHOW", "SHADOWREGIONS", menu.shadowRegions->getCheck());
+        reg.writeUnsignedEntry("SHOW", "COLORIZEUNITS", menu.colorizeUnits->getCheck());
+        reg.writeUnsignedEntry("SHOW", "REGDESCRIPTION", menu.regdescription->getCheck());
+        reg.writeUnsignedEntry("SHOW", "OWNFACTIONGROUP", menu.ownFactionGroup->getCheck());
 
 		// save ToolBarTab on/off state
-		getApp()->reg().writeUnsignedEntry("TABS", "REGIONINFOS", riTab->isCollapsed());
-		getApp()->reg().writeUnsignedEntry("TABS", "STATSINFOS", siTab->isCollapsed());
-		getApp()->reg().writeUnsignedEntry("TABS", "TRADEINFOS", tiTab->isCollapsed());
+        reg.writeUnsignedEntry("TABS", "REGIONINFOS", riTab->isCollapsed());
+        reg.writeUnsignedEntry("TABS", "STATSINFOS", siTab->isCollapsed());
+        reg.writeUnsignedEntry("TABS", "TRADEINFOS", tiTab->isCollapsed());
 
 		// quit application
 		return FXMainWindow::close(notify);
@@ -1012,7 +1023,7 @@ bool CSMap::saveFile(FXString filename, bool merge_commands /*= false*/)
 	return true;
 }
 
-bool CSMap::loadCommands(FXString filename)
+bool CSMap::loadCommands(const FXString& filename)
 {
 	if (filename.empty())
 		return false;
@@ -1037,17 +1048,17 @@ bool CSMap::loadCommands(FXString filename)
 	}
 	catch(const std::runtime_error& err)
 	{
-		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", FXString(err.what()).text());
+        FXString msg(err.what());
+		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", msg.text());
 		mapChange(false);
 		return false;
 	}
 
-	//recentFiles.appendFile(filename);
 	mapChange(true);	// new file flag
 	return true;
 }
 
-bool CSMap::saveCommands(FXString filename, bool stripped)
+bool CSMap::saveCommands(const FXString &filename, bool stripped)
 {
 	if (filename.empty())
 		return false;
@@ -1059,7 +1070,7 @@ bool CSMap::saveCommands(FXString filename, bool stripped)
 		return false;
 
 	datafile &file = files.front();
-	FXint res = file.saveCmds(filename.text(), stripped, false);	// nicht \u00fcberschreiben
+	FXint res = file.saveCmds(filename.text(), password, stripped, false);	// nicht \u00fcberschreiben
 	if (res == -2)
 	{
 		FXString text;
@@ -1067,15 +1078,12 @@ bool CSMap::saveCommands(FXString filename, bool stripped)
 
 		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
 		if (MBOX_CLICKED_YES == answ)
-			res = file.saveCmds(filename.text(), stripped, true);	// \u00fcberschreiben
+			res = file.saveCmds(filename.text(), password, stripped, true);	// \u00fcberschreiben
 	}
 	if (res == -1)
 	{
 		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
 	}
-
-	//if (res > 0)
-	//	recentFiles.appendFile(filename);
 
 	mapChange();
 	return true;
@@ -2160,23 +2168,33 @@ long CSMap::onFileExportCommands(FXObject*, FXSelector, void* ptr)
     return 1;
 }
 
+FXString CSMap::getPassword()
+{
+    return password;
+}
+
+void CSMap::setPassword(const FXString &passwd)
+{
+    password = passwd;
+}
+
 void CSMap::saveCommandsDlg(bool stripped)
 {
 	if (files.empty())
 		return;
 
-	if (files.front().password().empty())
+    FXString passwd = getPassword();
+    if (passwd.empty())
 	{
 		FXInputDialog dlg(this, "Passwort eingeben", FXString(L"Geben Sie das Passwort f\u00fcr die Partei ein:"), NULL,
 			INPUTDIALOG_STRING | INPUTDIALOG_PASSWORD);
 		FXint res = dlg.execute(PLACEMENT_SCREEN);
 		if (res)
 		{
-			FXString passwd = dlg.getText();
-			if (!passwd.empty())
-				passwd = "\"" + passwd + "\"";
-
-			files.front().password(passwd);
+			passwd = dlg.getText();
+            if (!passwd.empty()) {
+                setPassword(passwd);
+            }
 		}
 	}
 

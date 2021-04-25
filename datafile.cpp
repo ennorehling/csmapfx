@@ -1095,12 +1095,12 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 // === datafile command loading routine
 
 // loads command file and attaches the commands to the units
-FXint datafile::loadCmds(const FXchar* filename)
+FXint datafile::loadCmds(const FXString& filename)
 {
 	cmdfilename("");
 	modifiedCmds(false);
 
-	if (!filename)
+	if (filename.empty())
 		return 0;
 
 	if (activefaction() == end())
@@ -1159,7 +1159,7 @@ FXint datafile::loadCmds(const FXchar* filename)
 	// found first non-empty line
 	FXString line = ptr;
 	if (!*ptr || (line.section(' ', 0) != "ERESSEA" && line.section(' ', 0) != "PARTEI"))
-		throw std::runtime_error("Keine g\u00fcltige Befehlsdatei.");
+		throw std::runtime_error(FXString(L"Keine g\u00fcltige Befehlsdatei.").text());
 
 	if (!utf8mode)
 		line = FXString(line);
@@ -1167,23 +1167,19 @@ FXint datafile::loadCmds(const FXchar* filename)
 	// parse header line:
 	// ERESSEA ioen "PASSWORT"
 	FXString id36 = line.section(' ', 1);
-	FXString passwd = line.section(' ', 2);
 
 	char* endptr;
 	int factionId = strtol(id36.text(), &endptr, 36);
 
     if (endptr && *endptr)		// id36 string has to be consumed by strtol
-		throw std::runtime_error(("Keine g\u00fcltige Parteinummer: " + id36).text());
+		throw std::runtime_error((L"Keine g\u00fcltige Parteinummer: " + id36).text());
 	if (factionId != activefaction()->info())
-		throw std::runtime_error(("Die Befehle sind f\u00fcr eine andere Partei: " + id36).text());
-	if (passwd.length() < 2 || passwd.left(1) != "\"" || passwd.right(1) != "\"")
-		throw std::runtime_error(("Das Passwort muss in Anf\u00fchrungszeichen gesetzt werden: " + passwd).text());
+		throw std::runtime_error((L"Die Befehle sind f\u00fcr eine andere Partei: " + id36).text());
 
     // consider command file as correct, read in commands
 	m_cmds.prefix_lines.clear();
 	m_cmds.region_lines.clear();
 	m_cmds.region_order.clear();
-	password(passwd);
 
 	FXString cmd;
 	int headerindent = 0, indent = 0;
@@ -1493,7 +1489,7 @@ private:
 				}
 			}
 
-			if (i == 0 && !m_line.empty())		// when line width is to short, avoid endless loop
+			if (i == 0 && !m_line.empty())		// when line width is too short, avoid endless loop
 				throw std::runtime_error("Zeilenbreite ist zu klein.");
 
 			if (i < size)
@@ -1520,16 +1516,16 @@ private:
 };
 
 // saves command file
-FXint datafile::saveCmds(const FXchar* filename, bool stripped, bool replace)
+FXint datafile::saveCmds(const FXString& filename, const FXString& password, bool stripped, bool replace)
 {
-	if (!filename)
+	if (filename.empty())
 		return -1;
 
     if (activefaction() == end())
 		return -1;
 
 	// Soll \u00fcberschrieben werden? Wenn nicht, pr\u00fcfen, ob Datei vorhanden
-	if (replace == false)
+	if (!replace)
 	{
 		FXFileStream filestr;
 		filestr.open(filename, FXStreamLoad);
@@ -1541,7 +1537,7 @@ FXint datafile::saveCmds(const FXchar* filename, bool stripped, bool replace)
 	}
 
 	// Datei zum Schreiben \u00f6ffnen
-	std::ofstream file(filename);
+	std::ofstream file(filename.text());
 	if (!file.is_open())
 		return -1;
 
@@ -1566,10 +1562,10 @@ FXint datafile::saveCmds(const FXchar* filename, bool stripped, bool replace)
 	
 	out << " " << activefaction()->id() << " ";
 	
-	if (password().empty())	
+	if (password.empty())	
 		out << "\"HIER-PASSWORT\"" << "\n";
 	else
-		out << password() << "\n";
+		out << "\"" << password << "\"\n";
     
 	// output prefix lines
 	if (!m_cmds.prefix_lines.empty())

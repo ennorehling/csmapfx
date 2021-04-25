@@ -31,6 +31,9 @@ public:
 
     static CSMap* getInstance();
 
+    FXString getPassword();
+    void setPassword(const FXString &password);
+
 	void mapChange(bool newfile = false);
 	bool haveActiveFaction() const;
 	bool loadFile(FXString filename);
@@ -38,8 +41,8 @@ public:
 	bool saveFile(FXString filename, bool merge_commands = false);
 	void closeFile();
     void saveCommandsDlg(bool stripped);
-	bool loadCommands(FXString filename);
-	bool saveCommands(FXString filename, bool stripped);
+	bool loadCommands(const FXString& filename);
+	bool saveCommands(const FXString &filename, bool stripped);
 	bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
 	void stripReportToMap();
 
@@ -189,7 +192,7 @@ private:
 	FXPopup			*terrainPopup;
 	FXButton		*terrainSelect;
 	
-	// Men�: Speichert zuletzt verwendete Dateien
+	// Menu: Speichert zuletzt verwendete Dateien
 	FXRecentFiles	recentFiles;
 	
 	// Dialog: Speichert aktuelles Verzeichnis
@@ -274,6 +277,8 @@ private:
 
 	// clipboard data
 	FXString clipboard;
+    // password for active faction
+    FXString password;
 
 	// icons for toolbar
 	struct
