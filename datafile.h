@@ -13,10 +13,9 @@
 class datakey
 {
 public:
-	datakey() {}
+	datakey() : m_type(0) {}
 	~datakey() {}
 
-	//const FXString& key() const { return m_key; }
 	const FXString& value() const { return m_value; }
 	FXint type() const { return (m_type & TYPE_MASK); }
 	const FXString key() const;
@@ -52,7 +51,6 @@ public:
 		TYPE_EMAIL,
 		TYPE_BANNER,
 		TYPE_ORDERS_CONFIRMED,		// ejcOrdersConfirmed, special tag
-		TYPE_CHARSET,
 		TYPE_LAST,
 
 		TYPE_MASK = (1 << 7) - 1,
@@ -65,9 +63,6 @@ public:
 
 	typedef std::vector<datakey/*, boost::pool_allocator<datakey>*/ > list_type;
 	typedef list_type::iterator itor;
-
-	void iso2utf();			// converts strings from file-charset (iso8859-15) to utf8
-	void utf2iso();
 
 protected:
 	FXint m_type;
@@ -299,9 +294,6 @@ public:
 	typedef std::list<datablock/*, boost::fast_pool_allocator<datablock>*/ > list_type;
 	typedef list_type::iterator itor;
 
-	void iso2utf();			// converts strings from file-charset (iso8859-15) to utf8
-	void utf2iso();
-
 protected:
 	FXint m_type, m_info;
 	FXint m_x, m_y, m_terrain;
@@ -329,9 +321,6 @@ public:
 	
 	const FXString& cmdfilename() const { return m_cmdfilename; }
 	void cmdfilename(const FXString& s) { m_cmdfilename = s; }
-
-	bool utf8cr() const { return m_utf8cr; }
-	void utf8cr(bool utf8) { m_utf8cr = utf8; }
 
 	bool modifiedCmds() const { return m_cmds.modified; }
 	void modifiedCmds(bool mod) { m_cmds.modified = mod; }
@@ -405,8 +394,6 @@ public:
 protected:
 	// file names of report and command files
     FXString m_filename, m_cmdfilename;
-
-	bool m_utf8cr;
 
 	struct koordinates
 	{

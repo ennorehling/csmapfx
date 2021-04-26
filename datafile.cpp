@@ -79,8 +79,6 @@ void datakey::value(const FXString& s)
 		return TYPE_BANNER;
 	if (type == "ejcOrdersConfirmed")
 		return TYPE_ORDERS_CONFIRMED;
-	if (type == "charset")
-		return TYPE_CHARSET;
 	
 	return TYPE_UNKNOWN;
 }
@@ -133,8 +131,6 @@ const FXString datakey::key() const
 		return "banner";
 	else if (type() == TYPE_ORDERS_CONFIRMED)
 		return "ejcOrdersConfirmed";
-	else if (type() == TYPE_CHARSET)
-		return "charset";
 
 	return "";
 }
@@ -240,19 +236,6 @@ FXbool datakey::parse(FXchar* str)
 	value(val);						// Wert speichern
 
 	return true;
-}
-
-// converts strings from file-charset (iso8859-15) to utf8
-void datakey::iso2utf()
-{
-	m_key = ::iso2utf(m_key);
-	m_value = ::iso2utf(m_value);
-}
-
-void datakey::utf2iso()
-{
-	m_key = ::utf2iso(m_key);
-	m_value = ::utf2iso(m_value);
 }
 
 // =============================
@@ -639,16 +622,6 @@ const datakey* datablock::valueKey(FXint key) const
 	return NULL;
 }
 
-void datablock::iso2utf()
-{
-	m_string = ::FXString(m_string);
-}
-
-void datablock::utf2iso()
-{
-	m_string = ::utf2iso(m_string);
-}
-
 // ===========================
 // === datafile implementation
 
@@ -681,7 +654,6 @@ const FXchar* UTF8BOM = "\xEF\xBB\xBF";
 FXint datafile::load(const FXchar* filename)
 {
 	this->filename(filename);
-	this->utf8cr(false);
 
 	if (!filename)
 		return 0;
@@ -753,11 +725,8 @@ FXint datafile::load(const FXchar* filename)
 	FXchar *ptr, *next = &data[0];
 
 	// check for utf8 BOM: EF BB BF
-	bool utf8mode = utf8cr();
 	if (!strncmp(next, UTF8BOM, strlen(UTF8BOM)))
 	{
-		utf8cr(true);
-		utf8mode = true;
         next += strlen(UTF8BOM);
 	}
 
@@ -769,9 +738,6 @@ FXint datafile::load(const FXchar* filename)
 		// erster versuch: enth\u00e4lt die Zeile einen datakey?
 		if (key.parse(ptr))
 		{
-			if (!utf8mode)
-				key.iso2utf();
-
 			if (block)
 			{
 				if (key.type() == datakey::TYPE_TERRAIN)
@@ -790,26 +756,11 @@ FXint datafile::load(const FXchar* filename)
 				else
 					block->data().push_back(key);			// appends "Value";Key - tags
 
-				// check if charset set
-				if (key.type() == datakey::TYPE_CHARSET && block->type() == datablock::TYPE_VERSION)
-				{
-					FXString charset = key.value();
-					charset.upper();
-
-					if (charset == "UTF-8" || charset == "UTF8")
-					{
-						utf8cr(true);
-						utf8mode = true;
-					}
-				}
 			}
 		}
 		// zweiter versuch: enth\u00e4lt die Zeile einen datablock-header?
 		else if (newblock.parse(ptr))
 		{
-			if (!utf8mode)
-				newblock.iso2utf();
-
 			m_blocks.push_back(newblock);		// appends BLOCK Info - tags
 			block = &m_blocks.back();
 		}
@@ -874,12 +825,6 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 
 	// Alles ok soweit...
 	this->filename(filename);
-	//this->utf8cr(false);
-
-	const bool utf8mode = utf8cr();
-
-	if (utf8mode)
-		file << UTF8BOM;
 
 	const datablock::itor end = blocks().end();
 	for (datablock::itor block = blocks().begin(); block != end; block++)
@@ -907,8 +852,6 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 		if (block->type() == datablock::TYPE_REGION)
 		{
 			FXString name = block->value(datakey::TYPE_NAME);
-			if (!utf8mode)
-				name = utf2iso(name);
 			if (!name.empty())
 			{
 				file << '\"';
@@ -929,37 +872,18 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 				file << "\";Name" << std::endl;
 			}
 
-			if (utf8mode)
-				file << '\"' << block->terrainString().text() << "\";Terrain" << std::endl;
-			else
-				file << '\"' << block->terrainString() << "\";Terrain" << std::endl;
+			file << '\"' << block->terrainString().text() << "\";Terrain" << std::endl;
 		}
 		// Konfiguration-Block anpassen und Charset auf ISO-8859-1 setzen
 		else if (block->type() == datablock::TYPE_VERSION)
 		{
-			bool charsettag = false;
-			datakey charset;
-			charset.key("charset");
-			if (utf8mode)
-				charset.value("UTF-8");
-			else
-				charset.value("ISO-8859-1");
-
 			for (datakey::itor tags = block->data().begin(); tags != block->data().end(); tags++)
 			{
 				if (tags->type() == datakey::TYPE_KONFIGURATION)
 				{
                     tags->value(CSMAP_APP_TITLE_VERSION);
 				}
-				if (tags->type() == datakey::TYPE_CHARSET)
-				{
-					tags->value(charset.value());
-					charsettag = true;
-				}
 			}
-
-            if (!charsettag)
-				block->data().insert(block->data().begin(), charset);
 		}
 		else if (block->type() == datablock::TYPE_UNIT && merge_commands)
 		{
@@ -992,10 +916,6 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 					file << '\"';
 
 					FXString value = *it;
-					if (!utf8mode)
-						value = utf2iso(value);
-
-
 					/*
 					\\ ist ein \, \" ist ein ", einzelen " sind Anfang und Ende 
 					von Strings, \n ist ein Zeilenumbruch, (\x ist x, falls keine Sonderregel)
@@ -1040,9 +960,6 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 			}
 
 			FXString value = tags->value();
-			if (!utf8mode)
-				value = utf2iso(value);
-
 			// String wird mit "" umgeben...
 			if (tags->isInt())
 				file << value.text();				
@@ -1073,10 +990,7 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 			// key
 			if (!tags->key().empty())
 			{
-				if (!utf8mode)
-					file << ';' << tags->key();	// als iso/latin1 ausgeben
-				else
-					file << ';' << tags->key().text();	// als utf8 ausgeben
+				file << ';' << tags->key().text();	// als utf8 ausgeben
 			}
 
 			file << std::endl;

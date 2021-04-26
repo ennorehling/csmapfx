@@ -246,15 +246,6 @@ long FXCalculator::onChanged(FXObject*, FXSelector, void*)
         delete e;
     }
 
-    /*
-    Ruby::Value val = Ruby::Evaluate( utf2iso(exp).text() );
-    resultstr = val.to_s();
-
-    for (std::string::iterator it = resultstr.begin(); it != resultstr.end(); it++)
-        if (*it == '\n' || *it == '\r' || *it == '\t')
-            *it = ' ';
-    */
-
     if (resultstr.size() > 15)
     {
         result->setText("");

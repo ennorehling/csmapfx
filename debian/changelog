@@ -3,8 +3,9 @@ csmapfx (0.7.1-1) stable; urgency=low
   * remember password between sessions
   * save and export orders as utf-8
   * no longer requires boost to build
+  * remove support for non-unicode files
 
- -- Enno Rehling <enno@eressea.de>  Sun, 25 Apr 2021 10:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Mon, 26 Apr 2021 10:00:00 +0200
 
 csmapfx (0.7.0-1) stable; urgency=low
 
