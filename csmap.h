@@ -277,8 +277,12 @@ private:
 
 	// clipboard data
 	FXString clipboard;
-    // password for active faction
-    FXString password;
+
+    struct {
+        // password for active faction
+        FXString faction_id;
+        FXString password;
+    } settings;
 
 	// icons for toolbar
 	struct

@@ -608,9 +608,10 @@ void CSMap::create()
 
 	// reload window position & size
     FXRegistry &reg = getApp()->reg();
-    const FXchar *passwd = reg.readStringEntry("WINDOW", "PASSWORD", NULL);
+    const FXchar *passwd = reg.readStringEntry("settings", "password", NULL);
     if (passwd) {
-        password.assign(passwd);
+        settings.password.assign(passwd);
+        settings.faction_id = reg.readStringEntry("settings", "faction", "");
     }
     FXint x = reg.readUnsignedEntry("WINDOW", "XPOS", 100);
 	FXint y = reg.readUnsignedEntry("WINDOW", "YPOS", 100);
@@ -714,8 +715,9 @@ void CSMap::create()
 	{
         FXRegistry &reg = getApp()->reg();
 
-        if (!password.empty()) {
-            reg.writeStringEntry("WINDOW", "PASSWORD", password.text());
+        if (!settings.password.empty()) {
+            reg.writeStringEntry("settings", "password", settings.password.text());
+            reg.writeStringEntry("settings", "faction_id", settings.faction_id.text());
         }
 
 		// save configuration
@@ -1070,7 +1072,7 @@ bool CSMap::saveCommands(const FXString &filename, bool stripped)
 		return false;
 
 	datafile &file = files.front();
-	FXint res = file.saveCmds(filename.text(), password, stripped, false);	// nicht \u00fcberschreiben
+	FXint res = file.saveCmds(filename.text(), settings.password, stripped, false);	// nicht \u00fcberschreiben
 	if (res == -2)
 	{
 		FXString text;
@@ -1078,7 +1080,7 @@ bool CSMap::saveCommands(const FXString &filename, bool stripped)
 
 		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
 		if (MBOX_CLICKED_YES == answ)
-			res = file.saveCmds(filename.text(), password, stripped, true);	// \u00fcberschreiben
+			res = file.saveCmds(filename.text(), settings.password, stripped, true);	// \u00fcberschreiben
 	}
 	if (res == -1)
 	{
@@ -2168,32 +2170,26 @@ long CSMap::onFileExportCommands(FXObject*, FXSelector, void* ptr)
     return 1;
 }
 
-FXString CSMap::getPassword()
-{
-    return password;
-}
-
-void CSMap::setPassword(const FXString &passwd)
-{
-    password = passwd;
-}
-
 void CSMap::saveCommandsDlg(bool stripped)
 {
 	if (files.empty())
 		return;
 
-    FXString passwd = getPassword();
-    if (passwd.empty())
+    datafile::itor firstfile = files.begin();
+    FXString id = firstfile->activefaction()->id();
+
+    FXString passwd = settings.password;
+    if (passwd.empty() || id != settings.faction_id)
 	{
-		FXInputDialog dlg(this, "Passwort eingeben", FXString(L"Geben Sie das Passwort f\u00fcr die Partei ein:"), NULL,
+		FXInputDialog dlg(this, "Passwort eingeben", FXString(L"Geben Sie das Passwort f\u00fcr die Partei " + id + " ein:"), NULL,
 			INPUTDIALOG_STRING | INPUTDIALOG_PASSWORD);
 		FXint res = dlg.execute(PLACEMENT_SCREEN);
 		if (res)
 		{
 			passwd = dlg.getText();
             if (!passwd.empty()) {
-                setPassword(passwd);
+                settings.faction_id = id;
+                settings.password = passwd;
             }
 		}
 	}
