@@ -977,7 +977,7 @@ bool CSMap::mergeFile(FXString filename)
         return false;
 	}
 
-	// dann: Datei an den aktuellen CR anf\u00fcgen (nur Karteninformationen)
+	// dann: Datei an den aktuellen CR anfuegen (nur Karteninformationen)
 	datafile &cr = files.front();
 
 	datablock regionblock;
