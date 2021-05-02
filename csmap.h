@@ -60,7 +60,8 @@ public:		// this functions are slots for menu commands
 	long onFileOpenCommands(FXObject*, FXSelector, void* ptr);
 	long onFileSaveCommands(FXObject*, FXSelector, void* ptr);
     long onFileExportCommands(FXObject*, FXSelector, void* ptr);
-    long onFileSaveWithCmds(FXObject*, FXSelector, void* ptr);
+    long onFileSaveWithCmds(FXObject *, FXSelector, void *ptr);
+    long onFileCheckCommands(FXObject*, FXSelector, void* ptr);
     long onFileRecent(FXObject*, FXSelector, void* ptr);
 
     long onQuit(FXObject*, FXSelector, void* ptr);
@@ -135,6 +136,7 @@ public:
         ID_FILE_LOAD_ORDERS,
         ID_FILE_SAVE_ORDERS,
         ID_FILE_SAVE_ALL,
+        ID_FILE_CHECK_ORDERS,
         ID_FILE_EXPORT_ORDERS,
         ID_FILE_QUIT,
 
@@ -282,6 +284,7 @@ private:
         // password for active faction
         FXString faction_id;
         FXString password;
+        FXString echeck_exe;
     } settings;
 
 	// icons for toolbar

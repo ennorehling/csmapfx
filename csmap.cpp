@@ -1,3 +1,12 @@
+#include <climits>
+#ifndef MAX_PATH
+#ifdef WIN32
+#include <windows.h>
+#elif !defined(MAX_PATH)
+#define MAX_PATH 260
+#endif
+#endif
+
 #include "version.h"
 #include "main.h"
 #include "fxhelper.h"
@@ -25,7 +34,8 @@ FXDEFMAP(CSMap) MessageMap[]=
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_MAP,	    CSMap::onFileMapExport),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_LOAD_ORDERS,	    CSMap::onFileOpenCommands),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ORDERS,	    CSMap::onFileSaveCommands),
-	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ALL,	    CSMap::onFileSaveWithCmds),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ALL,	    CSMap::onFileSaveWithCmds),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_CHECK_ORDERS,    CSMap::onFileCheckCommands),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_ORDERS,   CSMap::onFileExportCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_RECENT,		    CSMap::onFileRecent),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_QUIT,		    CSMap::onQuit),
@@ -179,8 +189,8 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 		this,
 		ID_FILE_MERGE, BUTTON_TOOLBAR);
 	new FXButton(toolbar,
-		FXString(L"\tDatei speichern unter...\tDie aktuelle Datei als neue Datei speichern."),
-		icons.save,
+        FXString(L"\tDatei speichern unter...\tDie aktuelle Datei als neue Datei speichern."),
+        icons.save,
 		this,
 		ID_FILE_SAVE_AS, BUTTON_TOOLBAR);
 	new FXButton(toolbar,
@@ -273,6 +283,10 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
         filemenu,
         FXString(L"Be&fehle speichern...\tF11\tDie Befehle als Textdatei speichern."),
         NULL, this, ID_FILE_SAVE_ORDERS);
+    new FXMenuCommand(
+        filemenu,
+        FXString(L"Befehle pr\u00fcfen\t\tPr\u00fct die Befehle."),
+        NULL, this, ID_FILE_CHECK_ORDERS);
     new FXMenuCommand(
         filemenu,
         FXString(L"Befehle mit &CR speichern...\t\tSpeichert den aktuellen Report zusammen mit den ge\u00e4nderten Befehlen."),
@@ -608,6 +622,10 @@ void CSMap::create()
 
 	// reload window position & size
     FXRegistry &reg = getApp()->reg();
+    const FXchar *echeck = reg.readStringEntry("settings", "echeck_path", NULL);
+    if (echeck) {
+        settings.echeck_exe.assign(echeck);
+    }
     const FXchar *passwd = reg.readStringEntry("settings", "password", NULL);
     if (passwd) {
         settings.password.assign(passwd);
@@ -715,6 +733,9 @@ void CSMap::create()
 	{
         FXRegistry &reg = getApp()->reg();
 
+        if (!settings.echeck_exe.empty()) {
+            reg.writeStringEntry("settings", "echeck_path", settings.echeck_exe.text());
+        }
         if (!settings.password.empty()) {
             reg.writeStringEntry("settings", "password", settings.password.text());
             reg.writeStringEntry("settings", "faction_id", settings.faction_id.text());
@@ -2069,10 +2090,56 @@ long CSMap::onFileMerge(FXObject*, FXSelector, void*r)
 	return 1;
 }
 
-long CSMap::onFileSave(FXObject*, FXSelector, void*)
+long CSMap::onFileCheckCommands(FXObject*, FXSelector, void*)
 {
-	FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Nicht implementiert.");
+    // save to a temporary file:
+    datafile &file = files.front();
+    char infile[MAX_PATH];
+    char outfile[MAX_PATH];
+    if (!settings.echeck_exe.empty()) {
+        if (tmpnam(infile) && file.saveCmds(infile, "", true, true) > 0) {
+            if (tmpnam(outfile)) {
+                // Echeck it:
+                char cmdline[1024];
+
+                snprintf(cmdline, 1024, "\"%s\" -c -Lde -Re2 -w0 -O%s %s", settings.echeck_exe.text(), outfile, infile);
+#ifdef WIN32
+                STARTUPINFO si;
+                PROCESS_INFORMATION pi;
+
+                ZeroMemory(&si, sizeof(si));
+                si.cb = sizeof(si);
+                ZeroMemory(&pi, sizeof(pi));
+                if (!CreateProcess(NULL, cmdline, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+                    throw std::runtime_error("CreateProcess failed");
+                }
+
+                // Wait until child process exits.
+                WaitForSingleObject(pi.hProcess, INFINITE);
+
+                // Close process and thread handles. 
+                CloseHandle(pi.hProcess);
+                CloseHandle(pi.hThread); 
+#else
+                system(cmdline);
+#endif
+                unlink(outfile);
+            }
+            unlink(infile);
+        }
+    }
 	return 1;
+}
+
+long CSMap::onFileSave(FXObject *, FXSelector, void *)
+{
+    datafile &file = files.front();
+    FXString filename = file.filename();
+    // overwrite existing, with commands:
+    if (file.save(filename.text(), true, true) > 0) {
+        file.modifiedCmds(false);
+    }
+    return 1;
 }
 
 long CSMap::onFileSaveAs(FXObject*, FXSelector, void*)
@@ -2230,38 +2297,38 @@ void CSMap::saveCommandsDlg(bool stripped)
 
 long CSMap::onFileSaveWithCmds(FXObject *, FXSelector, void *)
 {
-	FXFileDialog dlg(this, "Befehle mit CR speichern unter...", DLGEX_SAVE);
-	dlg.setIcon(icons.save);
-	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(FXString(L"Eressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nM\u00f6gliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nAlle Dateien (*)"));
-	FXint res = dlg.execute(PLACEMENT_SCREEN);
-	dialogDirectory = dlg.getDirectory();
-	if (res)
-	{
-		FXString filename = dlg.getFilename();
-		FXString pattern = dlg.getPattern();
+    FXFileDialog dlg(this, "Befehle mit CR speichern unter...", DLGEX_SAVE);
+    dlg.setIcon(icons.save);
+    dlg.setDirectory(dialogDirectory);
+    dlg.setPatternList(FXString(L"Eressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nM\u00f6gliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nAlle Dateien (*)"));
+    FXint res = dlg.execute(PLACEMENT_SCREEN);
+    dialogDirectory = dlg.getDirectory();
+    if (res)
+    {
+        FXString filename = dlg.getFilename();
+        FXString pattern = dlg.getPattern();
 
-		// Pr\u00fcft, ob Dateiname bereits Endung enth\u00e4lt.
-		FXString ext = filename.rafter('.');
-		for (int i = 0; ; i++)
-		{
-			FXString patt = pattern.section(',',i);
-			if (patt.empty())
-			{
+        // Pr\u00fcft, ob Dateiname bereits Endung enth\u00e4lt.
+        FXString ext = filename.rafter('.');
+        for (int i = 0; ; i++)
+        {
+            FXString patt = pattern.section(',', i);
+            if (patt.empty())
+            {
                 // Der Dateiname endet nicht mit ".cr" o.\u00e4., deshalb wird Endung angehangen.
-				ext = pattern.section(',',0).after('.');
-				if (!ext.empty())
-					filename += "." + ext;
-				break;
-			}
+                ext = pattern.section(',', 0).after('.');
+                if (!ext.empty())
+                    filename += "." + ext;
+                break;
+            }
 
-			// Dateiname endet auf ".cr" o.\u00e4.
+            // Dateiname endet auf ".cr" o.\u00e4.
             if (ext == patt.after('.'))
-				break;
-		}
+                break;
+        }
 
-		saveFile(filename, true);	// save with commands
-	}
+        saveFile(filename, true);	// save with commands
+    }
     return 1;
 }
 
