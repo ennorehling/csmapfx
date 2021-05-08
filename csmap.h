@@ -230,7 +230,9 @@ private:
 	FXTradeInfos	*tradeinfos;
 	FXSplitterEx	*commandsplitter;
 	FXTabBook		*tabbook;
+	FXTabBook		*outputTabs;
 	FXCommands		*commands;
+    FXList          *errors;
 
 	FXVerticalFrame *commandframe;
 

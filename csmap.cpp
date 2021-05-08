@@ -22,6 +22,8 @@
 #include <FXICOIcon.h>
 #include <FXSocket.h>
 #include <stdexcept>
+#include <fstream>
+#include <string>
 
 FXDEFMAP(CSMap) MessageMap[]=
 {
@@ -465,10 +467,15 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	// List of regions messages
 	msgBorder = new FXVerticalFrame(mapsplit,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0,0,0,0, 0,0,0,0);
 	msgBorder->setBorderColor(getApp()->getShadowColor());
-	messages = new FXMessages(msgBorder, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	messages->mapfiles(&files);
 
-	// Calculator bar
+    outputTabs = new FXTabBook(msgBorder, NULL, 0, TABBOOK_NORMAL | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
+    new FXTabItem(outputTabs, "Meldungen");
+    messages = new FXMessages(outputTabs, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
+	messages->mapfiles(&files);
+    new FXTabItem(outputTabs, "Fehler");
+    errors = new FXList(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
+
+    // Calculator bar
 	mathbar = new FXCalculator(middle, this,ID_SELECTION, LAYOUT_FILL_X);
 	mathbar->mapfiles(&files);
 	mathbar->connectMap(map);
@@ -609,6 +616,9 @@ CSMap::~CSMap()
 
 	delete icons.pointer;
 	delete icons.select;
+
+    delete tabbook;
+    delete outputTabs;
 
 	for (int i = 0; i < data::TERRAIN_LAST; i++)
 		delete icons.terrain[i];
@@ -2123,6 +2133,26 @@ long CSMap::onFileCheckCommands(FXObject*, FXSelector, void*)
 #else
                 system(cmdline);
 #endif
+                errors->clearItems();
+                
+                std::ifstream results;
+                results.open(outfile, std::ios::in);
+                if (results.is_open()) {
+                    std::string str;
+                    while (!results.eof()) {
+                        std::getline(results, str);
+                        if (!str.empty()) {
+                            FXString line, error, order;
+                            FXint level, unit_id;
+                            line.assign(str.c_str());
+                            level = FXIntVal(line.section("|", 1));
+                            unit_id = FXIntVal(line.section("|", 2), 36);
+                            error = line.section("|", 3);
+                            order = line.section("|", 4);
+                            errors->appendItem(order + ": " + error);
+                        }
+                    }
+                }
                 unlink(outfile);
             }
             unlink(infile);
