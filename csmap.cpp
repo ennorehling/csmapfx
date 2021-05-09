@@ -53,7 +53,9 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ORDERS,     CSMap::updActiveFaction),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ALL,        CSMap::updActiveFaction),
 
-	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_VIEW_MAPONLY,		    CSMap::onViewMapOnly),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_ERRROR_SELECTED,	    CSMap::onErrorSelected),
+
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_VIEW_MAPONLY,		    CSMap::onViewMapOnly),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_VIEW_MAPONLY,		    CSMap::updViewMapOnly),
 
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_VIEW_MESSAGES,        CSMap::onViewMessages),
@@ -473,7 +475,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
     messages = new FXMessages(outputTabs, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
 	messages->mapfiles(&files);
     new FXTabItem(outputTabs, "Fehler");
-    errors = new FXList(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
+    errors = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
 
     // Calculator bar
 	mathbar = new FXCalculator(middle, this,ID_SELECTION, LAYOUT_FILL_X);
@@ -1501,6 +1503,14 @@ long CSMap::onUpdVisiblePlane(FXObject* sender, FXSelector, void* ptr)
 	return 1;
 }
 
+long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
+{
+    FXList *list = (FXList *)sender;
+    FXint item = list->getCurrentItem();
+    FXint unit_id = (FXint)list->getItemData(item);
+    return (long)unit_id;
+}
+
 long CSMap::onMapSelectMarked(FXObject*, FXSelector, void*)
 {
 	if (files.empty())
@@ -2146,10 +2156,11 @@ long CSMap::onFileCheckCommands(FXObject*, FXSelector, void*)
                             FXint level, unit_id;
                             line.assign(str.c_str());
                             level = FXIntVal(line.section("|", 1));
-                            unit_id = FXIntVal(line.section("|", 2), 36);
+                            order = line.section("|", 2);
+                            unit_id = FXIntVal(order, 36);
                             error = line.section("|", 3);
                             order = line.section("|", 4);
-                            errors->appendItem(order + ": " + error);
+                            errors->appendItem(order + ": " + error, NULL, (void *)unit_id);
                         }
                     }
                 }

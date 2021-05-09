@@ -97,6 +97,8 @@ public:		// this functions are slots for menu commands
 
 	long onSetOrigin(FXObject*, FXSelector, void* ptr);
 	long onMakeMap(FXObject*, FXSelector, void* ptr);
+
+    long onErrorSelected(FXObject*, FXSelector, void* ptr);
 	
 	long onSetVisiblePlane(FXObject*, FXSelector, void* ptr);
 	long onUpdVisiblePlane(FXObject*, FXSelector, void* ptr);
@@ -139,6 +141,9 @@ public:
         ID_FILE_CHECK_ORDERS,
         ID_FILE_EXPORT_ORDERS,
         ID_FILE_QUIT,
+
+        // ECheck error list
+        ID_ERRROR_SELECTED,
 
 		// View menu
 		ID_VIEW_MAPONLY,
