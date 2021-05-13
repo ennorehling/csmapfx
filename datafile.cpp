@@ -1455,7 +1455,7 @@ FXint datafile::saveCmds(const FXString& filename, const FXString& password, boo
 	if (!file.is_open())
 		return -1;
 
-	LineCounter out(file, 75);
+	LineCounter out(file, 7500);
 	out.stripped(stripped);
 
 	// Alles ok soweit...

@@ -2,6 +2,8 @@
 #ifndef MAX_PATH
 #ifdef WIN32
 #include <windows.h>
+#include <shlobj_core.h>
+#include <shlwapi.h>
 #elif !defined(MAX_PATH)
 #define MAX_PATH 260
 #endif
@@ -638,6 +640,19 @@ void CSMap::create()
     if (echeck) {
         settings.echeck_exe.assign(echeck);
     }
+#ifdef WIN32
+    else {
+        PWSTR wPath = NULL;
+        if (S_OK == SHGetKnownFolderPath(FOLDERID_ProgramFiles, 0, NULL, &wPath)) {
+            FXString path(wPath);
+            path.append("\\Eressea\\Echeck\\echeckw.exe");
+            if (PathFileExists(path.text())) {
+                settings.echeck_exe = path;
+            }
+        }
+        CoTaskMemFree(wPath);
+    }
+#endif
     const FXchar *passwd = reg.readStringEntry("settings", "password", NULL);
     if (passwd) {
         settings.password.assign(passwd);
@@ -1508,7 +1523,14 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
     FXList *list = (FXList *)sender;
     FXint item = list->getCurrentItem();
     FXint unit_id = (FXint)list->getItemData(item);
-    return (long)unit_id;
+
+    if (files.empty())
+        return 0;
+    datafile::SelectionState state;
+    state.selected = selection.UNIT;
+    state.unit = files.front().unit(unit_id);
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    return 1;
 }
 
 long CSMap::onMapSelectMarked(FXObject*, FXSelector, void*)
@@ -2122,7 +2144,7 @@ long CSMap::onFileCheckCommands(FXObject*, FXSelector, void*)
                 // Echeck it:
                 char cmdline[1024];
 
-                snprintf(cmdline, 1024, "\"%s\" -c -Lde -Re2 -w0 -O%s %s", settings.echeck_exe.text(), outfile, infile);
+                snprintf(cmdline, 1024, "\"%s\" -c -Lde -Re2 -O%s %s", settings.echeck_exe.text(), outfile, infile);
 #ifdef WIN32
                 STARTUPINFO si;
                 PROCESS_INFORMATION pi;
