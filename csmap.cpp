@@ -2180,10 +2180,9 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
 #else
                 snprintf(cmdline, sizeof(cmdline), "\"%s/echeck\" -c -Lde -Re2 -O%s %s",
                     settings.echeck_dir.text(), outfile, infile);
-                if (system(cmdline)) < 0) {
+                if (system(cmdline) < 0) {
                     throw std::runtime_error("echeck call failed");
                 }
-}
 #endif
                 errorList->clearItems();
                 for (auto error : output) delete error;

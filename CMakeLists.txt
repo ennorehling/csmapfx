@@ -40,7 +40,7 @@ endif (WIN32)
 
 find_package(PhysFS 2.1 REQUIRED)
 find_package(PNG REQUIRED)
-find_package(CURL REQUIRED)
+find_package(CURL)
 
 find_library(LEGACY_STDIO_LIBRARY NAMES legacy_stdio_definitions)
 if (LEGACY_STDIO_LIBRARY)
@@ -70,7 +70,6 @@ target_link_libraries(${PROJECT_NAME}
   ${PHYSFS_LIBRARY}
   ${PNG_LIBRARIES}
   ${FOX_LIBRARIES}
-  ${CURL_LIBRARIES}
 )
 if (FOX_LIBRARY_DIRS)
   target_link_libraries(${PROJECT_NAME} -L${FOX_LIBRARY_DIRS})
@@ -79,5 +78,4 @@ include_directories(
   ${PHYSFS_INCLUDE_DIR}
 	${PNG_INCLUDE_DIRS}
 	${FOX_INCLUDE_DIRS}
-	${CURL_INCLUDE_DIRS}
 )
