@@ -335,7 +335,7 @@ public:
 	void createHashTables();
 
 	FXint loadCmds(const FXString &filename);
-	FXint saveCmds(const FXString &filename, const FXString &passwd, bool stripped, bool replace);
+	FXint saveCmds(const FXString &filename, const FXString &passwd, bool stripped, bool replace, int max_width = 75);
 
 	datablock::list_type& blocks() { return m_blocks; }
 

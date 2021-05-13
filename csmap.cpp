@@ -2147,7 +2147,7 @@ long CSMap::onFileCheckCommands(FXObject*, FXSelector, void*)
     char infile[PATH_MAX];
     char outfile[PATH_MAX];
     if (!settings.echeck_dir.empty()) {
-        if (tmpnam(infile) && file.saveCmds(infile, "", true, true) > 0) {
+        if (tmpnam(infile) && file.saveCmds(infile, "", true, true, 2000) > 0) {
             if (tmpnam(outfile)) {
                 // Echeck it:
                 char cmdline[1024];

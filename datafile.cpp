@@ -1367,9 +1367,6 @@ private:
             m_target << indent;
 			int col = width - 2;
 
-			if (comment)
-				m_target << "; ", col-=2;
-			
             for (; i < size && col > 0; i++, col--)
 			{
 				char c = m_line[i];
@@ -1384,7 +1381,7 @@ private:
 			if (col <= 0)
 			{
 				// if we need a "line break backslash" and a space, print it
-				if (!comment && (i+2 < size) && (m_line[i+1] == ' ' || m_line[i+1] == '\t'))
+				if ((i+2 < size) && (m_line[i+1] == ' ' || m_line[i+1] == '\t'))
 				{
 					if (m_line[i] == ' ' || m_line[i] == '\t')
 						m_target << m_line[i++];
@@ -1396,7 +1393,7 @@ private:
 						m_target << m_line[i++];
 
 					// if we need a "line break backslash", print it
-					if (!comment && (i+1 < size))
+					if ((i+1 < size))
 						m_target << '\\';
 					else if (i < size)	// else, print another char
 						m_target << m_line[i++];
@@ -1430,7 +1427,7 @@ private:
 };
 
 // saves command file
-FXint datafile::saveCmds(const FXString& filename, const FXString& password, bool stripped, bool replace)
+FXint datafile::saveCmds(const FXString& filename, const FXString& password, bool stripped, bool replace, int max_width)
 {
 	if (filename.empty())
 		return -1;
@@ -1455,7 +1452,7 @@ FXint datafile::saveCmds(const FXString& filename, const FXString& password, boo
 	if (!file.is_open())
 		return -1;
 
-	LineCounter out(file, 7500);
+	LineCounter out(file, max_width);
 	out.stripped(stripped);
 
 	// Alles ok soweit...
