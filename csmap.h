@@ -312,7 +312,7 @@ private:
 
     // some data
 	std::list<datafile>			files;
-    std::list<MessageInfo *>           output;
+    std::list<MessageInfo *>    output;
     datafile::SelectionState	selection;			// selected region,faction,unit...
 
 protected: 

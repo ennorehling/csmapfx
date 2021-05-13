@@ -1487,7 +1487,7 @@ FXint datafile::saveCmds(const FXString& filename, const FXString& password, boo
 	else
 	{
 		out << "\n";
-		out << " ; ECHECK -l -w4 -r" << recruitment() << "\n";
+		out << " ; ECHECK -l -w3 -r" << recruitment() << "\n";
 		out << "\n";
 		out << " ; " << CSMAP_APP_TITLE_VERSION << "\n";
 		out << "\n";

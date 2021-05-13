@@ -56,6 +56,7 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_LOAD_ORDERS,     CSMap::updActiveFaction),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ORDERS,     CSMap::updActiveFaction),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ALL,        CSMap::updActiveFaction),
+    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_CHECK_ORDERS,    CSMap::updActiveFaction),
 
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_ERRROR_SELECTED,	    CSMap::onErrorSelected),
 
@@ -2072,75 +2073,75 @@ long CSMap::onSetClipboard(FXObject*, FXSelector, void* ptr)
 	if (hasClipboard())
 		releaseClipboard();
 
-	if (ptr)
-	{
-		clipboard = utf2iso(static_cast<const char*>(ptr));
-		acquireClipboard(&stringType, 1);
-	}
-
-	return 1;
+if (ptr)
+{
+    clipboard = utf2iso(static_cast<const char *>(ptr));
+    acquireClipboard(&stringType, 1);
 }
 
-long CSMap::onSearchInfo(FXObject*, FXSelector, void* ptr)
-{
-	if (ptr)
-	{
-		infodlg->setSearchText(reinterpret_cast<const char*>(ptr));
-
-		if (!infodlg->shown())
-			infodlg->show(PLACEMENT_OWNER);
-	}
-
-	return 1;
+return 1;
 }
 
-long CSMap::onCalculator(FXObject*, FXSelector, void*)
+long CSMap::onSearchInfo(FXObject *, FXSelector, void *ptr)
 {
-	if (!mathbar->shown())
-	{
-		mathbar->show();
-		mathbar->recalc();
-	}
+    if (ptr)
+    {
+        infodlg->setSearchText(reinterpret_cast<const char *>(ptr));
 
-	if (!mathbar->hasFocus())
-		mathbar->setFocus();
+        if (!infodlg->shown())
+            infodlg->show(PLACEMENT_OWNER);
+    }
 
-	return 1;
+    return 1;
 }
 
-long CSMap::onFileOpen(FXObject*, FXSelector, void*r)
+long CSMap::onCalculator(FXObject *, FXSelector, void *)
 {
-	FXFileDialog dlg(this, FXString(L"\u00d6ffnen..."));
-	dlg.setIcon(icons.open);
-	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(FXString(L"M\u00f6gliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nEressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nAlle Dateien (*)"));
-	FXint res = dlg.execute(PLACEMENT_SCREEN);
-	dialogDirectory = dlg.getDirectory();
-	if (res)
+    if (!mathbar->shown())
+    {
+        mathbar->show();
+        mathbar->recalc();
+    }
+
+    if (!mathbar->hasFocus())
+        mathbar->setFocus();
+
+    return 1;
+}
+
+long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
+{
+    FXFileDialog dlg(this, FXString(L"\u00d6ffnen..."));
+    dlg.setIcon(icons.open);
+    dlg.setDirectory(dialogDirectory);
+    dlg.setPatternList(FXString(L"M\u00f6gliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nEressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nAlle Dateien (*)"));
+    FXint res = dlg.execute(PLACEMENT_SCREEN);
+    dialogDirectory = dlg.getDirectory();
+    if (res)
         loadFile(dlg.getFilename());
-	return 1;
+    return 1;
 }
 
-long CSMap::onFileMerge(FXObject*, FXSelector, void*r)
+long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
 {
-	FXFileDialog dlg(this, FXString(L"Karte hinzuf\u00fcgen..."));
-	dlg.setIcon(icons.merge);
-	dlg.setSelectMode(SELECTFILE_MULTIPLE);
-	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(FXString(L"M\u00f6gliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nEressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nAlle Dateien (*)"));
-	FXint res = dlg.execute(PLACEMENT_SCREEN);
-	dialogDirectory = dlg.getDirectory();
-	if (res)
-	{
-		FXString* filenames = dlg.getFilenames();
-		if (filenames)
-			for (int i = 0; filenames[i].length(); i++)
-				mergeFile(filenames[i]);
-	}
-	return 1;
+    FXFileDialog dlg(this, FXString(L"Karte hinzuf\u00fcgen..."));
+    dlg.setIcon(icons.merge);
+    dlg.setSelectMode(SELECTFILE_MULTIPLE);
+    dlg.setDirectory(dialogDirectory);
+    dlg.setPatternList(FXString(L"M\u00f6gliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nEressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nAlle Dateien (*)"));
+    FXint res = dlg.execute(PLACEMENT_SCREEN);
+    dialogDirectory = dlg.getDirectory();
+    if (res)
+    {
+        FXString *filenames = dlg.getFilenames();
+        if (filenames)
+            for (int i = 0; filenames[i].length(); i++)
+                mergeFile(filenames[i]);
+    }
+    return 1;
 }
 
-long CSMap::onFileCheckCommands(FXObject*, FXSelector, void*)
+long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
 {
     // save to a temporary file:
     datafile &file = files.front();
@@ -2152,7 +2153,6 @@ long CSMap::onFileCheckCommands(FXObject*, FXSelector, void*)
                 // Echeck it:
                 char cmdline[1024];
 
-                snprintf(cmdline, 1024, "\"%s\\echeckw.exe\" -c -Lde -Re2 -O%s %s", settings.echeck_dir.text(), outfile, infile);
 #ifdef WIN32
                 STARTUPINFO si;
                 PROCESS_INFORMATION pi;
@@ -2160,6 +2160,8 @@ long CSMap::onFileCheckCommands(FXObject*, FXSelector, void*)
                 ZeroMemory(&si, sizeof(si));
                 si.cb = sizeof(si);
                 ZeroMemory(&pi, sizeof(pi));
+                snprintf(cmdline, sizeof(cmdline), "\"%s\\echeckw.exe\" -c -Lde -Re2 -O%s %s",
+                    settings.echeck_dir.text(), outfile, infile);
                 if (!CreateProcess(NULL, cmdline, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
                     throw std::runtime_error("CreateProcess failed");
                 }
@@ -2169,13 +2171,19 @@ long CSMap::onFileCheckCommands(FXObject*, FXSelector, void*)
 
                 // Close process and thread handles. 
                 CloseHandle(pi.hProcess);
-                CloseHandle(pi.hThread); 
+                CloseHandle(pi.hThread);
 #else
-                system(cmdline);
+                snprintf(cmdline, sizeof(cmdline), "\"%s/echeck\" -c -Lde -Re2 -O%s %s",
+                    settings.echeck_dir.text(), outfile, infile);
+                if (system(cmdline)) < 0) {
+                    throw std::runtime_error("echeck call failed");
+                }
+}
 #endif
                 errorList->clearItems();
                 for (auto error : output) delete error;
                 output.clear();
+                outputTabs->setCurrent(1);
                 
                 std::ifstream results;
                 results.open(outfile, std::ios::in);
