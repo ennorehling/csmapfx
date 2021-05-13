@@ -636,18 +636,20 @@ void CSMap::create()
 
 	// reload window position & size
     FXRegistry &reg = getApp()->reg();
-    const FXchar *echeck = reg.readStringEntry("settings", "echeck_path", NULL);
+    const FXchar *echeck = reg.readStringEntry("settings", "echeck_dir", NULL);
     if (echeck) {
-        settings.echeck_exe.assign(echeck);
+        settings.echeck_dir.assign(echeck);
     }
 #ifdef WIN32
     else {
         PWSTR wPath = NULL;
         if (S_OK == SHGetKnownFolderPath(FOLDERID_ProgramFiles, 0, NULL, &wPath)) {
             FXString path(wPath);
-            path.append("\\Eressea\\Echeck\\echeckw.exe");
-            if (PathFileExists(path.text())) {
-                settings.echeck_exe = path;
+            FXString exefile;
+            path.append("\\Eressea\\Echeck");
+            exefile = path + "\\echeckw.exe";
+            if (PathFileExists(exefile.text())) {
+                settings.echeck_dir = path;
             }
         }
         CoTaskMemFree(wPath);
@@ -760,8 +762,8 @@ void CSMap::create()
 	{
         FXRegistry &reg = getApp()->reg();
 
-        if (!settings.echeck_exe.empty()) {
-            reg.writeStringEntry("settings", "echeck_path", settings.echeck_exe.text());
+        if (!settings.echeck_dir.empty()) {
+            reg.writeStringEntry("settings", "echeck_dir", settings.echeck_dir.text());
         }
         if (!settings.password.empty()) {
             reg.writeStringEntry("settings", "password", settings.password.text());
@@ -2138,13 +2140,13 @@ long CSMap::onFileCheckCommands(FXObject*, FXSelector, void*)
     datafile &file = files.front();
     char infile[MAX_PATH];
     char outfile[MAX_PATH];
-    if (!settings.echeck_exe.empty()) {
+    if (!settings.echeck_dir.empty()) {
         if (tmpnam(infile) && file.saveCmds(infile, "", true, true) > 0) {
             if (tmpnam(outfile)) {
                 // Echeck it:
                 char cmdline[1024];
 
-                snprintf(cmdline, 1024, "\"%s\" -c -Lde -Re2 -O%s %s", settings.echeck_exe.text(), outfile, infile);
+                snprintf(cmdline, 1024, "\"%s\\echeckw.exe\" -c -Lde -Re2 -O%s %s", settings.echeck_dir.text(), outfile, infile);
 #ifdef WIN32
                 STARTUPINFO si;
                 PROCESS_INFORMATION pi;

@@ -291,7 +291,7 @@ private:
         // password for active faction
         FXString faction_id;
         FXString password;
-        FXString echeck_exe;
+        FXString echeck_dir;
     } settings;
 
 	// icons for toolbar
