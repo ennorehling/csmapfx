@@ -1535,10 +1535,15 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
 
     if (files.empty())
         return 0;
-    datafile::SelectionState state;
-    state.selected = selection.UNIT;
-    state.unit = files.front().unit(info->unit_id);
-    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    if (info->unit_id) {
+        datafile::SelectionState state;
+        state.selected = selection.UNIT;
+        datafile &file = files.front();
+        state.unit = file.unit(info->unit_id);
+        if (state.unit != file.end()) {
+            handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+        }
+    }
     return 1;
 }
 
@@ -2160,7 +2165,7 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
                 ZeroMemory(&si, sizeof(si));
                 si.cb = sizeof(si);
                 ZeroMemory(&pi, sizeof(pi));
-                snprintf(cmdline, sizeof(cmdline), "\"%s\\echeckw.exe\" -c -Lde -Re2 -O%s %s",
+                snprintf(cmdline, sizeof(cmdline), "\"%s\\echeckw.exe\" -w3 -c -Lde -Re2 -O%s %s",
                     settings.echeck_dir.text(), outfile, infile);
                 if (!CreateProcess(NULL, cmdline, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
                     throw std::runtime_error("CreateProcess failed");
