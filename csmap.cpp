@@ -1,12 +1,14 @@
 #include <climits>
-#ifndef MAX_PATH
 #ifdef WIN32
 #include <windows.h>
 #include <shlobj_core.h>
 #include <shlwapi.h>
-#elif !defined(MAX_PATH)
-#define MAX_PATH 260
+#else
+#include <unistd.h>
 #endif
+
+#if !defined(PATH_MAX)
+#define PATH_MAX 260
 #endif
 
 #include "version.h"
@@ -477,7 +479,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
     messages = new FXMessages(outputTabs, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
 	messages->mapfiles(&files);
     new FXTabItem(outputTabs, "Fehler");
-    errors = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
+    errorList = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
 
     // Calculator bar
 	mathbar = new FXCalculator(middle, this,ID_SELECTION, LAYOUT_FILL_X);
@@ -595,7 +597,11 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 CSMap::~CSMap()
 {
-	// delete menus
+    errorList->clearItems();
+    for (auto error : output) delete error;
+    output.clear();
+    
+    // delete menus
 	delete filemenu;
 		delete recentmenu;
 	delete viewmenu;
@@ -1524,13 +1530,13 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
 {
     FXList *list = (FXList *)sender;
     FXint item = list->getCurrentItem();
-    FXint unit_id = (FXint)list->getItemData(item);
+    MessageInfo *info = static_cast<MessageInfo *>(list->getItemData(item));
 
     if (files.empty())
         return 0;
     datafile::SelectionState state;
     state.selected = selection.UNIT;
-    state.unit = files.front().unit(unit_id);
+    state.unit = files.front().unit(info->unit_id);
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
     return 1;
 }
@@ -2138,8 +2144,8 @@ long CSMap::onFileCheckCommands(FXObject*, FXSelector, void*)
 {
     // save to a temporary file:
     datafile &file = files.front();
-    char infile[MAX_PATH];
-    char outfile[MAX_PATH];
+    char infile[PATH_MAX];
+    char outfile[PATH_MAX];
     if (!settings.echeck_dir.empty()) {
         if (tmpnam(infile) && file.saveCmds(infile, "", true, true) > 0) {
             if (tmpnam(outfile)) {
@@ -2167,7 +2173,9 @@ long CSMap::onFileCheckCommands(FXObject*, FXSelector, void*)
 #else
                 system(cmdline);
 #endif
-                errors->clearItems();
+                errorList->clearItems();
+                for (auto error : output) delete error;
+                output.clear();
                 
                 std::ifstream results;
                 results.open(outfile, std::ios::in);
@@ -2176,15 +2184,18 @@ long CSMap::onFileCheckCommands(FXObject*, FXSelector, void*)
                     while (!results.eof()) {
                         std::getline(results, str);
                         if (!str.empty()) {
-                            FXString line, error, order;
-                            FXint level, unit_id;
-                            line.assign(str.c_str());
-                            level = FXIntVal(line.section("|", 1));
-                            order = line.section("|", 2);
-                            unit_id = FXIntVal(order, 36);
-                            error = line.section("|", 3);
-                            order = line.section("|", 4);
-                            errors->appendItem(order + ": " + error, NULL, (void *)unit_id);
+                            MessageInfo *error = new MessageInfo();
+                            if (error) {
+                                FXString line, display;
+                                line.assign(str.c_str());
+                                error->level = FXIntVal(line.section("|", 1));
+                                error->unit_id = FXIntVal(line.section("|", 2), 36);
+                                output.push_back(error);
+                                display = line.section("|", 4);
+                                display += ": ";
+                                display += line.section("|", 3);
+                                errorList->appendItem(display, NULL, error);
+                            }
                         }
                     }
                 }

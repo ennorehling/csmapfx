@@ -237,7 +237,7 @@ private:
 	FXTabBook		*tabbook;
 	FXTabBook		*outputTabs;
 	FXCommands		*commands;
-    FXList          *errors;
+    FXList          *errorList;
 
 	FXVerticalFrame *commandframe;
 
@@ -287,6 +287,11 @@ private:
 	// clipboard data
 	FXString clipboard;
 
+    struct MessageInfo {
+        FXint unit_id;
+        FXint level;
+    };
+
     struct {
         // password for active faction
         FXString faction_id;
@@ -307,7 +312,8 @@ private:
 
     // some data
 	std::list<datafile>			files;
-	datafile::SelectionState	selection;			// selected region,faction,unit...
+    std::list<MessageInfo *>           output;
+    datafile::SelectionState	selection;			// selected region,faction,unit...
 
 protected: 
 	CSMap() {}
