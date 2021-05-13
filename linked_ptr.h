@@ -64,7 +64,7 @@ namespace detail
 			next->prev = other.next = this;
 		}
 
-		~linked_ptr_node() throw()
+		~linked_ptr_node() noexcept
 		{
 			if (!unique())
 			{

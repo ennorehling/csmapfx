@@ -215,7 +215,7 @@ protected:
 	FXint GetScreenFromHexX(FXint x, FXint y);
 
 protected:
-	FXCSMap(){}
+	FXCSMap() {}
 	FXCSMap(const FXCSMap&) {}
 
 };

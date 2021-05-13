@@ -67,8 +67,10 @@ protected:
 	void createTable();
 
 protected:
-	FXInfoDlg(){}
-	FXInfoDlg(const FXInfoDlg&) {}
+	FXInfoDlg():search(nullptr), tabbook(nullptr) {
+    }
+	FXInfoDlg(const FXInfoDlg&) :search(nullptr), tabbook(nullptr) {
+    }
 };
 
 #endif //_CSMAP_INFODLG
