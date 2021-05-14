@@ -1,10 +1,10 @@
 csmapfx (0.7.3-1) stable; urgency=low
 
-  * integrate echeck for error checking (windows only)
+  * integrate echeck for error checking
   * do not add line breaks to orders.
   * fix line breaks in unit comments
 
- -- Enno Rehling <enno@eressea.de>  Mon, 13 May 2021 16:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Mon, 14 May 2021 18:00:00 +0200
 
 csmapfx (0.7.1-1) stable; urgency=low
 
