@@ -5,7 +5,7 @@
 Name "CsMapFX"
 
 ; The file to write
-OutFile "csmapinst.exe"
+OutFile "..\csmapinst.exe"
 
 ; Request application privileges for Windows Vista and higher
 RequestExecutionLevel admin

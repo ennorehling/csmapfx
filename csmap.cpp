@@ -2152,12 +2152,27 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
     datafile &file = files.front();
     char infile[PATH_MAX];
     char outfile[PATH_MAX];
+    FXString cmdline;
+#ifdef WIN32
     if (!settings.echeck_dir.empty()) {
+        cmdline = "\"" + settings.echeck_dir + "\\echeckw.exe\"";
+    }
+#else
+    if (!settings.echeck_dir.empty()) {
+        cmdline = settings.echeck_dir + "/echeck";
+    }
+    else {
+        cmdline = "echeck";
+    }
+#endif
+    if (!cmdline.empty()) {
         if (tmpnam(infile) && file.saveCmds(infile, "", true, true, 2000) > 0) {
             if (tmpnam(outfile)) {
                 // Echeck it:
-                char cmdline[1024];
-
+                cmdline.append(" -w3 -c -Lde -Re2 -O");
+                cmdline.append(outfile);
+                cmdline.append(" ");
+                cmdline.append(infile);
 #ifdef WIN32
                 STARTUPINFO si;
                 PROCESS_INFORMATION pi;
@@ -2165,9 +2180,7 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
                 ZeroMemory(&si, sizeof(si));
                 si.cb = sizeof(si);
                 ZeroMemory(&pi, sizeof(pi));
-                snprintf(cmdline, sizeof(cmdline), "\"%s\\echeckw.exe\" -w3 -c -Lde -Re2 -O%s %s",
-                    settings.echeck_dir.text(), outfile, infile);
-                if (!CreateProcess(NULL, cmdline, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+                if (!CreateProcess(NULL, (LPSTR)cmdline.text(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
                     throw std::runtime_error("CreateProcess failed");
                 }
 
