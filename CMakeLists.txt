@@ -1,5 +1,17 @@
 cmake_minimum_required(VERSION 2.9)
-project (csmapfx CXX)
+project (csmapfx CXX C)
+
+include (CheckIncludeFile)
+check_include_file(unistd.h UNISTD_H_FOUND)
+if (UNISTD_H_FOUND)
+  add_compile_definitions(HAVE_UNISTD_H)
+endif (UNISTD_H_FOUND)
+
+include (CheckFunctionExists)
+check_function_exists(mkstemp MKSTEMP_FOUND)
+if (MKSTEMP_FOUND)
+  add_compile_definitions(HAVE_MKSTEMP)
+endif (MKSTEMP_FOUND)
 
 set (SOURCES
 	calc.cpp

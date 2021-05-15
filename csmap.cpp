@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <shlobj_core.h>
 #include <shlwapi.h>
-#else
+#elif defined (HAVE_UNISTD_H)
 #include <unistd.h>
 #endif
 
@@ -29,6 +29,7 @@
 #include <fstream>
 #include <string>
 #include <cstdio>
+#include <cstring>
 
 FXDEFMAP(CSMap) MessageMap[]=
 {
@@ -2147,6 +2148,16 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
     return 1;
 }
 
+char *u_mkstemp(char *buffer) {
+#ifdef HAVE_MKSTEMP
+    strncpy(buffer, "/tmp/csmapXXXXXX", PATH_MAX);
+    return buffer;
+#else
+    return tmpnam(buffer);
+#endif
+}
+
+
 long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
 {
     // save to a temporary file:
@@ -2167,8 +2178,8 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
     }
 #endif
     if (!cmdline.empty()) {
-        if (tmpnam(infile) && file.saveCmds(infile, "", true, true, 2000) > 0) {
-            if (tmpnam(outfile)) {
+        if (u_mkstemp(infile) && file.saveCmds(infile, "", true, true, 2000) > 0) {
+            if (u_mkstemp(outfile)) {
                 // Echeck it:
                 cmdline.append(" -w3 -c -Lde -Re2 -O");
                 cmdline.append(outfile);
