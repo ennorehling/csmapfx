@@ -2150,10 +2150,15 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
 
 char *u_mkstemp(char *buffer) {
 #ifdef HAVE_MKSTEMP
+    int fd;
     strncpy(buffer, "/tmp/csmapXXXXXX", PATH_MAX);
-    return buffer;
+    if (0 <= (fd = mkstemp(buffer))) {
+        close(fd);
+        return buffer;
+    }
+    return NULL;
 #else
-    return tmpnam(buffer);
+    return tempnam(buffer);
 #endif
 }
 
