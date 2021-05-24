@@ -334,8 +334,8 @@ public:
 	void createHierarchy();
 	void createHashTables();
 
-	FXint loadCmds(const FXString &filename);
-	FXint saveCmds(const FXString &filename, const FXString &passwd, bool stripped, bool replace, int max_width = 75);
+	FXint loadCmds(const FXString &filename, bool trim_indent = true);
+	FXint saveCmds(const FXString &filename, const FXString &passwd, bool stripped, bool replace);
 
 	datablock::list_type& blocks() { return m_blocks; }
 

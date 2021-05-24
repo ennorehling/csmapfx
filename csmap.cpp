@@ -767,74 +767,69 @@ void CSMap::create()
 	// Dateien schliessen, Speicher frei geben
 	closeFile();
 
-	if (files.empty())
+    FXRegistry &reg = getApp()->reg();
+
+    if (!settings.echeck_dir.empty()) {
+        reg.writeStringEntry("settings", "echeck_dir", settings.echeck_dir.text());
+    }
+    if (!settings.password.empty()) {
+        reg.writeStringEntry("settings", "password", settings.password.text());
+        reg.writeStringEntry("settings", "faction", settings.faction_id.text());
+    }
+
+	// save configuration
+	if (!isMaximized() && !isMinimized())
 	{
-        FXRegistry &reg = getApp()->reg();
+		FXint x = getX(), y = getY();
+		FXint w = getWidth(), h = getHeight();
 
-        if (!settings.echeck_dir.empty()) {
-            reg.writeStringEntry("settings", "echeck_dir", settings.echeck_dir.text());
-        }
-        if (!settings.password.empty()) {
-            reg.writeStringEntry("settings", "password", settings.password.text());
-            reg.writeStringEntry("settings", "faction_id", settings.faction_id.text());
-        }
-
-		// save configuration
-		if (!isMaximized() && !isMinimized())
-		{
-			FXint x = getX(), y = getY();
-			FXint w = getWidth(), h = getHeight();
-
-            reg.writeUnsignedEntry("WINDOW", "XPOS", x);
-            reg.writeUnsignedEntry("WINDOW", "YPOS", y);
-            reg.writeUnsignedEntry("WINDOW", "WIDTH", w);
-            reg.writeUnsignedEntry("WINDOW", "HEIGHT", h);
-		}
-
-        reg.writeUnsignedEntry("WINDOW", "MAXIMIZED", isMaximized());
-
-		// save splitter size
-		FXint regionsWidth = leftframe->getWidth();
-		FXint mapWidth = middle->getWidth();
-		FXint infoWidth = rightframe->getWidth();
-
-		FXint msgHeight = msgBorder->getHeight();
-		FXint cmdHeight = commandframe->getHeight();
-
-        reg.writeUnsignedEntry("WINDOW", "REGIONS_WIDTH", regionsWidth);
-        reg.writeUnsignedEntry("WINDOW", "MAP_WIDTH", mapWidth);
-        reg.writeUnsignedEntry("WINDOW", "INFO_WIDTH", infoWidth);
-
-        reg.writeUnsignedEntry("WINDOW", "MESSAGES_HEIGHT", msgHeight);
-        reg.writeUnsignedEntry("WINDOW", "COMMANDS_HEIGHT", cmdHeight);
-
-		// save InfoDlg/SearchDlg window size
-		searchdlg->saveState(reg);
-		infodlg->saveState(reg);
-		statistics->saveState(reg);
-
-		// save menu options state
-        reg.writeUnsignedEntry("SHOW", "TOOLBAR", menu.toolbar->getCheck());
-        reg.writeUnsignedEntry("SHOW", "MESSAGES", menu.messages->getCheck());
-        reg.writeUnsignedEntry("SHOW", "CALCULATOR", menu.calc->getCheck());
-        reg.writeUnsignedEntry("SHOW", "STREETS", menu.streets->getCheck());
-        reg.writeUnsignedEntry("SHOW", "VISIBILITYSYMBOL", menu.visibility->getCheck());
-        reg.writeUnsignedEntry("SHOW", "SHIPTRAVEL", menu.shiptravel->getCheck());
-        reg.writeUnsignedEntry("SHOW", "SHADOWREGIONS", menu.shadowRegions->getCheck());
-        reg.writeUnsignedEntry("SHOW", "COLORIZEUNITS", menu.colorizeUnits->getCheck());
-        reg.writeUnsignedEntry("SHOW", "REGDESCRIPTION", menu.regdescription->getCheck());
-        reg.writeUnsignedEntry("SHOW", "OWNFACTIONGROUP", menu.ownFactionGroup->getCheck());
-
-		// save ToolBarTab on/off state
-        reg.writeUnsignedEntry("TABS", "REGIONINFOS", riTab->isCollapsed());
-        reg.writeUnsignedEntry("TABS", "STATSINFOS", siTab->isCollapsed());
-        reg.writeUnsignedEntry("TABS", "TRADEINFOS", tiTab->isCollapsed());
-
-		// quit application
-		return FXMainWindow::close(notify);
+        reg.writeUnsignedEntry("WINDOW", "XPOS", x);
+        reg.writeUnsignedEntry("WINDOW", "YPOS", y);
+        reg.writeUnsignedEntry("WINDOW", "WIDTH", w);
+        reg.writeUnsignedEntry("WINDOW", "HEIGHT", h);
 	}
 
-	return FALSE;
+    reg.writeUnsignedEntry("WINDOW", "MAXIMIZED", isMaximized());
+
+	// save splitter size
+	FXint regionsWidth = leftframe->getWidth();
+	FXint mapWidth = middle->getWidth();
+	FXint infoWidth = rightframe->getWidth();
+
+	FXint msgHeight = msgBorder->getHeight();
+	FXint cmdHeight = commandframe->getHeight();
+
+    reg.writeUnsignedEntry("WINDOW", "REGIONS_WIDTH", regionsWidth);
+    reg.writeUnsignedEntry("WINDOW", "MAP_WIDTH", mapWidth);
+    reg.writeUnsignedEntry("WINDOW", "INFO_WIDTH", infoWidth);
+
+    reg.writeUnsignedEntry("WINDOW", "MESSAGES_HEIGHT", msgHeight);
+    reg.writeUnsignedEntry("WINDOW", "COMMANDS_HEIGHT", cmdHeight);
+
+	// save InfoDlg/SearchDlg window size
+	searchdlg->saveState(reg);
+	infodlg->saveState(reg);
+	statistics->saveState(reg);
+
+	// save menu options state
+    reg.writeUnsignedEntry("SHOW", "TOOLBAR", menu.toolbar->getCheck());
+    reg.writeUnsignedEntry("SHOW", "MESSAGES", menu.messages->getCheck());
+    reg.writeUnsignedEntry("SHOW", "CALCULATOR", menu.calc->getCheck());
+    reg.writeUnsignedEntry("SHOW", "STREETS", menu.streets->getCheck());
+    reg.writeUnsignedEntry("SHOW", "VISIBILITYSYMBOL", menu.visibility->getCheck());
+    reg.writeUnsignedEntry("SHOW", "SHIPTRAVEL", menu.shiptravel->getCheck());
+    reg.writeUnsignedEntry("SHOW", "SHADOWREGIONS", menu.shadowRegions->getCheck());
+    reg.writeUnsignedEntry("SHOW", "COLORIZEUNITS", menu.colorizeUnits->getCheck());
+    reg.writeUnsignedEntry("SHOW", "REGDESCRIPTION", menu.regdescription->getCheck());
+    reg.writeUnsignedEntry("SHOW", "OWNFACTIONGROUP", menu.ownFactionGroup->getCheck());
+
+	// save ToolBarTab on/off state
+    reg.writeUnsignedEntry("TABS", "REGIONINFOS", riTab->isCollapsed());
+    reg.writeUnsignedEntry("TABS", "STATSINFOS", siTab->isCollapsed());
+    reg.writeUnsignedEntry("TABS", "TRADEINFOS", tiTab->isCollapsed());
+
+	// quit application
+	return FXMainWindow::close(notify);
 }
 
 void CSMap::mapChange(bool newfile /*= false*/)
@@ -1099,7 +1094,7 @@ bool CSMap::loadCommands(const FXString& filename)
 
 	try
 	{
-		FXint res = file.loadCmds(filename.text());
+		FXint res = file.loadCmds(filename, true);
 		if (res < 0)
 		{
 			FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht gelesen werden.");
@@ -2183,7 +2178,7 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
     }
 #endif
     if (!cmdline.empty()) {
-        if (u_mkstemp(infile) && file.saveCmds(infile, "", true, true, 2000) > 0) {
+        if (u_mkstemp(infile) && file.saveCmds(infile, "", true, true) > 0) {
             if (u_mkstemp(outfile)) {
                 // Echeck it:
                 cmdline.append(" -w3 -c -Lde -Re2 -O");

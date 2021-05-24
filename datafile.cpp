@@ -1009,7 +1009,7 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 // === datafile command loading routine
 
 // loads command file and attaches the commands to the units
-FXint datafile::loadCmds(const FXString& filename)
+FXint datafile::loadCmds(const FXString &filename, bool trim_indent)
 {
 	cmdfilename("");
 	modifiedCmds(false);
@@ -1117,8 +1117,10 @@ FXint datafile::loadCmds(const FXString& filename)
 		if (cmd == "REGION" || cmd == "EINHEIT")
 			break;
 
-		// add line to prefix
-		m_cmds.prefix_lines.push_back(line);
+        // add line to prefix
+        if (!line.empty()) {
+            m_cmds.prefix_lines.push_back(line);
+        }
 	}
 
 	// check for end of file:
@@ -1214,25 +1216,30 @@ FXint datafile::loadCmds(const FXString& filename)
 				cmds_list->confirmed = true;
 			}
 			// when normal command or comment indented as command
-			else if ((!line.empty() && line.left(1) != ";") || indent > headerindent)
+			else if (!line.empty() && (line.left(1) != ";" || indent > headerindent))
 			{
-				// move all postfix comments into command block
-				if (!cmds_list->postfix_lines.empty())
-				{
-					std::copy(cmds_list->postfix_lines.begin(), cmds_list->postfix_lines.end(),
-							std::back_inserter(cmds_list->commands));
+                // move all postfix comments into command block
+                if (!cmds_list->postfix_lines.empty())
+                {
+                    std::copy(cmds_list->postfix_lines.begin(), cmds_list->postfix_lines.end(),
+                        std::back_inserter(cmds_list->commands));
                     cmds_list->postfix_lines.clear();
-				}
-
-				indent -= headerindent + 2;
-				while (indent >= 4) indent -= 4, line = "\t" + line;
-				while (indent >= 1) indent -= 1, line = " " + line;
-
+                }
+                if (trim_indent) {
+                    line.trim();
+                }
+                else {
+                    indent -= headerindent + 2;
+                    while (indent >= 4) indent -= 4, line = "\t" + line;
+                    while (indent >= 1) indent -= 1, line = " " + line;
+                }
                 // then append command
-				cmds_list->commands.push_back(line);
+                if (!line.empty()) {
+                    cmds_list->commands.push_back(line);
+                }
 			}
 			// seems to be a comment
-			else
+			else if (!line.empty())
 			{
 				// add to prefix if no other command is found,
 				if (cmds_list->commands.empty())
@@ -1264,170 +1271,8 @@ FXint datafile::loadCmds(const FXString& filename)
 	return true;
 }
 
-class LineCounter
-{
-public:
-	LineCounter(std::ostream& target, int lineWidth) : m_target(target), m_width(lineWidth), m_stripped(false), m_row(0)
-	{}
-
-	~LineCounter() { flush(); }
-
-	void stripped(bool strip) { m_stripped = strip; }
-	unsigned row() const { return m_row; }
-
-	template <typename TYPE>
-	LineCounter& operator<<(const TYPE& data)
-	{
-		m_stream << data;
-        *this << m_stream.str();
-		m_stream.str("");
-		return *this;
-	}
-
-	LineCounter& operator<<(const std::string& str)
-	{
-		for (size_t i = 0; i < str.size(); i++)
-            *this << str[i];
-		return *this;
-	}
-
-	LineCounter& operator<<(char c)
-	{
-		m_line += c;
-        if (c == '\n')
-		{
-			flush();
-			m_row++;
-		}
-		return *this;
-	}
-
-private:
-	// don't call it by hand!
-	void flush()
-	{
-		std::string indent;
-		int width = m_width;
-
-		bool linefeed = false, comment = false, stringlit = false;
-		if (m_line.size() && m_line[m_line.size() - 1] == '\n')
-		{
-			m_line.erase(m_line.size() - 1, 1);
-			linefeed = true;
-		}
-
-		size_t pos = m_line.find_first_not_of(" \t");
-		if (pos > 0 || pos == std::string::npos)
-		{
-			indent = m_line.substr(0, pos);
-			m_line.erase(0, pos);
-
-			// strip off comments and indentation in stripped-mode
-			if (m_stripped)
-			{
-				indent.clear();
-				if (!m_line.empty() && m_line.substr(0, 1) == ";")
-				{
-					bool stripComment = true;
-
-					size_t start = m_line.find_first_not_of("; \t"), end = std::string::npos;
-					if (start != std::string::npos)
-						end = m_line.find_first_of(" \t", start);
-					if (end != std::string::npos && flatten(m_line.substr(start, end-start)) == "echeck")
-							stripComment = false;
-
-					if (stripComment)
-						m_line.clear();
-				}
-			}
-/*
-			// replace 4 spaces by '\t'
-			for (pos = indent.find_first_not_of(' '); (pos == std::string::npos) ? indent.size() > 3 : pos > 3; pos = indent.find_first_not_of(' '))
-				indent.replace(0, 4, "\t");
-
-			for (pos = indent.find('\t'); pos != std::string::npos; pos = indent.find('\t', pos+1))
-				width -= 3;		// count tabs as 4 spaces
-*/
-			width -= indent.size();
-		}
-
-		if (width < 4)
-		{
-			indent.clear();
-			width = 4;
-		}
-
-		size_t i = 0, size = m_line.size();
-
-		if (!size && m_stripped)
-			linefeed = false;
-
-		while (i < size)
-		{
-            m_target << indent;
-			int col = width - 2;
-
-            for (; i < size && col > 0; i++, col--)
-			{
-				char c = m_line[i];
-				m_target << c;
-
-				if (c == ';' && !stringlit && !comment)
-					comment = true;
-				else if(c == '\"' && !comment)
-					stringlit = !stringlit;
-			}
-
-			if (col <= 0)
-			{
-				// if we need a "line break backslash" and a space, print it
-				if ((i+2 < size) && (m_line[i+1] == ' ' || m_line[i+1] == '\t'))
-				{
-					if (m_line[i] == ' ' || m_line[i] == '\t')
-						m_target << m_line[i++];
-					m_target << '\\';
-				}
-				else
-				{
-					if (i < size)
-						m_target << m_line[i++];
-
-					// if we need a "line break backslash", print it
-					if ((i+1 < size))
-						m_target << '\\';
-					else if (i < size)	// else, print another char
-						m_target << m_line[i++];
-				}
-			}
-
-			if (i == 0 && !m_line.empty())		// when line width is too short, avoid endless loop
-				throw std::runtime_error("Zeilenbreite ist zu klein.");
-
-			if (i < size)
-				m_target << '\n', m_row++;
-		}
-
-		m_line.clear();
-
-		if (linefeed)
-			m_target << '\n';
-	}
-
-private:
-	LineCounter(const LineCounter&);
-	void operator=(const LineCounter&);
-
-	std::ostream& m_target;		// where to put the data
-	unsigned m_width;			// how wide are the lines?
-	bool m_stripped;			// strip off comments and indentation
-
-	std::ostringstream m_stream;
-	std::string m_line;			// current line
-	unsigned m_row;				// current row
-};
-
 // saves command file
-FXint datafile::saveCmds(const FXString& filename, const FXString& password, bool stripped, bool replace, int max_width)
+FXint datafile::saveCmds(const FXString& filename, const FXString& password, bool stripped, bool replace)
 {
 	if (filename.empty())
 		return -1;
@@ -1448,12 +1293,9 @@ FXint datafile::saveCmds(const FXString& filename, const FXString& password, boo
 	}
 
 	// Datei zum Schreiben \u00f6ffnen
-	std::ofstream file(filename.text());
-	if (!file.is_open())
+	std::ofstream out(filename.text());
+	if (!out.is_open())
 		return -1;
-
-	LineCounter out(file, max_width);
-	out.stripped(stripped);
 
 	// Alles ok soweit...
 	cmdfilename(filename);
@@ -1479,7 +1321,7 @@ FXint datafile::saveCmds(const FXString& filename, const FXString& password, boo
 		out << "\"" << password << "\"\n";
     
 	// output prefix lines
-	if (!m_cmds.prefix_lines.empty())
+	if (!stripped && !m_cmds.prefix_lines.empty())
 	{
 		for (std::vector<FXString>::iterator itor = m_cmds.prefix_lines.begin(); itor != m_cmds.prefix_lines.end(); itor++)
 			out << " " << (*itor).text() << "\n";

@@ -1,3 +1,13 @@
+csmapfx (0.7.4-1) stable; urgency=low
+
+  * do not create linebreaks in orders (breaks UTF-8).
+  * strip comments when orders are exported.
+  * remove leading whitespace when orders are imported.
+  * remember password and faction.
+  * fix display of peasants wage surplus.
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 24 May 2021 20:00:00 +0200
+
 csmapfx (0.7.3-1) stable; urgency=low
 
   * integrate echeck for error checking
