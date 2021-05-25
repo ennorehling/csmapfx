@@ -2426,7 +2426,7 @@ long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
                     }
                     else {
                         FXString message(response.response, response.size);
-                        FXMessageBox::information(this, MBOX_OK, CSMAP_APP_TITLE, message.text());
+                        FXMessageBox::information(this, MBOX_OK, CSMAP_APP_TITLE, "%s", message.text());
                     }
                 }
                 curl_mime_free(form);
