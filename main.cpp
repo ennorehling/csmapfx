@@ -29,6 +29,7 @@
 #include <string>
 #include <fx.h>
 #include <physfs.h>
+#include <curl/curl.h>
 
 void showHelpText()
 {
@@ -81,6 +82,7 @@ int main(int argc, char *argv[])
     PHYSFS_mount(PHYSFS_getBaseDir(), NULL, 0);
     PHYSFS_mount(PHYSFS_getPrefDir("Eressea", "CsMapFX"), NULL, 0);
     initSystems();		// inits COM under windows
+    curl_global_init(CURL_GLOBAL_DEFAULT);
 
 	// Make application 
 	FXApp CSApp("CSMap", "Eressea"); 
@@ -265,6 +267,7 @@ int main(int argc, char *argv[])
 
 	// Run 
 	int exitcode = CSApp.run(); 
+    curl_global_cleanup();
     PHYSFS_deinit();
     return exitcode;
 }

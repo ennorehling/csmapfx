@@ -1,5 +1,6 @@
 csmapfx (0.7.4-1) stable; urgency=low
 
+  * send orders over http.
   * do not create linebreaks in orders (breaks UTF-8).
   * strip comments when orders are exported.
   * remove leading whitespace when orders are imported.

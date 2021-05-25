@@ -30,6 +30,7 @@
 #include <string>
 #include <cstdio>
 #include <cstring>
+#include <curl/curl.h>
 
 FXDEFMAP(CSMap) MessageMap[]=
 {
@@ -45,6 +46,7 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ALL,	    CSMap::onFileSaveWithCmds),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_CHECK_ORDERS,    CSMap::onFileCheckCommands),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_ORDERS,   CSMap::onFileExportCommands),
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_UPLOAD_ORDERS,   CSMap::onFileUploadCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_RECENT,		    CSMap::onFileRecent),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_QUIT,		    CSMap::onQuit),
 
@@ -54,6 +56,7 @@ FXDEFMAP(CSMap) MessageMap[]=
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_CLOSE,		    CSMap::updOpenFile),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_MAP,	    CSMap::updOpenFile),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_ORDERS,   CSMap::updOpenFile),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_UPLOAD_ORDERS,   CSMap::updOpenFile),
 
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_LOAD_ORDERS,     CSMap::updActiveFaction),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ORDERS,     CSMap::updActiveFaction),
@@ -308,7 +311,11 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
         filemenu,
         L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",
         NULL, this, ID_FILE_EXPORT_ORDERS);
-	new FXMenuCommand(
+    new FXMenuCommand(
+        filemenu,
+        L"Befehle einsenden...\t\tDie Befehle an den Server versenden.",
+        NULL, this, ID_FILE_UPLOAD_ORDERS);
+    new FXMenuCommand(
 		filemenu,
 		L"Karte exportieren...\t\tDie Karte als PNG speichern.",
 		NULL, this, ID_FILE_EXPORT_MAP);
@@ -2348,6 +2355,110 @@ long CSMap::onFileExportCommands(FXObject*, FXSelector, void* ptr)
     return 1;
 }
 
+struct memory {
+    char *response;
+    size_t size;
+};
+
+static size_t write_data(void *data, size_t size, size_t nmemb, void *userp)
+{
+    size_t realsize = size * nmemb;
+    struct memory *mem = (struct memory *)userp;
+
+    char *ptr = (char *)realloc(mem->response, mem->size + realsize + 1);
+    if (ptr == NULL)
+        return 0;  /* out of memory! */
+
+    mem->response = ptr;
+    memcpy(&(mem->response[mem->size]), data, realsize);
+    mem->size += realsize;
+    mem->response[mem->size] = 0;
+
+    return realsize;
+}
+
+long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
+{
+    char infile[PATH_MAX];
+    memory response = { 0 };
+    if (files.empty())
+        return 0;
+
+    datafile::itor file = files.begin();
+    FXString id = file->activefaction()->id();
+    FXString passwd = askPasswordDlg(id);
+    if (u_mkstemp(infile) && file->saveCmds(infile, passwd, true, true) > 0) {
+        CURL *ch;
+        CURLcode success;
+        ch = curl_easy_init();
+        if (ch) {
+            long code = 0;
+            curl_mime *form;
+            form = curl_mime_init(ch);
+            if (form) {
+                curl_mimepart *field;
+                field = curl_mime_addpart(form);
+                curl_mime_name(field, "input");
+                curl_mime_filedata(field, infile);
+                field = curl_mime_addpart(form);
+                curl_mime_name(field, "submit");
+                curl_mime_data(field, "submit", CURL_ZERO_TERMINATED);
+
+                curl_easy_setopt(ch, CURLOPT_URL, "https://www.eressea.kn-bremen.de/eressea/orders-php/upload.php");
+                curl_easy_setopt(ch, CURLOPT_WRITEDATA, &response);
+                curl_easy_setopt(ch, CURLOPT_WRITEFUNCTION, write_data);
+                curl_easy_setopt(ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+                curl_easy_setopt(ch, CURLOPT_USERNAME, id.text());
+                curl_easy_setopt(ch, CURLOPT_PASSWORD, passwd.text());
+                curl_easy_setopt(ch, CURLOPT_MIMEPOST, form);
+                success = curl_easy_perform(ch);
+                if (success == CURLE_OK) {
+                    curl_easy_getinfo(ch, CURLINFO_RESPONSE_CODE, &code);
+                    if (code == 401) {
+                        settings.password.clear();
+                        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: Falsches Passwort.", code);
+                    }
+                    else if (code >= 500) {
+                        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Serverfehler %ld: Bitte sp\u00e4ter noch einmal versuchen.", code);
+                    }
+                    else if (code < 200 || code >= 300) {
+                        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: Befehle nicht akzeptiert.", code);
+                    }
+                    else {
+                        FXString message(response.response, response.size);
+                        FXMessageBox::information(this, MBOX_OK, CSMAP_APP_TITLE, message.text());
+                    }
+                }
+                curl_mime_free(form);
+            }
+            curl_easy_cleanup(ch);
+        }
+        unlink(infile);
+        return 1;
+    }
+    return 0;
+}
+
+FXString CSMap::askPasswordDlg(const FXString &faction_id) {
+    FXString passwd = settings.password;
+    if (passwd.empty() || faction_id != settings.faction_id)
+    {
+        FXInputDialog dlg(this, "Passwort eingeben",
+            FXString(L"Geben Sie das Passwort f\u00fcr die Partei " + faction_id + " ein:"),
+            NULL, INPUTDIALOG_STRING | INPUTDIALOG_PASSWORD);
+        FXint res = dlg.execute(PLACEMENT_SCREEN);
+        if (res)
+        {
+            passwd = dlg.getText();
+            if (!passwd.empty()) {
+                settings.faction_id = faction_id;
+                settings.password = passwd;
+            }
+        }
+    }
+    return passwd;
+}
+
 void CSMap::saveCommandsDlg(bool stripped)
 {
 	if (files.empty())
@@ -2356,21 +2467,7 @@ void CSMap::saveCommandsDlg(bool stripped)
     datafile::itor firstfile = files.begin();
     FXString id = firstfile->activefaction()->id();
 
-    FXString passwd = settings.password;
-    if (passwd.empty() || id != settings.faction_id)
-	{
-		FXInputDialog dlg(this, "Passwort eingeben", FXString(L"Geben Sie das Passwort f\u00fcr die Partei " + id + " ein:"), NULL,
-			INPUTDIALOG_STRING | INPUTDIALOG_PASSWORD);
-		FXint res = dlg.execute(PLACEMENT_SCREEN);
-		if (res)
-		{
-			passwd = dlg.getText();
-            if (!passwd.empty()) {
-                settings.faction_id = id;
-                settings.password = passwd;
-            }
-		}
-	}
+    FXString passwd = askPasswordDlg(id);
 
 	FXFileDialog dlg(this, stripped ? "Versandbefehle speichern unter..." : "Befehle speichern unter...", DLGEX_SAVE);
 	dlg.setIcon(icons.save);

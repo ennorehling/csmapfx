@@ -41,6 +41,7 @@ public:
 	bool saveFile(FXString filename, bool merge_commands = false);
 	void closeFile();
     void saveCommandsDlg(bool stripped);
+    FXString askPasswordDlg(const FXString &faction_id);
 	bool loadCommands(const FXString& filename);
 	bool saveCommands(const FXString &filename, bool stripped);
 	bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
@@ -60,6 +61,7 @@ public:		// this functions are slots for menu commands
 	long onFileOpenCommands(FXObject*, FXSelector, void* ptr);
 	long onFileSaveCommands(FXObject*, FXSelector, void* ptr);
     long onFileExportCommands(FXObject*, FXSelector, void* ptr);
+    long onFileUploadCommands(FXObject*, FXSelector, void* ptr);
     long onFileSaveWithCmds(FXObject *, FXSelector, void *ptr);
     long onFileCheckCommands(FXObject*, FXSelector, void* ptr);
     long onFileRecent(FXObject*, FXSelector, void* ptr);
@@ -140,6 +142,7 @@ public:
         ID_FILE_SAVE_ALL,
         ID_FILE_CHECK_ORDERS,
         ID_FILE_EXPORT_ORDERS,
+        ID_FILE_UPLOAD_ORDERS,
         ID_FILE_QUIT,
 
         // ECheck error list
