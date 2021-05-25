@@ -2160,7 +2160,7 @@ char *u_mkstemp(char *buffer) {
     }
     return NULL;
 #else
-    return tempnam(buffer);
+    return tmpnam(buffer);
 #endif
 }
 
