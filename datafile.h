@@ -17,14 +17,14 @@ public:
 	~datakey() {}
 
 	const FXString& value() const { return m_value; }
-	FXint type() const { return (m_type & TYPE_MASK); }
+	int type() const { return (m_type & TYPE_MASK); }
 	const FXString key() const;
 
 	void key(const FXString& s);
 	void value(const FXString& s);
 
 	bool isInt() const { return (m_type & TYPE_INTEGER) != 0; }
-	FXint getInt() const;
+	int getInt() const;
 
 	enum
 	{
@@ -58,14 +58,14 @@ public:
 	};
 
 	// parses str and create datakey object
-	static FXint parseType(const FXString& type);
-	FXbool parse(FXchar* str);
+	static int parseType(const FXString& type);
+	bool parse(FXchar* str);
 
 	typedef std::vector<datakey/*, boost::pool_allocator<datakey>*/ > list_type;
 	typedef list_type::iterator itor;
 
 protected:
-	FXint m_type;
+	int m_type;
 	FXString m_key, m_value;
 };
 	
@@ -164,23 +164,23 @@ public:
 	datablock();
 	~datablock();
 
-	FXint type() const { return m_type; }
-	FXint info() const { return m_info; }	// identifier for UNIT, SCHIFF... plane for REGION
+	int type() const { return m_type; }
+	int info() const { return m_info; }	// identifier for UNIT, SCHIFF... plane for REGION
 	FXString id() const;					// identifier as base36
-	FXint x() const { return m_x; }
-	FXint y() const { return m_y; }
-	FXint terrain() const { return m_terrain; }
-	FXint flags() const { return m_flags; }
-	FXint depth() const { return m_depth; }
+	int x() const { return m_x; }
+	int y() const { return m_y; }
+	int terrain() const { return m_terrain; }
+	int flags() const { return m_flags; }
+	int depth() const { return m_depth; }
 	const FXString string() const;
 	datakey::list_type& data(){ return m_data; }
 
 	void string(const FXString& s);
 	void infostr(const FXString& s);
-	void terrain(FXint terrain);
-	void flags(FXint flags);				// set <flags> and unset all other flags
-	void setFlags(FXint flags);				// set <flags> and don't modify the other flags
-	void depth(FXint depth);				// set depth of the block
+	void terrain(int terrain);
+	void flags(int flags);				// set <flags> and unset all other flags
+	void setFlags(int flags);				// set <flags> and don't modify the other flags
+	void depth(int depth);				// set depth of the block
 
 	::attachment* attachment() const { return m_attachment; }
 	void attachment(::attachment* attach);
@@ -188,10 +188,10 @@ public:
 	const FXString terrainString() const;
 
 	const FXString value(const FXchar* key) const;
-	const FXString value(FXint key) const;
-	FXint valueInt(const FXchar* key, FXint def = 0) const;
-	FXint valueInt(FXint key, FXint def = 0) const;
-	const datakey* valueKey(FXint key) const;
+	const FXString value(int key) const;
+	int valueInt(const FXchar* key, int def = 0) const;
+	int valueInt(int key, int def = 0) const;
+	const datakey* valueKey(int key) const;
 
 	// types of datablocks
 	enum
@@ -285,19 +285,19 @@ public:
 	};
 
 	// parses str and create datablock object
-	static FXint parseType(const FXString& type);
-	static FXint parseTerrain(const FXString& str);			// Plains, Mountains, ... Volcano
-	static FXint parseSpecialTerrain(const FXString& str);	// Active volcano, ... (terrain that uses image of another terrain)
-	static FXString planeName(FXint plane);					// Eressea,Astralraum,Weihnachtsinsel...
-	FXbool parse(FXchar* str);
+	static int parseType(const FXString& type);
+	static int parseTerrain(const FXString& str);			// Plains, Mountains, ... Volcano
+	static int parseSpecialTerrain(const FXString& str);	// Active volcano, ... (terrain that uses image of another terrain)
+	static FXString planeName(int plane);					// Eressea,Astralraum,Weihnachtsinsel...
+	bool parse(FXchar* str);
 
 	typedef std::list<datablock/*, boost::fast_pool_allocator<datablock>*/ > list_type;
 	typedef list_type::iterator itor;
 
 protected:
-	FXint m_type, m_info;
-	FXint m_x, m_y, m_terrain;
-	FXint m_flags, m_depth;
+	int m_type, m_info;
+	int m_x, m_y, m_terrain;
+	int m_flags, m_depth;
 	FXString m_string;
 	datakey::list_type m_data;
 
@@ -305,7 +305,7 @@ protected:
 
 	struct blocknames
 	{
-		FXint id;
+		int id;
 		const FXchar *name;
 	};
 	static blocknames BLOCKNAMES[];
@@ -329,22 +329,22 @@ public:
 	int recruitment() const { return m_recruitment; }
 	datablock::itor activefaction() { return m_activefaction; }
 
-	FXint load(const FXchar* filename);
-	FXint save(const FXchar* filename);
+	int load(const FXchar* filename);
+	int save(const FXchar* filename);
 	void createHierarchy();
 	void createHashTables();
 
-	FXint loadCmds(const FXString &filename, bool trim_indent = true);
-	FXint saveCmds(const FXString &filename, const FXString &passwd, bool stripped, bool replace);
+	int loadCmds(const FXString &filename, bool trim_indent = true);
+	int saveCmds(const FXString &filename, const FXString &passwd, bool stripped, bool replace);
 
 	datablock::list_type& blocks() { return m_blocks; }
 
-	datablock::itor region(FXint x, FXint y, FXint plane);
-	datablock::itor unit(FXint id);
-	datablock::itor faction(FXint id);
-	datablock::itor building(FXint id);
-	datablock::itor ship(FXint id);
-	datablock::itor island(FXint id);
+	datablock::itor region(int x, int y, int plane);
+	datablock::itor unit(int id);
+	datablock::itor faction(int id);
+	datablock::itor building(int id);
+	datablock::itor ship(int id);
+	datablock::itor island(int id);
 	datablock::itor end();
 
 	datablock::itor dummyToItor(const datablock* block);
@@ -354,18 +354,18 @@ public:
 	// data of selection state (what region, what unit is actually selected?)
 	struct SelectionState
 	{
-        FXint selected;			// flags; what iterator contains valid information?
-		FXint map;				// flags that indicate map states
+        int selected;			// flags; what iterator contains valid information?
+		int map;				// flags that indicate map states
 
 		datablock::itor region, faction, building, ship, unit;
 
-		FXint sel_x, sel_y, sel_plane;
+		int sel_x, sel_y, sel_plane;
 
 		std::set<datablock*> regionsSelected;
 
 		datablock::itor activefaction;
 
-        FXint selChange, fileChange;	// incremented on changes to any datafile (loaded, closed or changed)
+        int selChange, fileChange;	// incremented on changes to any datafile (loaded, closed or changed)
 
 		// selected flags
 		enum
@@ -446,7 +446,7 @@ protected:
 	datablock::itor m_activefaction;
 
 	// hash tables
-	std::map<FXint, datablock::itor> m_units, m_factions, m_buildings, m_ships, m_islands;
+	std::map<int, datablock::itor> m_units, m_factions, m_buildings, m_ships, m_islands;
 	std::map<koordinates, datablock::itor> m_regions;
 
 	// temporaries (like FACTION block that don't exist in CR)

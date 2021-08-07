@@ -29,7 +29,7 @@ void datakey::value(const FXString& s)
 	m_value = s;
 }
 
-/*static*/ FXint datakey::parseType(const FXString& type)
+/*static*/ int datakey::parseType(const FXString& type)
 {
 	if (type.empty())
 		return TYPE_EMPTY;
@@ -131,13 +131,13 @@ const FXString datakey::key() const
 	return "";
 }
 
-FXint datakey::getInt() const
+int datakey::getInt() const
 {
 	return strtol(m_value.text(), NULL, 10);
 }
 
 // parses str and returns created datakey object or NULL pointer
-FXbool datakey::parse(FXchar* str)
+bool datakey::parse(FXchar* str)
 {
 	if (!str)
 		return false;
@@ -196,7 +196,7 @@ FXbool datakey::parse(FXchar* str)
 	von Strings, \n ist ein Zeilenumbruch, (\x ist x, falls keine Sonderregel)
 	*/
 
-	FXint length;
+	int length;
 	if (semikolon)
 		length = semikolon - str;
 	else
@@ -274,7 +274,7 @@ FXbool datakey::parse(FXchar* str)
 	{ 0, NULL }
 };
 
-/*static*/ FXint datablock::parseType(const FXString& type)
+/*static*/ int datablock::parseType(const FXString& type)
 {
 	// region moved to top (performance)
 	if (type == "REGION")
@@ -338,7 +338,7 @@ const FXString datablock::terrainString() const
     return "Unbekannt";
 }
 
-/*static*/ FXint datablock::parseTerrain(const FXString& terrain)
+/*static*/ int datablock::parseTerrain(const FXString& terrain)
 {
 	// this terrain does not need textual representation
 
@@ -388,7 +388,7 @@ const FXString datablock::terrainString() const
 	return data::TERRAIN_UNKNOWN;
 }
 
-/*static*/ FXint datablock::parseSpecialTerrain(const FXString& terrain)
+/*static*/ int datablock::parseSpecialTerrain(const FXString& terrain)
 {
 	// (terrain that uses image of another terrain)
 
@@ -399,7 +399,7 @@ const FXString datablock::terrainString() const
 	return data::TERRAIN_UNKNOWN;
 }
 
-/*static*/ FXString datablock::planeName(FXint plane)
+/*static*/ FXString datablock::planeName(int plane)
 {
 	if (plane == 0)
 		return "Eressea";
@@ -417,7 +417,7 @@ const FXString datablock::terrainString() const
 }
 
 // parses str and returns created datablock object or NULL pointer
-FXbool datablock::parse(FXchar* str)
+bool datablock::parse(FXchar* str)
 {
 	if (!str)
 		return false;
@@ -501,8 +501,8 @@ FXString datablock::id() const
 {
 	FXchar buf[35], b36[] = "0123456789abcdefghijkLmnopqrstuvwxyz";
 	FXchar *p=buf+34;
-	FXint nn=(FXint)info();
-	FXbool negativ = false;
+	int nn=(int)info();
+	bool negativ = false;
 	if (nn < 0)
 	{
         nn = -nn;
@@ -547,22 +547,22 @@ void datablock::infostr(const FXString& s)
 	}
 }
 
-void datablock::terrain(FXint terrain)
+void datablock::terrain(int terrain)
 {
 	m_terrain = terrain;
 }
 
-void datablock::flags(FXint flags)
+void datablock::flags(int flags)
 {
 	m_flags = flags;
 }
 
-void datablock::setFlags(FXint flags)
+void datablock::setFlags(int flags)
 {
 	m_flags |= flags;
 }
 
-void datablock::depth(FXint depth)
+void datablock::depth(int depth)
 {
 	m_depth = depth;
 }
@@ -582,7 +582,7 @@ const FXString datablock::value(const FXchar* key) const
 	return "";
 }
 
-const FXString datablock::value(FXint key) const
+const FXString datablock::value(int key) const
 {
 	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
 		if (srch->type() == key)
@@ -591,7 +591,7 @@ const FXString datablock::value(FXint key) const
 	return "";
 }
 
-FXint datablock::valueInt(const FXchar* key, FXint def /* = 0 */) const
+int datablock::valueInt(const FXchar* key, int def /* = 0 */) const
 {
 	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
 		if (srch->key() == key)
@@ -600,7 +600,7 @@ FXint datablock::valueInt(const FXchar* key, FXint def /* = 0 */) const
 	return def;
 }
 
-FXint datablock::valueInt(FXint key, FXint def /* = 0 */) const
+int datablock::valueInt(int key, int def /* = 0 */) const
 {
 	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
 		if (srch->type() == key)
@@ -609,7 +609,7 @@ FXint datablock::valueInt(FXint key, FXint def /* = 0 */) const
 	return def;
 }
 
-const datakey* datablock::valueKey(FXint key) const
+const datakey* datablock::valueKey(int key) const
 {
 	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
 		if (srch->type() == key)
@@ -647,7 +647,7 @@ static inline char* getNextLine(char* str)
 const FXchar* UTF8BOM = "\xEF\xBB\xBF";
 
 // loads file, parses it and returns number of block
-FXint datafile::load(const FXchar* filename)
+int datafile::load(const FXchar* filename)
 {
 	this->filename(filename);
 
@@ -714,7 +714,7 @@ FXint datafile::load(const FXchar* filename)
 			{
 				if (key.type() == datakey::TYPE_TERRAIN)
 				{
-					FXint terrain = datablock::parseTerrain(key.value());
+					int terrain = datablock::parseTerrain(key.value());
 
 					if (terrain == data::TERRAIN_UNKNOWN)
 					{
@@ -745,7 +745,7 @@ FXint datafile::load(const FXchar* filename)
 }
 
 // saves file
-FXint datafile::save(const FXchar* filename)
+int datafile::save(const FXchar* filename)
 {
 	if (!filename)
 		return 0;
@@ -959,7 +959,7 @@ FXint datafile::save(const FXchar* filename)
 // === datafile command loading routine
 
 // loads command file and attaches the commands to the units
-FXint datafile::loadCmds(const FXString &filename, bool trim_indent)
+int datafile::loadCmds(const FXString &filename, bool trim_indent)
 {
 	cmdfilename("");
 	modifiedCmds(false);
@@ -1210,7 +1210,7 @@ FXint datafile::loadCmds(const FXString &filename, bool trim_indent)
 }
 
 // saves command file
-FXint datafile::saveCmds(const FXString& filename, const FXString& password, bool stripped, bool replace)
+int datafile::saveCmds(const FXString& filename, const FXString& password, bool stripped, bool replace)
 {
 	if (filename.empty())
 		return -1;
@@ -1429,7 +1429,7 @@ FXint datafile::saveCmds(const FXString& filename, const FXString& password, boo
 				//bool EdETrireme = false;
 				//if (regord->first.x == 3 && regord->first.y == -1 && regord->first.z == 0)
 				//{
-				//	FXint shipId = unit->valueInt("Schiff");
+				//	int shipId = unit->valueInt("Schiff");
 				//	if (shipId)
 				//	{
 				//		datablock::itor ship = this->ship(shipId);
@@ -1487,7 +1487,7 @@ FXint datafile::saveCmds(const FXString& filename, const FXString& password, boo
 
 // block hash tables
 // -----------------
-datablock::itor datafile::region(FXint x, FXint y, FXint plane)
+datablock::itor datafile::region(int x, int y, int plane)
 { 
 	std::map<koordinates, datablock::itor>::iterator region;
 	region = m_regions.find(koordinates(x, y, plane));
@@ -1497,36 +1497,36 @@ datablock::itor datafile::region(FXint x, FXint y, FXint plane)
 
 	return region->second;
 }
-datablock::itor datafile::unit(FXint id)
+datablock::itor datafile::unit(int id)
 { 
-	std::map<FXint, datablock::itor>::iterator unit = m_units.find(id);
+	std::map<int, datablock::itor>::iterator unit = m_units.find(id);
 
 	if (unit == m_units.end())
 		return end();
 
 	return unit->second;
 }
-datablock::itor datafile::faction(FXint id)
+datablock::itor datafile::faction(int id)
 {
-	std::map<FXint, datablock::itor>::iterator faction = m_factions.find(id);
+	std::map<int, datablock::itor>::iterator faction = m_factions.find(id);
 
 	if (faction == m_factions.end())
 		return end();
 
 	return faction->second;
 }
-datablock::itor datafile::building(FXint id)
+datablock::itor datafile::building(int id)
 { 
-	std::map<FXint, datablock::itor>::iterator building = m_buildings.find(id);
+	std::map<int, datablock::itor>::iterator building = m_buildings.find(id);
 
 	if (building == m_buildings.end())
 		return end();
 
 	return building->second;
 }
-datablock::itor datafile::ship(FXint id)
+datablock::itor datafile::ship(int id)
 { 
-	std::map<FXint, datablock::itor>::iterator ship = m_ships.find(id);
+	std::map<int, datablock::itor>::iterator ship = m_ships.find(id);
 
 	if (ship == m_ships.end())
 		return end();
@@ -1534,9 +1534,9 @@ datablock::itor datafile::ship(FXint id)
 	return ship->second;
 }
 
-datablock::itor datafile::island(FXint id)
+datablock::itor datafile::island(int id)
 { 
-	std::map<FXint, datablock::itor>::iterator island = m_islands.find(id);
+	std::map<int, datablock::itor>::iterator island = m_islands.find(id);
 
 	if (island == m_islands.end())
 		return end();
@@ -1654,7 +1654,7 @@ void datafile::createHashTables()
 	int region_ally = 0;
 	int region_enemy = 0;
 
-	std::map<int, FXint> allied_status;	// what factions do we have HELP stati set to?
+	std::map<int, int> allied_status;	// what factions do we have HELP stati set to?
 	std::set<int> unit_got_taxes;		// units that got taxes (MSG id 1264208711); the regions will get a coins icon
 	/*
 	MESSAGE <id>
@@ -1695,7 +1695,7 @@ void datafile::createHashTables()
 		for (block++; block != end() && block->depth() > factionDepth; block++)
 		{
             if (block->type() == datablock::TYPE_ALLIANCE) {
-                FXint status = block->valueInt("Status", 0);
+                int status = block->valueInt("Status", 0);
                 allied_status[block->info()] = status;
             }
 		}
@@ -2007,7 +2007,7 @@ void datafile::createHashTables()
 		if (att_region* stats = dynamic_cast<att_region*>((*itor)->attachment()))
 			name = stats->island;
 
-		FXint x = (*itor)->x(), y = (*itor)->y(), z = (*itor)->info();
+		int x = (*itor)->x(), y = (*itor)->y(), z = (*itor)->info();
 
 		// get neighbours
 		for (int i = 0; i < 6; i++)
