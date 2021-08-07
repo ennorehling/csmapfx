@@ -39,13 +39,12 @@ FXDEFMAP(CSMap) MessageMap[]=
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_MERGE,		    CSMap::onFileMerge),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE,		    CSMap::onFileSave),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_AS,		    CSMap::onFileSaveAs),
-	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_CLOSE,		    CSMap::onFileClose),
-	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_MAP,	    CSMap::onFileMapExport),
-	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_LOAD_ORDERS,	    CSMap::onFileOpenCommands),
-	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ORDERS,	    CSMap::onFileSaveCommands),
-    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ALL,	    CSMap::onFileSaveWithCmds),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_LOAD_ORDERS,	    CSMap::onFileOpenCommands),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ORDERS,	    CSMap::onFileSaveCommands),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_CLOSE,		    CSMap::onFileClose),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_CHECK_ORDERS,    CSMap::onFileCheckCommands),
-	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_ORDERS,   CSMap::onFileExportCommands),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_MAP,	    CSMap::onFileMapExport),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_ORDERS,   CSMap::onFileExportCommands),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_UPLOAD_ORDERS,   CSMap::onFileUploadCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_RECENT,		    CSMap::onFileRecent),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_QUIT,		    CSMap::onQuit),
@@ -60,7 +59,6 @@ FXDEFMAP(CSMap) MessageMap[]=
 
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_LOAD_ORDERS,     CSMap::updActiveFaction),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ORDERS,     CSMap::updActiveFaction),
-    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ALL,        CSMap::updActiveFaction),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_CHECK_ORDERS,    CSMap::updActiveFaction),
 
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_ERRROR_SELECTED,	    CSMap::onErrorSelected),
@@ -267,44 +265,36 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	new FXMenuTitle(menubar,"&Datei",NULL,filemenu);
 	new FXMenuCommand(
 		filemenu,
-		FXString(L"\u00d6&ffnen...\tCtrl-O\tEine neue Datei \u00f6ffnen."),
+		FXString(L"\u00d6&ffnen...\tCtrl-O\tEinen Report \u00f6ffnen."),
 		NULL,
 		this,
 		ID_FILE_OPEN);
 	new FXMenuCommand(
 		filemenu,
-		FXString(L"&Hinzuf\u00fcgen...\tCtrl-I\tL\u00e4dt einen Karten-Report in den aktuellen Report."),
+		FXString(L"Karte h&inzuf\u00fcgen...\tCtrl-I\tL\u00e4dt einen Karten-Report in den aktuellen Report."),
 		NULL, this, ID_FILE_MERGE);
-	new FXMenuCommand(
+    new FXMenuCommand(
+        filemenu,
+        FXString(L"Karte sp&eichern...\tCtrl-E\tNeuen Karten-Report speichern."),
+        NULL, this, ID_FILE_SAVE_AS);
+    new FXMenuCommand(
+        filemenu,
+        FXString(L"Befehle &laden...\tCtrl-Shift-O\tBefehle aus einer Textdatei laden."),
+        NULL, this, ID_FILE_LOAD_ORDERS);
+    new FXMenuCommand(
 		filemenu,
-		FXString(L"&Speichern\tCtrl-S\tDie \u00c4nderungen speichern."),
+		FXString(L"Befehle &speichern\tCtrl-S\t\u00c4nderungen an Befehlsdatei speichern."),
 		NULL, this, ID_FILE_SAVE);
-	new FXMenuCommand(
-		filemenu,
-		FXString(L"Speichern &unter...\tF12\tDie aktuelle Datei als neue Datei speichern."),
-		NULL, this, ID_FILE_SAVE_AS);
 	new FXMenuCommand(
 		filemenu,
 		FXString(L"Sch&liessen\t\tDie aktuelle Datei schliessen."),
 		NULL, this, ID_FILE_CLOSE);
 
 	new FXMenuSeparatorEx(filemenu);
-	new FXMenuCommand(
-        filemenu,
-        FXString(L"&Befehle laden...\tCtrl-Shift-O\tDie Befehle aus Textdatei laden."),
-        NULL, this, ID_FILE_LOAD_ORDERS);
-    new FXMenuCommand(
-        filemenu,
-        FXString(L"Be&fehle speichern...\tF11\tDie Befehle als Textdatei speichern."),
-        NULL, this, ID_FILE_SAVE_ORDERS);
     new FXMenuCommand(
         filemenu,
         FXString(L"Befehle pr\u00fcfen\t\tPr\u00fct die Befehle."),
         NULL, this, ID_FILE_CHECK_ORDERS);
-    new FXMenuCommand(
-        filemenu,
-        FXString(L"Befehle mit &CR speichern...\t\tSpeichert den aktuellen Report zusammen mit den ge\u00e4nderten Befehlen."),
-        NULL, this, ID_FILE_SAVE_ALL);
 
 	new FXMenuSeparatorEx(filemenu);
     new FXMenuCommand(
@@ -1055,43 +1045,37 @@ bool CSMap::mergeFile(FXString filename)
 	return true;
 }
 
+bool CSMap::fileExists(const char *filename) {
+    struct stat buf;
+    return (stat(filename, &buf) == 0);
+}
+
 bool CSMap::saveFile(FXString filename, bool merge_commands /*= false*/)
 {
-	if (filename.empty())
-		return false;
-
-	if (!files.size())
+	if (filename.empty() || files.empty())
 		return false;
 
 	datafile &file = files.front();
-	FXint res = file.save(filename.text(), false, true);		// nicht \u00fcberschreiben, mit Befehlen
-	if (res == -2)
-	{
+	if (fileExists(filename.text())) {
 		FXString text;
-		text = "Die Datei " + filename + FXString(L" existiert bereits.\n\nM\u00f6chten Sie sie ersetzen?");
+		text = filename + FXString(L" existiert bereits.\n\nM\u00f6chten Sie sie ersetzen?");
 
 		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
-		if (MBOX_CLICKED_YES == answ)
-			res = file.save(filename.text(), true, true);	// \u00fcberschreiben, mit Befehlen
+        if (MBOX_CLICKED_YES != answ) return false;
 	}
-	if (res == -1)
-	{
-		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
-	}
-
-	if (res > 0)
-		recentFiles.appendFile(filename);
-
-	mapChange();
-	return true;
+    FXint res = file.save(filename.text());	// \u00fcberschreiben, mit Befehlen
+    if (res <= 0) {
+        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
+        return false;
+    }
+    recentFiles.appendFile(filename);
+    mapChange();
+    return true;
 }
 
 bool CSMap::loadCommands(const FXString& filename)
 {
-	if (filename.empty())
-		return false;
-
-	if (files.empty())
+	if (filename.empty() || files.empty())
 		return false;
 
 	if (!(selection.map & selection.ACTIVEFACTION))
@@ -2249,17 +2233,6 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
 	return 1;
 }
 
-long CSMap::onFileSave(FXObject *, FXSelector, void *)
-{
-    datafile &file = files.front();
-    FXString filename = file.filename();
-    // overwrite existing, with commands:
-    if (file.save(filename.text(), true, true) > 0) {
-        file.modifiedCmds(false);
-    }
-    return 1;
-}
-
 long CSMap::onFileSaveAs(FXObject*, FXSelector, void*)
 {
 	FXFileDialog dlg(this, "Speichern unter...", DLGEX_SAVE);
@@ -2341,6 +2314,17 @@ long CSMap::onFileOpenCommands(FXObject *, FXSelector, void *)
         return 1;
     }
     return 0;
+}
+
+long CSMap::onFileSave(FXObject *, FXSelector, void *)
+{
+    datafile &file = files.front();
+    FXString filename = file.filename();
+    // overwrite existing, with commands:
+    if (file.save(filename.text()) > 0) {
+        file.modifiedCmds(false);
+    }
+    return 1;
 }
 
 long CSMap::onFileSaveCommands(FXObject*, FXSelector, void* ptr)
@@ -2425,8 +2409,8 @@ long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
                         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: Befehle nicht akzeptiert.", code);
                     }
                     else {
-                        FXString message(response.response, response.size);
-                        FXMessageBox::information(this, MBOX_OK, CSMAP_APP_TITLE, "%s", message.text());
+                        FXString msg(response.response, response.size);
+                        FXMessageBox::information(this, MBOX_OK, CSMAP_APP_TITLE, "%s", msg.text());
                     }
                     free(response.response);
                 }
@@ -2502,43 +2486,6 @@ void CSMap::saveCommandsDlg(bool stripped)
 
 		saveCommands(filename, stripped);
 	}
-}
-
-long CSMap::onFileSaveWithCmds(FXObject *, FXSelector, void *)
-{
-    FXFileDialog dlg(this, "Befehle mit CR speichern unter...", DLGEX_SAVE);
-    dlg.setIcon(icons.save);
-    dlg.setDirectory(dialogDirectory);
-    dlg.setPatternList(FXString(L"Eressea Computer Report (*.cr)\nEressea CR, bzip2 gepackt (*.cr.bz2)\nXML Computer Report (*.xml)\nM\u00f6gliche Computerreporte (*.cr,*.cr.bz2,*.xml)\nAlle Dateien (*)"));
-    FXint res = dlg.execute(PLACEMENT_SCREEN);
-    dialogDirectory = dlg.getDirectory();
-    if (res)
-    {
-        FXString filename = dlg.getFilename();
-        FXString pattern = dlg.getPattern();
-
-        // Pr\u00fcft, ob Dateiname bereits Endung enth\u00e4lt.
-        FXString ext = filename.rafter('.');
-        for (int i = 0; ; i++)
-        {
-            FXString patt = pattern.section(',', i);
-            if (patt.empty())
-            {
-                // Der Dateiname endet nicht mit ".cr" o.\u00e4., deshalb wird Endung angehangen.
-                ext = pattern.section(',', 0).after('.');
-                if (!ext.empty())
-                    filename += "." + ext;
-                break;
-            }
-
-            // Dateiname endet auf ".cr" o.\u00e4.
-            if (ext == patt.after('.'))
-                break;
-        }
-
-        saveFile(filename, true);	// save with commands
-    }
-    return 1;
 }
 
 long CSMap::onFileMapExport(FXObject *, FXSelector, void *)

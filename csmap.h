@@ -62,7 +62,6 @@ public:		// this functions are slots for menu commands
 	long onFileSaveCommands(FXObject*, FXSelector, void* ptr);
     long onFileExportCommands(FXObject*, FXSelector, void* ptr);
     long onFileUploadCommands(FXObject*, FXSelector, void* ptr);
-    long onFileSaveWithCmds(FXObject *, FXSelector, void *ptr);
     long onFileCheckCommands(FXObject*, FXSelector, void* ptr);
     long onFileRecent(FXObject*, FXSelector, void* ptr);
 
@@ -139,7 +138,6 @@ public:
 		ID_FILE_EXPORT_MAP,
         ID_FILE_LOAD_ORDERS,
         ID_FILE_SAVE_ORDERS,
-        ID_FILE_SAVE_ALL,
         ID_FILE_CHECK_ORDERS,
         ID_FILE_EXPORT_ORDERS,
         ID_FILE_UPLOAD_ORDERS,
@@ -191,7 +189,8 @@ public:
 	};
 
 private: 
-	// Men�bar
+    bool fileExists(const char *filename);
+	// Menubar
 	FXMenuBar		*menubar;
 	FXMenuPane		*filemenu, *recentmenu, *viewmenu, *regionmenu, *factionmenu;
 	FXMenuPane		*mapmenu, *selectionmenu, *planemenu, *zoommenu, *helpmenu;

@@ -9,10 +9,6 @@
 #include "datafile.h"
 #include "terrain.h"
 
-#ifdef HAVE_BZ2LIB_H
-#include <FXBZFileStream.h>
-#endif
-
 #define HELP_GUARD 16
 
 // ===========================
@@ -663,29 +659,6 @@ FXint datafile::load(const FXchar* filename)
 	FXString filename_str = filename;
 	if (filename_str.length() >= 7 && filename_str.right(7) == ".cr.bz2")
 	{
-#ifdef HAVE_BZ2LIB_H
-            // load bzip2 packed CR
-		FXBZFileStream file;
-		file.open(filename,FXStreamLoad);
-		if (file.status() != FXStreamOK)
-		{
-			this->filename("");
-            throw std::runtime_error(FXString(L"Datei konnte nicht ge\u00f6ffnet werden.").text());
-		}
-
-		FXString buffer;
-		buffer.length(1024*100+1);
-
-		do
-		{
-			memset(&buffer[0], 0, buffer.length());
-			file.load(&buffer[0], buffer.length()-1);
-			data.append(buffer.text());
-
-		} while(file.status() == FXStreamOK);
-		
-		file.close();
-#endif
 	}
 	else if (filename_str.length() >= 4 && filename_str.right(4) == ".xml")
 	{
@@ -725,8 +698,7 @@ FXint datafile::load(const FXchar* filename)
 	FXchar *ptr, *next = &data[0];
 
 	// check for utf8 BOM: EF BB BF
-	if (!strncmp(next, UTF8BOM, strlen(UTF8BOM)))
-	{
+	if (!strncmp(next, UTF8BOM, strlen(UTF8BOM))) {
         next += strlen(UTF8BOM);
 	}
 
@@ -773,30 +745,15 @@ FXint datafile::load(const FXchar* filename)
 }
 
 // saves file
-FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /*= false*/)
+FXint datafile::save(const FXchar* filename)
 {
 	if (!filename)
 		return 0;
-
-	// Soll \u00fcberschrieben werden? Wenn nicht, pr\u00fcfen, ob Datei vorhanden
-	if (replace == false)
-	{
-		FXFileStream filestr;
-		filestr.open(filename, FXStreamLoad);
-		if (filestr.status() == FXStreamOK)
-		{
-			filestr.close();
-			return -2;		// Datei existiert schon, Fehler!
-		}
-	}
 
 	// Datei zum Schreiben \u00f6ffnen
 	std::ostringstream file;
 
 	FXFileStream plainfile;
-#ifdef HAVE_BZ2LIB_H
-        FXBZFileStream bzip2file;
-#endif
 	FXStream *filestr_ptr;
 
 	FXString filename_str = filename;
@@ -804,13 +761,6 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
     {
         return -1;
     }
-#ifdef HAVE_BZ2LIB_H
-    else if (filename_str.length() >= 7 && filename_str.right(7) == ".cr.bz2")
-    {
-        bzip2file.open(filename, FXStreamSave);
-		filestr_ptr = &bzip2file;
-    }
-#endif
 	else
 	{
 		plainfile.open(filename, FXStreamSave);
@@ -885,7 +835,7 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 				}
 			}
 		}
-		else if (block->type() == datablock::TYPE_UNIT && merge_commands)
+		else if (block->type() == datablock::TYPE_UNIT)
 		{
 			// search for command block of unit
 			datablock::itor cmd = block;
@@ -905,7 +855,7 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 			if (confirmed)	// datakey::TYPE_ORDERS_CONFIRMED
 				file << "1;ejcOrdersConfirmed" << std::endl;
 		}
-		else if (block->type() == datablock::TYPE_COMMANDS && merge_commands)
+		else if (block->type() == datablock::TYPE_COMMANDS)
 		{
 			if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
 			{
@@ -953,7 +903,7 @@ FXint datafile::save(const FXchar* filename, bool replace, bool merge_commands /
 				if (tags->type() == datakey::TYPE_TERRAIN || tags->type() == datakey::TYPE_NAME)
 					continue;
 			}
-			else if (block->type() == datablock::TYPE_UNIT && merge_commands)
+			else if (block->type() == datablock::TYPE_UNIT)
 			{
 				if (tags->type() == datakey::TYPE_ORDERS_CONFIRMED)
 					continue;		// will be set above
@@ -1048,10 +998,7 @@ FXint datafile::loadCmds(const FXString &filename, bool trim_indent)
 	FXchar *ptr, *next = &data[0];
 
 	// check for utf8 BOM: EF BB BF
-	bool utf8mode = false;
-	if (!strncmp(next, UTF8BOM, strlen(UTF8BOM)))
-	{
-		utf8mode = true;
+	if (!strncmp(next, UTF8BOM, strlen(UTF8BOM))) {
         next += strlen(UTF8BOM);
 	}
 
@@ -1074,9 +1021,6 @@ FXint datafile::loadCmds(const FXString &filename, bool trim_indent)
 	FXString line = ptr;
 	if (!*ptr || (line.section(' ', 0) != "ERESSEA" && line.section(' ', 0) != "PARTEI"))
 		throw std::runtime_error(FXString(L"Keine g\u00fcltige Befehlsdatei.").text());
-
-	if (!utf8mode)
-		line = FXString(line);
 
 	// parse header line:
 	// ERESSEA ioen "PASSWORT"
@@ -1106,9 +1050,6 @@ FXint datafile::loadCmds(const FXString &filename, bool trim_indent)
 
 		// check if line is REGION or EINHEIT command
 		line = ptr;
-		if (!utf8mode)
-			line = FXString(line);
-
 		line.substitute("\t", "    ");
 		indent = line.find_first_not_of(' ');
 		cmd = line.trim().before(' ');
@@ -1161,8 +1102,6 @@ FXint datafile::loadCmds(const FXString &filename, bool trim_indent)
 			}
 			else if (cmd == "EINHEIT")
 			{
-				cmds_list = NULL;
-
 				int unitId = strtol(param.text(), &endptr, 36);
 
 				// add to order list for units of this region
@@ -1177,24 +1116,25 @@ FXint datafile::loadCmds(const FXString &filename, bool trim_indent)
 					unitDepth = block->depth();
 					block++;
 				}
-				else
-					throw std::runtime_error(("Einheit nicht gefunden: " + line).text());
+                else {
+                    throw std::runtime_error(("Einheit nicht gefunden: " + line).text());
+                }
+                for (cmds_list = NULL; block != end() && block->depth() > unitDepth; block++) {
+                    if (block->type() == datablock::TYPE_COMMANDS) {
+                        // TODO: why can't this be a static_cast?
+                        if (att_commands *cmds = dynamic_cast<att_commands *>(block->attachment())) {
+                            cmds_list = cmds;
+                            break;
+                        }
+                    }
+                }
 
-				for (; block != end() && block->depth() > unitDepth; block++)
-					if (block->type() == datablock::TYPE_COMMANDS)
-						break;				// found
-
-				if (block != end() && block->type() == datablock::TYPE_COMMANDS)
-				{
-					if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
-						cmds_list = cmds;
-				}
-				else
-					throw std::runtime_error(("Einheit hat keinen Befehlsblock: " + line).text());
+                if (!cmds_list) {
+                    throw std::runtime_error(("Einheit hat keinen Befehlsblock: " + line).text());
+                }
 			}
 
-			if (cmds_list)
-			{
+			if (cmds_list) {
 				cmds_list->confirmed = false;
 				cmds_list->prefix_lines.clear();
 				cmds_list->commands.clear();
@@ -1257,8 +1197,6 @@ FXint datafile::loadCmds(const FXString &filename, bool trim_indent)
 
 		// check if line is REGION oder EINHEIT command
 		line = ptr;
-		if (!utf8mode)
-			line = FXString(line);
 
 		line.substitute("\t", "    ");
 		indent = line.find_first_not_of(' ');

@@ -330,7 +330,7 @@ public:
 	datablock::itor activefaction() { return m_activefaction; }
 
 	FXint load(const FXchar* filename);
-	FXint save(const FXchar* filename, bool replace, bool merge_commands = false);
+	FXint save(const FXchar* filename);
 	void createHierarchy();
 	void createHashTables();
 

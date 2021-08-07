@@ -62,24 +62,24 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>Debug\</OutDir>
     <IntDir>Debug\</IntDir>
-    <IncludePath>C:\homebrew\fox-1.6.57\include;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>C:\homebrew\installed\x86-windows\fox-1.6.57\include</IncludePath>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
-    <LibraryPath>C:\homebrew\fox-1.6.57\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\homebrew\installed\x86-windows\fox-1.6.57\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>Release\</OutDir>
     <IntDir>Release\</IntDir>
-    <IncludePath>C:\homebrew\fox-1.6.57\include;C:\vcpkg\installed\x86-windows\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\homebrew\installed\x86-windows\fox-1.6.57\include</IncludePath>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
-    <LibraryPath>C:\homebrew\fox-1.6.57\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\homebrew\installed\x86-windows\fox-1.6.57\lib;$(LibraryPath)</LibraryPath>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoOptimization|Win32'">
     <OutDir>Testing\</OutDir>
     <IntDir>Testing\</IntDir>
-    <IncludePath>C:\homebrew\fox-1.6.57\include;C:\vcpkg\installed\x86-windows\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\homebrew\installed\x86-windows\fox-1.6.57\include</IncludePath>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
-    <LibraryPath>C:\homebrew\fox-1.6.57\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\homebrew\installed\x86-windows\fox-1.6.57\lib;$(LibraryPath)</LibraryPath>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='NoOptimization|Win32'">
