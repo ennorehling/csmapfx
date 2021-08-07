@@ -1324,19 +1324,19 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 		// output region header + text lines
 		att_commands* cmds = &m_cmds.region_lines[regord->first];
 
-		out << " " << cmds->header.text() << "\n";
+		out << cmds->header.text() << "\n";
 
 		// output prefix lines
 		for (att_commands::cmdlist_t::iterator itor = cmds->prefix_lines.begin(); itor != cmds->prefix_lines.end(); itor++)
-			out << " " << (*itor).text() << "\n";
+			out << (*itor).text() << "\n";
 
 		// output changed commands
 		for (att_commands::cmdlist_t::iterator itor = cmds->commands.begin(); itor != cmds->commands.end(); itor++)
-			out << "  " << (*itor).text() << "\n";
+			out << "    " << (*itor).text() << "\n";
 
 		// output postfix lines
 		for (att_commands::cmdlist_t::iterator itor = cmds->postfix_lines.begin(); itor != cmds->postfix_lines.end(); itor++)
-			out << " " << (*itor).text() << "\n";
+			out << (*itor).text() << "\n";
 
 		// output units in order
 		std::vector<int>& order = regord->second;
@@ -1366,9 +1366,10 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 			// unit has command block
 			//  EINHEIT wz5t;  Botschafter des Konzils [1,146245$,Beqwx(1/3)] k\u00e4mpft nicht
 
+            out << "\n";
 			att_commands* attcmds = dynamic_cast<att_commands*>(cmdb->attachment());
 			if (attcmds && !attcmds->header.empty())
-				out << "  " << attcmds->header.text() << "\n";
+				out << attcmds->header.text() << "\n";
 			else
 			{
 				// get amount of silber from GEGENSTAENDE block
@@ -1383,7 +1384,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 					}
 
 				// output unit header
-				out << "  EINHEIT " << unit->id();
+				out << "EINHEIT " << unit->id();
 
 				out << ";  " << (unit->value(datakey::TYPE_NAME)).text();
 			
@@ -1392,59 +1393,25 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 				out << "\n";
 			}
 
-			//out << "  ; Debug: EINHEIT ist in Zeile: " << out.row() << "\n";
-
 			// output attachment (changed) or default commands
 			if (attcmds)
 			{
 				if (attcmds->confirmed)
-					out << "  ; bestaetigt\n";
-
-				// *** SOME DEBUGGING ***
-				//bool EdEKaravelle = false;
-				//bool EdETrireme = false;
-				//if (regord->first.x == 3 && regord->first.y == -1 && regord->first.z == 0)
-				//{
-				//	int shipId = unit->valueInt("Schiff");
-				//	if (shipId)
-				//	{
-				//		datablock::itor ship = this->ship(shipId);
-				//		if (ship != end() && *uid == ship->valueInt("Kapitaen"))
-				//		{
-				//			if (ship->value("Typ") == "Karavelle")
-				//				EdEKaravelle = true;
-				//			else if (ship->value("Typ") == "Trireme")
-				//				EdETrireme = true;
-
-				//			//out << "  ; auf Schiff " << ship->value("Name") << " (" << ship->id() << ")\n";
-				//		}
-				//	}
-				//}
+					out << "; bestaetigt\n";
 
 				// output prefix lines
 				for (att_commands::cmdlist_t::iterator itor = attcmds->prefix_lines.begin(); itor != attcmds->prefix_lines.end(); itor++)
-					out << "  " << (*itor).text() << "\n";
+					out << (*itor).text() << "\n";
 
 				// output changed commands
-				//if (EdEKaravelle)
-				//{
-				//	out << "  ; auf EdEKaravelle\n";
-				//	out << "    @reserviere 3000 Silber\n";
-				//}
-				//else if (EdETrireme)
-				//{
-				//	out << "  ; auf EdETrireme\n";
-				//	out << "    @reserviere 2000 Silber\n";
-				//}
-				//else
 				{
 					for (att_commands::cmdlist_t::iterator itor = attcmds->commands.begin(); itor != attcmds->commands.end(); itor++)
-						out << "   " << (*itor).text() << "\n";
+						out << "    " << (*itor).text() << "\n";
 				}
 
 				// output postfix lines
 				for (att_commands::cmdlist_t::iterator itor = attcmds->postfix_lines.begin(); itor != attcmds->postfix_lines.end(); itor++)
-					out << "  " << (*itor).text() << "\n";
+					out << (*itor).text() << "\n";
 			}		
 			else
 			{
@@ -1452,12 +1419,12 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 				datakey::list_type &list = cmdb->data();
 
 				for (datakey::itor itor = list.begin(); itor != list.end(); itor++)
-					out << " " << itor->value() << "\n";
+					out << "    " << itor->value() << "\n";
 			}
 		}
 	}
 
-	out << " NAECHSTER\n";
+	out << "\nNAECHSTER\n";
 	return true;
 }
 
