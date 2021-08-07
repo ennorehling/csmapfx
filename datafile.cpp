@@ -1238,14 +1238,14 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 	if (!stripped && !m_cmds.prefix_lines.empty())
 	{
 		for (std::vector<FXString>::iterator itor = m_cmds.prefix_lines.begin(); itor != m_cmds.prefix_lines.end(); itor++)
-			out << " " << (*itor).text() << "\n";
+			out << (*itor).text() << "\n";
 	}
 	else
 	{
 		out << "\n";
-		out << " ; ECHECK -l -w3 -r" << recruitment() << "\n";
+		out << "; ECHECK -l -w3 -r" << recruitment() << "\n";
 		out << "\n";
-		out << " ; " << CSMAP_APP_TITLE_VERSION << "\n";
+		out << "; " << CSMAP_APP_TITLE_VERSION << "\n";
 		out << "\n";
 	}
 
@@ -1335,7 +1335,8 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 			out << "    " << (*itor).text() << "\n";
 
 		// output postfix lines
-		for (att_commands::cmdlist_t::iterator itor = cmds->postfix_lines.begin(); itor != cmds->postfix_lines.end(); itor++)
+        out << "\n";
+        for (att_commands::cmdlist_t::iterator itor = cmds->postfix_lines.begin(); itor != cmds->postfix_lines.end(); itor++)
 			out << (*itor).text() << "\n";
 
 		// output units in order
@@ -1366,7 +1367,6 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 			// unit has command block
 			//  EINHEIT wz5t;  Botschafter des Konzils [1,146245$,Beqwx(1/3)] k\u00e4mpft nicht
 
-            out << "\n";
 			att_commands* attcmds = dynamic_cast<att_commands*>(cmdb->attachment());
 			if (attcmds && !attcmds->header.empty())
 				out << attcmds->header.text() << "\n";
@@ -1409,7 +1409,8 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 						out << "    " << (*itor).text() << "\n";
 				}
 
-				// output postfix lines
+                out << "\n";
+                // output postfix lines
 				for (att_commands::cmdlist_t::iterator itor = attcmds->postfix_lines.begin(); itor != attcmds->postfix_lines.end(); itor++)
 					out << (*itor).text() << "\n";
 			}		
