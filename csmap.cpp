@@ -37,7 +37,6 @@ FXDEFMAP(CSMap) MessageMap[]=
 	//________Message_Type_____________________ID_______________Message_Handler_______
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_OPEN,		    CSMap::onFileOpen),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_MERGE,		    CSMap::onFileMerge),
-	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE,		    CSMap::onFileSave),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_AS,		    CSMap::onFileSaveAs),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_LOAD_ORDERS,	    CSMap::onFileOpenCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ORDERS,	    CSMap::onFileSaveCommands),
@@ -50,7 +49,6 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_QUIT,		    CSMap::onQuit),
 
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_MERGE,		    CSMap::updOpenFile),
-	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE,		    CSMap::updOpenFile),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_AS,		    CSMap::updOpenFile),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_CLOSE,		    CSMap::updOpenFile),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_MAP,	    CSMap::updOpenFile),
@@ -284,7 +282,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
     new FXMenuCommand(
 		filemenu,
 		FXString(L"Befehle &speichern\tCtrl-S\t\u00c4nderungen an Befehlsdatei speichern."),
-		NULL, this, ID_FILE_SAVE);
+		NULL, this, ID_FILE_SAVE_ORDERS);
 	new FXMenuCommand(
 		filemenu,
 		FXString(L"Sch&liessen\t\tDie aktuelle Datei schliessen."),
@@ -2314,17 +2312,6 @@ long CSMap::onFileOpenCommands(FXObject *, FXSelector, void *)
         return 1;
     }
     return 0;
-}
-
-long CSMap::onFileSave(FXObject *, FXSelector, void *)
-{
-    datafile &file = files.front();
-    FXString filename = file.filename();
-    // overwrite existing, with commands:
-    if (file.save(filename.text()) > 0) {
-        file.modifiedCmds(false);
-    }
-    return 1;
 }
 
 long CSMap::onFileSaveCommands(FXObject*, FXSelector, void* ptr)

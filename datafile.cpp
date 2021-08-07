@@ -1040,7 +1040,6 @@ int datafile::loadCmds(const FXString &filename, bool trim_indent)
 	m_cmds.region_order.clear();
 
 	FXString cmd;
-	int headerindent = 0, indent = 0;
 
 	// process lines
 	while(*(ptr = next))
@@ -1050,8 +1049,6 @@ int datafile::loadCmds(const FXString &filename, bool trim_indent)
 
 		// check if line is REGION or EINHEIT command
 		line = ptr;
-		line.substitute("\t", "    ");
-		indent = line.find_first_not_of(' ');
 		cmd = line.trim().before(' ');
 		cmd.upper();
 
@@ -1076,7 +1073,6 @@ int datafile::loadCmds(const FXString &filename, bool trim_indent)
 		if (cmd == "REGION" || cmd == "EINHEIT")
 		{
 			FXString param = line.section(' ', 1);
-			headerindent = indent;
 
 			if (cmd == "REGION")
 			{
@@ -1144,49 +1140,32 @@ int datafile::loadCmds(const FXString &filename, bool trim_indent)
 		}
 		else if (cmds_list)
 		{
-			if (line.left(1) == ";")
-			{
-				cmd = line.after(';');
-				cmd.trim().lower();
-			}
-
-			if (flatten(cmd) == "bestaetigt")
-			{
-				// don't add "; bestaetigt" comment, just set confirmed flag
-				cmds_list->confirmed = true;
-			}
-			// when normal command or comment indented as command
-			else if (!line.empty() && (line.left(1) != ";" || indent > headerindent))
-			{
-                // move all postfix comments into command block
-                if (!cmds_list->postfix_lines.empty())
-                {
+            if (!line.empty()) {
+                if (line.left(1) == ";") {
+                    cmd = line.after(';');
+                    cmd.trim().lower();
+                    if (flatten(cmd) == "bestaetigt") {
+                        // don't add "; bestaetigt" comment, just set confirmed flag
+                        cmds_list->confirmed = true;
+                    }
+                    else {
+                        if (cmds_list->commands.empty()) {
+                            cmds_list->prefix_lines.push_back(line);
+                        }
+                        else {
+                            // add to postfix if it follows some commands
+                            cmds_list->postfix_lines.push_back(line);
+                        }
+                    }
+                }
+                else {
+                    // TODO: why are there postfix lines?
                     std::copy(cmds_list->postfix_lines.begin(), cmds_list->postfix_lines.end(),
                         std::back_inserter(cmds_list->commands));
                     cmds_list->postfix_lines.clear();
-                }
-                if (trim_indent) {
-                    line.trim();
-                }
-                else {
-                    indent -= headerindent + 2;
-                    while (indent >= 4) indent -= 4, line = "\t" + line;
-                    while (indent >= 1) indent -= 1, line = " " + line;
-                }
-                // then append command
-                if (!line.empty()) {
                     cmds_list->commands.push_back(line);
                 }
-			}
-			// seems to be a comment
-			else if (!line.empty())
-			{
-				// add to prefix if no other command is found,
-				if (cmds_list->commands.empty())
-					cmds_list->prefix_lines.push_back(line);
-				else	// add to postfix if it follows some commands
-					cmds_list->postfix_lines.push_back(line);
-			}
+            }
 		}
 
 		if (!*(ptr = next))
@@ -1197,9 +1176,6 @@ int datafile::loadCmds(const FXString &filename, bool trim_indent)
 
 		// check if line is REGION oder EINHEIT command
 		line = ptr;
-
-		line.substitute("\t", "    ");
-		indent = line.find_first_not_of(' ');
 		cmd = line.trim().before(' ');
 		cmd.upper();
 

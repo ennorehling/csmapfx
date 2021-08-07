@@ -53,7 +53,6 @@ public:		// this functions are slots for menu commands
 	long updActiveFaction(FXObject *sender, FXSelector, void *);
 
 	long onFileMerge(FXObject*, FXSelector, void*);
-	long onFileSave(FXObject*, FXSelector, void*);
 	long onFileSaveAs(FXObject*, FXSelector, void*);
 	long onFileClose(FXObject*, FXSelector, void*);
 	long onFileMapExport(FXObject*, FXSelector, void*);
@@ -132,7 +131,6 @@ public:
 		ID_FILE_RECENT,
 		ID_FILE_OPEN,
 		ID_FILE_MERGE,
-		ID_FILE_SAVE,
 		ID_FILE_SAVE_AS,
 		ID_FILE_CLOSE,
 		ID_FILE_EXPORT_MAP,
