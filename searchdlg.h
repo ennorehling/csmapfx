@@ -6,7 +6,6 @@
 #include <fx.h>
 
 #include <map>
-#include <memory>
 #include <vector>
 
 class FXSearchDlg : public FXDialogBox
@@ -19,7 +18,7 @@ public:
 	void create();
 	virtual ~FXSearchDlg();
 
-    void setMapFile(std::shared_ptr<datafile> &f);
+    void setMapFile(datafile *f);
 
 	void loadState(FXRegistry& reg);
 	void saveState(FXRegistry& reg);
@@ -42,7 +41,7 @@ public:
 
 protected:
 	datafile::SelectionState selection;
-    std::shared_ptr<datafile> mapFile;
+    datafile *mapFile;
 
 	FXTextField		*search;				// textfield for search
 	FXButton		*search_button;			// "do the search!"

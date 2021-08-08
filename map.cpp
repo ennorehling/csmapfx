@@ -448,7 +448,7 @@ void FXCSMap::moveContents(FXint x,FXint y)
 	map->update();
 }
 
-void FXCSMap::setMapFile(std::shared_ptr<datafile> &f)
+void FXCSMap::setMapFile(datafile *f)
 {
     mapFile = f;
 }
@@ -1348,27 +1348,8 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 
 void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 {
-	// create empty file if none exists
-	if (!mapFile)
-	{
-		if (!new_terrain)	// don't create file, if region should be deleted anyway.
-			return;
-
-        mapFile.reset(new datafile);
-        mapFile->filename("unbenannt");
-
-		datablock version;
-		version.string("VERSION");
-		version.infostr("64");
-
-		datakey key;
-		key.key("Konfiguration"); key.value(CSMAP_APP_TITLE_VERSION);
-		version.data().push_back(key);
-
-		key.key("Koordinaten"); key.value("Hex");
-		version.data().push_back(key);
-
-        mapFile->blocks().push_back(version);
+	if (!mapFile) {
+		return;
 	}
 
 	if (selection.selected & selection.MULTIPLE_REGIONS)

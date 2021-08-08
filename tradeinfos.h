@@ -6,7 +6,6 @@
 #include <fx.h>
 
 #include <list>
-#include <memory>
 #include <vector>
 
 class FXTradeInfos : public FXVerticalFrame
@@ -19,7 +18,7 @@ public:
 	void create();
 	virtual ~FXTradeInfos();
 
-	void setMapFile(std::shared_ptr<datafile> &f);
+	void setMapFile(datafile *f);
 
 public:
 	long onMapChange(FXObject*,FXSelector,void*);
@@ -34,7 +33,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-    std::shared_ptr<datafile> mapFile;
+    datafile *mapFile;
 
 	// Tradeinfos
 	struct

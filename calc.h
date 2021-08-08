@@ -7,7 +7,6 @@
 #include <fx.h>
 
 #include <list>
-#include <memory>
 
 class FXCalculator : public FXHorizontalFrame
 {
@@ -19,7 +18,7 @@ public:
 	void create();
 	virtual ~FXCalculator();
 
-    void setMapFile(std::shared_ptr<datafile> &f);
+    void setMapFile(datafile *f);
 
 	void connectMap(FXCSMap* map);
 
@@ -44,7 +43,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-	std::shared_ptr<datafile> mapFile;
+	datafile *mapFile;
 
 	FXHorizontalFrame	*firstline;
 	FXHorizontalFrame	*secondline;

@@ -51,7 +51,7 @@ FXStatsInfos::~FXStatsInfos()
 {
 }
 
-void FXStatsInfos::setMapFile(std::shared_ptr<datafile> &f)
+void FXStatsInfos::setMapFile(datafile *f)
 {
     mapFile = f;
 }

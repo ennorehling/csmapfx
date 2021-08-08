@@ -20,8 +20,6 @@
 
 #include <fx.h>
 
-#include <memory>
-
 class CSMap : public FXMainWindow
 { 
   // Macro for class hierarchy declarations 
@@ -315,7 +313,7 @@ private:
 	} icons;
 
     // some data
-	std::shared_ptr<datafile> report;
+	datafile *report;
     std::list<MessageInfo *> output;
     datafile::SelectionState selection;			// selected region,faction,unit...
 

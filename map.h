@@ -8,7 +8,6 @@
 
 #include <fx.h>
 
-#include <memory>
 #include <vector>
 #include <list>
 #include <map>
@@ -43,7 +42,7 @@ public:
 	virtual void moveContents(FXint x,FXint y);
 
 	FXbool paintMap(FXDrawable* buffer /*, FXRectangle& rect*/);
-	void setMapFile(std::shared_ptr<datafile> &f);
+	void setMapFile(datafile *f);
 	void connectMap(FXCSMap* map);
 
 	void scrollTo(FXint x, FXint y);
@@ -204,7 +203,7 @@ protected:
 	std::vector<arrow> arrows;
 	std::vector<arrow> routeArrows[2];		// saved
     
-    std::shared_ptr<datafile> mapFile;
+    datafile *mapFile;
 
 	// Return default width / height
 	virtual FXint getDefaultWidth();

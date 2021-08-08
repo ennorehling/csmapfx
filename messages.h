@@ -7,7 +7,6 @@
 
 #include <list>
 #include <vector>
-#include <memory>
 
 class FXMessages : public FXTreeList
 {
@@ -19,7 +18,7 @@ public:
 	void create();
 	virtual ~FXMessages();
 
-    void setMapFile(std::shared_ptr<datafile> &f);
+    void setMapFile(datafile *f);
 
 public:
 	long onMapChange(FXObject*,FXSelector,void*);
@@ -28,7 +27,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-    std::shared_ptr<datafile> mapFile;
+    datafile *mapFile;
 
 	struct
 	{

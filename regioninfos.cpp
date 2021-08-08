@@ -79,7 +79,7 @@ FXRegionInfos::~FXRegionInfos()
 		delete terrainIcons[i];
 }
 
-void FXRegionInfos::setMapFile(std::shared_ptr<datafile> &f)
+void FXRegionInfos::setMapFile(datafile *f)
 {
     mapFile = f;
 }

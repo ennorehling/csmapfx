@@ -6,7 +6,6 @@
 
 #include <fx.h>
 
-#include <memory>
 #include <vector>
 
 class FXCommands : public FXText
@@ -19,7 +18,7 @@ public:
 	void create();
 	virtual ~FXCommands();
 
-	void setMapFile(std::shared_ptr<datafile> &f);
+	void setMapFile(datafile *f);
 
 	void connectMap(FXCSMap* map);
 
@@ -56,7 +55,7 @@ public:
    
 protected:
 	datafile::SelectionState selection;
-    std::shared_ptr<datafile> mapFile;
+    datafile *mapFile;
 
 	FXCSMap				*map;				// map to send ROUTE commands to
 	int					routeLength;		// length of ROUTE

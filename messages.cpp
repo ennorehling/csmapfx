@@ -45,7 +45,7 @@ FXMessages::~FXMessages()
 {
 }
 
-void FXMessages::setMapFile(std::shared_ptr<datafile> &f)
+void FXMessages::setMapFile(datafile *f)
 {
     mapFile = f;
 }

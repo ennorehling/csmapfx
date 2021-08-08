@@ -79,7 +79,7 @@ FXStatistics::~FXStatistics()
 {
 }
 
-void FXStatistics::setMapFile(std::shared_ptr<datafile> &f)
+void FXStatistics::setMapFile(datafile *f)
 {
     mapFile = f;
 }

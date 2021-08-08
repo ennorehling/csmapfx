@@ -50,7 +50,7 @@ FXUnitList::~FXUnitList()
 {
 }
 
-void FXUnitList::setMapFile(std::shared_ptr<datafile> &f)
+void FXUnitList::setMapFile(datafile *f)
 {
     mapFile = f;
 }

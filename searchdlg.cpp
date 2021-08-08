@@ -107,7 +107,7 @@ FXSearchDlg::~FXSearchDlg()
 {
 }
 
-void FXSearchDlg::setMapFile(std::shared_ptr<datafile> &f)
+void FXSearchDlg::setMapFile(datafile *f)
 {
     mapFile = f;
 }

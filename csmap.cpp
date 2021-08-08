@@ -899,7 +899,7 @@ bool CSMap::loadFile(FXString filename)
 	// vorherige Dateien schliessen, Speicher frei geben
 	closeFile();
 
-	report.reset(new datafile);
+	report = new datafile();
 
 	FXString app_title = CSMAP_APP_TITLE " - lade " + filename;
 	handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &app_title);
@@ -2274,6 +2274,7 @@ void CSMap::closeFile()
 				return;
 		}
 	}
+    delete report;
     report = nullptr;
 }
 

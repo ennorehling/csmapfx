@@ -322,7 +322,7 @@ long FXRegionList::onUpdateUnitColors(FXObject* sender, FXSelector, void* ptr)
 	return 1;
 }
 
-void FXRegionList::setMapFile(std::shared_ptr<datafile> &f)
+void FXRegionList::setMapFile(datafile *f)
 {
     mapFile = f;
 }

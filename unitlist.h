@@ -5,8 +5,6 @@
 
 #include <fx.h>
 
-#include <memory>
-
 class FXUnitList : public FXVerticalFrame
 {
 	FXDECLARE(FXUnitList)
@@ -17,7 +15,7 @@ public:
 	void create();
 	virtual ~FXUnitList();
 
-    void setMapFile(std::shared_ptr<datafile> &f);
+    void setMapFile(datafile *f);
 
 	void setClipboard(const FXString& text);
 	void showInfo(const FXString& text);
@@ -46,7 +44,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-    std::shared_ptr<datafile> mapFile;
+    datafile *mapFile;
 
 	FXTreeList *list;
 

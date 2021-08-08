@@ -55,7 +55,7 @@ FXTradeInfos::~FXTradeInfos()
 {
 }
 
-void FXTradeInfos::setMapFile(std::shared_ptr<datafile> &f)
+void FXTradeInfos::setMapFile(datafile *f)
 {
     mapFile = f;
 }
