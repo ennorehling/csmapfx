@@ -864,7 +864,7 @@ void CSMap::mapChange(bool newfile /*= false*/)
 long CSMap::updOpenFile(FXObject *sender, FXSelector, void *)
 {
 	FXWindow *wnd = (FXWindow *)sender;
-    if (report) {
+    if (!report) {
         wnd->disable();
     }
     else {
