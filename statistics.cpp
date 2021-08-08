@@ -36,7 +36,7 @@ FXStatistics::FXStatistics(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	setFrameStyle(FRAME_LINE);
 
 	// init variables
-	files = NULL;
+	mapFile = NULL;
 
 	select.faction = -2;		// no faction selected
 	select.filter = select.FILTER_PERSONS|select.FILTER_ITEMS|select.FILTER_TALENTS;
@@ -79,9 +79,9 @@ FXStatistics::~FXStatistics()
 {
 }
 
-void FXStatistics::mapfiles(std::list<datafile> *f)
+void FXStatistics::setMapFile(std::shared_ptr<datafile> &f)
 {
-    files = f;
+    mapFile = f;
 }
 
 void FXStatistics::loadState(FXRegistry& reg)
@@ -108,7 +108,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 	bool unitInFaction = false;
 	int unitId = 0, personsInUnit = 0;
 
-	datablock::itor end = files->front().blocks().end();
+	datablock::itor end = mapFile->blocks().end();
 	datablock::itor block = region;
 	for (block++; block != end && block->depth() > region->depth(); block++)
 	{
@@ -215,7 +215,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 void FXStatistics::updateList()
 {
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return;
 
 	// clear old list	
@@ -232,10 +232,10 @@ void FXStatistics::updateList()
 	// collect data
 	if (selection.selected & selection.MULTIPLE_REGIONS)
 	{
-		datablock::itor notfound = files->begin()->blocks().end();
+		datablock::itor notfound = mapFile->blocks().end();
 		for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
 		{
-			datablock::itor region = files->begin()->region((*itor)->x(), (*itor)->y(), (*itor)->info());
+			datablock::itor region = mapFile->region((*itor)->x(), (*itor)->y(), (*itor)->info());
 			if (region != notfound)
 			{
 				// collect if selected
@@ -439,7 +439,7 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 	FXEvent *event = (FXEvent*)ptr;
 
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	// dont't show popup if mouse has moved
@@ -470,13 +470,13 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 			datablock::itor block;
 
 			if (entryType == 0)
-				block = files->front().unit(itor->first);		// get unit
+				block = mapFile->unit(itor->first);		// get unit
 			else if (entryType == 1)
-				block = files->front().building(itor->first);	// get building/castle
+				block = mapFile->building(itor->first);	// get building/castle
 			else if (entryType == 2)
-				block = files->front().ship(itor->first);		// get ship
+				block = mapFile->ship(itor->first);		// get ship
 
-			if (block == files->front().blocks().end())
+			if (block == mapFile->blocks().end())
 			{
 				new FXMenuCommand(menu, "- error: not found -", NULL, this,ID_POPUP_CLICKED);
 				continue;
@@ -513,7 +513,7 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 {
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	if (sender && sender->isMemberOf(&FXMenuCommand::metaClass))
@@ -522,48 +522,47 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 		
 		datablock* dblock = (datablock*)cmd->getUserData();
 
-		datablock::itor main = files->begin()->blocks().end();
-		datablock::itor iparent = files->begin()->blocks().end();
+		datablock::itor main = mapFile->blocks().end();
+		datablock::itor iparent = mapFile->blocks().end();
 
-		for (datafile::itor file = files->begin(); file != files->end(); file++)
-			for (datablock::itor block = file->blocks().begin(); block != file->blocks().end(); block++)
-			{
-				// nothing to search for
-				if (!dblock)
-					break;
-
-				// handle only regions, factions (+alliances), buildings, ships and units
-				if (block->type() != datablock::TYPE_REGION &&
-					block->type() != datablock::TYPE_ALLIANCE &&
-					block->type() != datablock::TYPE_FACTION &&
-					block->type() != datablock::TYPE_BUILDING &&
-					block->type() != datablock::TYPE_SHIP &&
-					block->type() != datablock::TYPE_UNIT)
-					continue;
-
-				if (dblock && dblock == &*block)
-				{
-					main = block;
-					dblock = NULL;		// to indicate that block was found.
-				}
-				else if (block->type() == datablock::TYPE_REGION)
-				{
-					iparent = block;
-				}
-			}
-
-		if (main == files->begin()->blocks().end())
+		for (datablock::itor block = mapFile->blocks().begin(); block != mapFile->blocks().end(); block++)
 		{
-			main = files->begin()->dummyToItor(dblock);
+			// nothing to search for
+			if (!dblock)
+				break;
+
+			// handle only regions, factions (+alliances), buildings, ships and units
+			if (block->type() != datablock::TYPE_REGION &&
+				block->type() != datablock::TYPE_ALLIANCE &&
+				block->type() != datablock::TYPE_FACTION &&
+				block->type() != datablock::TYPE_BUILDING &&
+				block->type() != datablock::TYPE_SHIP &&
+				block->type() != datablock::TYPE_UNIT)
+				continue;
+
+			if (dblock && dblock == &*block)
+			{
+				main = block;
+				dblock = NULL;		// to indicate that block was found.
+			}
+			else if (block->type() == datablock::TYPE_REGION)
+			{
+				iparent = block;
+			}
 		}
 
-		if (main == files->begin()->blocks().end())
+		if (main == mapFile->blocks().end())
+		{
+			main = mapFile->dummyToItor(dblock);
+		}
+
+		if (main == mapFile->blocks().end())
 		{
 			main = iparent;
-			iparent = files->begin()->blocks().end();
+			iparent = mapFile->blocks().end();
 		}
 
-		if (main != files->begin()->blocks().end())
+		if (main != mapFile->blocks().end())
 		{
 			// send new selection to main window
 			datafile::SelectionState state;
@@ -578,7 +577,7 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 				state.selected = state.FACTION;
 				state.faction = main;
 
-				if (iparent != files->begin()->blocks().end())
+				if (iparent != mapFile->blocks().end())
 				{
 					state.selected |= state.REGION;
 					state.region = iparent;
@@ -589,7 +588,7 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 				state.selected = state.BUILDING;
 				state.building = main;
 
-				if (iparent != files->begin()->blocks().end())
+				if (iparent != mapFile->blocks().end())
 				{
 					state.selected |= state.REGION;
 					state.region = iparent;
@@ -600,7 +599,7 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 				state.selected = state.SHIP;
 				state.ship = main;
 
-				if (iparent != files->begin()->blocks().end())
+				if (iparent != mapFile->blocks().end())
 				{
 					state.selected |= state.REGION;
 					state.region = iparent;
@@ -611,7 +610,7 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 				state.selected = state.UNIT;
 				state.unit = main;
 
-				if (iparent != files->begin()->blocks().end())
+				if (iparent != mapFile->blocks().end())
 				{
 					state.selected |= state.FACTION;
 					state.faction = iparent;
@@ -643,7 +642,7 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor region)
 {
 	// list factions of selected region
-	datablock::itor end = files->front().blocks().end();
+	datablock::itor end = mapFile->blocks().end();
 	datablock::itor block = region;
 	for (block++; block != end && block->depth() > region->depth(); block++)
 	{
@@ -659,7 +658,7 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 				factions.insert(factionId);
 
 				FXString name, label;
-				datablock::itor faction = files->front().faction(factionId);
+				datablock::itor faction = mapFile->faction(factionId);
 
 				name = faction->value(datakey::TYPE_FACTIONNAME);
 				if (name.empty())
@@ -682,7 +681,7 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	bool needUpdate = false;
@@ -734,10 +733,10 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 			if (selection.selected & selection.MULTIPLE_REGIONS)
 			{
-				datablock::itor notfound = files->begin()->blocks().end();
+				datablock::itor notfound = mapFile->blocks().end();
 				for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
 				{
-					datablock::itor region = files->begin()->region((*itor)->x(), (*itor)->y(), (*itor)->info());
+					datablock::itor region = mapFile->region((*itor)->x(), (*itor)->y(), (*itor)->info());
 					if (region != notfound)
 					{
 						// collect if selected
@@ -770,7 +769,7 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 long FXStatistics::onQueryHelp(FXObject* /*sender*/, FXSelector, void* /*ptr*/)
 { 
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	return 0;

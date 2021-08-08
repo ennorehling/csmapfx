@@ -2,7 +2,7 @@
 #define _CSMAP_STATISTICS
 
 #include <fx.h>
-#include <list>
+#include <memory>
 #include <vector>
 #include <map>
 #include <set>
@@ -18,7 +18,7 @@ public:
 	void create();
 	virtual ~FXStatistics();
 
-	void mapfiles(std::list<datafile> *f);
+    void setMapFile(std::shared_ptr<datafile> &f);
 
 	void loadState(FXRegistry& reg);
 	void saveState(FXRegistry& reg);
@@ -48,7 +48,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-	std::list<datafile>	*files;
+    std::shared_ptr<datafile> mapFile;
 
 	// control box
 	FXComboBox		*factionBox;

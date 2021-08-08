@@ -1,11 +1,13 @@
 #ifndef _CSMAP_COMMANDS
 #define _CSMAP_COMMANDS
 
-#include <fx.h>
-#include <list>
-#include <vector>
 #include "datafile.h"
 #include "map.h"
+
+#include <fx.h>
+
+#include <memory>
+#include <vector>
 
 class FXCommands : public FXText
 {
@@ -17,7 +19,7 @@ public:
 	void create();
 	virtual ~FXCommands();
 
-	void mapfiles(std::list<datafile> *f);
+	void setMapFile(std::shared_ptr<datafile> &f);
 
 	void connectMap(FXCSMap* map);
 
@@ -54,8 +56,7 @@ public:
    
 protected:
 	datafile::SelectionState selection;
-
-	std::list<datafile>	*files;
+    std::shared_ptr<datafile> mapFile;
 
 	FXCSMap				*map;				// map to send ROUTE commands to
 	int					routeLength;		// length of ROUTE

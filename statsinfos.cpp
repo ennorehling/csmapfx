@@ -28,7 +28,7 @@ FXStatsInfos::FXStatsInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	setFrameStyle(FRAME_LINE);
 
 	// init variables
-	files = NULL;
+	mapFile = NULL;
 
 	// create layout
 	tags.matrixframe = new FXHorizontalFrame(this, LAYOUT_SIDE_TOP|LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
@@ -51,9 +51,9 @@ FXStatsInfos::~FXStatsInfos()
 {
 }
 
-void FXStatsInfos::mapfiles(std::list<datafile> *f)
+void FXStatsInfos::setMapFile(std::shared_ptr<datafile> &f)
 {
-    files = f;
+    mapFile = f;
 }
 
 inline FXString thousandsPoints(FXint value, bool plusSign = false)
@@ -182,7 +182,7 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
 	if (earnings) addEntry(info, "Bauernertrag", earnings, 0, 0, FXString(L"\u00dcberschuss der Bauerneinnahmen pro Runde. Kann sicher eingetrieben werden."));
 
 	// search income messages for this region
-	datablock::itor faction, block, end = files->front().blocks().end();
+	datablock::itor faction, block, end = mapFile->blocks().end();
 	if (selection.map & selection.ACTIVEFACTION)
 	{
 		block = faction = selection.activefaction;
@@ -277,10 +277,10 @@ void FXStatsInfos::updateData()
 		std::list<Info> info;
 
 		// collect infos
-		datablock::itor notfound = files->begin()->blocks().end();
+		datablock::itor notfound = mapFile->blocks().end();
 		for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
 		{
-			datablock::itor region = files->begin()->region((*itor)->x(), (*itor)->y(), (*itor)->info());
+			datablock::itor region = mapFile->region((*itor)->x(), (*itor)->y(), (*itor)->info());
 
 			if (region != notfound)
 			{
@@ -324,7 +324,7 @@ long FXStatsInfos::onMapChange(FXObject*, FXSelector, void* ptr)
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	bool needUpdate = false;

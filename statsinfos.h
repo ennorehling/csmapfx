@@ -1,10 +1,13 @@
 #ifndef _CSMAP_STATSINFOS
 #define _CSMAP_STATSINFOS
 
-#include <fx.h>
-#include <list>
-#include <vector>
 #include "datafile.h"
+
+#include <fx.h>
+
+#include <list>
+#include <memory>
+#include <vector>
 
 class FXStatsInfos : public FXVerticalFrame
 {
@@ -16,7 +19,7 @@ public:
 	void create();
 	virtual ~FXStatsInfos();
 
-	void mapfiles(std::list<datafile> *f);
+    void setMapFile(std::shared_ptr<datafile> &f);
 
 public:
 	long onMapChange(FXObject*,FXSelector,void*);
@@ -31,7 +34,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-	std::list<datafile>	*files;
+    std::shared_ptr<datafile> mapFile;
 
 	// Statsinfos
 	struct

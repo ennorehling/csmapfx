@@ -434,7 +434,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 	// Region list window
 	regions = new FXRegionList(leftframe, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	regions->mapfiles(&files);
+	regions->setMapFile(report);
 
 	menu.ownFactionGroup->setTarget(regions);
 	menu.ownFactionGroup->setSelector(FXRegionList::ID_TOGGLEOWNFACTIONGROUP);
@@ -450,7 +450,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
 	// Map window
 	map = new FXCSMap(mapsplit, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	map->mapfiles(&files);
+	map->setMapFile(report);
 	mapsplit->setStretcher(map);
 
 	menu.streets->setTarget(map);
@@ -475,13 +475,13 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
     outputTabs = new FXTabBook(msgBorder, NULL, 0, TABBOOK_NORMAL | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
     new FXTabItem(outputTabs, "Meldungen");
     messages = new FXMessages(outputTabs, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	messages->mapfiles(&files);
+	messages->setMapFile(report);
     new FXTabItem(outputTabs, "Fehler");
     errorList = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
 
     // Calculator bar
 	mathbar = new FXCalculator(middle, this,ID_SELECTION, LAYOUT_FILL_X);
-	mathbar->mapfiles(&files);
+	mathbar->setMapFile(report);
 	mathbar->connectMap(map);
 	menu.calc->setTarget(mathbar);
 	menu.calc->setSelector(FXCalculator::ID_TOGGLESHOWN);
@@ -493,7 +493,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	riTab = new FXToolBarTab(riFrame, NULL,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
 	riTab->setTipText("Regionsinformationen ein- und ausblenden");
 	regioninfos = new FXRegionInfos(riFrame, this,ID_SELECTION, LAYOUT_FILL_X);
-	regioninfos->mapfiles(&files);
+	regioninfos->setMapFile(report);
 
 	menu.regdescription->setTarget(regioninfos);
 	menu.regdescription->setSelector(FXRegionInfos::ID_TOGGLEDESCRIPTION);
@@ -502,13 +502,13 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	siTab = new FXToolBarTab(siFrame, NULL,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
 	siTab->setTipText("Statistik ein- und ausblenden");
 	statsinfos = new FXStatsInfos(siFrame, this,ID_SELECTION, LAYOUT_FILL_X);
-	statsinfos->mapfiles(&files);
+	statsinfos->setMapFile(report);
 
 	FXHorizontalFrame *tiFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
 	tiTab = new FXToolBarTab(tiFrame, NULL,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
 	tiTab->setTipText("Handelsinformationen ein- und ausblenden");
 	tradeinfos = new FXTradeInfos(tiFrame, this,ID_SELECTION, LAYOUT_FILL_X);
-	tradeinfos->mapfiles(&files);
+	tradeinfos->setMapFile(report);
 
 	commandsplitter = new FXSplitterEx(rightframe, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
@@ -516,10 +516,10 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 
     new FXTabItem(tabbook, "Einheiten");
 	unitlist = new FXUnitList(tabbook, this,ID_SELECTION, LAYOUT_FILL_X);
-	unitlist->mapfiles(&files);
+	unitlist->setMapFile(report);
     new FXTabItem(tabbook, "Statistik");
 	statistics = new FXStatistics(tabbook, this,ID_SELECTION, LAYOUT_FILL_X);
-	statistics->mapfiles(&files);
+	statistics->setMapFile(report);
     getAccelTable()->addAccel(MKUINT(KEY_1, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_UNIT));
     getAccelTable()->addAccel(MKUINT(KEY_2, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_STATS));
 
@@ -527,7 +527,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	commandframe = new FXVerticalFrame(commandsplitter,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 0,0,0,0);
 	commandframe->setBorderColor(getApp()->getShadowColor());
 	commands = new FXCommands(commandframe, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	commands->mapfiles(&files);
+	commands->setMapFile(report);
 	commands->connectMap(map);
 
 	// commands editor tools
@@ -571,7 +571,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	minimap_bar->getStatusLine()->setNormalText("");
 
 	minimap = new FXCSMap(minimap_frame, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y, true /*minimap-mode*/);
-	minimap->mapfiles(&files);
+	minimap->setMapFile(report);
 	minimap->connectMap(map);
 
 	menu.minimap_islands->setTarget(minimap);
@@ -585,7 +585,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL,
 	// search dialog
 	searchdlg = new FXSearchDlg(this, "Suchen...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));
 	searchdlg->getAccelTable()->addAccel(MKUINT(KEY_F,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_SEARCHDLG));
-	searchdlg->mapfiles(&files);
+	searchdlg->setMapFile(report);
 }
 
 /*static*/ CSMap* CSMap::getInstance()
@@ -831,10 +831,10 @@ void CSMap::mapChange(bool newfile /*= false*/)
 {
 	// map changed, let selection-function handle this
 	datafile::SelectionState state = selection;
-	if (files.empty())
-		state.selected = 0,
-		state.map = 0;
-
+    if (!report) {
+        state.selected = 0;
+        state.map = 0;
+    }
 	state.map |= state.MAPCHANGED;
 
 	if (newfile)
@@ -847,12 +847,29 @@ void CSMap::mapChange(bool newfile /*= false*/)
 	}
 
 	handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+
+    searchdlg->setMapFile(report);
+    minimap->setMapFile(report);
+    commands->setMapFile(report);
+    unitlist->setMapFile(report);
+    tradeinfos->setMapFile(report);
+    statsinfos->setMapFile(report);
+    regioninfos->setMapFile(report);
+    mathbar->setMapFile(report);
+    messages->setMapFile(report);
+    map->setMapFile(report);
+    regions->setMapFile(report);
 }
 
 long CSMap::updOpenFile(FXObject *sender, FXSelector, void *)
 {
 	FXWindow *wnd = (FXWindow *)sender;
-	files.empty() ? wnd->disable() : wnd->enable();
+    if (report) {
+        wnd->disable();
+    }
+    else {
+        wnd->enable();
+    }
 	return 1;
 }
 
@@ -865,7 +882,7 @@ long CSMap::updActiveFaction(FXObject *sender, FXSelector, void *)
 
 bool CSMap::haveActiveFaction() const
 {
-	if (files.empty())
+	if (!report)
 		return false;
 
 	if (!(selection.map & selection.ACTIVEFACTION))
@@ -882,39 +899,35 @@ bool CSMap::loadFile(FXString filename)
 	// vorherige Dateien schliessen, Speicher frei geben
 	closeFile();
 
-	if (!files.empty())
-		return false;
-
-	files.push_back(datafile());
-	datafile &file = files.back();
+	report.reset(new datafile);
 
 	FXString app_title = CSMAP_APP_TITLE " - lade " + filename;
 	handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &app_title);
 
 	try
 	{
-		file.load(filename.text());
+		report->load(filename.text());
 	}
 	catch(const std::runtime_error& err)
 	{
-		files.pop_back();
+        report = nullptr;
 		recentFiles.removeFile(filename);
 		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", err.what());
 		return false;
 	}
 
-	if (!file.blocks().size())
+	if (report->blocks().empty())
 	{
-		files.pop_back();
-		recentFiles.removeFile(filename);
+        report = nullptr;
+        recentFiles.removeFile(filename);
 		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht gelesen werden.\nM\u00f6glicherweise wird das Format nicht unterst\u00fctzt.");
 		return false;
 	}
 
-	if (file.blocks().front().type() != datablock::TYPE_VERSION)
+	if (report->blocks().front().type() != datablock::TYPE_VERSION)
 	{
-		files.pop_back();
-		recentFiles.removeFile(filename);
+        report = nullptr;
+        recentFiles.removeFile(filename);
 		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei hat das falsche Format.");
         return false;
 	}
@@ -929,52 +942,47 @@ bool CSMap::mergeFile(FXString filename)
 	if (filename.empty())
 		return false;
 
-	if (!files.size())
+	if (!report) {
 		return loadFile(filename);	// normal laden, wenn vorher keine Datei geladen ist.
+    }
 
-	// zuerst: Datei normal laden
-	files.push_back(datafile());
-	datafile &file = files.back();
+    // zuerst: Datei normal laden
+    datafile new_cr;
 
 	FXString app_title = CSMAP_APP_TITLE " - lade " + filename;
 	handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &app_title);
 
 	try
 	{
-		file.load(filename.text());
+        new_cr.load(filename.text());
 	}
 	catch(const std::runtime_error& err)
 	{
-		files.pop_back();
 		recentFiles.removeFile(filename);
 		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", (filename + ": " + FXString(err.what())).text());
 		return false;
 	}
 
-	if (!file.blocks().size())
+	if (!new_cr.blocks().size())
 	{
-		files.pop_back();
 		recentFiles.removeFile(filename);
 		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s",
 		FXString(L"Die Datei konnte nicht gelesen werden.\nM\u00f6glicherweise wird das Format nicht unterst\u00fctzt.").text());
 		return false;
 	}
 
-	if (file.blocks().front().type() != datablock::TYPE_VERSION)
+	if (new_cr.blocks().front().type() != datablock::TYPE_VERSION)
 	{
-		files.pop_back();
 		recentFiles.removeFile(filename);
 		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei hat das falsche Format.");
         return false;
 	}
 
 	// dann: Datei an den aktuellen CR anfuegen (nur Karteninformationen)
-	datafile &cr = files.front();
-
 	datablock regionblock;
 	regionblock.string("REGION");
 
-	for (datablock::itor block = file.blocks().begin(); block != file.blocks().end(); block++)
+	for (datablock::itor block = new_cr.blocks().begin(); block != new_cr.blocks().end(); block++)
 	{
 		// handle only regions
 		if (block->type() == datablock::TYPE_REGION)
@@ -983,8 +991,8 @@ bool CSMap::mergeFile(FXString filename)
 			FXint y = block->y();
 			FXint plane = block->info();
 
-			datablock::itor oldr = cr.region(x, y, plane);
-			if (oldr != cr.blocks().end())			// add some info to old cr (island names)
+			datablock::itor oldr = report->region(x, y, plane);
+			if (oldr != report->blocks().end())			// add some info to old cr (island names)
 			{
 				if (const datakey* islandkey = block->valueKey(datakey::TYPE_ISLAND))
 					if (!oldr->valueKey(datakey::TYPE_ISLAND))
@@ -993,10 +1001,10 @@ bool CSMap::mergeFile(FXString filename)
 							oldr->data().push_back(*islandkey);
 					}
 			}
-            else //if (oldr == cr.blocks().end())	// add region to old cr
+            else //if (oldr == file->blocks().end())	// add region to old cr
 			{
-                cr.blocks().push_back(regionblock);
-                datablock& newblock = cr.blocks().back();
+                report->blocks().push_back(regionblock);
+                datablock& newblock = report->blocks().back();
 
 				newblock.infostr(FXString().format("%d %d %d", x, y, plane));
 				newblock.terrain(block->terrain());
@@ -1028,7 +1036,7 @@ bool CSMap::mergeFile(FXString filename)
 
 				key.key("Runde");
 				if (turn.empty())
-					key.value(FXStringVal(cr.turn()));
+					key.value(FXStringVal(report->turn()));
 				else
 					key.value(turn);
 				newblock.data().push_back(key);
@@ -1036,9 +1044,7 @@ bool CSMap::mergeFile(FXString filename)
 		}
 	}
 
-	// dann: 2. Datei freigeben, da jetzt in 1. Datei integriert
-	files.pop_back();
-	cr.createHashTables();
+    report->createHashTables();
 	mapChange();
 	return true;
 }
@@ -1050,10 +1056,9 @@ bool CSMap::fileExists(const char *filename) {
 
 bool CSMap::saveFile(FXString filename, bool merge_commands /*= false*/)
 {
-	if (filename.empty() || files.empty())
+	if (filename.empty() || !report)
 		return false;
 
-	datafile &file = files.front();
 	if (fileExists(filename.text())) {
 		FXString text;
 		text = filename + FXString(L" existiert bereits.\n\nM\u00f6chten Sie sie ersetzen?");
@@ -1061,7 +1066,7 @@ bool CSMap::saveFile(FXString filename, bool merge_commands /*= false*/)
 		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
         if (MBOX_CLICKED_YES != answ) return false;
 	}
-    FXint res = file.save(filename.text());	// \u00fcberschreiben, mit Befehlen
+    FXint res = report->save(filename.text());	// \u00fcberschreiben, mit Befehlen
     if (res <= 0) {
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
         return false;
@@ -1073,17 +1078,15 @@ bool CSMap::saveFile(FXString filename, bool merge_commands /*= false*/)
 
 bool CSMap::loadCommands(const FXString& filename)
 {
-	if (filename.empty() || files.empty())
+	if (filename.empty() || !report)
 		return false;
 
 	if (!(selection.map & selection.ACTIVEFACTION))
 		return false;
 
-	datafile &file = files.front();
-
 	try
 	{
-		FXint res = file.loadCmds(filename, true);
+		FXint res = report->loadCmds(filename, true);
 		if (res < 0)
 		{
 			FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht gelesen werden.");
@@ -1105,17 +1108,13 @@ bool CSMap::loadCommands(const FXString& filename)
 
 bool CSMap::saveCommands(const FXString &filename, bool stripped)
 {
-	if (filename.empty())
-		return false;
-
-	if (files.empty())
+	if (filename.empty() || !report)
 		return false;
 
 	if (!(selection.map & selection.ACTIVEFACTION))
 		return false;
 
-	datafile &file = files.front();
-	FXint res = file.saveCmds(filename.text(), settings.password, stripped, false);	// nicht \u00fcberschreiben
+	FXint res = report->saveCmds(filename.text(), settings.password, stripped, false);	// nicht \u00fcberschreiben
 	if (res == -2)
 	{
 		FXString text;
@@ -1123,7 +1122,7 @@ bool CSMap::saveCommands(const FXString &filename, bool stripped)
 
 		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
 		if (MBOX_CLICKED_YES == answ)
-			res = file.saveCmds(filename.text(), settings.password, stripped, true);	// \u00fcberschreiben
+			res = report->saveCmds(filename.text(), settings.password, stripped, true);	// \u00fcberschreiben
 	}
 	if (res == -1)
 	{
@@ -1141,12 +1140,12 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
     if (filename.empty())
 		return false;
 
-	if (!files.size())
+	if (!report)
 		return false;
 
     FXCSMap *csmap = new FXCSMap(this);
     csmap->hide();
-    csmap->mapfiles(&files);
+    csmap->setMapFile(report);
     csmap->create();
 
 	// options
@@ -1184,61 +1183,56 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
 
 	delete csmap;
 
-    mapChange();
     return true;
 }
 
 void CSMap::stripReportToMap()
 {
-	for (datafile::itor file = files.begin(); file != files.end(); file++)
+	for (datablock::itor block = report->blocks().begin(); block != report->blocks().end(); block++)
 	{
-		for (datablock::itor block = file->blocks().begin(); block != file->blocks().end(); block++)
+		// handle regions
+		if (block->type() == datablock::TYPE_REGION)
 		{
-			// handle regions
-			if (block->type() == datablock::TYPE_REGION)
+			block->flags( block->flags() & datablock::FLAG_NONE );		// unset all flags
+
+			// delete keys except ;Name, ;Terrain, ;Insel, ;turn, ;id
+			for (datakey::itor key = block->data().begin(); key != block->data().end(); key++)
 			{
-				block->flags( block->flags() & datablock::FLAG_NONE );		// unset all flags
+				if (key->type() == datakey::TYPE_NAME || key->type() == datakey::TYPE_TERRAIN
+					|| key->type() == datakey::TYPE_ISLAND || key->type() == datakey::TYPE_TURN
+					|| key->type() == datakey::TYPE_ID)
+					continue;
 
-				// delete keys except ;Name, ;Terrain, ;Insel, ;turn, ;id
-				for (datakey::itor key = block->data().begin(); key != block->data().end(); key++)
-				{
-					if (key->type() == datakey::TYPE_NAME || key->type() == datakey::TYPE_TERRAIN
-						|| key->type() == datakey::TYPE_ISLAND || key->type() == datakey::TYPE_TURN
-						|| key->type() == datakey::TYPE_ID)
-						continue;
-
-					datakey::itor del = key--;
-					block->data().erase(del);
-				}
-
-			}	// handle VERSION block
-			else if (block->type() == datablock::TYPE_VERSION)
-			{
-				// delete keys except ;Konfiguration, ;Spiel, ;Koordinaten, ;Basis, ;Umlaute
-				for (datakey::itor key = block->data().begin(); key != block->data().end(); key++)
-				{
-					if (key->type() == datakey::TYPE_KONFIGURATION || key->type() == datakey::TYPE_TURN)
-						continue;
-
-					if (key->key() == "Spiel" || key->key() == "Koordinaten" || key->key() == "Basis"
-						|| key->key() == "Umlaute")
-						continue;
-
-					datakey::itor del = key--;
-					block->data().erase(del);
-				}
-			}
-			else
-			{
-				// delete the rest
-
-				datablock::itor del = block--;
-				file->blocks().erase(del);
+				datakey::itor del = key--;
+				block->data().erase(del);
 			}
 
+		}	// handle VERSION block
+		else if (block->type() == datablock::TYPE_VERSION)
+		{
+			// delete keys except ;Konfiguration, ;Spiel, ;Koordinaten, ;Basis, ;Umlaute
+			for (datakey::itor key = block->data().begin(); key != block->data().end(); key++)
+			{
+				if (key->type() == datakey::TYPE_KONFIGURATION || key->type() == datakey::TYPE_TURN)
+					continue;
+
+				if (key->key() == "Spiel" || key->key() == "Koordinaten" || key->key() == "Basis"
+					|| key->key() == "Umlaute")
+					continue;
+
+				datakey::itor del = key--;
+				block->data().erase(del);
+			}
+		}
+		else
+		{
+			// delete the rest
+
+			datablock::itor del = block--;
+            report->blocks().erase(del);
 		}
 
-		file->createHashTables();
+        report->createHashTables();
 	}
 }
 
@@ -1448,23 +1442,20 @@ long CSMap::onSetOrigin(FXObject*, FXSelector, void*)
 	if (res != MBOX_CLICKED_YES)
 		return 1;
 
-	for (datafile::itor file = files.begin(); file != files.end(); file++)
+	for (datablock::itor block = report->blocks().begin(); block != report->blocks().end(); block++)
 	{
-		for (datablock::itor block = file->blocks().begin(); block != file->blocks().end(); block++)
-		{
-			// handle only regions
-			if (block->type() != datablock::TYPE_REGION)
-				continue;
+		// handle only regions
+		if (block->type() != datablock::TYPE_REGION)
+			continue;
 
-			// handle only the actually selected plain
-			if (block->info() != orig_plane)
-				continue;
+		// handle only the actually selected plain
+		if (block->info() != orig_plane)
+			continue;
 
-            block->infostr(txt.format("%d %d %d", block->x()-orig_x, block->y()-orig_y, orig_plane));
-		}
-
-		file->createHashTables();
+        block->infostr(txt.format("%d %d %d", block->x()-orig_x, block->y()-orig_y, orig_plane));
 	}
+
+    report->createHashTables();
 
 	selection.sel_x = 0, selection.sel_y = 0;	// its the origin now
 
@@ -1490,7 +1481,7 @@ long CSMap::onMakeMap(FXObject*, FXSelector, void*)
 
 long CSMap::onSetVisiblePlane(FXObject* sender, FXSelector, void* ptr)
 {
-	if (!files.size())
+	if (!report)
 		return 0;
 
 	if (map)
@@ -1504,7 +1495,7 @@ long CSMap::onSetVisiblePlane(FXObject* sender, FXSelector, void* ptr)
 
 long CSMap::onUpdVisiblePlane(FXObject* sender, FXSelector, void* ptr)
 {
-	if (!files.size())
+	if (!report)
 		return 0;
 
 	if (map)
@@ -1519,14 +1510,13 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
     FXint item = list->getCurrentItem();
     MessageInfo *info = static_cast<MessageInfo *>(list->getItemData(item));
 
-    if (files.empty())
+    if (!report)
         return 0;
     if (info->unit_id) {
         datafile::SelectionState state;
         state.selected = selection.UNIT;
-        datafile &file = files.front();
-        state.unit = file.unit(info->unit_id);
-        if (state.unit != file.end()) {
+        state.unit = report->unit(info->unit_id);
+        if (state.unit != report->end()) {
             handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
         }
     }
@@ -1535,7 +1525,7 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
 
 long CSMap::onMapSelectMarked(FXObject*, FXSelector, void*)
 {
-	if (files.empty())
+	if (!report)
 		return 0;
 
 	// if no (existing) region marked, do nothing
@@ -1569,7 +1559,7 @@ long CSMap::onMapSelectMarked(FXObject*, FXSelector, void*)
 
 long CSMap::onMapMoveMarker(FXObject*, FXSelector sel, void*)
 {
-	if (files.empty())
+	if (!report)
 		return 0;
 
 	// move mark cursor
@@ -1603,11 +1593,11 @@ long CSMap::onMapMoveMarker(FXObject*, FXSelector sel, void*)
 	datafile::SelectionState state;
 
 	state.selected = 0;
-	state.region = files.front().region(x, y, plane);
+	state.region = report->region(x, y, plane);
 
 	state.sel_x = x, state.sel_y = y, state.sel_plane = plane;
 
-	if (state.region != files.front().blocks().end())
+	if (state.region != report->blocks().end())
 		state.selected = state.REGION;
 	else
 		state.selected = state.UNKNOWN_REGION;
@@ -1660,11 +1650,8 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 	{
 		// notify info dialog of new game type
 		FXString name_of_game;
-		if (files.size())
-		{
-			datafile::itor file = files.begin();
-
-			name_of_game = file->blocks().front().value("Spiel");
+		if (report) {
+			name_of_game = report->blocks().front().value("Spiel");
 		}
 		if (name_of_game.empty())
 			name_of_game = "default";
@@ -1690,23 +1677,19 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
             item = nextw;
 		}
 
-		if (files.size())
-		{
+		if (report) {
 			// get all planes in report
 			std::set<int> planeSet;		// what planes are in the report
 
-			for (datafile::itor file = files.begin(); file != files.end(); file++)
+			datablock::itor end = report->blocks().end();
+			for (datablock::itor block = report->blocks().begin(); block != end; block++)
 			{
-				datablock::itor end = file->blocks().end();
-				for (datablock::itor block = file->blocks().begin(); block != end; block++)
-				{
-					// handle only regions
-					if (block->type() != datablock::TYPE_REGION)
-						continue;
+				// handle only regions
+				if (block->type() != datablock::TYPE_REGION)
+					continue;
 
-					// insert plane into set
-					planeSet.insert(block->info());
-				}
+				// insert plane into set
+				planeSet.insert(block->info());
 			}
 
 			for (std::set<int>::iterator plane = planeSet.begin(); plane != planeSet.end(); plane++)
@@ -1742,10 +1725,8 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 			planes->setNumVisible(planes->getNumItems());
 
 			// get info about active faction
-			datafile::itor firstfile = files.begin();
-			if (firstfile->activefaction() != firstfile->end())
-			{
-				datablock::itor block = firstfile->activefaction();
+			if (report->activefaction() != report->end()) {
+				datablock::itor block = report->activefaction();
 
 				// set first faction in file to active faction
 				selection.map |= selection.ACTIVEFACTION;
@@ -1856,7 +1837,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 		}
 
 		// automatic map-mode switch on NEWFILE flag
-		if (files.size() && (state->map & selection.NEWFILE)) {
+		if (report && (state->map & selection.NEWFILE)) {
 			if (selection.map & selection.ACTIVEFACTION)
 			{
 				// faction report: show regionlist/info
@@ -1898,7 +1879,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 		if (selection.selected & selection.UNIT)
 		{
 			// start with selected unit and search containing region
-			datablock::itor end = files.front().blocks().end();	// begin()-- does a wrap-around to end()
+			datablock::itor end = report->blocks().end();	// begin()-- does a wrap-around to end()
 
 			datablock::itor block = selection.unit;
 			for (; block != end; block--)
@@ -1929,22 +1910,21 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 	// change window title and status bar
 	FXString titlestr;
 
-    if (files.size())
-	{
+    if (report) {
 		// get report file name
-		FXString filenames = FXPath::name(files.begin()->filename());
+		FXString filenames = FXPath::name(report->filename());
 
 		// append command file name, if any
-		if (!files.begin()->cmdfilename().empty())
+		if (!report->cmdfilename().empty())
 		{
 			filenames += ", ";
-			filenames += FXPath::name(files.begin()->cmdfilename());
+			filenames += FXPath::name(report->cmdfilename());
 
 			// mark modified command file with an asterisk
-			if (files.begin()->modifiedCmds())
+			if (report->modifiedCmds())
 				filenames += "*";
 		}
-		else if (files.begin()->modifiedCmds())
+		else if (report->modifiedCmds())
 			filenames += ", *";
 
 		// put the filenames in the title
@@ -1970,7 +1950,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 		status_faction->setText(faction);
 		status_faction->show(), status_lfaction->show();
 
-		status_turn->setText(FXStringVal(files.front().turn()));
+		status_turn->setText(FXStringVal(report->turn()));
 		status_turn->show(), status_lturn->show();
 	}
 	else
@@ -2150,7 +2130,6 @@ char *u_mkstemp(char *buffer) {
 long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
 {
     // save to a temporary file:
-    datafile &file = files.front();
     char infile[PATH_MAX];
     char outfile[PATH_MAX];
     FXString cmdline;
@@ -2167,7 +2146,7 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
     }
 #endif
     if (!cmdline.empty()) {
-        if (u_mkstemp(infile) && file.saveCmds(infile, "", true, true) > 0) {
+        if (u_mkstemp(infile) && report->saveCmds(infile, "", true, true) > 0) {
             if (u_mkstemp(outfile)) {
                 // Echeck it:
                 cmdline.append(" -w3 -c -Lde -Re2 -O");
@@ -2272,13 +2251,14 @@ long CSMap::onFileSaveAs(FXObject*, FXSelector, void*)
 long CSMap::onFileClose(FXObject*, FXSelector, void*)
 {
 	closeFile();
-	return 1;
+    mapChange();
+    return 1;
 }
 
 void CSMap::closeFile()
 {
 	// ask if modified commands should be safed
-	if (!files.empty() && files.front().modifiedCmds())
+	if (report && report->modifiedCmds())
 	{
 		FXuint res = FXMessageBox::question(this, (FXuint)MBOX_SAVE_CANCEL_DONTSAVE, CSMAP_APP_TITLE, "%s",
             FXString(L"Die \u00c4nderungen an den Befehlen speichern?").text());
@@ -2290,13 +2270,11 @@ void CSMap::closeFile()
             saveCommandsDlg(false);			// save commands
 
 			// cancel close, when save was unsuccessful
-			if (!files.empty() && files.front().modifiedCmds())
+			if (report && report->modifiedCmds())
 				return;
 		}
 	}
-
-	files.clear();
-	mapChange();
+    report = nullptr;
 }
 
 long CSMap::onFileOpenCommands(FXObject *, FXSelector, void *)
@@ -2352,13 +2330,12 @@ long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
 {
     char infile[PATH_MAX];
     memory response = { 0 };
-    if (files.empty())
+    if (!report)
         return 0;
 
-    datafile::itor file = files.begin();
-    FXString id = file->activefaction()->id();
+    FXString id = report->activefaction()->id();
     FXString passwd = askPasswordDlg(id);
-    if (u_mkstemp(infile) && file->saveCmds(infile, passwd, true, true) > 0) {
+    if (u_mkstemp(infile) && report->saveCmds(infile, passwd, true, true) > 0) {
         CURL *ch;
         CURLcode success;
         ch = curl_easy_init();
@@ -2433,11 +2410,10 @@ FXString CSMap::askPasswordDlg(const FXString &faction_id) {
 
 void CSMap::saveCommandsDlg(bool stripped)
 {
-	if (files.empty())
+	if (!report)
 		return;
 
-    datafile::itor firstfile = files.begin();
-    FXString id = firstfile->activefaction()->id();
+    FXString id = report->activefaction()->id();
 
     FXString passwd = askPasswordDlg(id);
 
@@ -2546,21 +2522,18 @@ long CSMap::onRegionSelAll(FXObject*, FXSelector, void*)
 
 	int visiblePlane = map->getVisiblePlane();
 
-	for (datafile::itor file = files.begin(); file != files.end(); file++)
+	datablock::itor end = report->blocks().end();
+	for (datablock::itor block = report->blocks().begin(); block != end; block++)
 	{
-		datablock::itor end = file->blocks().end();
-		for (datablock::itor block = file->blocks().begin(); block != end; block++)
-		{
-			// handle only regions
-			if (block->type() != datablock::TYPE_REGION)
-				continue;
+		// handle only regions
+		if (block->type() != datablock::TYPE_REGION)
+			continue;
 
-			// mark only visible plane
-			if (block->info() != visiblePlane)
-				continue;
+		// mark only visible plane
+		if (block->info() != visiblePlane)
+			continue;
 
-			state.regionsSelected.insert(&*block);
-		}
+		state.regionsSelected.insert(&*block);
 	}
 
 	handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
@@ -2587,26 +2560,23 @@ long CSMap::onRegionInvertSel(FXObject*, FXSelector, void*)
 
 	int visiblePlane = map->getVisiblePlane();
 
-	for (datafile::itor file = files.begin(); file != files.end(); file++)
+	datablock::itor end = report->blocks().end();
+
+	for (datablock::itor block = report->blocks().begin(); block != end; block++)
 	{
-		datablock::itor end = file->blocks().end();
+		// handle only regions
+		if (block->type() != datablock::TYPE_REGION)
+			continue;
 
-		for (datablock::itor block = file->blocks().begin(); block != end; block++)
-		{
-			// handle only regions
-			if (block->type() != datablock::TYPE_REGION)
-				continue;
+		// mark only visible plane
+		if (block->info() != visiblePlane)
+			continue;
 
-			// mark only visible plane
-			if (block->info() != visiblePlane)
-				continue;
-
-			std::set<datablock*>::iterator srch = state.regionsSelected.find(&*block);
-			if (srch == state.regionsSelected.end())
-				state.regionsSelected.insert(&*block);
-			else
-				state.regionsSelected.erase(srch);
-		}
+		std::set<datablock*>::iterator srch = state.regionsSelected.find(&*block);
+		if (srch == state.regionsSelected.end())
+			state.regionsSelected.insert(&*block);
+		else
+			state.regionsSelected.erase(srch);
 	}
 
 	if (state.regionsSelected.size())
@@ -2631,7 +2601,7 @@ long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
 
 	int visiblePlane = map->getVisiblePlane();
 
-	datablock::itor notfound = files.begin()->blocks().end();
+	datablock::itor notfound = report->blocks().end();
 	for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
 	{
 		// all previously selected regions are selected here, too
@@ -2649,27 +2619,27 @@ long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
 		datablock::itor region;
 
 		// each of the six hex directions
-		region = files.begin()->region(x, y+1, visiblePlane);
+		region = report->region(x, y+1, visiblePlane);
 		if (region != notfound)
 			state.regionsSelected.insert(&*region);
 
-		region = files.begin()->region(x+1, y, visiblePlane);
+		region = report->region(x+1, y, visiblePlane);
 		if (region != notfound)
 			state.regionsSelected.insert(&*region);
 
-		region = files.begin()->region(x+1, y-1, visiblePlane);
+		region = report->region(x+1, y-1, visiblePlane);
 		if (region != notfound)
 			state.regionsSelected.insert(&*region);
 
-		region = files.begin()->region(x, y-1, visiblePlane);
+		region = report->region(x, y-1, visiblePlane);
 		if (region != notfound)
 			state.regionsSelected.insert(&*region);
 
-		region = files.begin()->region(x-1, y, visiblePlane);
+		region = report->region(x-1, y, visiblePlane);
 		if (region != notfound)
 			state.regionsSelected.insert(&*region);
 
-		region = files.begin()->region(x-1, y+1, visiblePlane);
+		region = report->region(x-1, y+1, visiblePlane);
 		if (region != notfound)
 			state.regionsSelected.insert(&*region);
 	}
@@ -2693,7 +2663,7 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
 	{
 		changed = false;
 
-		datablock::itor notfound = files.begin()->blocks().end();
+		datablock::itor notfound = report->blocks().end();
 		for (std::set<datablock*>::iterator itor = state.regionsSelected.begin(); itor != state.regionsSelected.end(); itor++)
 		{
 			if ((*itor)->info() != visiblePlane)
@@ -2714,37 +2684,37 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
 			datablock::itor region;
 
 			// each of the six hex directions
-			region = files.begin()->region(x, y+1, visiblePlane);
+			region = report->region(x, y+1, visiblePlane);
 			if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
 				&& region->terrain() != data::TERRAIN_FIREWALL)
 				if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
 					state.regionsSelected.insert(&*region), changed = true;
 
-			region = files.begin()->region(x+1, y, visiblePlane);
+			region = report->region(x+1, y, visiblePlane);
 			if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
 				&& region->terrain() != data::TERRAIN_FIREWALL)
 				if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
 					state.regionsSelected.insert(&*region), changed = true;
 
-			region = files.begin()->region(x+1, y-1, visiblePlane);
+			region = report->region(x+1, y-1, visiblePlane);
 			if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
 				&& region->terrain() != data::TERRAIN_FIREWALL)
 				if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
 					state.regionsSelected.insert(&*region), changed = true;
 
-			region = files.begin()->region(x, y-1, visiblePlane);
+			region = report->region(x, y-1, visiblePlane);
 			if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
 				&& region->terrain() != data::TERRAIN_FIREWALL)
 				if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
 					state.regionsSelected.insert(&*region), changed = true;
 
-			region = files.begin()->region(x-1, y, visiblePlane);
+			region = report->region(x-1, y, visiblePlane);
 			if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
 				&& region->terrain() != data::TERRAIN_FIREWALL)
 				if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
 					state.regionsSelected.insert(&*region), changed = true;
 
-			region = files.begin()->region(x-1, y+1, visiblePlane);
+			region = report->region(x-1, y+1, visiblePlane);
 			if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
 				&& region->terrain() != data::TERRAIN_FIREWALL)
 				if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
@@ -2767,26 +2737,23 @@ long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
 
 	int visiblePlane = map->getVisiblePlane();
 
-	for (datafile::itor file = files.begin(); file != files.end(); file++)
+	datablock::itor end = report->blocks().end();
+	for (datablock::itor block = report->blocks().begin(); block != end; block++)
 	{
-		datablock::itor end = file->blocks().end();
-		for (datablock::itor block = file->blocks().begin(); block != end; block++)
-		{
-			// handle only regions
-			if (block->type() != datablock::TYPE_REGION)
-				continue;
+		// handle only regions
+		if (block->type() != datablock::TYPE_REGION)
+			continue;
 
-			// mark only visible plane
-			if (block->info() != visiblePlane)
-				continue;
+		// mark only visible plane
+		if (block->info() != visiblePlane)
+			continue;
 
-			// skip ocean, firewall and iceberg
-			if (block->terrain() == data::TERRAIN_OCEAN || block->terrain() == data::TERRAIN_FIREWALL
-				|| block->terrain() == data::TERRAIN_ICEBERG)
-				continue;
+		// skip ocean, firewall and iceberg
+		if (block->terrain() == data::TERRAIN_OCEAN || block->terrain() == data::TERRAIN_FIREWALL
+			|| block->terrain() == data::TERRAIN_ICEBERG)
+			continue;
 
-			state.regionsSelected.insert(&*block);
-		}
+		state.regionsSelected.insert(&*block);
 	}
 
 	handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
@@ -2828,26 +2795,22 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 				selection.selected &= ~selection.REGION;
 
 		// delete this region
-		for (datafile::itor file = files.begin(); file != files.end(); file++)
+		datablock::itor end = report->blocks().end();
+		datablock::itor block = report->region(region->x(), region->y(), region->info());
+		if (block == end)
+			continue;
+
+		// found the region. delete all blocks until next region.
+		datablock::itor srch = block;
+		for (srch++; srch != end && srch->depth() > block->depth(); srch++)
 		{
-			datablock::itor end = file->blocks().end();
-			datablock::itor block = file->region(region->x(), region->y(), region->info());
-			if (block == end)
-				continue;
-
-			// found the region. delete all blocks until next region.
-			datablock::itor srch = block;
-			for (srch++; srch != end && srch->depth() > block->depth(); srch++)
-			{
-				// block is in region
-			}
-
-			file->blocks().erase(block, srch);
+			// block is in region
 		}
+
+        report->blocks().erase(block, srch);
 	}
 
-	for (datafile::itor file = files.begin(); file != files.end(); file++)
-		file->createHashTables();
+    report->createHashTables();
 
 	// Markierung auch l\u00f6schen
 	selection.selected &= ~selection.MULTIPLE_REGIONS;

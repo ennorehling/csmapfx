@@ -1,11 +1,14 @@
 #ifndef _CSMAP_REGIONINFOS
 #define _CSMAP_REGIONINFOS
 
-#include <fx.h>
-#include <list>
-#include <vector>
 #include "datafile.h"
 #include "terrain.h"
+
+#include <fx.h>
+
+#include <list>
+#include <memory>
+#include <vector>
 
 class FXRegionInfos : public FXVerticalFrame
 {
@@ -17,7 +20,7 @@ public:
 	void create();
 	virtual ~FXRegionInfos();
 
-	void mapfiles(std::list<datafile> *f);
+    void setMapFile(std::shared_ptr<datafile> &f);
 
 public:
 	long onMapChange(FXObject*,FXSelector,void*);
@@ -37,7 +40,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-	std::list<datafile>	*files;
+    std::shared_ptr<datafile> mapFile;
 
 	FXIcon			*terrainIcons[data::TERRAIN_LAST];
 

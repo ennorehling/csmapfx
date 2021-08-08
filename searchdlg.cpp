@@ -107,9 +107,9 @@ FXSearchDlg::~FXSearchDlg()
 {
 }
 
-void FXSearchDlg::mapfiles(std::list<datafile> *f)
+void FXSearchDlg::setMapFile(std::shared_ptr<datafile> &f)
 {
-    files = f;
+    mapFile = f;
 }
 
 void FXSearchDlg::loadState(FXRegistry& reg)
@@ -388,7 +388,7 @@ long FXSearchDlg::onUpdateSearch(FXObject* sender, FXSelector sel, void* ptr)
 
 long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 {
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	// clear old results
@@ -440,109 +440,106 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 	}
 
 	// do the search
-	for (datafile::itor file = files->begin(); file != files->end(); file++)
+	datablock::itor end = mapFile->end();
+
+	datablock::itor region = end,			// initialize last-block-of-typ holder
+					building = end,
+					ship = end,
+					unit = end;
+
+	block_context context(region, building, ship, unit, end, compare_func, compare_func_icase, descriptions);
+
+	for (datablock::itor block = mapFile->blocks().begin(); block != end; block++)
 	{
-		datablock::itor end = file->end();
-
-		datablock::itor region = end,			// initialize last-block-of-typ holder
-						building = end,
-						ship = end,
-						unit = end;
-
-		block_context context(region, building, ship, unit, end, compare_func, compare_func_icase, descriptions);
-
-		for (datablock::itor block = file->blocks().begin(); block != end; block++)
+		// pass blocks to search functors
+		if (block->type() == datablock::TYPE_REGION)
 		{
-			// pass blocks to search functors
-			if (block->type() == datablock::TYPE_REGION)
+			region = block;
+			building = ship = unit = end;
+		}
+		else if (block->type() == datablock::TYPE_BUILDING)
+		{
+			building = block;
+			ship = unit = end;
+		}
+		else if (block->type() == datablock::TYPE_SHIP)
+		{
+			ship = block;
+			building = unit = end;
+		}
+		else if (block->type() == datablock::TYPE_UNIT)
+		{
+			unit = block;
+			building = ship = end;
+		}
+
+		if (search_func(block, context))
+		{
+			FXString region_str, object_str;
+
+			// add region to results-list in first column
+			if (region != end)
 			{
-				region = block;
-				building = ship = unit = end;
+				FXString terrain = region->terrainString();
+				FXString name = region->value(datakey::TYPE_NAME);
+
+				if (name.empty())
+					name = terrain;
+				if (name.empty())
+					name = "Unbekannt";
+
+				if (region->info())
+					region_str.format("%s (%d,%d,%s)", name.text(), region->x(), region->y(), datablock::planeName(region->info()).text());
+				else
+					region_str.format("%s (%d,%d)", name.text(), region->x(), region->y());
 			}
-			else if (block->type() == datablock::TYPE_BUILDING)
+
+			// add block to results-list in second column
+			if (building != end)
 			{
-				building = block;
-				ship = unit = end;
+				FXString name = building->value(datakey::TYPE_NAME);
+				FXString id = building->id();
+
+				if (name.empty())
+					name = FXString(L"Geb\u00e4ude ") + id;
+
+				object_str = name + " (" + id + ")";
 			}
-			else if (block->type() == datablock::TYPE_SHIP)
+			else if (ship != end)
 			{
-				ship = block;
-				building = unit = end;
+				FXString name = ship->value(datakey::TYPE_NAME);
+				FXString id = ship->id();
+
+				if (name.empty())
+					name = "Schiff " + id;
+
+				object_str = name + " (" + id + ")";
 			}
-			else if (block->type() == datablock::TYPE_UNIT)
+			else if (unit != end)
 			{
-				unit = block;
-				building = ship = end;
+				FXString name = unit->value(datakey::TYPE_NAME);
+				FXString id = unit->id();
+				//FXString number = block->value(datakey::TYPE_NUMBER);
+				//FXString type = block->value(datakey::TYPE_TYPE);
+
+				if (name.empty())
+					name = "Einheit " + id;
+
+				object_str = name + " (" + id + ")";
 			}
 
-			if (search_func(block, context))
-			{
-				FXString region_str, object_str;
+			// add to list
+			datablock::itor link = region;
+			if (unit != end)
+				link = unit;
+			else if (building != end)
+				link = building;
+			else if (ship != end)
+				link = ship;
 
-				// add region to results-list in first column
-				if (region != end)
-				{
-					FXString terrain = region->terrainString();
-					FXString name = region->value(datakey::TYPE_NAME);
-
-					if (name.empty())
-						name = terrain;
-					if (name.empty())
-						name = "Unbekannt";
-
-					if (region->info())
-						region_str.format("%s (%d,%d,%s)", name.text(), region->x(), region->y(), datablock::planeName(region->info()).text());
-					else
-						region_str.format("%s (%d,%d)", name.text(), region->x(), region->y());
-				}
-
-				// add block to results-list in second column
-				if (building != end)
-				{
-					FXString name = building->value(datakey::TYPE_NAME);
-					FXString id = building->id();
-
-					if (name.empty())
-						name = FXString(L"Geb\u00e4ude ") + id;
-
-					object_str = name + " (" + id + ")";
-				}
-				else if (ship != end)
-				{
-					FXString name = ship->value(datakey::TYPE_NAME);
-					FXString id = ship->id();
-
-					if (name.empty())
-						name = "Schiff " + id;
-
-					object_str = name + " (" + id + ")";
-				}
-				else if (unit != end)
-				{
-					FXString name = unit->value(datakey::TYPE_NAME);
-					FXString id = unit->id();
-					//FXString number = block->value(datakey::TYPE_NUMBER);
-					//FXString type = block->value(datakey::TYPE_TYPE);
-
-					if (name.empty())
-						name = "Einheit " + id;
-
-					object_str = name + " (" + id + ")";
-				}
-
-				// add to list
-				datablock::itor link = region;
-				if (unit != end)
-					link = unit;
-				else if (building != end)
-					link = building;
-				else if (ship != end)
-					link = ship;
-
-                results->appendItem(NULL, region_str + "\t" + object_str, NULL,NULL, (void*)&*link);
-				if (limitresults && results->getNumItems() >= 1000)
-					break;				// list only 1000 results
-			}
+            results->appendItem(NULL, region_str + "\t" + object_str, NULL,NULL, (void*)&*link);
+			if (limitresults && results->getNumItems() >= 1000)
+				break;				// list only 1000 results
 		}
 	}
 
@@ -556,7 +553,7 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 
 long FXSearchDlg::onSelectResults(FXObject*, FXSelector, void*)
 {
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	FXFoldingItem *item = results->getCurrentItem();
@@ -565,38 +562,35 @@ long FXSearchDlg::onSelectResults(FXObject*, FXSelector, void*)
 
 	datablock* select = (datablock*)item->getData();
 
-	for (datafile::itor file = files->begin(); file != files->end(); file++)
+	datablock::itor end = mapFile->blocks().end();
+
+	datablock::itor region = end;
+
+	for (datablock::itor block = mapFile->blocks().begin(); block != end; block++)
 	{
-		datablock::itor end = file->blocks().end();
+		if (block->type() == datablock::TYPE_REGION)
+			region = block;
 
-		datablock::itor region = end;
+		if (select != &*block)
+			continue;
 
-		for (datablock::itor block = file->blocks().begin(); block != end; block++)
-		{
-			if (block->type() == datablock::TYPE_REGION)
-				region = block;
+		// propagate selection
+        datafile::SelectionState state;
 
-			if (select != &*block)
-				continue;
+		state.selected = 0;
 
-			// propagate selection
-            datafile::SelectionState state;
+		if (region != end)
+			state.region = region, state.selected |= state.REGION;
 
-			state.selected = 0;
+		if (block->type() == datablock::TYPE_UNIT)
+			state.unit = block, state.selected |= state.UNIT;
+		else if (block->type() == datablock::TYPE_BUILDING)
+			state.building = block, state.selected |= state.BUILDING;
+		else if (block->type() == datablock::TYPE_SHIP)
+			state.ship = block, state.selected |= state.SHIP;
 
-			if (region != end)
-				state.region = region, state.selected |= state.REGION;
-
-			if (block->type() == datablock::TYPE_UNIT)
-				state.unit = block, state.selected |= state.UNIT;
-			else if (block->type() == datablock::TYPE_BUILDING)
-				state.building = block, state.selected |= state.BUILDING;
-			else if (block->type() == datablock::TYPE_SHIP)
-				state.ship = block, state.selected |= state.SHIP;
-
-			getOwner()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
-			return 1;
-		}
+		getOwner()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+		return 1;
 	}
 
 	return 1;

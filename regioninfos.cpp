@@ -38,7 +38,7 @@ FXRegionInfos::FXRegionInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuin
 	setFrameStyle(FRAME_LINE);
 
 	// init variables
-	files = NULL;
+	mapFile = NULL;
 	show_description = false;
 
 	// create layout
@@ -79,9 +79,9 @@ FXRegionInfos::~FXRegionInfos()
 		delete terrainIcons[i];
 }
 
-void FXRegionInfos::mapfiles(std::list<datafile> *f)
+void FXRegionInfos::setMapFile(std::shared_ptr<datafile> &f)
 {
-    files = f;
+    mapFile = f;
 }
 
 inline FXString thousandsPoints(FXint value, bool plusSign = false)
@@ -199,7 +199,7 @@ void FXRegionInfos::collectData(std::list<Info>& info, datablock::itor region)
 	FXint Personen = 0, Parteipersonen = 0;
 	FXint Parteisilber = 0;
 
-	datablock::itor end = files->front().blocks().end();
+	datablock::itor end = mapFile->blocks().end();
 	datablock::itor block = region;
 	for (block++; block != end && block->depth() > region->depth(); block++)
 	{
@@ -291,10 +291,10 @@ void FXRegionInfos::updateData()
 		std::list<Info> info;
 
 		// collect infos
-		datablock::itor notfound = files->begin()->blocks().end();
+		datablock::itor notfound = mapFile->blocks().end();
 		for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
 		{
-			datablock::itor region = files->begin()->region((*itor)->x(), (*itor)->y(), (*itor)->info());
+			datablock::itor region = mapFile->region((*itor)->x(), (*itor)->y(), (*itor)->info());
 
 			if (region != notfound)
 			{
@@ -391,7 +391,7 @@ long FXRegionInfos::onMapChange(FXObject*, FXSelector, void* ptr)
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	bool needUpdate = false;

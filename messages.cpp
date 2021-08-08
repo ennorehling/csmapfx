@@ -21,7 +21,7 @@ FXMessages::FXMessages(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 		: FXTreeList(p, tgt,sel, opts|TREELIST_SINGLESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES, x,y,w,h)
 {
 	// init variables
-	files = NULL;
+	mapFile = NULL;
 
 	// set styles...
 	setNumVisible(7);
@@ -45,9 +45,9 @@ FXMessages::~FXMessages()
 {
 }
 
-void FXMessages::mapfiles(std::list<datafile> *f)
+void FXMessages::setMapFile(std::shared_ptr<datafile> &f)
 {
-    files = f;
+    mapFile = f;
 }
 
 long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
@@ -55,7 +55,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 	datafile::SelectionState *sel_state = (datafile::SelectionState*)ptr;
 
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	// any data changed, so need to update list?
@@ -85,9 +85,8 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 
 		if (selection.selected & selection.REGION)
 		{
-            datafile &file = files->front();
 			datablock::itor region = selection.region;
-			datablock::itor end = file.blocks().end();
+			datablock::itor end = mapFile->blocks().end();
 			datablock::itor block = region;
             std::set<FXint> guard_ids;
 			for (block++; block != end && block->depth() > region->depth(); block++)
@@ -181,8 +180,8 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 			}
             if (!guard_ids.empty()) {
                 for (FXint id : guard_ids) {
-                    datablock::itor faction = file.faction(id);
-                    if (faction != file.end()) {
+                    datablock::itor faction = mapFile->faction(id);
+                    if (faction != mapFile->end()) {
                         FXString label = faction->value("Parteiname") + " (" + faction->id() + ")";
                         appendItem(groups.guards, label);
                     }
@@ -196,7 +195,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 
 long FXMessages::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 {
-	if (!files || !files->size())
+	if (!mapFile)
 		return 0;
 
 	FXTreeItem* item = (FXTreeItem*)ptr;
@@ -211,8 +210,8 @@ long FXMessages::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 		sel_state.selected = selection.selected & selection.REGION;
 		sel_state.region = selection.region;
 
-		datablock::itor unit = files->front().unit(id);
-		if (unit != files->front().blocks().end())
+		datablock::itor unit = mapFile->unit(id);
+		if (unit != mapFile->blocks().end())
 		{
 			sel_state.unit = unit;
 			sel_state.selected |= sel_state.UNIT;

@@ -1,10 +1,13 @@
 #ifndef _CSMAP_MESSAGES
 #define _CSMAP_MESSAGES
 
+#include "datafile.h"
+
 #include <fx.h>
+
 #include <list>
 #include <vector>
-#include "datafile.h"
+#include <memory>
 
 class FXMessages : public FXTreeList
 {
@@ -16,7 +19,7 @@ public:
 	void create();
 	virtual ~FXMessages();
 
-	void mapfiles(std::list<datafile> *f);
+    void setMapFile(std::shared_ptr<datafile> &f);
 
 public:
 	long onMapChange(FXObject*,FXSelector,void*);
@@ -25,7 +28,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-	std::list<datafile>	*files;
+    std::shared_ptr<datafile> mapFile;
 
 	struct
 	{

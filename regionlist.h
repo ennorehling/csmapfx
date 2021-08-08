@@ -1,10 +1,13 @@
 #ifndef _CSMAP_REGIONLIST
 #define _CSMAP_REGIONLIST
 
-#include <fx.h>
-#include <list>
 #include "datafile.h"
 #include "terrain.h"
+
+#include <fx.h>
+
+#include <list>
+#include <memory>
 
 class FXRegionList : public FXTreeList
 {
@@ -16,7 +19,7 @@ public:
 	void create();
 	virtual ~FXRegionList();
 
-	void mapfiles(std::list<datafile> *f);
+	void setMapFile(std::shared_ptr<datafile> &f);
 
 public:
 	long onSelected(FXObject*,FXSelector,void*);
@@ -48,7 +51,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-	std::list<datafile>	*files;
+    std::shared_ptr<datafile> mapFile;
 
 	FXIcon			*terrainIcons[data::TERRAIN_LAST];
 	FXIcon			*green, *red, *blue, *cyan, *yellow, *orange, *gray, *black;

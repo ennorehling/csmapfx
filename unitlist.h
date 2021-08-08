@@ -1,9 +1,11 @@
 #ifndef _CSMAP_UNITLIST
 #define _CSMAP_UNITLIST
 
-#include <fx.h>
-#include <list>
 #include "datafile.h"
+
+#include <fx.h>
+
+#include <memory>
 
 class FXUnitList : public FXVerticalFrame
 {
@@ -15,7 +17,7 @@ public:
 	void create();
 	virtual ~FXUnitList();
 
-	void mapfiles(std::list<datafile> *f);
+    void setMapFile(std::shared_ptr<datafile> &f);
 
 	void setClipboard(const FXString& text);
 	void showInfo(const FXString& text);
@@ -44,7 +46,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-	std::list<datafile>	*files;
+    std::shared_ptr<datafile> mapFile;
 
 	FXTreeList *list;
 

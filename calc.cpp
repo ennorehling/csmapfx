@@ -84,9 +84,8 @@ FXCalculator::~FXCalculator()
 {
 }
 
-void FXCalculator::mapfiles(std::list<datafile> *f)
-{
-    files = f;
+void FXCalculator::setMapFile(std::shared_ptr<datafile> &f) {
+    mapFile = f;
 }
 
 void FXCalculator::connectMap(FXCSMap* map_)
@@ -154,7 +153,7 @@ long FXCalculator::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
     datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
     // connected to a datafile list?
-    if (!files)
+    if (!mapFile)
         return 0;
 
     bool needUpdate = false;

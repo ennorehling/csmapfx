@@ -1,8 +1,6 @@
 #ifndef _CSMAP
 #define _CSMAP
 
-#include <fx.h>
-#include "FXSplitterEx.h"
 #include "regionlist.h"
 #include "regioninfos.h"
 #include "statsinfos.h"
@@ -17,6 +15,12 @@
 #include "infodlg.h"
 #include "searchdlg.h"
 #include "terrain.h"
+
+#include "FXSplitterEx.h"
+
+#include <fx.h>
+
+#include <memory>
 
 class CSMap : public FXMainWindow
 { 
@@ -311,9 +315,9 @@ private:
 	} icons;
 
     // some data
-	std::list<datafile>			files;
-    std::list<MessageInfo *>    output;
-    datafile::SelectionState	selection;			// selected region,faction,unit...
+	std::shared_ptr<datafile> report;
+    std::list<MessageInfo *> output;
+    datafile::SelectionState selection;			// selected region,faction,unit...
 
 protected: 
 	CSMap() {}

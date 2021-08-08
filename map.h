@@ -1,17 +1,19 @@
 #ifndef _CSMAP_MAP
 #define _CSMAP_MAP
 
+#include "datafile.h"
+#include "terrain.h"
+#include "mapcanvas.h"
+#include "linked_ptr.h"
+
 #include <fx.h>
+
+#include <memory>
 #include <vector>
 #include <list>
 #include <map>
 #include <functional>
 
-#include "datafile.h"
-#include "terrain.h"
-#include "mapcanvas.h"
-#include "linked_ptr.h"
-//#include "scout.h"
 
 struct LeftTop
 {
@@ -41,7 +43,7 @@ public:
 	virtual void moveContents(FXint x,FXint y);
 
 	FXbool paintMap(FXDrawable* buffer /*, FXRectangle& rect*/);
-	void mapfiles(std::list<datafile> *f);
+	void setMapFile(std::shared_ptr<datafile> &f);
 	void connectMap(FXCSMap* map);
 
 	void scrollTo(FXint x, FXint y);
@@ -202,7 +204,7 @@ protected:
 	std::vector<arrow> arrows;
 	std::vector<arrow> routeArrows[2];		// saved
     
-	std::list<datafile>	*files;
+    std::shared_ptr<datafile> mapFile;
 
 	// Return default width / height
 	virtual FXint getDefaultWidth();

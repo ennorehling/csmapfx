@@ -34,7 +34,7 @@ FXUnitList::FXUnitList(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 	setFrameStyle(FRAME_LINE);
 
 	// init variables
-	files = NULL;
+	mapFile = NULL;
 
 	// create layout
 	list = new FXTreeList(this, this,ID_LIST, LAYOUT_FILL_X|LAYOUT_FILL_Y|
@@ -50,9 +50,9 @@ FXUnitList::~FXUnitList()
 {
 }
 
-void FXUnitList::mapfiles(std::list<datafile> *f)
+void FXUnitList::setMapFile(std::shared_ptr<datafile> &f)
 {
-    files = f;
+    mapFile = f;
 }
 
 long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
@@ -60,7 +60,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	// any data changed, so need to update list?
@@ -89,7 +89,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 		if (selection.selected & selection.UNIT)
 		{
-			datablock::itor end = files->front().blocks().end();
+			datablock::itor end = mapFile->blocks().end();
 			
 			datablock::itor unit = selection.unit;
 			datablock::itor items = end;
@@ -143,9 +143,9 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				else if (key->type() == datakey::TYPE_AURAMAX)
 					auramax = key->value();
 				else if (key->key() == "Burg")
-					building = files->front().building(atoi(key->value().text()));
+					building = mapFile->building(atoi(key->value().text()));
 				else if (key->key() == "Schiff")
-					ship = files->front().ship(atoi(key->value().text()));
+					ship = mapFile->ship(atoi(key->value().text()));
 				else if (key->key() == "weight")
 					weight = key->value();
 				else if (key->key() == "gruppe")
@@ -185,8 +185,8 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 			if (factionId != -1 || AnotherfactionId != -1 || !group.empty())
 			{
-				datablock::itor faction = files->front().faction(factionId);
-				datablock::itor anotherfaction = files->front().faction(AnotherfactionId);
+				datablock::itor faction = mapFile->faction(factionId);
+				datablock::itor anotherfaction = mapFile->faction(AnotherfactionId);
 
 				label = "";
 
@@ -607,7 +607,7 @@ long FXUnitList::onPopup(FXObject* sender, FXSelector sel, void* ptr)
 	FXEvent *event = (FXEvent*)ptr;
 
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	// dont't show popup if mouse has moved
@@ -722,7 +722,7 @@ FXString FXUnitList::getSubTreeText(const FXTreeItem* item) const
 long FXUnitList::onQueryHelp(FXObject* /*sender*/, FXSelector, void* /*ptr*/)
 { 
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	return 0;

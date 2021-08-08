@@ -1,10 +1,13 @@
 #ifndef _CSMAP_CALCULATOR
 #define _CSMAP_CALCULATOR
 
-#include <fx.h>
-#include <list>
 #include "datafile.h"
 #include "map.h"
+
+#include <fx.h>
+
+#include <list>
+#include <memory>
 
 class FXCalculator : public FXHorizontalFrame
 {
@@ -16,7 +19,7 @@ public:
 	void create();
 	virtual ~FXCalculator();
 
-	void mapfiles(std::list<datafile> *f);
+    void setMapFile(std::shared_ptr<datafile> &f);
 
 	void connectMap(FXCSMap* map);
 
@@ -25,7 +28,6 @@ public:
 	long onUpdateShown(FXObject*, FXSelector, void*);
 	long onCloseButton(FXObject*, FXSelector, void*);
 	long onChanged(FXObject*, FXSelector, void*);
-	long onKeyPress(FXObject*, FXSelector, void*);
 	long onFocusIn(FXObject*, FXSelector, void*);
 	long onFocusNext(FXObject*, FXSelector, void*);
 	long onFocusPrev(FXObject*, FXSelector, void*);
@@ -42,7 +44,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-	std::list<datafile>	*files;
+	std::shared_ptr<datafile> mapFile;
 
 	FXHorizontalFrame	*firstline;
 	FXHorizontalFrame	*secondline;

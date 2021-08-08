@@ -32,7 +32,7 @@ FXCommands::FXCommands(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 	setTabColumns(4);
 
 	// init variables
-	files = NULL;
+	mapFile = NULL;
 
 	// set text color styles
 	textStyles.resize(19);
@@ -90,9 +90,9 @@ FXCommands::~FXCommands()
 {
 }
 
-void FXCommands::mapfiles(std::list<datafile> *f)
+void FXCommands::setMapFile(std::shared_ptr<datafile> &f)
 {
-    files = f;
+    mapFile = f;
 }
 
 void FXCommands::connectMap(FXCSMap* map_)
@@ -102,11 +102,11 @@ void FXCommands::connectMap(FXCSMap* map_)
 
 long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
 {
-	if (!files)
+	if (!mapFile)
 		return 0;
 
-	datablock::itor end = files->front().blocks().end();
-	datablock::itor unit = files->front().blocks().end();
+	datablock::itor end = mapFile->end();
+	datablock::itor unit = mapFile->end();
 	unit--;
 	if (selection.selected & selection.UNIT)
 		unit = selection.unit;
@@ -163,11 +163,11 @@ long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
 
 long FXCommands::onNextUnit(FXObject *, FXSelector, void *)
 {
-	if (!files)
+	if (!mapFile)
 		return 0;
 
-	datablock::itor end = files->front().blocks().end();
-	datablock::itor unit = files->front().blocks().begin();
+	datablock::itor end = mapFile->blocks().end();
+	datablock::itor unit = mapFile->blocks().begin();
 	if (selection.selected & selection.UNIT)
 		unit = selection.unit;
 	else if (selection.selected & selection.REGION)
@@ -263,7 +263,7 @@ long FXCommands::onCreateUnit(FXObject*, FXSelector, void*)
 
 void FXCommands::setConfirmed(bool confirmed)
 {
-	if (!files)
+	if (!mapFile)
 		return;
 
 	if (selection.selected & selection.UNIT)
@@ -271,7 +271,7 @@ void FXCommands::setConfirmed(bool confirmed)
 		datablock::itor unit = selection.unit;
 
 		// search for command block of unit
-		datablock::itor end = files->front().blocks().end();
+		datablock::itor end = mapFile->blocks().end();
 		datablock::itor block = unit;
 		for (block++; block != end && block->depth() > unit->depth(); block++)
 			if (block->type() == datablock::TYPE_COMMANDS)
@@ -303,7 +303,7 @@ void FXCommands::setConfirmed(bool confirmed)
 
 int FXCommands::getConfirmed()
 {
-	if (!files)
+	if (!mapFile)
 		return -1;
 
 	if (selection.selected & selection.UNIT)
@@ -311,7 +311,7 @@ int FXCommands::getConfirmed()
 		datablock::itor unit = selection.unit;
 
 		// search for command block of unit
-		datablock::itor end = files->front().blocks().end();
+		datablock::itor end = mapFile->blocks().end();
 		datablock::itor block = unit;
 		for (block++; block != end && block->depth() > unit->depth(); block++)
 			if (block->type() == datablock::TYPE_COMMANDS)
@@ -335,7 +335,7 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	// any data changed, so need to update list?
@@ -366,7 +366,7 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 			datablock::itor unit = selection.unit;
 
 			// search for command block of unit
-			datablock::itor end = files->front().blocks().end();
+			datablock::itor end = mapFile->blocks().end();
 			datablock::itor block = unit;
 			for (block++; block != end && block->depth() > unit->depth(); block++)
 				if (block->type() == datablock::TYPE_COMMANDS)
@@ -545,7 +545,7 @@ void FXCommands::saveCommands()
 	if (selection.selected & selection.UNIT)
 	{
 		// search for command block of unit
-		datablock::itor iend = files->front().end();
+		datablock::itor iend = mapFile->end();
 		datablock::itor iblock = selection.unit;
 		for (iblock++; iblock != iend && iblock->depth() > selection.unit->depth(); iblock++)
 			if (iblock->type() == datablock::TYPE_COMMANDS)
@@ -583,9 +583,9 @@ void FXCommands::saveCommands()
 		setModified(false);
 
 		// notify application, that commands were modified
-		if (!files->front().modifiedCmds())
+		if (!mapFile->modifiedCmds())
 		{
-			files->front().modifiedCmds(true);
+			mapFile->modifiedCmds(true);
 			
 			datafile::SelectionState state = selection;
 			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);

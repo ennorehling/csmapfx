@@ -26,7 +26,7 @@ FXTradeInfos::FXTradeInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	setFrameStyle(FRAME_LINE);
 
 	// init variables
-	files = NULL;
+	mapFile = NULL;
 
 	// create layout
 	tags.topmatrix = new FXMatrix(this,3,MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
@@ -55,9 +55,9 @@ FXTradeInfos::~FXTradeInfos()
 {
 }
 
-void FXTradeInfos::mapfiles(std::list<datafile> *f)
+void FXTradeInfos::setMapFile(std::shared_ptr<datafile> &f)
 {
-    files = f;
+    mapFile = f;
 }
 
 inline FXString thousandsPoints(FXint value, bool plusSign = false)
@@ -161,7 +161,7 @@ void FXTradeInfos::addEntry(std::list<Info>& info, FXString name, int value, int
 void FXTradeInfos::collectData(std::list<Info>& info, datablock::itor region)
 {
 	// search prices block of this region
-	datablock::itor end = files->front().blocks().end();
+	datablock::itor end = mapFile->blocks().end();
 	datablock::itor block = region;
 	for (block++; block != end && block->depth() > region->depth(); block++)
 		if (block->type() == datablock::TYPE_PRICES)
@@ -243,7 +243,7 @@ long FXTradeInfos::onMapChange(FXObject*, FXSelector, void* ptr)
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	bool needUpdate = false;

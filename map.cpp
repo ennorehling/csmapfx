@@ -109,7 +109,7 @@ FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbo
 
 	// selected region
 	sel_x = sel_y = sel_plane = 0;
-	files = NULL;
+	mapFile = nullptr;
 }
 
 // helper function
@@ -162,7 +162,7 @@ FXint FXCSMap::getDefaultHeight()
 // Determine minimum content width / height of scroll area
 void FXCSMap::calculateContentSize()
 {
-	if (!files)
+	if (!mapFile)
 	{
 		image_w = image_h = 0;
 		return;
@@ -177,26 +177,25 @@ void FXCSMap::calculateContentSize()
 
 	FXint regionSize = FXint(64*scale);
 
-	for (datafile::itor file = files->begin(); file != files->end(); file++)
-		for (datablock::itor block = file->blocks().begin(); block != file->blocks().end(); block++)
-		{
-			// handle only regions
-			if (block->type() != datablock::TYPE_REGION)
-				continue;
+	for (datablock::itor block = mapFile->blocks().begin(); block != mapFile->blocks().end(); block++)
+	{
+		// handle only regions
+		if (block->type() != datablock::TYPE_REGION)
+			continue;
 
-			// handle only the actually visible plane
-			if (block->info() != visiblePlane)
-				continue;
+		// handle only the actually visible plane
+		if (block->info() != visiblePlane)
+			continue;
 
-			FXint scr_x = GetScreenFromHexX(block->x(), block->y());
-			FXint scr_y = GetScreenFromHexY(block->x(), block->y());
+		FXint scr_x = GetScreenFromHexX(block->x(), block->y());
+		FXint scr_y = GetScreenFromHexY(block->x(), block->y());
 
-			if (scr_x < min_x)	min_x = scr_x;
-			if (scr_y < min_y)	min_y = scr_y;
+		if (scr_x < min_x)	min_x = scr_x;
+		if (scr_y < min_y)	min_y = scr_y;
 
-			if (scr_x+regionSize > max_x)	max_x = scr_x+regionSize;
-			if (scr_y+regionSize > max_y)	max_y = scr_y+regionSize;
-		}
+		if (scr_x+regionSize > max_x)	max_x = scr_x+regionSize;
+		if (scr_y+regionSize > max_y)	max_y = scr_y+regionSize;
+	}
 
 	offset_x = -min_x;
 	offset_y = -min_y;
@@ -449,9 +448,9 @@ void FXCSMap::moveContents(FXint x,FXint y)
 	map->update();
 }
 
-void FXCSMap::mapfiles(std::list<datafile> *f)
+void FXCSMap::setMapFile(std::shared_ptr<datafile> &f)
 {
-    files = f;
+    mapFile = f;
 }
 
 void FXCSMap::connectMap(FXCSMap* a_map)
@@ -803,7 +802,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 		// set mark cursor
 		datafile::SelectionState state;
 
-		if (!files->empty())
+		if (mapFile)
 		{
 			state.selected = 0;
 
@@ -814,8 +813,8 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 					state.regionsSelected = selection.regionsSelected;
 			}
 
-			state.region = files->begin()->region(x, y, visiblePlane);
-			if (state.region != files->begin()->blocks().end())
+			state.region = mapFile->region(x, y, visiblePlane);
+			if (state.region != mapFile->blocks().end())
 			{
 				if (event->state&CONTROLMASK || modus == MODUS_SELECT)
 				{
@@ -862,7 +861,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 long FXCSMap::onLeftButtonPress(FXObject* sender,FXSelector sel,void* ptr)
 {
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	if (map->isEnabled())
@@ -882,7 +881,7 @@ long FXCSMap::onLeftButtonPress(FXObject* sender,FXSelector sel,void* ptr)
 long FXCSMap::onLeftButtonRelease(FXObject* /*sender*/, FXSelector /*sel*/, void* /*ptr*/)
 {
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	if (map->isEnabled())
@@ -893,7 +892,7 @@ long FXCSMap::onLeftButtonRelease(FXObject* /*sender*/, FXSelector /*sel*/, void
 		// when in painting mode, relayout should not be done when button is pressed, so do it on buttonrelease
 		if (modus >= MODUS_SETTERRAIN && modus < MODUS_SETTERRAIN+ data::TERRAIN_LAST)
 		{
-			files->begin()->createHashTables();	// deferred
+            mapFile->createHashTables();	// deferred
 
 			datafile::SelectionState state = selection;
 			state.selected &= ~(state.REGION|state.UNKNOWN_REGION);
@@ -908,7 +907,7 @@ long FXCSMap::onLeftButtonRelease(FXObject* /*sender*/, FXSelector /*sel*/, void
 long FXCSMap::onRightButtonPress(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 {
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	if (map->isEnabled())
@@ -929,7 +928,7 @@ long FXCSMap::onRightButtonPress(FXObject* /*sender*/, FXSelector /*sel*/, void*
 long FXCSMap::onRightButtonRelease(FXObject* sender,FXSelector sel,void* ptr)
 {
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	if (map->isEnabled())
@@ -951,7 +950,7 @@ long FXCSMap::onRightButtonRelease(FXObject* sender,FXSelector sel,void* ptr)
 long FXCSMap::onWheel(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 {
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	FXEvent *ev = (FXEvent*)ptr;
@@ -1031,7 +1030,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 	if (minimap)
 		return 1;
 
-	if (!files->empty())
+	if (!mapFile)
 	{
 		if (selection.selected & selection.MULTIPLE_REGIONS)
 		{
@@ -1073,8 +1072,8 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 			return 1;
 		}
 
-		datablock::itor region = files->begin()->region(popup_x, popup_y, visiblePlane);
-		if (region != files->begin()->blocks().end())
+		datablock::itor region = mapFile->region(popup_x, popup_y, visiblePlane);
+		if (region != mapFile->blocks().end())
 		{
 			// create popup
 			FXMenuPane *menu = new FXMenuPane(this);
@@ -1251,7 +1250,7 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 					}
 
 					// map changed
-					files->begin()->createHashTables();
+                    mapFile->createHashTables();
 
 					datafile::SelectionState state = selection;
 					state.map |= state.MAPCHANGED;
@@ -1263,10 +1262,10 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 			return 1;
 		}
 
-		if (!files->empty())
+		if (mapFile)
 		{
-			datablock::itor region = files->begin()->region(popup_x, popup_y, visiblePlane);
-			if (region != files->begin()->blocks().end())
+			datablock::itor region = mapFile->region(popup_x, popup_y, visiblePlane);
+			if (region != mapFile->blocks().end())
 			{
 				if (cmd == POPUP_SETISLAND)
 				{
@@ -1297,7 +1296,7 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 						}
 
 						// map changed
-						files->begin()->createHashTables();
+                        mapFile->createHashTables();
 
 						datafile::SelectionState state = selection;
 						state.map |= state.MAPCHANGED;
@@ -1350,13 +1349,13 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 {
 	// create empty file if none exists
-	if (files->empty())
+	if (!mapFile)
 	{
 		if (!new_terrain)	// don't create file, if region should be deleted anyway.
 			return;
 
-		files->push_back(datafile());
-		files->back().filename("unbenannt");
+        mapFile.reset(new datafile);
+        mapFile->filename("unbenannt");
 
 		datablock version;
 		version.string("VERSION");
@@ -1369,7 +1368,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 		key.key("Koordinaten"); key.value("Hex");
 		version.data().push_back(key);
 
-		files->begin()->blocks().push_back(version);
+        mapFile->blocks().push_back(version);
 	}
 
 	if (selection.selected & selection.MULTIPLE_REGIONS)
@@ -1394,15 +1393,15 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 	}
 
 	// don't use hash table only since it might be out-of-date
-	datablock::itor end = files->begin()->blocks().end();
+	datablock::itor end = mapFile->blocks().end();
 	datablock::itor iregion = end;
 
 	if (new_terrain)			// speeds things up but only works when we don't delete
-        iregion = files->begin()->region(x, y, plane);
+        iregion = mapFile->region(x, y, plane);
 
 	if (iregion == end)
 	{
-		for (iregion = files->begin()->blocks().begin(); iregion != end; iregion++)
+		for (iregion = mapFile->blocks().begin(); iregion != end; iregion++)
 		{
 			if (iregion->type() != datablock::TYPE_REGION)
 				continue;
@@ -1434,57 +1433,27 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 			bool deleted = false;
 
 			// delete region
-			for (datafile::itor file = files->begin(); file != files->end(); file++)
-				for (datablock::itor block = file->blocks().begin(); block != file->blocks().end(); block++)
+			for (datablock::itor block = mapFile->blocks().begin(); block != mapFile->blocks().end(); block++)
+			{
+				// handle only regions
+				if (block->type() != datablock::TYPE_REGION)
+					continue;
+
+				if (iregion != block)
+					continue;
+
+				// gefunden. nun loeschen
+				datablock::itor srch = block;
+				for (srch++; srch != mapFile->blocks().end() && srch->depth() > block->depth(); srch++)
 				{
-					// handle only regions
-					if (block->type() != datablock::TYPE_REGION)
-						continue;
-
-					if (iregion != block)
-						continue;
-
-					// gefunden. nun loeschen
-					datablock::itor srch = block;
-					for (srch++; srch != file->blocks().end() && srch->depth() > block->depth(); srch++)
-					{
-						// block is part of the region
-					}
-
-                    /*
-                    datablock::itor next = block; next++;
-					if (srch != next)
-					{
-						// Wenn die Region Unterbloecke hat (Einheiten, Schiffe...) besser nachfragen...
-						FXString name = region->value(datakey::TYPE_NAME);
-						if (name.empty())
-							name = region->terrainString();
-						if (name.empty())
-							name = "Unbekannt";
-
-						FXString label;
-						label.format("Die Region %s (%d,%d)\nund alle dazugehoerigen Daten wirklich loeschen?", name.text(), region->x(), region->y());
-
-						FXMessageBox dlg(this, CSMAP_APP_TITLE_VERSION, label, 0, MBOX_YES_NO);
-						FXuint res = dlg.execute(PLACEMENT_SCREEN);
-
-						if (res == MBOX_CLICKED_YES)
-						{
-							// ok, loeschen
-							file->blocks().erase(block, srch);
-							file->createHashTables();
-							deleted = true;
-						}
-					}
-					else*/
-					{
-						// sofort loeschen
-						file->blocks().erase(block, srch);
-						file->createHashTables();
-						deleted = true;
-					}
-					break;
+					// block is part of the region
 				}
+				// sofort loeschen
+                mapFile->blocks().erase(block, srch);
+                mapFile->createHashTables();
+				deleted = true;
+				break;
+			}
 
 			if (deleted)
 			{
@@ -1519,13 +1488,13 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 		region.infostr(FXString().format("%d %d %d", x, y, plane));
 		region.terrain(new_terrain);
 
-		files->begin()->blocks().push_back(region);
+        mapFile->blocks().push_back(region);
 	}
 
 	// map changed
 	if (!(flags&FLAG_PRESSED) || modus < MODUS_SETTERRAIN || modus >= MODUS_SETTERRAIN+ data::TERRAIN_LAST)
 	{
-		files->begin()->createHashTables();			// don't do this in painting mode
+        mapFile->createHashTables();			// don't do this in painting mode
 
 		datafile::SelectionState state = selection;
 		state.selected &= ~(state.REGION|state.UNKNOWN_REGION);
@@ -1539,7 +1508,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 FXbool FXCSMap::paintMap(FXDrawable* buffer)
 {
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	// create DC and empty buffer
@@ -1571,228 +1540,225 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 	std::map<FXString, IslandPos> islands;
 
 	// iterate throu all datafiles and all regions
-	for (datafile& file : *files)
+	for (datablock& block : mapFile->blocks())
 	{
-		for (datablock& block : file.blocks())
+		// handle only regions
+		// handle only the actually visible plain
+		if (block.type() != datablock::TYPE_REGION ||
+			block.info() != visiblePlane)
+			continue;
+
+		// map coordinates to screen
+		FXint scr_x = GetScreenFromHexX(block.x(), block.y()) + scr_offset_x;
+		FXint scr_y = GetScreenFromHexY(block.x(), block.y()) + scr_offset_y;
+
+		// clip regions outside of view
+		if (scr_x < -regionSize || scr_y < -regionSize || scr_x > w || scr_y > h)
+			continue;
+
+		// draw terrain image
+		FXIcon **icons = terrain;
+
+		if (show_shadow_regions && !(block.flags() & datablock::FLAG_REGION_SEEN))
+			icons = terrainShadow;
+
+		dc.drawIcon(icons[block.terrain()], scr_x, scr_y);
+
+		// island names
+		if (show_islands)
 		{
-			// handle only regions
-			// handle only the actually visible plain
-			if (block.type() != datablock::TYPE_REGION ||
-				block.info() != visiblePlane)
-				continue;
-
-			// map coordinates to screen
-			FXint scr_x = GetScreenFromHexX(block.x(), block.y()) + scr_offset_x;
-			FXint scr_y = GetScreenFromHexY(block.x(), block.y()) + scr_offset_y;
-
-			// clip regions outside of view
-			if (scr_x < -regionSize || scr_y < -regionSize || scr_x > w || scr_y > h)
-				continue;
-
-			// draw terrain image
-			FXIcon **icons = terrain;
-
-			if (show_shadow_regions && !(block.flags() & datablock::FLAG_REGION_SEEN))
-				icons = terrainShadow;
-
-			dc.drawIcon(icons[block.terrain()], scr_x, scr_y);
-
-			// island names
-			if (show_islands)
+			if (att_region* stats = dynamic_cast<att_region*>(block.attachment()))
 			{
-				if (att_region* stats = dynamic_cast<att_region*>(block.attachment()))
+				if (!stats->island.empty())
 				{
-					if (!stats->island.empty())
+					std::map<FXString, IslandPos>::iterator itor = islands.find(stats->island);
+					if (itor == islands.end())
 					{
-						std::map<FXString, IslandPos>::iterator itor = islands.find(stats->island);
-						if (itor == islands.end())
-						{
-							IslandPos is{};
-							is.left = scr_x; is.top = scr_y;
-							is.right = scr_x + regionSize; is.bottom = scr_y + regionSize;
-							islands[stats->island] = is;
-						}
-						else
-						{
-							IslandPos& is = itor->second;
-							is.left = std::min(is.left, scr_x); is.top = std::min(is.top, scr_y);
-							is.right = std::max(is.right, scr_x + regionSize); is.bottom = std::max(is.bottom, scr_y + regionSize);
-						}
+						IslandPos is{};
+						is.left = scr_x; is.top = scr_y;
+						is.right = scr_x + regionSize; is.bottom = scr_y + regionSize;
+						islands[stats->island] = is;
+					}
+					else
+					{
+						IslandPos& is = itor->second;
+						is.left = std::min(is.left, scr_x); is.top = std::min(is.top, scr_y);
+						is.right = std::max(is.right, scr_x + regionSize); is.bottom = std::max(is.bottom, scr_y + regionSize);
 					}
 				}
 			}
+		}
 
-			// don't draw special icons on minimap
-			if (minimap)
-				continue;
+		// don't draw special icons on minimap
+		if (minimap)
+			continue;
 
-			// draw region troop icon
-			/*if (block.flags() & datablock::FLAG_TROOPS)
+		// draw region troop icon
+		/*if (block.flags() & datablock::FLAG_TROOPS)
+		{
+			dc.drawIcon(troopsunknown, scr_x+FXint(regionSize/1.7), scr_y+FXint(regionSize/2.3));
+
+			int number_ally = (block.flags() & (datablock::FLAG_ALLY1|datablock::FLAG_ALLY2|datablock::FLAG_ALLY3)) / datablock::FLAG_ALLY1;
+			int number_enemy = (block.flags() & (datablock::FLAG_ENEMY1|datablock::FLAG_ENEMY2|datablock::FLAG_ENEMY3)) / datablock::FLAG_ENEMY1;
+
+			int i = 0;
+            for (; i < number_ally && i < 4; i++)
+				dc.drawIcon(troopally, scr_x+FXint(regionSize/1.7+i*regionSize/16), scr_y+FXint(regionSize/2.3));
+
+			int j = 0;
+            for (; j < number_enemy && (i+j) < 4; j++)
+				dc.drawIcon(troopenemy, scr_x+FXint(regionSize/1.7+(i+j)*regionSize/16), scr_y+FXint(regionSize/2.3));
+		}//*/
+
+		// draw diagramm
+		if (block.flags() & datablock::FLAG_TROOPS && block.attachment())
+		{
+			if (att_region* stats = dynamic_cast<att_region*>(block.attachment()))
 			{
-				dc.drawIcon(troopsunknown, scr_x+FXint(regionSize/1.7), scr_y+FXint(regionSize/2.3));
+				static FXColor colors[] = { FXRGB(64,64,255), FXRGB(64,255,64), FXRGB(255,64,64), FXRGB(255,255,64), FXRGB(64,255,255), FXRGB(255,255,255), FXRGB(0,0,0) };
 
-				int number_ally = (block.flags() & (datablock::FLAG_ALLY1|datablock::FLAG_ALLY2|datablock::FLAG_ALLY3)) / datablock::FLAG_ALLY1;
-				int number_enemy = (block.flags() & (datablock::FLAG_ENEMY1|datablock::FLAG_ENEMY2|datablock::FLAG_ENEMY3)) / datablock::FLAG_ENEMY1;
+				int rl = scr_x+int(regionSize/1.5), rt = scr_y+int(regionSize/1.8);
+				int rw = int(regionSize/4.2), rh = int(regionSize/4.2);
 
-				int i = 0;
-                for (; i < number_ally && i < 4; i++)
-					dc.drawIcon(troopally, scr_x+FXint(regionSize/1.7+i*regionSize/16), scr_y+FXint(regionSize/2.3));
+				if (!stats->people.size())
+					stats->people.push_back(0);
+				else if (stats->people.size() > sizeof(colors)/sizeof(colors[0]))
+					stats->people.resize(sizeof(colors)/sizeof(colors[0]));
 
-				int j = 0;
-                for (; j < number_enemy && (i+j) < 4; j++)
-					dc.drawIcon(troopenemy, scr_x+FXint(regionSize/1.7+(i+j)*regionSize/16), scr_y+FXint(regionSize/2.3));
-			}//*/
+				int rw_part = rw / stats->people.size();
 
-			// draw diagramm
-			if (block.flags() & datablock::FLAG_TROOPS && block.attachment())
-			{
-				if (att_region* stats = dynamic_cast<att_region*>(block.attachment()))
+				for (size_t i = 0; i < stats->people.size(); i++)
 				{
-					static FXColor colors[] = { FXRGB(64,64,255), FXRGB(64,255,64), FXRGB(255,64,64), FXRGB(255,255,64), FXRGB(64,255,255), FXRGB(255,255,255), FXRGB(0,0,0) };
-
-					int rl = scr_x+int(regionSize/1.5), rt = scr_y+int(regionSize/1.8);
-					int rw = int(regionSize/4.2), rh = int(regionSize/4.2);
-
-					if (!stats->people.size())
-						stats->people.push_back(0);
-					else if (stats->people.size() > sizeof(colors)/sizeof(colors[0]))
-						stats->people.resize(sizeof(colors)/sizeof(colors[0]));
-
-					int rw_part = rw / stats->people.size();
-
-					for (size_t i = 0; i < stats->people.size(); i++)
-					{
-						float val = stats->people[i];
-						if (val < 0) val = 0;
-						if (val > 1) val = 1;
-						dc.setForeground(colors[i]);
-						dc.fillRectangle(rl+i*rw_part, rt+rh-int(val*rh), rw_part, int(val*rh));
-					}
-
-					dc.setForeground(map->getBackColor());
-
-					for (size_t i = 0; i < stats->people.size(); i++)
-					{
-						float val = stats->people[i];
-						if (val < 0) val = 0;
-						if (val > 1) val = 1;
-						dc.drawRectangle(rl+i*rw_part, rt+rh-int(val*rh), rw_part, int(val*rh));
-					}
-				}
-			}
-
-			// draw region icons (ship, castle...)
-			if (block.flags() & datablock::FLAG_REGION_OWN)
-				dc.drawIcon(castleown, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
-			else if (block.flags() & datablock::FLAG_REGION_ALLY)
-				dc.drawIcon(castleally, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
-			else if (block.flags() & datablock::FLAG_REGION_ENEMY)
-				dc.drawIcon(castleenemy, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
-			else if (block.flags() & datablock::FLAG_CASTLE)
-				dc.drawIcon(castle, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
-
-			if (block.flags() & datablock::FLAG_REGION_TAXES)
-				dc.drawIcon(castlecoins, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
-
-			// draw guarded icons
-			if ((block.flags() & (datablock::FLAG_GUARD_OWN|datablock::FLAG_GUARD_ALLY))
-				&& (block.flags() & datablock::FLAG_GUARD_ENEMY))
-				dc.drawIcon(guardmixed, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/18));
-			else if (block.flags() & datablock::FLAG_GUARD_OWN)
-				dc.drawIcon(guardown, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/18));
-			else if (block.flags() & datablock::FLAG_GUARD_ALLY)
-				dc.drawIcon(guardally, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/18));
-			else if (block.flags() & datablock::FLAG_GUARD_ENEMY)
-				dc.drawIcon(guardenemy, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/18));
-
-			if (block.flags() & datablock::FLAG_SHIP)
-				dc.drawIcon(ship, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/2.5));
-			else if ((block.flags() & datablock::FLAG_SHIPTRAVEL) && show_ship_travel)
-				dc.drawIcon(shiptravel, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/2.5));
-
-			// draw region "seen by" icons
-			if (show_visibility_symbol)
-			{
-				if (block.flags() & datablock::FLAG_LIGHTHOUSE)
-					dc.drawIcon(lighthouse, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/18));
-				if (block.flags() & datablock::FLAG_TRAVEL)
-					dc.drawIcon(travel, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/18));
-			}
-
-			// show symbol for dragon, seasnake or any other monster by priority
-			if (block.flags() & datablock::FLAG_DRAGON)
-				dc.drawIcon(dragon, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/2));
-			else if (block.flags() & datablock::FLAG_SEASNAKE)
-				dc.drawIcon(seasnake, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/2));
-			else if (block.flags() & datablock::FLAG_MONSTER)
-				dc.drawIcon(monster, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/2));
-
-			// show symbol for wormhole
-			if (block.flags() & datablock::FLAG_WORMHOLE)
-				dc.drawIcon(wormhole, scr_x+FXint(regionSize/4), scr_y);
-
-			// draw street symbols
-			if (show_streets)
-				for (int i = 0; i < 6; i++)
-				{
-					if (block.flags() & (datablock::FLAG_STREET << i))
-						dc.drawIcon(street[i], scr_x, scr_y);
-					else if (block.flags() & (datablock::FLAG_STREET_UNDONE << i))
-						dc.drawIcon(street_undone[i], scr_x, scr_y);
+					float val = stats->people[i];
+					if (val < 0) val = 0;
+					if (val > 1) val = 1;
+					dc.setForeground(colors[i]);
+					dc.fillRectangle(rl+i*rw_part, rt+rh-int(val*rh), rw_part, int(val*rh));
 				}
 
-			// draw selection mark if region is in multiple selection
-			if (selection.selected & selection.MULTIPLE_REGIONS)
-				if (selection.regionsSelected.find(&block) != selection.regionsSelected.end())
-					dc.drawIcon(selectedRegion, scr_x,scr_y);
+				dc.setForeground(map->getBackColor());
 
-			// skip label
-			if (regionSize < 30)
-				continue;
+				for (size_t i = 0; i < stats->people.size(); i++)
+				{
+					float val = stats->people[i];
+					if (val < 0) val = 0;
+					if (val > 1) val = 1;
+					dc.drawRectangle(rl+i*rw_part, rt+rh-int(val*rh), rw_part, int(val*rh));
+				}
+			}
+		}
 
-			if (show_names)
-				label = block.value(datakey::TYPE_NAME);
-			else
-				label.clear();
+		// draw region icons (ship, castle...)
+		if (block.flags() & datablock::FLAG_REGION_OWN)
+			dc.drawIcon(castleown, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
+		else if (block.flags() & datablock::FLAG_REGION_ALLY)
+			dc.drawIcon(castleally, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
+		else if (block.flags() & datablock::FLAG_REGION_ENEMY)
+			dc.drawIcon(castleenemy, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
+		else if (block.flags() & datablock::FLAG_CASTLE)
+			dc.drawIcon(castle, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
 
-			if (show_koords)
+		if (block.flags() & datablock::FLAG_REGION_TAXES)
+			dc.drawIcon(castlecoins, scr_x+FXint(regionSize/1.75), scr_y+FXint(regionSize/18));
+
+		// draw guarded icons
+		if ((block.flags() & (datablock::FLAG_GUARD_OWN|datablock::FLAG_GUARD_ALLY))
+			&& (block.flags() & datablock::FLAG_GUARD_ENEMY))
+			dc.drawIcon(guardmixed, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/18));
+		else if (block.flags() & datablock::FLAG_GUARD_OWN)
+			dc.drawIcon(guardown, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/18));
+		else if (block.flags() & datablock::FLAG_GUARD_ALLY)
+			dc.drawIcon(guardally, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/18));
+		else if (block.flags() & datablock::FLAG_GUARD_ENEMY)
+			dc.drawIcon(guardenemy, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/18));
+
+		if (block.flags() & datablock::FLAG_SHIP)
+			dc.drawIcon(ship, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/2.5));
+		else if ((block.flags() & datablock::FLAG_SHIPTRAVEL) && show_ship_travel)
+			dc.drawIcon(shiptravel, scr_x-FXint(regionSize/12), scr_y+FXint(regionSize/2.5));
+
+		// draw region "seen by" icons
+		if (show_visibility_symbol)
+		{
+			if (block.flags() & datablock::FLAG_LIGHTHOUSE)
+				dc.drawIcon(lighthouse, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/18));
+			if (block.flags() & datablock::FLAG_TRAVEL)
+				dc.drawIcon(travel, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/18));
+		}
+
+		// show symbol for dragon, seasnake or any other monster by priority
+		if (block.flags() & datablock::FLAG_DRAGON)
+			dc.drawIcon(dragon, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/2));
+		else if (block.flags() & datablock::FLAG_SEASNAKE)
+			dc.drawIcon(seasnake, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/2));
+		else if (block.flags() & datablock::FLAG_MONSTER)
+			dc.drawIcon(monster, scr_x+FXint(regionSize/4), scr_y+FXint(regionSize/2));
+
+		// show symbol for wormhole
+		if (block.flags() & datablock::FLAG_WORMHOLE)
+			dc.drawIcon(wormhole, scr_x+FXint(regionSize/4), scr_y);
+
+		// draw street symbols
+		if (show_streets)
+			for (int i = 0; i < 6; i++)
 			{
-				if (!label.empty())
-					label += "\r";
-				label += FXStringVal(block.x()) + ":" + FXStringVal(block.y());
+				if (block.flags() & (datablock::FLAG_STREET << i))
+					dc.drawIcon(street[i], scr_x, scr_y);
+				else if (block.flags() & (datablock::FLAG_STREET_UNDONE << i))
+					dc.drawIcon(street_undone[i], scr_x, scr_y);
 			}
 
-			// clip label to region
+		// draw selection mark if region is in multiple selection
+		if (selection.selected & selection.MULTIPLE_REGIONS)
+			if (selection.regionsSelected.find(&block) != selection.regionsSelected.end())
+				dc.drawIcon(selectedRegion, scr_x,scr_y);
+
+		// skip label
+		if (regionSize < 30)
+			continue;
+
+		if (show_names)
+			label = block.value(datakey::TYPE_NAME);
+		else
+			label.clear();
+
+		if (show_koords)
+		{
 			if (!label.empty())
+				label += "\r";
+			label += FXStringVal(block.x()) + ":" + FXStringVal(block.y());
+		}
+
+		// clip label to region
+		if (!label.empty())
+		{
+            FXint label_x, label_y;
+			clip.x = (FXshort)scr_x;
+			clip.y = (FXshort)scr_y;
+			dc.setClipRectangle(clip);
+
+			// draw region label
+			if (label.find('\r') != -1)
 			{
-                FXint label_x, label_y;
-				clip.x = (FXshort)scr_x;
-				clip.y = (FXshort)scr_y;
-				dc.setClipRectangle(clip);
+				FXString name = label.before('\r'); label = label.after('\r');
 
-				// draw region label
-				if (label.find('\r') != -1)
-				{
-					FXString name = label.before('\r'); label = label.after('\r');
+				label_x = scr_x+regionSize/2 - font->getTextWidth(name.text(), name.length())/2;
+				label_y = scr_y+regionSize/2 - font->getTextHeight(name.text(), name.length())/6;
+				dc.drawText(label_x, label_y, name.text(), name.length());
 
-					label_x = scr_x+regionSize/2 - font->getTextWidth(name.text(), name.length())/2;
-					label_y = scr_y+regionSize/2 - font->getTextHeight(name.text(), name.length())/6;
-					dc.drawText(label_x, label_y, name.text(), name.length());
-
-					label_x = scr_x+regionSize/2 - font->getTextWidth(label.text(), label.length())/2;
-					label_y = scr_y+regionSize/2 + font->getTextHeight(label.text(), label.length())*5/6;
-					dc.drawText(label_x, label_y, label.text(), label.length());
-				}
-				else
-				{
-					label_x = scr_x+regionSize/2 - font->getTextWidth(label.text(), label.length())/2;
-					label_y = scr_y+regionSize/2 + font->getTextHeight(label.text(), label.length())/3;
-					dc.drawText(label_x, label_y, label.text(), label.length());
-				}
-
-				// end drawing this region
-				dc.clearClipRectangle();
+				label_x = scr_x+regionSize/2 - font->getTextWidth(label.text(), label.length())/2;
+				label_y = scr_y+regionSize/2 + font->getTextHeight(label.text(), label.length())*5/6;
+				dc.drawText(label_x, label_y, label.text(), label.length());
 			}
+			else
+			{
+				label_x = scr_x+regionSize/2 - font->getTextWidth(label.text(), label.length())/2;
+				label_y = scr_y+regionSize/2 + font->getTextHeight(label.text(), label.length())/3;
+				dc.drawText(label_x, label_y, label.text(), label.length());
+			}
+
+			// end drawing this region
+			dc.clearClipRectangle();
 		}
 	}
 
@@ -1843,7 +1809,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 void FXCSMap::paintMapLines(FXDrawable* buffer, LeftTop offset)
 {
 	// connected to a datafile list?
-	if (!files) return;
+	if (!mapFile) return;
 
 	// create DC and empty buffer
 	FXDCWindow dc(buffer);
@@ -1860,75 +1826,72 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, LeftTop offset)
 	FXint regionSize = FXint(64*scale);
 
 	// iterate throu all datafiles and all regions
-	for (datafile& file : *files)
+	for (datablock& block : mapFile->blocks())
 	{
-		for (datablock& block : file.blocks())
+		// handle only regions
+		// handle only the actually visible plain
+		if (block.type() != datablock::TYPE_REGION ||
+			block.info() != visiblePlane)
+			continue;
+
+		// map coordinates to screen
+		FXint scr_x = GetScreenFromHexX(block.x(), block.y()) - offset.left;
+		FXint scr_y = GetScreenFromHexY(block.x(), block.y()) - offset.top;
+
+		// clip regions outside of view
+		if (scr_x < -regionSize || scr_y < -regionSize || scr_x > w || scr_y > h)
+			continue;
+
+		// draw terrain image
+		dc.drawIcon(terrain[block.terrain()], scr_x, scr_y);
+
+		// skip label
+		if (regionSize < 30)
+			continue;
+
+        FXString label;
+        if (show_names)
+			label = block.value(datakey::TYPE_NAME);
+		else
+			label.clear();
+
+		if (show_koords)
 		{
-			// handle only regions
-			// handle only the actually visible plain
-			if (block.type() != datablock::TYPE_REGION ||
-				block.info() != visiblePlane)
-				continue;
-
-			// map coordinates to screen
-			FXint scr_x = GetScreenFromHexX(block.x(), block.y()) - offset.left;
-			FXint scr_y = GetScreenFromHexY(block.x(), block.y()) - offset.top;
-
-			// clip regions outside of view
-			if (scr_x < -regionSize || scr_y < -regionSize || scr_x > w || scr_y > h)
-				continue;
-
-			// draw terrain image
-			dc.drawIcon(terrain[block.terrain()], scr_x, scr_y);
-
-			// skip label
-			if (regionSize < 30)
-				continue;
-
-            FXString label;
-            if (show_names)
-				label = block.value(datakey::TYPE_NAME);
-			else
-				label.clear();
-
-			if (show_koords)
-			{
-				if (!label.empty())
-					label += "\r";
-				label += FXStringVal(block.x()) + ":" + FXStringVal(block.y());
-			}
-
-			// clip label to region
 			if (!label.empty())
+				label += "\r";
+			label += FXStringVal(block.x()) + ":" + FXStringVal(block.y());
+		}
+
+		// clip label to region
+		if (!label.empty())
+		{
+            FXint label_x, label_y;
+            clip.x = (FXshort)scr_x;
+			clip.y = (FXshort)scr_y;
+			dc.setClipRectangle(clip);
+
+			// draw region label
+			if (label.find('\r') != -1)
 			{
-                FXint label_x, label_y;
-                clip.x = (FXshort)scr_x;
-				clip.y = (FXshort)scr_y;
-				dc.setClipRectangle(clip);
+				FXString name = label.before('\r'); label = label.after('\r');
 
-				// draw region label
-				if (label.find('\r') != -1)
-				{
-					FXString name = label.before('\r'); label = label.after('\r');
+				label_x = scr_x+regionSize/2 - font->getTextWidth(name.text(), name.length())/2;
+				label_y = scr_y+regionSize/2 - font->getTextHeight(name.text(), name.length())/6;
+				dc.drawText(label_x, label_y, name.text(), name.length());
 
-					label_x = scr_x+regionSize/2 - font->getTextWidth(name.text(), name.length())/2;
-					label_y = scr_y+regionSize/2 - font->getTextHeight(name.text(), name.length())/6;
-					dc.drawText(label_x, label_y, name.text(), name.length());
-
-					label_x = scr_x+regionSize/2 - font->getTextWidth(label.text(), label.length())/2;
-					label_y = scr_y+regionSize/2 + font->getTextHeight(label.text(), label.length())*5/6;
-					dc.drawText(label_x, label_y, label.text(), label.length());
-				}
-				else
-				{
-					label_x = scr_x+regionSize/2 - font->getTextWidth(label.text(), label.length())/2;
-					label_y = scr_y+regionSize/2 + font->getTextHeight(label.text(), label.length())/3;
-					dc.drawText(label_x, label_y, label.text(), label.length());
-				}
-
-				// end drawing this region
-				dc.clearClipRectangle();
+				label_x = scr_x+regionSize/2 - font->getTextWidth(label.text(), label.length())/2;
+				label_y = scr_y+regionSize/2 + font->getTextHeight(label.text(), label.length())*5/6;
+				dc.drawText(label_x, label_y, label.text(), label.length());
 			}
+			else
+			{
+				label_x = scr_x+regionSize/2 - font->getTextWidth(label.text(), label.length())/2;
+				label_y = scr_y+regionSize/2 + font->getTextHeight(label.text(), label.length())/3;
+				dc.drawText(label_x, label_y, label.text(), label.length());
+			}
+
+			// end drawing this region
+			dc.clearClipRectangle();
 		}
 	}
 }
@@ -1936,28 +1899,25 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, LeftTop offset)
 LeftTop FXCSMap::getMapLeftTop()
 {
 	// connected to a datafile list?
-	if (!files) return LeftTop{0, 0};
+	if (!mapFile) return LeftTop{0, 0};
 
 	// initialize to 'impossible' values
 	FXint min_x = 0x0FFFFFFF, min_y = 0x0FFFFFFF;
 
 	// iterate throu all datafiles and all regions
-	for (datafile& file : *files)
+	for (datablock& block : mapFile->blocks())
 	{
-		for (datablock& block : file.blocks())
-		{
-			// handle only regions
-			// handle only the actually visible plain
-			if (block.type() != datablock::TYPE_REGION ||
-				block.info() != visiblePlane)
-				continue;
+		// handle only regions
+		// handle only the actually visible plain
+		if (block.type() != datablock::TYPE_REGION ||
+			block.info() != visiblePlane)
+			continue;
 
-			FXint scr_x = GetScreenFromHexX(block.x(), block.y());
-			FXint scr_y = GetScreenFromHexY(block.x(), block.y());
+		FXint scr_x = GetScreenFromHexX(block.x(), block.y());
+		FXint scr_y = GetScreenFromHexY(block.x(), block.y());
 
-			if (scr_x < min_x) min_x = scr_x;
-			if (scr_y < min_y) min_y = scr_y;
-		}
+		if (scr_x < min_x) min_x = scr_x;
+		if (scr_y < min_y) min_y = scr_y;
 	}
 
 	return LeftTop{min_x, min_y};
@@ -1968,43 +1928,40 @@ std::map<FXString, IslandPos> FXCSMap::collectIslandNames()
 	std::map<FXString, IslandPos> islands;
 
 	// connected to a datafile list?
-	if (!files) return islands;
+	if (!mapFile) return islands;
 
 	FXint regionSize = FXint(64*scale);
 
 	// iterate throu all datafiles and all regions
-	for (datafile& file : *files)
+	for (datablock& block : mapFile->blocks())
 	{
-		for (datablock& block : file.blocks())
+		// handle only regions
+		// handle only the actually visible plain
+		if (block.type() != datablock::TYPE_REGION ||
+			block.info() != visiblePlane)
+			continue;
+
+		FXint scr_x = GetScreenFromHexX(block.x(), block.y());
+		FXint scr_y = GetScreenFromHexY(block.x(), block.y());
+
+		//  calculate island rect
+		if (att_region* stats = dynamic_cast<att_region*>(block.attachment()))
 		{
-			// handle only regions
-			// handle only the actually visible plain
-			if (block.type() != datablock::TYPE_REGION ||
-				block.info() != visiblePlane)
-				continue;
-
-			FXint scr_x = GetScreenFromHexX(block.x(), block.y());
-			FXint scr_y = GetScreenFromHexY(block.x(), block.y());
-
-			//  calculate island rect
-			if (att_region* stats = dynamic_cast<att_region*>(block.attachment()))
+			if (!stats->island.empty())
 			{
-				if (!stats->island.empty())
+				std::map<FXString, IslandPos>::iterator itor = islands.find(stats->island);
+				if (itor == islands.end())
 				{
-					std::map<FXString, IslandPos>::iterator itor = islands.find(stats->island);
-					if (itor == islands.end())
-					{
-						IslandPos is{};
-						is.left = scr_x; is.top = scr_y;
-						is.right = scr_x + regionSize; is.bottom = scr_y + regionSize;
-						islands[stats->island] = is;
-					}
-					else
-					{
-						IslandPos& is = itor->second;
-						is.left = std::min(is.left, scr_x); is.top = std::min(is.top, scr_y);
-						is.right = std::max(is.right, scr_x + regionSize); is.bottom = std::max(is.bottom, scr_y + regionSize);
-					}
+					IslandPos is{};
+					is.left = scr_x; is.top = scr_y;
+					is.right = scr_x + regionSize; is.bottom = scr_y + regionSize;
+					islands[stats->island] = is;
+				}
+				else
+				{
+					IslandPos& is = itor->second;
+					is.left = std::min(is.left, scr_x); is.top = std::min(is.top, scr_y);
+					is.right = std::max(is.right, scr_x + regionSize); is.bottom = std::max(is.bottom, scr_y + regionSize);
 				}
 			}
 		}
@@ -2115,7 +2072,7 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	bool datachanged = false, scroll = false;
@@ -2167,7 +2124,7 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 			// parse commands of selected unit and show traveller arrows
 			datablock::itor unit = selection.unit;
 
-			datablock::itor end = files->front().blocks().end();
+			datablock::itor end = mapFile->blocks().end();
 			datablock::itor block = unit;
 			for (block++; block != end && block->depth() > unit->depth(); block++)
 				if (block->type() == datablock::TYPE_COMMANDS)
@@ -2400,29 +2357,10 @@ FXint FXCSMap::sendRouteCmds(const FXString& str, int which)
 	return length;
 }
 
-struct isOcean
-{
-	bool operator()(int x, int y) const
-	{
-		datablock::itor itor = m_files->front().region(x,y,0);
-		if (itor != m_files->front().end())
-		{
-			if (itor->terrain() ==  data::TERRAIN_OCEAN)
-				return true;
-		}
-
-		return false;
-	}
-
-	isOcean(std::list<datafile>	*files) : m_files(files) {}
-
-	std::list<datafile>	*m_files;
-};
-
 long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
 {
-	// connected to a datafile list?
-	if (!files || !files->size())
+	// connected to a datafile?
+	if (!mapFile)
 		return 0;
 
 	FXEvent *event = (FXEvent*)ptr;
@@ -2482,25 +2420,6 @@ long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
 	case 'h':
 		move_marker = true, offx = -1;
 		break;
-
-	/*case 'r':
-		scout.reset();
-		break;*/
-	/*case 's':
-		scout.step(isOcean(files));
-
-		{
-		std::ostringstream out;
-		out << "NACH ";
-		scout.get(out, 0);
-		sendRouteCmds(out.str().c_str(), 0);
-
-		//out.str();
-		//out << "NACH ";
-		//scout.get(out, 1);
-		//sendRouteCmds(out.str().c_str(), 1);
-		}
-		break;*/
 	}
 
 	if (move_marker && (offx || offy))		// move marker
@@ -2513,11 +2432,11 @@ long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
 		datafile::SelectionState state;
 
 		state.selected = 0;
-		state.region = files->front().region(x, y, plane);
+		state.region = mapFile->region(x, y, plane);
 
 		state.sel_x = x, state.sel_y = y, state.sel_plane = plane;
 
-		if (state.region != files->front().blocks().end())
+		if (state.region != mapFile->blocks().end())
 			state.selected = state.REGION;
 		else
 			state.selected = state.UNKNOWN_REGION;
@@ -2585,7 +2504,7 @@ long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
 long FXCSMap::onQueryHelp(FXObject* sender, FXSelector, void*)
 {
 	// connected to a datafile list?
-	if (!files)
+	if (!mapFile)
 		return 0;
 
 	FXint scrx, scry;
@@ -2601,26 +2520,15 @@ long FXCSMap::onQueryHelp(FXObject* sender, FXSelector, void*)
 	FXint x = GetHexFromScreenX(scrx, scry);
 	FXint y = GetHexFromScreenY(scrx, scry);
 
-	datablock* region = NULL;
 	// now get the region
-	for (datafile::itor file = files->begin(); file != files->end(); file++)
-	{
-		datablock::itor block = file->region(x, y, visiblePlane);
-		if (block != file->blocks().end())
-		{
-			region = &*block;
-			break;
-		}
-	}
-
+	datablock::itor block = mapFile->region(x, y, visiblePlane);
 	FXString help;
 
-	if (region)
-	{
-		FXString name, terrainString = region->terrainString();
+    if (block != mapFile->blocks().end()) {
+		FXString name, terrainString = (*block).terrainString();
 
 		// Terrain, Name, Koordinaten
-		name = region->value(datakey::TYPE_NAME);
+		name = (*block).value(datakey::TYPE_NAME);
 
 		if (name.empty())
 			help.format("%s (%d,%d)", terrainString.text(), x,y);
@@ -2628,7 +2536,7 @@ long FXCSMap::onQueryHelp(FXObject* sender, FXSelector, void*)
 			help.format("%s von %s (%d,%d)", terrainString.text(), name.text(), x,y);
 
 		// Inselname
-		if (att_region* stats = dynamic_cast<att_region*>(region->attachment()))
+		if (att_region* stats = dynamic_cast<att_region*>((*block).attachment()))
 			if (!stats->island.empty())
 				help.append(" auf ").append(stats->island);
 	}
