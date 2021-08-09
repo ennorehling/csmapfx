@@ -152,10 +152,6 @@ long FXCalculator::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 {
     datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
-    // connected to a datafile list?
-    if (!mapFile)
-        return 0;
-
     bool needUpdate = false;
 
     if (selection.fileChange != state->fileChange)

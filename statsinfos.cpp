@@ -28,7 +28,7 @@ FXStatsInfos::FXStatsInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	setFrameStyle(FRAME_LINE);
 
 	// init variables
-	mapFile = NULL;
+	mapFile = nullptr;
 
 	// create layout
 	tags.matrixframe = new FXHorizontalFrame(this, LAYOUT_SIDE_TOP|LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
@@ -181,90 +181,91 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
 	int earnings = Lohn * std::min(workstations, peasants) - 10 * peasants;
 	if (earnings) addEntry(info, "Bauernertrag", earnings, 0, 0, FXString(L"\u00dcberschuss der Bauerneinnahmen pro Runde. Kann sicher eingetrieben werden."));
 
-	// search income messages for this region
-	datablock::itor faction, block, end = mapFile->blocks().end();
-	if (selection.map & selection.ACTIVEFACTION)
-	{
-		block = faction = selection.activefaction;
-		if (block != end)
-			block++;
-	}
-	else
-		faction = block = end;
+    if (mapFile) {
+        // search income messages for this region
+        datablock::itor faction, block, end = mapFile->blocks().end();
+        if (selection.map & selection.ACTIVEFACTION)
+        {
+            block = faction = selection.activefaction;
+            if (block != end)
+                block++;
+        }
+        else
+            faction = block = end;
 
-	/*
-		modes:
-		0: misc
-		1: Unterhaltung
-		2: Steuern
-		3: Handel
-		4: Handel fremder Parteien
-		5: Diebstahl
-		6: Zauberei
-	*/
-	int income[7] = {};
-	int learncost = 0;
+        /*
+            modes:
+            0: misc
+            1: Unterhaltung
+            2: Steuern
+            3: Handel
+            4: Handel fremder Parteien
+            5: Diebstahl
+            6: Zauberei
+        */
+        int income[7] = {};
+        int learncost = 0;
 
-	for (; block != end && block->depth() > faction->depth(); block++)
-	{
-		if (block->type() == datablock::TYPE_MESSAGE)
-		{
-			int type = block->valueInt("type");
+        for (; block != end && block->depth() > faction->depth(); block++)
+        {
+            if (block->type() == datablock::TYPE_MESSAGE)
+            {
+                int type = block->valueInt("type");
 
-			if (type != 771334452 && type != 443066738)
-				continue;
+                if (type != 771334452 && type != 443066738)
+                    continue;
 
-			datakey::list_type& list = block->data();
+                datakey::list_type &list = block->data();
 
-			datakey::itor reg = list.end();
-			int amount = 0, mode = 0;
+                datakey::itor reg = list.end();
+                int amount = 0, mode = 0;
 
-			for (datakey::itor itor = list.begin(); itor != list.end(); itor++)
-			{
-				if (itor->key() == "region")
-					reg = itor;
-				else if (itor->key() == "amount")
-					amount = itor->getInt();
-				else if (itor->key() == "cost")
-					amount = itor->getInt();
-				else if (itor->key() == "mode")
-					mode = itor->getInt();
-			}
+                for (datakey::itor itor = list.begin(); itor != list.end(); itor++)
+                {
+                    if (itor->key() == "region")
+                        reg = itor;
+                    else if (itor->key() == "amount")
+                        amount = itor->getInt();
+                    else if (itor->key() == "cost")
+                        amount = itor->getInt();
+                    else if (itor->key() == "mode")
+                        mode = itor->getInt();
+                }
 
-			if (reg == list.end())
-				continue;
+                if (reg == list.end())
+                    continue;
 
-			FXString location = reg->value();
-			int x = atoi(location.before(' ').text());
-			location = location.after(' ');
-			int y = atoi(location.before(' ').text());
-			location = location.after(' ');
-			int z = atoi(location.before(' ').text());
-			
-			if (region->x() != x || region->y() != y || region->info() != z)
-				continue;
+                FXString location = reg->value();
+                int x = atoi(location.before(' ').text());
+                location = location.after(' ');
+                int y = atoi(location.before(' ').text());
+                location = location.after(' ');
+                int z = atoi(location.before(' ').text());
 
-			if (mode < 0 || mode > 6)
-				mode = 0;
+                if (region->x() != x || region->y() != y || region->info() != z)
+                    continue;
 
-			if (type == 771334452)	// Einnahmen
-				income[mode] += amount;
-			else if (type == 443066738)	// Ausgaben fuer teure Talente (+Akademie)
-				learncost += amount;
-		}
-	}
+                if (mode < 0 || mode > 6)
+                    mode = 0;
 
-	// display income messages
-	if (income[0]) addEntry(info, "Einnahmen", income[0], 0, 0, FXString(L"Einnahmen durch sonstige T\u00e4tigkeiten."));
-	if (income[1]) addEntry(info, "Unterhaltung", income[1], 0, 0, "Einnahmen durch Unterhaltung");
-	if (income[2]) addEntry(info, "Steuern", income[2], 0, 0, "Einnahmen durch Steuern");
-	if (income[3]) addEntry(info, "Handel", income[3], 0, 0, "Einnahmen durch Handel");
-	if (income[4]) addEntry(info, "Handelsabgaben", income[4], 0, 0, "Einnahmen durch Handel fremder Parteien");
-	if (income[5]) addEntry(info, "Diebstahl", income[5], 0, 0, "Einnahmen durch Diebstahl");
-	if (income[6]) addEntry(info, "Zauberei", income[6], 0, 0, "Einnahmen durch Zauberei");
+                if (type == 771334452)	// Einnahmen
+                    income[mode] += amount;
+                else if (type == 443066738)	// Ausgaben fuer teure Talente (+Akademie)
+                    learncost += amount;
+            }
+        }
+        // display income messages
+        if (income[0]) addEntry(info, "Einnahmen", income[0], 0, 0, FXString(L"Einnahmen durch sonstige T\u00e4tigkeiten."));
+        if (income[1]) addEntry(info, "Unterhaltung", income[1], 0, 0, "Einnahmen durch Unterhaltung");
+        if (income[2]) addEntry(info, "Steuern", income[2], 0, 0, "Einnahmen durch Steuern");
+        if (income[3]) addEntry(info, "Handel", income[3], 0, 0, "Einnahmen durch Handel");
+        if (income[4]) addEntry(info, "Handelsabgaben", income[4], 0, 0, "Einnahmen durch Handel fremder Parteien");
+        if (income[5]) addEntry(info, "Diebstahl", income[5], 0, 0, "Einnahmen durch Diebstahl");
+        if (income[6]) addEntry(info, "Zauberei", income[6], 0, 0, "Einnahmen durch Zauberei");
 
-	// display learncost messages
-	if (learncost) addEntry(info, "Lernkosten", -learncost, 0, 0, "Ausgaben zum Lernen von Talenten");
+        // display learncost messages
+        if (learncost) addEntry(info, "Lernkosten", -learncost, 0, 0, "Ausgaben zum Lernen von Talenten");
+    }
 }
 
 void FXStatsInfos::updateData()
@@ -322,10 +323,6 @@ void FXStatsInfos::updateData()
 long FXStatsInfos::onMapChange(FXObject*, FXSelector, void* ptr)
 {
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
-
-	// connected to a datafile list?
-	if (!mapFile)
-		return 0;
 
 	bool needUpdate = false;
 

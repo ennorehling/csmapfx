@@ -108,7 +108,9 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 	bool unitInFaction = false;
 	int unitId = 0, personsInUnit = 0;
 
-	datablock::itor end = mapFile->blocks().end();
+    if (!mapFile) return;
+    
+    datablock::itor end = mapFile->blocks().end();
 	datablock::itor block = region;
 	for (block++; block != end && block->depth() > region->depth(); block++)
 	{
@@ -214,10 +216,6 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 
 void FXStatistics::updateList()
 {
-	// connected to a datafile list?
-	if (!mapFile)
-		return;
-
 	// clear old list	
 	list->clearItems();
 	entries.clear();
@@ -230,7 +228,7 @@ void FXStatistics::updateList()
 	std::map<std::pair<FXString,int>, entry> talents;
 
 	// collect data
-	if (selection.selected & selection.MULTIPLE_REGIONS)
+	if (mapFile && selection.selected & selection.MULTIPLE_REGIONS)
 	{
 		datablock::itor notfound = mapFile->blocks().end();
 		for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
@@ -438,7 +436,7 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 
 	FXEvent *event = (FXEvent*)ptr;
 
-	// connected to a datafile list?
+	// no data, no popup:
 	if (!mapFile)
 		return 0;
 
@@ -512,7 +510,7 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 
 long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 {
-	// connected to a datafile list?
+	// no data, no popup
 	if (!mapFile)
 		return 0;
 
@@ -641,6 +639,7 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 
 void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor region)
 {
+    if (!mapFile) return;
 	// list factions of selected region
 	datablock::itor end = mapFile->blocks().end();
 	datablock::itor block = region;
@@ -679,10 +678,6 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 {
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
-
-	// connected to a datafile list?
-	if (!mapFile)
-		return 0;
 
 	bool needUpdate = false;
 
@@ -731,7 +726,7 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 			std::set<int> factions;
 
-			if (selection.selected & selection.MULTIPLE_REGIONS)
+			if (mapFile && selection.selected & selection.MULTIPLE_REGIONS)
 			{
 				datablock::itor notfound = mapFile->blocks().end();
 				for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
@@ -768,9 +763,5 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 long FXStatistics::onQueryHelp(FXObject* /*sender*/, FXSelector, void* /*ptr*/)
 { 
-	// connected to a datafile list?
-	if (!mapFile)
-		return 0;
-
 	return 0;
 }

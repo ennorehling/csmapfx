@@ -59,10 +59,6 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 {
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
-	// connected to a datafile list?
-	if (!mapFile)
-		return 0;
-
 	// any data changed, so need to update list?
 	if (selection.fileChange != state->fileChange)
 	{
@@ -606,10 +602,6 @@ long FXUnitList::onPopup(FXObject* sender, FXSelector sel, void* ptr)
 
 	FXEvent *event = (FXEvent*)ptr;
 
-	// connected to a datafile list?
-	if (!mapFile)
-		return 0;
-
 	// dont't show popup if mouse has moved
 	if (event->last_x != event->click_x || event->last_y != event->click_y)
 		return 0;
@@ -721,9 +713,5 @@ FXString FXUnitList::getSubTreeText(const FXTreeItem* item) const
 
 long FXUnitList::onQueryHelp(FXObject* /*sender*/, FXSelector, void* /*ptr*/)
 { 
-	// connected to a datafile list?
-	if (!mapFile)
-		return 0;
-
 	return 0;
 }

@@ -761,6 +761,7 @@ void CSMap::create()
 {
 	// Dateien schliessen, Speicher frei geben
 	closeFile();
+    mapChange();
 
     FXRegistry &reg = getApp()->reg();
 
@@ -897,7 +898,10 @@ bool CSMap::loadFile(FXString filename)
 		return false;
 
 	// vorherige Dateien schliessen, Speicher frei geben
-	closeFile();
+    if (report) {
+        closeFile();
+        mapChange();
+    }
 
 	report = new datafile();
 

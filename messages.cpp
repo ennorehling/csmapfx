@@ -54,10 +54,6 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 {
 	datafile::SelectionState *sel_state = (datafile::SelectionState*)ptr;
 
-	// connected to a datafile list?
-	if (!mapFile)
-		return 0;
-
 	// any data changed, so need to update list?
 	if (selection.fileChange != sel_state->fileChange)
 	{
@@ -83,7 +79,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 		clearSiblings(groups.other);
 		clearSiblings(groups.guards);
 
-		if (selection.selected & selection.REGION)
+		if (mapFile && selection.selected & selection.REGION)
 		{
 			datablock::itor region = selection.region;
 			datablock::itor end = mapFile->blocks().end();

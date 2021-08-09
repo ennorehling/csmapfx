@@ -38,7 +38,7 @@ FXRegionInfos::FXRegionInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuin
 	setFrameStyle(FRAME_LINE);
 
 	// init variables
-	mapFile = NULL;
+	mapFile = nullptr;
 	show_description = false;
 
 	// create layout
@@ -389,10 +389,6 @@ void FXRegionInfos::updateData()
 long FXRegionInfos::onMapChange(FXObject*, FXSelector, void* ptr)
 {
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
-
-	// connected to a datafile list?
-	if (!mapFile)
-		return 0;
 
 	bool needUpdate = false;
 

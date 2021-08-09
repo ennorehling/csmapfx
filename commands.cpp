@@ -334,10 +334,6 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 {
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
-	// connected to a datafile list?
-	if (!mapFile)
-		return 0;
-
 	// any data changed, so need to update list?
 	if (selection.fileChange != state->fileChange)
 	{
@@ -361,7 +357,7 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 		setModified(false);
 		disable();
 
-		if (selection.selected & selection.UNIT)
+		if (mapFile && selection.selected & selection.UNIT)
 		{
 			datablock::itor unit = selection.unit;
 

@@ -275,10 +275,6 @@ long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* p
 {
 	active_faction_group = !active_faction_group;
 
-	// connected to a datafile list?
-	if (!mapFile)
-		return 1;
-
 	// map change notify rebuilds treelist
 	datafile::SelectionState sel_state = selection;
     if (!mapFile) {
@@ -300,10 +296,6 @@ long FXRegionList::onUpdateOwnFactionGroup(FXObject* sender, FXSelector, void* p
 long FXRegionList::onToggleUnitColors(FXObject *sender, FXSelector, void *ptr)
 {
     colorized_units = !colorized_units;
-
-    // connected to a datafile list?
-    if (!mapFile)
-        return 1;
 
     // map change notify rebuilds treelist
     datafile::SelectionState sel_state = selection;
@@ -450,7 +442,7 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 
 	FXEvent *event = (FXEvent*)ptr;
 
-	// connected to a datafile list?
+	// no datafile, no popup
 	if (!mapFile)
 		return 0;
 
@@ -602,10 +594,6 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 {
 	datafile::SelectionState *sel_state = (datafile::SelectionState*)ptr;
 
-	// connected to a datafile list?
-	if (!mapFile)
-		return 0;
-
 	// any data changed, so need to update list?
 	if (selection.fileChange != sel_state->fileChange)
 	{
@@ -616,201 +604,203 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 		// clear list and build a new one from data in this->files
 		clearItems();
 
-		FXString label, terrainString;
+        if (mapFile) {
+            FXString label, terrainString;
 
-		for (datablock::itor iblock = mapFile->blocks().begin(); iblock != mapFile->blocks().end(); iblock++)
-		{
-			// handle only regions
-			if (iblock->type() != datablock::TYPE_REGION)
-				continue;
+            for (datablock::itor iblock = mapFile->blocks().begin(); iblock != mapFile->blocks().end(); iblock++)
+            {
+                // handle only regions
+                if (iblock->type() != datablock::TYPE_REGION)
+                    continue;
 
-			terrainString = iblock->terrainString();
+                terrainString = iblock->terrainString();
 
-            FXString name = iblock->value(datakey::TYPE_NAME);
+                FXString name = iblock->value(datakey::TYPE_NAME);
 
-			if (name.empty())
-				name = terrainString;
-			if (name.empty())
-				name = "Unbekannt";
+                if (name.empty())
+                    name = terrainString;
+                if (name.empty())
+                    name = "Unbekannt";
 
-			if (iblock->info())
-				label.format("%s (%d,%d,%s)", name.text(), iblock->x(), iblock->y(), datablock::planeName(iblock->info()).text());
-			else
-				label.format("%s (%d,%d)", name.text(), iblock->x(), iblock->y());
+                if (iblock->info())
+                    label.format("%s (%d,%d,%s)", name.text(), iblock->x(), iblock->y(), datablock::planeName(iblock->info()).text());
+                else
+                    label.format("%s (%d,%d)", name.text(), iblock->x(), iblock->y());
 
-			// select terrain image
-			FXint terrain = iblock->terrain();
+                // select terrain image
+                FXint terrain = iblock->terrain();
 
-			FXTreeItem* region = NULL;
-			FXString regionlabel = label;
+                FXTreeItem *region = NULL;
+                FXString regionlabel = label;
 
-			std::map<FXint,FXTreeItem*> factions;
+                std::map<FXint, FXTreeItem *> factions;
 
-			datablock::itor iend = mapFile->blocks().end();
-			datablock::itor unit = iblock;
-			for (unit++; unit != iend && unit->depth() > iblock->depth(); unit++)
-			{
-				// display units until next region
-				if (unit->type() != datablock::TYPE_UNIT)
-					continue;
+                datablock::itor iend = mapFile->blocks().end();
+                datablock::itor unit = iblock;
+                for (unit++; unit != iend && unit->depth() > iblock->depth(); unit++)
+                {
+                    // display units until next region
+                    if (unit->type() != datablock::TYPE_UNIT)
+                        continue;
 
-				// get faction id, -1 means unknown faction (or stealth/anonymous)
-				FXint factionId = unit->valueInt(datakey::TYPE_FACTION, -1);
+                    // get faction id, -1 means unknown faction (or stealth/anonymous)
+                    FXint factionId = unit->valueInt(datakey::TYPE_FACTION, -1);
 
-				FXTreeItem* &entry = factions[factionId];
-				if (!entry)
-				{
-					datablock::itor faction = mapFile->faction(factionId);
-					datablock* facPtr = NULL;
-					if (faction != mapFile->blocks().end())
-						facPtr = &*faction;
+                    FXTreeItem *&entry = factions[factionId];
+                    if (!entry)
+                    {
+                        datablock::itor faction = mapFile->faction(factionId);
+                        datablock *facPtr = NULL;
+                        if (faction != mapFile->blocks().end())
+                            facPtr = &*faction;
 
-					if (faction != mapFile->blocks().end())
-					{
-						name = faction->value(datakey::TYPE_FACTIONNAME);
-						if (faction->info() < 0)
-						{
-							if (name.empty())
-								name = "Parteigetarnt";
-							label.format("%s", name.text());
-						}
-						else
-						{
-							if (name.empty())
-								name = "Unbekannt";
-							label.format("%s (%s)", name.text(), faction->id().text());
-						}
-					}
-					else
-					{
-						datablock block;
-						block.infostr(FXStringVal(factionId));
+                        if (faction != mapFile->blocks().end())
+                        {
+                            name = faction->value(datakey::TYPE_FACTIONNAME);
+                            if (faction->info() < 0)
+                            {
+                                if (name.empty())
+                                    name = "Parteigetarnt";
+                                label.format("%s", name.text());
+                            }
+                            else
+                            {
+                                if (name.empty())
+                                    name = "Unbekannt";
+                                label.format("%s (%s)", name.text(), faction->id().text());
+                            }
+                        }
+                        else
+                        {
+                            datablock block;
+                            block.infostr(FXStringVal(factionId));
 
-						label.format("Unbekannt (%s)", block.id().text());
-					}
+                            label.format("Unbekannt (%s)", block.id().text());
+                        }
 
-					FXIcon* icon = red;
-					if (factionId == 0)
-						icon = black;
-					else if (factionId == -1)
-						icon = gray;
+                        FXIcon *icon = red;
+                        if (factionId == 0)
+                            icon = black;
+                        else if (factionId == -1)
+                            icon = gray;
 
-					if (selection.map & selection.ACTIVEFACTION)
-					{
-						if (faction == selection.activefaction)
-							icon = blue;
+                        if (selection.map & selection.ACTIVEFACTION)
+                        {
+                            if (faction == selection.activefaction)
+                                icon = blue;
 
-						datablock::itor block = selection.activefaction;
-						for (block++; block != mapFile->blocks().end(); block++)
-						{
-							if (block->type() != datablock::TYPE_ALLIANCE &&
-								block->type() != datablock::TYPE_ITEMS &&
-								block->type() != datablock::TYPE_OPTIONS &&
-								block->type() != datablock::TYPE_GROUP)
-								break;
+                            datablock::itor block = selection.activefaction;
+                            for (block++; block != mapFile->blocks().end(); block++)
+                            {
+                                if (block->type() != datablock::TYPE_ALLIANCE &&
+                                    block->type() != datablock::TYPE_ITEMS &&
+                                    block->type() != datablock::TYPE_OPTIONS &&
+                                    block->type() != datablock::TYPE_GROUP)
+                                    break;
 
-							if (block->type() != datablock::TYPE_ALLIANCE)
-								continue;
+                                if (block->type() != datablock::TYPE_ALLIANCE)
+                                    continue;
 
-							if (block->info() != factionId)
-								continue;
+                                if (block->info() != factionId)
+                                    continue;
 
-							// change icon to green, if alliance status to faction is set
-							icon = green;
-						}
-					}
+                                // change icon to green, if alliance status to faction is set
+                                icon = green;
+                            }
+                        }
 
-					// add region only if it has units in it
-					if (!region)
-						region = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain],terrainIcons[terrain], &*iblock));
+                        // add region only if it has units in it
+                        if (!region)
+                            region = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], &*iblock));
 
-					if (icon == blue)
-						entry = prependItem(region, new FXRegionItem(label, icon,icon, facPtr));
-					else
-						entry = appendItem(region, new FXRegionItem(label, icon,icon, facPtr));
-				}
-			}
-
-			FXTreeItem* act_faction = NULL;
-			if (selection.map & selection.ACTIVEFACTION)
-			{
-				act_faction = factions[selection.activefaction->info()];
-			}
-
-			unit = iblock;
-			for (unit++; unit != iend && unit->depth() > iblock->depth(); unit++)
-			{
-				// display units until next region
-				if (unit->type() != datablock::TYPE_UNIT)
-					continue;
-
-				// get treeitem node from faction
-				FXint factionId = -1;
-				FXString fac = unit->value(datakey::TYPE_FACTION);
-				if (!fac.empty())
-					factionId = strtol(fac.text(), NULL, 10);
-
-				FXTreeItem* faction = factions[factionId];
-
-				FXString uname, number;				
-                FXColor color = 0;
-
-				for (datakey::itor key = unit->data().begin(); key != unit->data().end(); key++)
-				{
-					if (key->type() == datakey::TYPE_NAME)
-                        uname = key->value();
-					else if (key->type() == datakey::TYPE_NUMBER)
-						number = key->value();
-                    else if (key->key() == "Burg") {
-                        color = FXRGB(0, 127, 0);
+                        if (icon == blue)
+                            entry = prependItem(region, new FXRegionItem(label, icon, icon, facPtr));
+                        else
+                            entry = appendItem(region, new FXRegionItem(label, icon, icon, facPtr));
                     }
-                    else if (key->key() == "Schiff") {
-                        color = FXRGB(0, 0, 255);
-                    }
-				}
-
-				label.format("%s (%s): %s", uname.text(), unit->id().text(), number.text());
-
-				// with active_faction_group not set, units of own faction are inserted
-				// directly as child of region node.
-				FXRegionItem *item;
-
-				if (!active_faction_group && faction == act_faction)
-					insertItem(faction, region, item = new FXRegionItem(label, 0,0, &*unit));
-				else
-					appendItem(faction, item = new FXRegionItem(label, 0,0, &*unit));
-
-                if (color) {
-                    item->setTextColor(color);
                 }
 
-                datablock::itor block = unit;
-				for (block++; block != iend && block->depth() > unit->depth(); block++)
-				{
-					if (block->type() != datablock::TYPE_COMMANDS)
-						continue;
+                FXTreeItem *act_faction = NULL;
+                if (selection.map & selection.ACTIVEFACTION)
+                {
+                    act_faction = factions[selection.activefaction->info()];
+                }
 
-					bool cmd_confirmed = false;
+                unit = iblock;
+                for (unit++; unit != iend && unit->depth() > iblock->depth(); unit++)
+                {
+                    // display units until next region
+                    if (unit->type() != datablock::TYPE_UNIT)
+                        continue;
 
-					if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
-						cmd_confirmed = cmds->confirmed;
+                    // get treeitem node from faction
+                    FXint factionId = -1;
+                    FXString fac = unit->value(datakey::TYPE_FACTION);
+                    if (!fac.empty())
+                        factionId = strtol(fac.text(), NULL, 10);
 
-					if (!cmd_confirmed)
-					{
-						item->setBold(!cmd_confirmed);
+                    FXTreeItem *faction = factions[factionId];
 
-						for (FXRegionItem *father = dynamic_cast<FXRegionItem*>(item->getParent());
-								father; father = dynamic_cast<FXRegionItem*>(father->getParent()))
-							father->setBold(!cmd_confirmed);
-					}
+                    FXString uname, number;
+                    FXColor color = 0;
 
-				}
-			}
+                    for (datakey::itor key = unit->data().begin(); key != unit->data().end(); key++)
+                    {
+                        if (key->type() == datakey::TYPE_NAME)
+                            uname = key->value();
+                        else if (key->type() == datakey::TYPE_NUMBER)
+                            number = key->value();
+                        else if (key->key() == "Burg") {
+                            color = FXRGB(0, 127, 0);
+                        }
+                        else if (key->key() == "Schiff") {
+                            color = FXRGB(0, 0, 255);
+                        }
+                    }
 
-			// with active_faction_group not set, remove node of own faction
-			if (!active_faction_group && act_faction)
-				removeItem(act_faction);
-		}
+                    label.format("%s (%s): %s", uname.text(), unit->id().text(), number.text());
+
+                    // with active_faction_group not set, units of own faction are inserted
+                    // directly as child of region node.
+                    FXRegionItem *item;
+
+                    if (!active_faction_group && faction == act_faction)
+                        insertItem(faction, region, item = new FXRegionItem(label, 0, 0, &*unit));
+                    else
+                        appendItem(faction, item = new FXRegionItem(label, 0, 0, &*unit));
+
+                    if (color) {
+                        item->setTextColor(color);
+                    }
+
+                    datablock::itor block = unit;
+                    for (block++; block != iend && block->depth() > unit->depth(); block++)
+                    {
+                        if (block->type() != datablock::TYPE_COMMANDS)
+                            continue;
+
+                        bool cmd_confirmed = false;
+
+                        if (att_commands *cmds = dynamic_cast<att_commands *>(block->attachment()))
+                            cmd_confirmed = cmds->confirmed;
+
+                        if (!cmd_confirmed)
+                        {
+                            item->setBold(!cmd_confirmed);
+
+                            for (FXRegionItem *father = dynamic_cast<FXRegionItem *>(item->getParent());
+                                father; father = dynamic_cast<FXRegionItem *>(father->getParent()))
+                                father->setBold(!cmd_confirmed);
+                        }
+
+                    }
+                }
+
+                // with active_faction_group not set, remove node of own faction
+                if (!active_faction_group && act_faction)
+                    removeItem(act_faction);
+            }
+        }
 	}
 
 	if (selection.selChange != sel_state->selChange)
@@ -892,9 +882,5 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 long FXRegionList::onQueryHelp(FXObject* /*sender*/, FXSelector, void* /*ptr*/)
 { 
-	// connected to a datafile list?
-	if (!mapFile)
-		return 0;
-
 	return 0;
 }

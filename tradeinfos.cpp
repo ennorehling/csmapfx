@@ -26,7 +26,7 @@ FXTradeInfos::FXTradeInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	setFrameStyle(FRAME_LINE);
 
 	// init variables
-	mapFile = NULL;
+	mapFile = nullptr;
 
 	// create layout
 	tags.topmatrix = new FXMatrix(this,3,MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
@@ -241,10 +241,6 @@ void FXTradeInfos::updateData()
 long FXTradeInfos::onMapChange(FXObject*, FXSelector, void* ptr)
 {
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
-
-	// connected to a datafile list?
-	if (!mapFile)
-		return 0;
 
 	bool needUpdate = false;
 
