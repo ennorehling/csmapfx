@@ -1067,7 +1067,7 @@ bool CSMap::saveFile(FXString filename, bool merge_commands /*= false*/)
 		FXString text;
 		text = filename + FXString(L" existiert bereits.\n\nM\u00f6chten Sie sie ersetzen?");
 
-		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
+		FXuint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
         if (MBOX_CLICKED_YES != answ) return false;
 	}
     FXint res = report->save(filename.text());	// \u00fcberschreiben, mit Befehlen
@@ -1090,7 +1090,7 @@ bool CSMap::loadCommands(const FXString& filename)
 
 	try
 	{
-		FXint res = report->loadCmds(filename, true);
+		FXint res = report->loadCmds(filename);
 		if (res < 0)
 		{
 			FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht gelesen werden.");
@@ -1118,21 +1118,13 @@ bool CSMap::saveCommands(const FXString &filename, bool stripped)
 	if (!(selection.map & selection.ACTIVEFACTION))
 		return false;
 
-	FXint res = report->saveCmds(filename.text(), settings.password, stripped, false);	// nicht \u00fcberschreiben
-	if (res == -2)
-	{
-		FXString text;
-		text = "Die Datei " + filename + FXString(L" existiert bereits.\n\nM\u00f6chten Sie sie ersetzen?");
-
-		FXint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
-		if (MBOX_CLICKED_YES == answ)
-			res = report->saveCmds(filename.text(), settings.password, stripped, true);	// \u00fcberschreiben
-	}
-	if (res == -1)
-	{
+    FXint res = report->saveCmds(filename.text(), settings.password, stripped);	// nicht \u00fcberschreiben
+	if (res < 0) {
 		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
+        return false;
 	}
 
+    // TODO: why? the map has not changed?
 	mapChange();
 	return true;
 }
@@ -2150,7 +2142,7 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
     }
 #endif
     if (!cmdline.empty()) {
-        if (u_mkstemp(infile) && report->saveCmds(infile, "", true, true) > 0) {
+        if (u_mkstemp(infile) && report->saveCmds(infile, "", true) > 0) {
             if (u_mkstemp(outfile)) {
                 // Echeck it:
                 cmdline.append(" -w3 -c -Lde -Re2 -O");
@@ -2271,7 +2263,7 @@ void CSMap::closeFile()
 			return;					// don't close, cancel clicked
 		else if (res == MBOX_CLICKED_SAVE)
 		{
-            saveCommandsDlg(false);			// save commands
+            saveCommandsDlg(false, true);			// save commands
 
 			// cancel close, when save was unsuccessful
 			if (report && report->modifiedCmds())
@@ -2299,13 +2291,28 @@ long CSMap::onFileOpenCommands(FXObject *, FXSelector, void *)
 
 long CSMap::onFileSaveCommands(FXObject*, FXSelector, void* ptr)
 {
-    saveCommandsDlg(false);
-    return 1;
+    if (report) {
+        FXString filename = report->cmdfilename();
+        if (filename.empty()) {
+            FXString patterns(L"Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nM\u00f6gliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)");
+            filename = askFileName("Befehle speichern unter...", patterns);
+            if (filename.empty()) return 0;
+            if (fileExists(filename.text())) {
+                FXString text;
+                text = "Die Datei " + filename + FXString(L" existiert bereits.\n\nM\u00f6chten Sie sie ersetzen?");
+                FXuint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
+                if (MBOX_CLICKED_YES != answ) return 0;
+            }
+        }
+        saveCommands(filename, false);
+        return 1;
+    }
+    return 0;
 }
 
 long CSMap::onFileExportCommands(FXObject*, FXSelector, void* ptr)
 {
-    saveCommandsDlg(true);
+    saveCommandsDlg(true, false);
     return 1;
 }
 
@@ -2340,7 +2347,7 @@ long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
 
     FXString id = report->activefaction()->id();
     FXString passwd = askPasswordDlg(id);
-    if (u_mkstemp(infile) && report->saveCmds(infile, passwd, true, true) > 0) {
+    if (u_mkstemp(infile) && report->saveCmds(infile, passwd, true) > 0) {
         CURL *ch;
         CURLcode success;
         ch = curl_easy_init();
@@ -2413,47 +2420,64 @@ FXString CSMap::askPasswordDlg(const FXString &faction_id) {
     return passwd;
 }
 
-void CSMap::saveCommandsDlg(bool stripped)
+FXString CSMap::askFileName(const FXString &dlgTitle, const FXString &patterns) {
+    FXFileDialog dlg(this, dlgTitle, DLGEX_SAVE);
+    dlg.setIcon(icons.save);
+    dlg.setDirectory(dialogDirectory);
+    dlg.setPatternList(patterns);
+    FXint res = dlg.execute(PLACEMENT_SCREEN);
+    dialogDirectory = dlg.getDirectory();
+    FXString filename = dlg.getFilename();
+    if (res) {
+        FXString pattern = dlg.getPattern();
+
+        // Pr\u00fcft, ob Dateiname bereits Endung enth\u00e4lt.
+        FXString ext = filename.rafter('.');
+        for (int i = 0; ; i++)
+        {
+            FXString patt = pattern.section(',', i);
+            if (patt.empty())
+            {
+                // Der Dateiname endet nicht mit ".cr" o.\u00e4., deshalb wird Endung angehangen.
+                ext = pattern.section(',', 0).after('.');
+                if (!ext.empty())
+                    filename += "." + ext;
+                break;
+            }
+
+            // Dateiname endet auf ".cr" o.\u00e4.
+            if (ext == patt.after('.'))
+                break;
+        }
+    }
+    return filename;
+}
+
+void CSMap::saveCommandsDlg(bool stripped, bool replace)
 {
 	if (!report)
 		return;
 
     FXString id = report->activefaction()->id();
-
+    FXString filename = report->cmdfilename();
     FXString passwd = askPasswordDlg(id);
 
-	FXFileDialog dlg(this, stripped ? "Versandbefehle speichern unter..." : "Befehle speichern unter...", DLGEX_SAVE);
-	dlg.setIcon(icons.save);
-	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(FXString(L"Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nM\u00f6gliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
-	FXint res = dlg.execute(PLACEMENT_SCREEN);
-	dialogDirectory = dlg.getDirectory();
-	if (res)
-	{
-		FXString filename = dlg.getFilename();
-		FXString pattern = dlg.getPattern();
-
-		// Pr\u00fcft, ob Dateiname bereits Endung enth\u00e4lt.
-		FXString ext = filename.rafter('.');
-		for (int i = 0; ; i++)
-		{
-			FXString patt = pattern.section(',',i);
-			if (patt.empty())
-			{
-                // Der Dateiname endet nicht mit ".cr" o.\u00e4., deshalb wird Endung angehangen.
-				ext = pattern.section(',',0).after('.');
-				if (!ext.empty())
-					filename += "." + ext;
-				break;
-			}
-
-			// Dateiname endet auf ".cr" o.\u00e4.
-            if (ext == patt.after('.'))
-				break;
-		}
-
-		saveCommands(filename, stripped);
+    if (stripped || filename.empty()) {
+        filename = askFileName(
+            stripped ? "Versandbefehle speichern unter..." : "Befehle speichern unter...",
+            FXString(L"Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nM\u00f6gliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
 	}
+    if (!filename.empty()) {
+        if (!replace && fileExists(filename.text())) {
+            FXString text;
+            text = "Die Datei " + filename + FXString(L" existiert bereits.\n\nM\u00f6chten Sie sie ersetzen?");
+
+            FXuint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
+            if (MBOX_CLICKED_YES != answ) return;
+        }
+
+        saveCommands(filename, stripped);
+    }
 }
 
 long CSMap::onFileMapExport(FXObject *, FXSelector, void *)

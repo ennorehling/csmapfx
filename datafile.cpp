@@ -959,7 +959,7 @@ int datafile::save(const FXchar* filename)
 // === datafile command loading routine
 
 // loads command file and attaches the commands to the units
-int datafile::loadCmds(const FXString &filename, bool trim_indent)
+int datafile::loadCmds(const FXString &filename)
 {
 	cmdfilename("");
 	modifiedCmds(false);
@@ -1186,25 +1186,13 @@ int datafile::loadCmds(const FXString &filename, bool trim_indent)
 }
 
 // saves command file
-int datafile::saveCmds(const FXString& filename, const FXString& password, bool stripped, bool replace)
+int datafile::saveCmds(const FXString& filename, const FXString& password, bool stripped)
 {
 	if (filename.empty())
 		return -1;
 
     if (activefaction() == end())
 		return -1;
-
-	// Soll \u00fcberschrieben werden? Wenn nicht, pr\u00fcfen, ob Datei vorhanden
-	if (!replace)
-	{
-		FXFileStream filestr;
-		filestr.open(filename, FXStreamLoad);
-		if (filestr.status() == FXStreamOK)
-		{
-			filestr.close();
-			return -2;		// Datei existiert schon, Fehler!
-		}
-	}
 
 	// Datei zum Schreiben \u00f6ffnen
 	std::ofstream out(filename.text());
