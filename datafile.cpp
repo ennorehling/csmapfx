@@ -11,6 +11,13 @@
 
 #define HELP_GUARD 16
 
+void att_commands::addCommand(const FXString &line) {
+    std::copy(postfix_lines.begin(), postfix_lines.end(),
+        std::back_inserter(commands));
+    postfix_lines.clear();
+    commands.push_back(line);
+}
+
 // ===========================
 // === datakey implementation
 
@@ -1041,6 +1048,7 @@ int datafile::loadCmds(const FXString &filename)
 
 	FXString cmd;
 
+    int headerindent = 0, indent = 0;
 	// process lines
 	while(*(ptr = next))
 	{
@@ -1049,11 +1057,13 @@ int datafile::loadCmds(const FXString &filename)
 
 		// check if line is REGION or EINHEIT command
 		line = ptr;
+        indent = line.find_first_not_of("\t ");
 		cmd = line.trim().before(' ');
 		cmd.upper();
 
-		if (cmd == "REGION" || cmd == "EINHEIT")
-			break;
+        if (cmd == "REGION" || cmd == "EINHEIT") {
+            break;
+        }
 
         // add line to prefix
         if (!line.empty()) {
@@ -1073,6 +1083,7 @@ int datafile::loadCmds(const FXString &filename)
 		if (cmd == "REGION" || cmd == "EINHEIT")
 		{
 			FXString param = line.section(' ', 1);
+            headerindent = indent;
 
 			if (cmd == "REGION")
 			{
@@ -1148,22 +1159,19 @@ int datafile::loadCmds(const FXString &filename)
                         // don't add "; bestaetigt" comment, just set confirmed flag
                         cmds_list->confirmed = true;
                     }
+                    else if (indent > headerindent) {
+                        cmds_list->addCommand(line);
+                    }
+                    else if (cmds_list->commands.empty()) {
+                        cmds_list->prefix_lines.push_back(line);
+                    }
                     else {
-                        if (cmds_list->commands.empty()) {
-                            cmds_list->prefix_lines.push_back(line);
-                        }
-                        else {
-                            // add to postfix if it follows some commands
-                            cmds_list->postfix_lines.push_back(line);
-                        }
+                        // add to postfix if it follows some commands
+                        cmds_list->postfix_lines.push_back(line);
                     }
                 }
                 else {
-                    // TODO: why are there postfix lines?
-                    std::copy(cmds_list->postfix_lines.begin(), cmds_list->postfix_lines.end(),
-                        std::back_inserter(cmds_list->commands));
-                    cmds_list->postfix_lines.clear();
-                    cmds_list->commands.push_back(line);
+                    cmds_list->addCommand(line);
                 }
             }
 		}
@@ -1176,7 +1184,8 @@ int datafile::loadCmds(const FXString &filename)
 
 		// check if line is REGION oder EINHEIT command
 		line = ptr;
-		cmd = line.trim().before(' ');
+        indent = line.find_first_not_of("\t ");
+        cmd = line.trim().before(' ');
 		cmd.upper();
 
 	} while (flatten(cmd) != "naechster");

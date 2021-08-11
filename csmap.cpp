@@ -1127,9 +1127,9 @@ bool CSMap::saveCommands(const FXString &filename, bool stripped)
 		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
         return false;
 	}
-
+    last_save_time = 0;
     // TODO: why? the map has not changed?
-	mapChange();
+//	mapChange();
 	return true;
 }
 
@@ -2069,7 +2069,6 @@ long CSMap::onSearchInfo(FXObject *, FXSelector, void *ptr)
 long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
 {
     if (report) {
-
         FXString filename = report->cmdfilename();
         if (!filename.empty()) {
             struct stat buf;

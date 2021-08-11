@@ -143,6 +143,7 @@ class att_commands : public attachment
 public:
 	att_commands() : confirmed(false) { }
 
+    void addCommand(const FXString &line);
 	typedef std::vector<FXString> cmdlist_t;
 
 	FXString	header;
