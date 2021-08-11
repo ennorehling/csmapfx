@@ -118,6 +118,8 @@ FXDEFMAP(CSMap) MessageMap[]=
 	FXMAPFUNC(SEL_CLIPBOARD_REQUEST, CSMap::ID_SETSTRINGVALUE,	CSMap::onSetClipboard),
 
 	FXMAPFUNC(SEL_QUERY_HELP,	CSMap::ID_SETSTRINGVALUE,	CSMap::onSearchInfo),
+
+    FXMAPFUNC(SEL_TIMEOUT,	CSMap::ID_WATCH_FILES,	CSMap::onWatchFiles),
 };
 
 FXIMPLEMENT(CSMap,FXMainWindow,MessageMap,ARRAYNUMBER(MessageMap))
@@ -125,11 +127,13 @@ FXIMPLEMENT(CSMap,FXMainWindow,MessageMap,ARRAYNUMBER(MessageMap))
 static CSMap* CSMap_instance = NULL;
 
 // Construct a MainWindow
-CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL,NULL, DECOR_ALL, 0,0, 800,600)
+CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL, DECOR_ALL, 0, 0, 800, 600)
 {
 	// set "singleton"
 	CSMap_instance = this;
 
+    last_save_time = 0;
+    app->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, NULL);
 	// create main window icon
 	FXIcon* ico = new FXICOIcon(app, data::csmap);
     setMiniIcon(ico);
@@ -2060,6 +2064,34 @@ long CSMap::onSearchInfo(FXObject *, FXSelector, void *ptr)
     }
 
     return 1;
+}
+
+long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
+{
+    if (report) {
+
+        FXString filename = report->cmdfilename();
+        if (!filename.empty()) {
+            struct stat buf;
+            if (stat(filename.text(), &buf) == 0) {
+                if (buf.st_mtime > last_save_time) {
+                    if (last_save_time != 0) {
+                        FXuint res = FXMessageBox::question(this, (FXuint)MBOX_YES_NO, CSMAP_APP_TITLE, "%s was changed on disk. Reload?",
+                            filename.text());
+                        if (res != MBOX_CLICKED_NO) {
+                            loadCommands(filename);
+                            last_save_time = buf.st_mtime;
+                            getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, NULL);
+                            return 1;
+                        }
+                    }
+                    last_save_time = buf.st_mtime;
+                }
+            }
+        }
+    }
+    getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, NULL);
+    return 0;
 }
 
 long CSMap::onCalculator(FXObject *, FXSelector, void *)

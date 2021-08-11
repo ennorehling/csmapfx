@@ -20,6 +20,8 @@
 
 #include <fx.h>
 
+#include <ctime>
+
 class CSMap : public FXMainWindow
 { 
   // Macro for class hierarchy declarations 
@@ -120,6 +122,8 @@ public:		// this functions are slots for menu commands
 	long onSetClipboard(FXObject*, FXSelector, void* ptr);		// a widget want to set clipboard text
 
 	long onSearchInfo(FXObject*, FXSelector, void* ptr);		// a widget wants to open infodlg
+
+    long onWatchFiles(FXObject*, FXSelector, void* ptr);		// timer, watching external files
 	
 	long onCalculator(FXObject*, FXSelector, void* ptr);
 
@@ -185,6 +189,9 @@ public:
         // TabBook accelarators
         ID_TAB_UNIT,
         ID_TAB_STATS,
+
+        // file watch callback
+        ID_WATCH_FILES,
 
 		ID_LAST
 	};
@@ -253,6 +260,7 @@ private:
 	FXCSMap			*minimap;
 	FXInfoDlg		*infodlg;
 	FXSearchDlg		*searchdlg;
+    time_t last_save_time;
 
 	struct
 	{
