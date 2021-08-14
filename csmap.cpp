@@ -858,6 +858,7 @@ void CSMap::mapChange(bool newfile /*= false*/)
     commands->setMapFile(report);
     unitlist->setMapFile(report);
     tradeinfos->setMapFile(report);
+    statistics->setMapFile(report);
     statsinfos->setMapFile(report);
     regioninfos->setMapFile(report);
     mathbar->setMapFile(report);

@@ -36,7 +36,7 @@ FXStatistics::FXStatistics(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	setFrameStyle(FRAME_LINE);
 
 	// init variables
-	mapFile = NULL;
+	mapFile = nullptr;
 
 	select.faction = -2;		// no faction selected
 	select.filter = select.FILTER_PERSONS|select.FILTER_ITEMS|select.FILTER_TALENTS;
