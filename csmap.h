@@ -50,7 +50,6 @@ public:
 	bool loadCommands(const FXString& filename);
 	bool saveCommands(const FXString &filename, bool stripped);
 	bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
-	void stripReportToMap();
 
 public:		// this functions are slots for menu commands
 	long onFileOpen(FXObject*, FXSelector, void*);
@@ -58,7 +57,7 @@ public:		// this functions are slots for menu commands
 	long updActiveFaction(FXObject *sender, FXSelector, void *);
 
 	long onFileMerge(FXObject*, FXSelector, void*);
-	long onFileSaveAs(FXObject*, FXSelector, void*);
+	long onFileSaveMap(FXObject*, FXSelector, void*);
 	long onFileClose(FXObject*, FXSelector, void*);
 	long onFileMapExport(FXObject*, FXSelector, void*);
 	
@@ -138,7 +137,7 @@ public:
 		ID_FILE_RECENT,
 		ID_FILE_OPEN,
 		ID_FILE_MERGE,
-		ID_FILE_SAVE_AS,
+		ID_FILE_SAVE_MAP,
 		ID_FILE_CLOSE,
 		ID_FILE_EXPORT_MAP,
         ID_FILE_LOAD_ORDERS,
@@ -170,7 +169,6 @@ public:
 		// Map menu
 		ID_MAP_ZOOM,
 		ID_MAP_SETORIGIN,
-		ID_MAP_MAKEMAP,
 		ID_MAP_VISIBLEPLANE,
 
 		ID_MAP_SETMODUS,

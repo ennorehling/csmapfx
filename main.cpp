@@ -40,18 +40,16 @@ void showHelpText()
 		"\n  " CSMAP_APP_COPYRIGHT
 		"\n"
 		"\n"
-		"Syntax: csmapfx [--help] [-hc] <Haupt-CR> <Karten-CRs> [--makemap] [-o <CR>]\n"
+		"Syntax: csmapfx [--help] [-hc] <Haupt-CR> <Karten-CRs> [-o <CR>]\n"
 		"\n"
 		"CsMapFX ist ein Kartenbetrachter f\u00fcr das Spiel Eressea (www.eressea.de).\n"
-		"Das Programm \u00f6ffnet Eressea-Computer-Reporte (*.cr) und\n"
-		"mit bzip2 gepackte CRs (*.cr.bz2).\n"
+		"Das Programm \u00f6ffnet Eressea-Computer-Reporte (*.cr).\n"
 		"\n"
 		"Optionen:\n"
 		"  -h, --help                  Zeigt diesen Text an.\n"
 		"  -v, --version               Zeigt Versionsinformationen.\n"
 		"  -c                          Startet ein kleines Fenster mit Taschenrechner.\n"
 		"Diese Optionen m\u00fcssen hinter einem CR stehen:\n"
-		"  --makemap                   Filtert nur die Karteninfos aus den CRs heraus.\n"
 		"  -o <Datei>                  Schreibt einen CR aus den aktuellen Daten.\n"
 		"\n"
 		"  <Haupt-CR> <Karten-CRs...>\n"
@@ -230,13 +228,6 @@ int main(int argc, char *argv[])
                     if (argv[arg][i+1] == 'h' && argv[arg][i+2] == 'e' && argv[arg][i+3] == 'l' &&
 							argv[arg][i+4] == 'p' && argv[arg][i+5] == '\0')
 						showHelpText();
-					else if (argv[arg][i+1] == 'm' && argv[arg][i+2] == 'a' && argv[arg][i+3] == 'k' &&
-							argv[arg][i+4] == 'e' && argv[arg][i+5] == 'm' && argv[arg][i+6] == 'a' &&
-							argv[arg][i+7] == 'p' && argv[arg][i+8] == '\0')
-					{
-						if (csmap)
-							csmap->stripReportToMap();
-					}
 					else
 						showError((std::string)"csmapfx: Ung\u00fcltige Option: --" + (argv[arg]+i+1) + "\nProbier 'csmapfx --help\' f\u00fcr m\u00f6gliche Optionen");
 

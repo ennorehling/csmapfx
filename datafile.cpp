@@ -664,38 +664,27 @@ int datafile::load(const FXchar* filename)
 	FXString data;
 
 	FXString filename_str = filename;
-	if (filename_str.length() >= 7 && filename_str.right(7) == ".cr.bz2")
-	{
-	}
-	else if (filename_str.length() >= 4 && filename_str.right(4) == ".xml")
+	// load plain text CR
+	FXFileStream file;
+	file.open(filename,FXStreamLoad);
+	if (file.status() != FXStreamOK)
 	{
 		this->filename("");
-		throw std::runtime_error("Dateiformat nicht implementiert: XML.");
+		throw std::runtime_error(FXString(L"Datei konnte nicht ge\u00f6ffnet werden.").text());
 	}
-	else
+
+	FXString buffer;
+	buffer.length(1024*100+1);
+
+	do
 	{
-		// load plain text CR
-		FXFileStream file;
-		file.open(filename,FXStreamLoad);
-		if (file.status() != FXStreamOK)
-		{
-			this->filename("");
-			throw std::runtime_error(FXString(L"Datei konnte nicht ge\u00f6ffnet werden.").text());
-		}
+		memset(&buffer[0], 0, buffer.length());
+		file.load(&buffer[0], buffer.length()-1);
+		data.append(buffer.text());
 
-		FXString buffer;
-		buffer.length(1024*100+1);
-
-		do
-		{
-			memset(&buffer[0], 0, buffer.length());
-			file.load(&buffer[0], buffer.length()-1);
-			data.append(buffer.text());
-
-		} while(file.status() == FXStreamOK);
+	} while(file.status() == FXStreamOK);
 		
-		file.close();
-	}
+	file.close();
 
 	// ...
 
@@ -764,15 +753,8 @@ int datafile::save(const FXchar* filename)
 	FXStream *filestr_ptr;
 
 	FXString filename_str = filename;
-    if (filename_str.length() >= 4 && filename_str.right(4) == ".xml")
-    {
-        return -1;
-    }
-	else
-	{
-		plainfile.open(filename, FXStreamSave);
-		filestr_ptr = &plainfile;
-	}
+	plainfile.open(filename, FXStreamSave);
+	filestr_ptr = &plainfile;
 
 	FXStream& filestr = *filestr_ptr;
 	if (filestr.status() != FXStreamOK)
