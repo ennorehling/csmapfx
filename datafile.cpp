@@ -741,7 +741,7 @@ int datafile::load(const FXchar* filename)
 }
 
 // saves file
-int datafile::save(const FXchar* filename)
+int datafile::save(const FXchar* filename, bool map_filter)
 {
 	if (!filename)
 		return 0;
@@ -766,9 +766,31 @@ int datafile::save(const FXchar* filename)
 	this->filename(filename);
 
 	const datablock::itor end = blocks().end();
-	for (datablock::itor block = blocks().begin(); block != end; block++)
-	{
+    datablock::itor block = blocks().begin();
+	while ( block != end) {
 		bool hideKeys = false;
+
+        if (map_filter) {
+            /* do not include these blocks at all */
+            if (block->type() == datablock::TYPE_EFFECTS
+                || block->type() == datablock::TYPE_MESSAGE
+                || block->type() == datablock::TYPE_MESSAGETYPE
+                || block->type() == datablock::TYPE_DURCHREISE
+                || block->type() == datablock::TYPE_DURCHSCHIFFUNG) {
+                ++block;
+                continue;
+            }
+            /* skip these blocks with all their children */
+            if (block->type() == datablock::TYPE_UNIT 
+                || block->type() == datablock::TYPE_BATTLE
+                || block->type() == datablock::TYPE_SHIP) {
+                int depth = block->depth();
+                do {
+                    ++block;
+                } while (block != end && block->depth() > depth);
+                continue;
+            }
+        }
 
         // Blocknamen + ID-Nummern ausgeben
 		file << block->string();
@@ -889,6 +911,8 @@ int datafile::save(const FXchar* filename)
 			// ;Terrain ignorieren. Wird an ;Name angehangen... (s.u.)
 			if (block->type() == datablock::TYPE_REGION)
 			{
+                if (map_filter && tags->type() == datakey::TYPE_VISIBILITY)
+                    continue;
 				if (tags->type() == datakey::TYPE_TERRAIN || tags->type() == datakey::TYPE_NAME)
 					continue;
 			}
@@ -939,6 +963,7 @@ int datafile::save(const FXchar* filename)
 		std::string output = file.str();		
 		filestr.save(output.c_str(), output.size());
 		file.str("");
+        ++block;
 	}
 
 	return blocks().size();

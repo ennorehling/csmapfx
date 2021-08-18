@@ -296,8 +296,6 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
         filemenu,
         FXString(L"Befehle pr\u00fcfen\t\tPr\u00fct die Befehle."),
         NULL, this, ID_FILE_CHECK_ORDERS);
-
-	new FXMenuSeparatorEx(filemenu);
     new FXMenuCommand(
         filemenu,
         L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",
@@ -1073,7 +1071,7 @@ bool CSMap::saveFile(FXString filename, bool merge_commands /*= false*/)
 		FXuint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
         if (MBOX_CLICKED_YES != answ) return false;
 	}
-    FXint res = report->save(filename.text());	// \u00fcberschreiben, mit Befehlen
+    FXint res = report->save(filename.text(), true);
     if (res <= 0) {
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
         return false;

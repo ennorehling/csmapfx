@@ -331,7 +331,7 @@ public:
 	datablock::itor activefaction() { return m_activefaction; }
 
 	int load(const FXchar* filename);
-	int save(const FXchar* filename);
+	int save(const FXchar* filename, bool map_filter);
 	void createHierarchy();
 	void createHashTables();
 
