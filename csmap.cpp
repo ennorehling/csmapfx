@@ -1893,7 +1893,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
 	if (selection.selected & selection.MULTIPLE_REGIONS)
 	{
-		titlestr.append(FXString().format(" - [%lu Regionen markiert]", selection.regionsSelected.size()));
+		titlestr.append(FXString().format(" - [%zu Regionen markiert]", selection.regionsSelected.size()));
 	}
 
 
@@ -2267,6 +2267,7 @@ long CSMap::onFileSaveCommands(FXObject*, FXSelector, void* ptr)
             }
         }
         saveCommands(filename, false);
+        report->cmdfilename(filename);
         return 1;
     }
     return 0;

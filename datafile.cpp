@@ -1216,7 +1216,6 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 		return -1;
 
 	// Alles ok soweit...
-	cmdfilename(filename);
 	if (!stripped)
 		modifiedCmds(false);	// command export doesn't change modified flag
 

@@ -280,7 +280,7 @@ void FXRegionInfos::updateData()
 	if (selection.selected & selection.MULTIPLE_REGIONS)
 	{
 		FXString label;
-		tags.name->setText(label.format("%lu Regionen", selection.regionsSelected.size()));
+		tags.name->setText(label.format("%zu Regionen", selection.regionsSelected.size()));
 		tags.name->setIcon(terrainIcons[0]);				// Symbol fuer unbekanntes Terrain, da mehrere Regionen
 		tags.name->setHelpText(label + " markiert");
 		tags.name->setTipText(label + " markiert");
