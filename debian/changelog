@@ -13,6 +13,12 @@ csmapfx (0.8.0-1) stable; urgency=low
 
  -- Enno Rehling <enno@eressea.de>  Mon, 16 Sep 2021 09:15:00 +0200
 
+csmapfx (0.7.5-1) stable; urgency=low
+
+  * fixed a memory leak.
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 24 May 2021 20:00:00 +0200
+
 csmapfx (0.7.4-1) stable; urgency=low
 
   * send orders over http.
