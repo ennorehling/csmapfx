@@ -80,6 +80,8 @@ void datakey::value(const FXString& s)
 		return TYPE_EMAIL;
 	if (type == "banner")
 		return TYPE_BANNER;
+	if (type == "locale")
+		return TYPE_LOCALE;
 	if (type == "ejcOrdersConfirmed")
 		return TYPE_ORDERS_CONFIRMED;
 	
@@ -132,7 +134,9 @@ const FXString datakey::key() const
 		return "email";
 	else if (type() == TYPE_BANNER)
 		return "banner";
-	else if (type() == TYPE_ORDERS_CONFIRMED)
+    else if (type() == TYPE_LOCALE)
+        return "locale";
+    else if (type() == TYPE_ORDERS_CONFIRMED)
 		return "ejcOrdersConfirmed";
 
 	return "";
@@ -762,9 +766,6 @@ int datafile::save(const FXchar* filename, bool map_filter)
 		return -1;
 	}
 
-	// Alles ok soweit...
-	this->filename(filename);
-
 	const datablock::itor end = blocks().end();
     datablock::itor block = blocks().begin();
 	while ( block != end) {
@@ -908,12 +909,23 @@ int datafile::save(const FXchar* filename, bool map_filter)
 
 		for (; tags != iend; tags++)
 		{
-			// ;Terrain ignorieren. Wird an ;Name angehangen... (s.u.)
-			if (block->type() == datablock::TYPE_REGION)
+            if (block->type() == datablock::TYPE_FACTION) {
+                if (map_filter) {
+                    if (tags->type() != datakey::TYPE_BANNER
+                        && tags->type() != datakey::TYPE_LOCALE
+                        && tags->type() != datakey::TYPE_FACTIONNAME
+                        && tags->type() != datakey::TYPE_EMAIL)
+                    {
+                        continue;
+                    }
+                }
+            }
+			else if (block->type() == datablock::TYPE_REGION)
 			{
                 if (map_filter && tags->type() == datakey::TYPE_VISIBILITY)
                     continue;
-				if (tags->type() == datakey::TYPE_TERRAIN || tags->type() == datakey::TYPE_NAME)
+                // ;Terrain ignorieren. Wird an ;Name angehangen... (s.u.)
+                if (tags->type() == datakey::TYPE_TERRAIN || tags->type() == datakey::TYPE_NAME)
 					continue;
 			}
 			else if (block->type() == datablock::TYPE_UNIT)
@@ -959,10 +971,21 @@ int datafile::save(const FXchar* filename, bool map_filter)
 			file << std::endl;
 		}
 
-		// save block to file
+        // save block to file
 		std::string output = file.str();		
 		filestr.save(output.c_str(), output.size());
 		file.str("");
+
+        if (map_filter) {
+            /* skip over child blocks */
+            if (block->type() == datablock::TYPE_FACTION) {
+                int depth = block->depth();
+                do {
+                    ++block;
+                } while (block != end && block->depth() > depth);
+                continue;
+            }
+        }
         ++block;
 	}
 

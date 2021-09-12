@@ -50,6 +50,7 @@ public:
 		TYPE_OPTIONS,
 		TYPE_EMAIL,
 		TYPE_BANNER,
+		TYPE_LOCALE,
 		TYPE_ORDERS_CONFIRMED,		// ejcOrdersConfirmed, special tag
 		TYPE_LAST,
 

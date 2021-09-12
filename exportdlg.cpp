@@ -30,7 +30,7 @@ FXExportDlg::FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 
 	FXHorizontalFrame* regionsize = new FXHorizontalFrame(vfoptions, LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT);
 
-	new FXLabel(regionsize, FXString("Regionsgr\u00f6\u00dfe"));
+	new FXLabel(regionsize, FXString(L"Regionsgr\u00f6\u00dfe"));
 
 	scalebox = new FXComboBox(regionsize, 0, NULL,0, COMBOBOX_STATIC|FRAME_NORMAL);
     for (FXint i = 1; i <= 128; i *= 2) {
