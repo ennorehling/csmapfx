@@ -5,6 +5,7 @@
 #include <shlwapi.h>
 #elif defined (HAVE_UNISTD_H)
 #include <unistd.h>
+#include <sys/stat.h>
 #endif
 
 #if !defined(PATH_MAX)
@@ -2831,7 +2832,6 @@ long CSMap::onViewUnitTab(FXObject *, FXSelector, void *)
 long CSMap::onHelpAbout(FXObject*, FXSelector, void*)
 {
 	FXString abouttext = CSMAP_APP_TITLE_VERSION;
-	abouttext.append("\n   build: " __DATE__ " " __TIME__);
 
 	abouttext.append("\n\n" CSMAP_APP_COPYRIGHT "\nWeb: " CSMAP_APP_URL);
 	abouttext.append("\n\nSpecial thanks to Xolgrim for assembling Eressea rules information.\nThanks to all users for suggesting features and finding bugs.");

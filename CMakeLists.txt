@@ -93,3 +93,12 @@ include_directories(
   ${CURL_INCLUDE_DIRS}
 	${FOX_INCLUDE_DIRS}
 )
+
+set(INSTALL_BIN_DIR "bin" CACHE STRING "Install executable in this directory")
+set(INSTALL_DATA_DIR "share/csmapfx" CACHE STRING "Install data to this directory")
+set(INSTALL_APPLICATIONS_DIR "share/applications" CACHE STRING "Install the .desktop file to this directory")
+
+
+install(TARGETS ${PROJECT_NAME} DESTINATION ${INSTALL_BIN_DIR})
+install(FILES csmapfx.xpm DESTINATION ${INSTALL_DATA_DIR})
+install(FILES csmapfx.desktop DESTINATION ${INSTALL_APPLICATIONS_DIR})
