@@ -48,7 +48,8 @@ public:
     FXString askFileName(const FXString &title, const FXString &patterns);
     FXString askPasswordDlg(const FXString &faction_id);
 	bool loadCommands(const FXString& filename);
-	bool saveCommands(const FXString &filename, bool stripped);
+    bool updateCommands(const FXString &filename);
+    bool saveCommands(const FXString &filename, bool stripped);
 	bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
 
 public:		// this functions are slots for menu commands

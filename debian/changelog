@@ -1,6 +1,7 @@
 csmapfx (0.8.1-1) stable; urgency=low
 
   * Fix cancel button when closing the app.
+  * Warn about lost changes before reloading external modifications.
 
  -- Enno Rehling <enno@eressea.de>  Sun, 19 Sep 2021 11:15:00 +0200
 

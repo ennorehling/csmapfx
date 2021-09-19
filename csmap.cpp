@@ -163,7 +163,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 	status_faction->setBorderColor(getApp()->getShadowColor());
 	status_faction->hide(); status_lfaction->hide();
 
-	// Men\u00fcbar, Toolbar
+	// Menubar, Toolbar
 	FXDockSite* topdock = new FXDockSite(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X);
 	/*FXDockSite* bottomdock =*/ new FXDockSite(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
 	/*FXDockSite* leftdock =*/ new FXDockSite(this,LAYOUT_SIDE_LEFT|LAYOUT_FILL_Y);
@@ -1999,6 +1999,21 @@ long CSMap::onSearchInfo(FXObject *, FXSelector, void *ptr)
     return 1;
 }
 
+bool CSMap::updateCommands(const FXString &filename) {
+    FXString ask = L"Eine andere Anwendung hat die Datei %s ge\u00e4ndert.\nNeu laden?";
+    if (report->modifiedCmds()) {
+        ask = L"Eine andere Anwendung hat die Datei %s ge\u00e4ndert.\nNeu laden und die in CSMap gemachten Änderungen verlieren?";
+    }
+    FXuint res = FXMessageBox::question(this,
+        (FXuint)MBOX_YES_NO, CSMAP_APP_TITLE,
+        ask.text(),
+        filename.text());
+    if (res != MBOX_CLICKED_NO) {
+        return loadCommands(filename);
+    }
+    return false;
+}
+
 long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
 {
     if (report) {
@@ -2008,10 +2023,7 @@ long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
             if (stat(filename.text(), &buf) == 0) {
                 if (buf.st_mtime > last_save_time) {
                     if (last_save_time != 0) {
-                        FXuint res = FXMessageBox::question(this, (FXuint)MBOX_YES_NO, CSMAP_APP_TITLE, "%s was changed on disk. Reload?",
-                            filename.text());
-                        if (res != MBOX_CLICKED_NO) {
-                            loadCommands(filename);
+                        if (updateCommands(filename)) {
                             last_save_time = buf.st_mtime;
                             getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, NULL);
                             return 1;
