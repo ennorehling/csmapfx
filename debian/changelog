@@ -1,3 +1,9 @@
+csmapfx (0.8.1-2) stable; urgency=low
+
+  * fix icon path.
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 19 Sep 2021 20:52:00 +0200
+
 csmapfx (0.8.1-1) stable; urgency=low
 
   * Fix cancel button when closing the app.
