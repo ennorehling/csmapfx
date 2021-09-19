@@ -2002,7 +2002,7 @@ long CSMap::onSearchInfo(FXObject *, FXSelector, void *ptr)
 bool CSMap::updateCommands(const FXString &filename) {
     FXString ask = L"Eine andere Anwendung hat die Datei %s ge\u00e4ndert.\nNeu laden?";
     if (report->modifiedCmds()) {
-        ask = L"Eine andere Anwendung hat die Datei %s ge\u00e4ndert.\nNeu laden und die in CSMap gemachten Änderungen verlieren?";
+        ask = L"Eine andere Anwendung hat die Datei %s ge\u00e4ndert.\nNeu laden und die in CSMap gemachten \u00c4nderungen verlieren?";
     }
     FXuint res = FXMessageBox::question(this,
         (FXuint)MBOX_YES_NO, CSMAP_APP_TITLE,
