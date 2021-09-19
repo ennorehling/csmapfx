@@ -761,8 +761,9 @@ void CSMap::create()
 /*virtual*/ FXbool CSMap::close(FXbool notify)
 {
 	// Dateien schliessen, Speicher frei geben
-	closeFile();
-    mapChange();
+    if (!closeFile()) {
+        return false;
+    }
 
     FXRegistry &reg = getApp()->reg();
 
@@ -2209,12 +2210,10 @@ long CSMap::onFileSaveMap(FXObject*, FXSelector, void*)
 
 long CSMap::onFileClose(FXObject*, FXSelector, void*)
 {
-	closeFile();
-    mapChange();
-    return 1;
+	return closeFile() ? 1 : 0;
 }
 
-void CSMap::closeFile()
+bool CSMap::closeFile()
 {
 	// ask if modified commands should be safed
 	if (report && report->modifiedCmds())
@@ -2223,18 +2222,20 @@ void CSMap::closeFile()
             FXString(L"Die \u00c4nderungen an den Befehlen speichern?").text());
 
 		if (res == MBOX_CLICKED_CANCEL)
-			return;					// don't close, cancel clicked
+			return false;					// don't close, cancel clicked
 		else if (res == MBOX_CLICKED_SAVE)
 		{
             saveCommandsDlg(false, true);			// save commands
 
 			// cancel close, when save was unsuccessful
 			if (report && report->modifiedCmds())
-				return;
+				return false;
 		}
 	}
     delete report;
     report = nullptr;
+    mapChange();
+    return true;
 }
 
 long CSMap::onFileOpenCommands(FXObject *, FXSelector, void *)

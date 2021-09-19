@@ -43,7 +43,7 @@ public:
 	bool loadFile(FXString filename);
 	bool mergeFile(FXString filename);
 	bool saveFile(FXString filename, bool merge_commands = false);
-	void closeFile();
+	bool closeFile();
     void saveCommandsDlg(bool stripped, bool replace);
     FXString askFileName(const FXString &title, const FXString &patterns);
     FXString askPasswordDlg(const FXString &faction_id);
