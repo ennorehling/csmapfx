@@ -129,6 +129,7 @@ static CSMap* CSMap_instance = NULL;
 // Construct a MainWindow
 CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL, DECOR_ALL, 0, 0, 800, 600)
 {
+    report = nullptr;
 	// set "singleton"
 	CSMap_instance = this;
 
@@ -435,7 +436,6 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 
 	// Region list window
 	regions = new FXRegionList(leftframe, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	regions->setMapFile(report);
 
 	menu.ownFactionGroup->setTarget(regions);
 	menu.ownFactionGroup->setSelector(FXRegionList::ID_TOGGLEOWNFACTIONGROUP);
@@ -451,7 +451,6 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 
 	// Map window
 	map = new FXCSMap(mapsplit, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	map->setMapFile(report);
 	mapsplit->setStretcher(map);
 
 	menu.streets->setTarget(map);
@@ -476,13 +475,11 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
     outputTabs = new FXTabBook(msgBorder, NULL, 0, TABBOOK_NORMAL | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
     new FXTabItem(outputTabs, "Meldungen");
     messages = new FXMessages(outputTabs, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	messages->setMapFile(report);
     new FXTabItem(outputTabs, "Fehler");
     errorList = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
 
     // Calculator bar
 	mathbar = new FXCalculator(middle, this,ID_SELECTION, LAYOUT_FILL_X);
-	mathbar->setMapFile(report);
 	mathbar->connectMap(map);
 	menu.calc->setTarget(mathbar);
 	menu.calc->setSelector(FXCalculator::ID_TOGGLESHOWN);
@@ -494,7 +491,6 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 	riTab = new FXToolBarTab(riFrame, NULL,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
 	riTab->setTipText("Regionsinformationen ein- und ausblenden");
 	regioninfos = new FXRegionInfos(riFrame, this,ID_SELECTION, LAYOUT_FILL_X);
-	regioninfos->setMapFile(report);
 
 	menu.regdescription->setTarget(regioninfos);
 	menu.regdescription->setSelector(FXRegionInfos::ID_TOGGLEDESCRIPTION);
@@ -503,13 +499,11 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 	siTab = new FXToolBarTab(siFrame, NULL,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
 	siTab->setTipText("Statistik ein- und ausblenden");
 	statsinfos = new FXStatsInfos(siFrame, this,ID_SELECTION, LAYOUT_FILL_X);
-	statsinfos->setMapFile(report);
 
 	FXHorizontalFrame *tiFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
 	tiTab = new FXToolBarTab(tiFrame, NULL,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
 	tiTab->setTipText("Handelsinformationen ein- und ausblenden");
 	tradeinfos = new FXTradeInfos(tiFrame, this,ID_SELECTION, LAYOUT_FILL_X);
-	tradeinfos->setMapFile(report);
 
 	commandsplitter = new FXSplitterEx(rightframe, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
@@ -517,10 +511,8 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 
     new FXTabItem(tabbook, "Einheiten");
 	unitlist = new FXUnitList(tabbook, this,ID_SELECTION, LAYOUT_FILL_X);
-	unitlist->setMapFile(report);
     new FXTabItem(tabbook, "Statistik");
 	statistics = new FXStatistics(tabbook, this,ID_SELECTION, LAYOUT_FILL_X);
-	statistics->setMapFile(report);
     getAccelTable()->addAccel(MKUINT(KEY_1, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_UNIT));
     getAccelTable()->addAccel(MKUINT(KEY_2, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_STATS));
 
@@ -528,7 +520,6 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 	commandframe = new FXVerticalFrame(commandsplitter,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 0,0,0,0);
 	commandframe->setBorderColor(getApp()->getShadowColor());
 	commands = new FXCommands(commandframe, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	commands->setMapFile(report);
 	commands->connectMap(map);
 
 	// commands editor tools
@@ -572,7 +563,6 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 	minimap_bar->getStatusLine()->setNormalText("");
 
 	minimap = new FXCSMap(minimap_frame, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y, true /*minimap-mode*/);
-	minimap->setMapFile(report);
 	minimap->connectMap(map);
 
 	menu.minimap_islands->setTarget(minimap);
@@ -586,7 +576,6 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 	// search dialog
 	searchdlg = new FXSearchDlg(this, "Suchen...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));
 	searchdlg->getAccelTable()->addAccel(MKUINT(KEY_F,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_SEARCHDLG));
-	searchdlg->setMapFile(report);
 }
 
 /*static*/ CSMap* CSMap::getInstance()
