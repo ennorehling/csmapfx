@@ -2,7 +2,7 @@ Source: csmapfx
 Maintainer: Enno Rehling <enno@eressea.de>
 Section: games
 Priority: optional
-Build-Depends: debhelper (>= 11), libcurl-dev, libfox-1.6-dev (>=1.6.57), libpng-dev (>=0.2.9), libphysfs-dev (>=2.1)
+Build-Depends: debhelper (>= 11), libc6 (>=2.11), libcurl-dev, libfox-1.6-dev (>=1.6.57), libpng-dev (>=0.2.9), libphysfs-dev (>=2.1)
 Standards-Version: 4.1.3
 Homepage: https://www.eressea.de
 
