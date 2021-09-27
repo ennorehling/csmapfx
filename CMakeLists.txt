@@ -37,7 +37,6 @@ set (SOURCES
 	statsinfos.cpp
 	symbols.cpp
 	tradeinfos.cpp
-	translator.cpp
 	unitlist.cpp
 	tinyjs/TinyJS.cpp
 	tinyjs/TinyJS_Functions.cpp
@@ -58,6 +57,15 @@ find_library(LEGACY_STDIO_LIBRARY NAMES legacy_stdio_definitions)
 if (LEGACY_STDIO_LIBRARY)
 target_link_libraries(${PROJECT_NAME} ${LEGACY_STDIO_LIBRARY})
 endif ()
+
+find_package(Intl)
+include_directories(${Intl_INCLUDE_DIR})
+if (Intl_FOUND)
+  target_compile_definitions (${PROJECT_NAME} PRIVATE HAVE_GETTEXT=1)
+  target_link_libraries(${PROJECT_NAME} ${Intl_LIBRARIES})
+else (Intl_FOUND)
+  message(STATUS "libintl not found")
+endif (Intl_FOUND)
 
 if (WIN32)
 set(FOX_ROOT $ENV{FOX_ROOT})
@@ -98,6 +106,9 @@ set(INSTALL_BIN_DIR "bin" CACHE STRING "Install executable in this directory")
 set(INSTALL_DATA_DIR "share/csmapfx" CACHE STRING "Install data to this directory")
 set(INSTALL_APPLICATIONS_DIR "share/applications" CACHE STRING "Install the .desktop file to this directory")
 
+include(Localization.cmake)
+SET (PACKAGE_NAME ${PROJECT_NAME})
+PROGRAM_LOCALIZATION()
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${INSTALL_BIN_DIR})
 install(FILES csmapfx.xpm DESTINATION ${INSTALL_DATA_DIR})

@@ -19,7 +19,6 @@
 #include "version.h"
 #include "main.h"
 #include "fxhelper.h"
-#include "translator.h"
 #include "csmap.h"
 
 #include "calc.h"

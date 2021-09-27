@@ -12,6 +12,7 @@
 #define PATH_MAX 260
 #endif
 
+#include "translate.h"
 #include "version.h"
 #include "main.h"
 #include "fxhelper.h"
@@ -266,7 +267,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 
 	// File menu
 	filemenu = new FXMenuPane(this);
-	new FXMenuTitle(menubar,"&Datei",NULL,filemenu);
+	new FXMenuTitle(menubar, _("&File"),NULL,filemenu);
 	new FXMenuCommand(
 		filemenu,
 		FXString(L"\u00d6&ffnen...\tCtrl-O\tEinen Report \u00f6ffnen."),
