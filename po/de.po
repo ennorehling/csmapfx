@@ -19,3 +19,7 @@ msgstr ""
 #: csmap.cpp:269
 msgid "&File"
 msgstr "&Datei"
+
+#: csmap.cpp:272
+msgid "&Open...\tCtrl-O\tOpen a report."
+msgstr "Ö&ffnen...\tStrg-O\tEinen Report öffnen."
