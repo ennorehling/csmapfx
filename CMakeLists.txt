@@ -37,7 +37,8 @@ set (SOURCES
 	statsinfos.cpp
 	symbols.cpp
 	tradeinfos.cpp
-	unitlist.cpp
+  translate.cpp
+  unitlist.cpp
 	tinyjs/TinyJS.cpp
 	tinyjs/TinyJS_Functions.cpp
 	tinyjs/TinyJS_MathFunctions.cpp
@@ -52,16 +53,17 @@ endif (WIN32)
 find_package(PhysFS 2.1 REQUIRED)
 find_package(PNG REQUIRED)
 find_package(CURL REQUIRED)
+find_package(Intl REQUIRED)
 
 find_library(LEGACY_STDIO_LIBRARY NAMES legacy_stdio_definitions)
 if (LEGACY_STDIO_LIBRARY)
 target_link_libraries(${PROJECT_NAME} ${LEGACY_STDIO_LIBRARY})
 endif ()
 
-find_package(Intl)
+find_package(Gettext)
 include_directories(${Intl_INCLUDE_DIR})
 if (Intl_FOUND)
-  target_compile_definitions (${PROJECT_NAME} PRIVATE HAVE_GETTEXT=1)
+  target_compile_definitions (${PROJECT_NAME} PRIVATE HAVE_INTL=1)
   target_link_libraries(${PROJECT_NAME} ${Intl_LIBRARIES})
 else (Intl_FOUND)
   message(STATUS "libintl not found")
@@ -102,14 +104,18 @@ include_directories(
 	${FOX_INCLUDE_DIRS}
 )
 
-set(INSTALL_BIN_DIR "bin" CACHE STRING "Install executable in this directory")
-set(INSTALL_DATA_DIR "share/csmapfx" CACHE STRING "Install data to this directory")
-set(INSTALL_APPLICATIONS_DIR "share/applications" CACHE STRING "Install the .desktop file to this directory")
+include(GNUInstallDirs)
+set(PREFIX_BIN ${CMAKE_INSTALL_BINDIR} CACHE STRING "Install executable in this directory")
+set(PREFIX_DATA ${CMAKE_INSTALL_DATADIR} CACHE STRING "Install data to this directory")
+set(PREFIX_PKGDATA ${CMAKE_INSTALL_DATADIR}/${PACKAGE_NAME})
+set(PREFIX_LOCALE ${CMAKE_INSTALL_DATADIR}/locale)
+set(PREFIX_APPDATA ${CMAKE_INSTALL_DATADIR}/applications)
+message(STATUS "SET LOC ${PREFIX_LOCALE} -- ${CMAKE_INSTALL_DATADIR}")
 
 include(Localization.cmake)
 SET (PACKAGE_NAME ${PROJECT_NAME})
 PROGRAM_LOCALIZATION()
 
-install(TARGETS ${PROJECT_NAME} DESTINATION ${INSTALL_BIN_DIR})
-install(FILES csmapfx.xpm DESTINATION ${INSTALL_DATA_DIR})
-install(FILES csmapfx.desktop DESTINATION ${INSTALL_APPLICATIONS_DIR})
+install(TARGETS ${PROJECT_NAME} DESTINATION ${PREFIX_BIN})
+install(FILES csmapfx.xpm DESTINATION ${PREFIX_PKGDATA})
+install(FILES csmapfx.desktop DESTINATION ${PREFIX_APPDATA})

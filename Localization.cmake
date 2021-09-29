@@ -1,3 +1,4 @@
+# inspired by https://github.com/OpenCPN/OpenCPN/blob/master/CMakeLists.txt
 FUNCTION(PROGRAM_LOCALIZATION)
 	FIND_PROGRAM(GETTEXT_XGETTEXT_EXECUTABLE xgettext)
 	string(REPLACE "_pi" "" I18N_NAME ${PACKAGE_NAME})
@@ -42,10 +43,11 @@ FUNCTION(PROGRAM_LOCALIZATION)
 
 	SET(_gmoFiles)
 	MACRO(GETTEXT_BUILD_MO)
-	   FOREACH (_poFile ${ARGN})
+	FOREACH (_poFile ${ARGN})
 	      GET_FILENAME_COMPONENT(_absFile ${_poFile} ABSOLUTE)
 	      GET_FILENAME_COMPONENT(_poBasename ${_absFile} NAME_WE)
-	      SET(_gmoFile ${CMAKE_CURRENT_BINARY_DIR}/${_poBasename}.mo)
+		  MAKE_DIRECTORY(${CMAKE_CURRENT_BINARY_DIR}/locale/${_poBasename}/LC_MESSAGES)
+	      SET(_gmoFile ${CMAKE_CURRENT_BINARY_DIR}/locale/${_poBasename}/LC_MESSAGES/${PACKAGE_NAME}.mo)
 
 	      ADD_CUSTOM_COMMAND(
 		 OUTPUT ${_gmoFile}
@@ -55,9 +57,10 @@ FUNCTION(PROGRAM_LOCALIZATION)
 	      )
 
 	IF(APPLE)
-	      INSTALL(FILES ${_gmoFile} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/OpenCPN.app/Contents/Resources/${_poBasename}.lproj RENAME opencpn-${PACKAGE_NAME}.mo )
+	      INSTALL(FILES ${_gmoFile} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/CsMapFX.app/Contents/Resources/${_poBasename}.lproj)
 	ELSE(APPLE)
-	      INSTALL(FILES ${_gmoFile} DESTINATION ${PREFIX_DATA}/po/${_poBasename}/LC_MESSAGES RENAME opencpn-${PACKAGE_NAME}.mo )
+	message(STATUS "GET LOC ${PREFIX_LOCALE}")
+	      INSTALL(FILES ${_gmoFile} DESTINATION ${PREFIX_LOCALE}/${_poBasename}/LC_MESSAGES)
 	ENDIF(APPLE)
 
 	      SET(_gmoFiles ${_gmoFiles} ${_gmoFile})

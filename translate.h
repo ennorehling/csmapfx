@@ -1,7 +1,6 @@
-#ifdef HAVE_GETTEXT
+#ifdef HAVE_INTL
 extern "C" {
 #include <libintl.h>
-#include <locale.h>
 }
 #else
 #define gettext(X) (X)
@@ -9,5 +8,10 @@ extern "C" {
 #endif
 
 #define _(str) gettext(str)
-#define t(str) (str)
 
+#ifdef WIN32
+#define PATH_SEP '\\'
+#else
+#define PATH_SEP '/'
+#endif
+void init_intl(void);

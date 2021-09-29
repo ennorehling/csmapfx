@@ -14,15 +14,17 @@
 */
 
 #define CSMAP_MAIN
+
 #include "fxwin.h"
 
 #include "version.h"
 #include "main.h"
 #include "fxhelper.h"
 #include "csmap.h"
-
 #include "calc.h"
+#include "translate.h"
 
+#include <clocale>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -81,6 +83,10 @@ int main(int argc, char *argv[])
     initSystems();		// inits COM under windows
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
+    setlocale(LC_ALL, "");
+#ifdef HAVE_INTL
+    init_intl();
+#endif
 	// Make application 
 	FXApp CSApp("CSMap", "Eressea"); 
 

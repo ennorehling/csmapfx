@@ -23,6 +23,5 @@ export DH_VERBOSE = 1
 override_dh_auto_configure:
 	dh_auto_configure -- \
 		-DCMAKE_BUILD_TYPE=Release \
-		-DINSTALL_BIN_DIR=/usr/games \
-		-DINSTALL_DATA_DIR=share/games/csmapfx
-
+		-DPREFIX_BIN=/usr/games \
+		-DPREFIX_DATA=share/games
