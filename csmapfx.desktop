@@ -2,7 +2,7 @@
 Version=1.0
 Name=csmapfx
 Exec=csmapfx
-Icon=/usr/share/games/csmapfx/csmapfx.xpm
+Icon=/usr/share/pixmaps/csmapfx.xpm
 Terminal=false
 MimeType=application/x-pyromod+zip;
 Type=Application
