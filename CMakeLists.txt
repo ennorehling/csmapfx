@@ -108,7 +108,7 @@ include(GNUInstallDirs)
 set(PREFIX_BIN ${CMAKE_INSTALL_BINDIR} CACHE STRING "Install executable in this directory")
 set(PREFIX_DATA ${CMAKE_INSTALL_DATADIR} CACHE STRING "Install data to this directory")
 set(PREFIX_PKGDATA ${PREFIX_DATA}/${PACKAGE_NAME})
-set(PREFIX_LOCALE ${PREFIX_DATA}/locale)
+set(PREFIX_LOCALE ${CMAKE_INSTALL_DATADIR}/locale)
 set(PREFIX_APPDATA ${CMAKE_INSTALL_DATADIR}/applications)
 
 include(Localization.cmake)

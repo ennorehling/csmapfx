@@ -9,5 +9,5 @@ fi
 mkdir -p build/$TYPE
 cd build/$TYPE
 cmake -DCMAKE_BUILD_TYPE=$TYPE ../..
-make -k csmapfx-pot-update csmapfx-po-update csmapfx-i18n csmapfx
+make -k csmapfx
 

@@ -270,7 +270,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 	new FXMenuTitle(menubar, _("&File"),NULL,filemenu);
 	new FXMenuCommand(
 		filemenu,
-        _("&Open...\tCtrl-O\nOpen a report."),
+        _("&Open...\tCtrl-O\tOpen a report."),
         icons.open,
 		this,
 		ID_FILE_OPEN);

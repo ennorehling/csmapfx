@@ -24,7 +24,7 @@ FUNCTION(PROGRAM_LOCALIZATION)
 
 	      ADD_CUSTOM_COMMAND(
 		 OUTPUT ${_absFile}.dummy
-		 COMMAND ${GETTEXT_MSGMERGE_EXECUTABLE} --width=80 --strict --quiet --update --backup=none --no-location -s ${_absFile} ${_absPotFile}
+		 COMMAND ${GETTEXT_MSGMERGE_EXECUTABLE} --width=80 --strict --quiet --update --backup=none --no-fuzzy-matching --no-location -s ${_absFile} ${_absPotFile}
 		 DEPENDS ${_absPotFile} ${_absFile}
 		 COMMENT "${I18N_NAME}-po-update [${_poBasename}]: Updated po file."
 	      )
@@ -37,39 +37,42 @@ FUNCTION(PROGRAM_LOCALIZATION)
 	ENDMACRO(GETTEXT_UPDATE_PO)
 
 	IF (GETTEXT_MSGMERGE_EXECUTABLE)
-	FILE(GLOB PACKAGE_PO_FILES po/*.po)
-	GETTEXT_UPDATE_PO(po/${PACKAGE_NAME}.pot ${PACKAGE_PO_FILES})
+		FILE(GLOB PACKAGE_PO_FILES po/*.po)
+		GETTEXT_UPDATE_PO(po/${PACKAGE_NAME}.pot ${PACKAGE_PO_FILES})
 	ENDIF(GETTEXT_MSGMERGE_EXECUTABLE)
 
 	SET(_gmoFiles)
-	MACRO(GETTEXT_BUILD_MO)
-	FOREACH (_poFile ${ARGN})
-	      GET_FILENAME_COMPONENT(_absFile ${_poFile} ABSOLUTE)
-	      GET_FILENAME_COMPONENT(_poBasename ${_absFile} NAME_WE)
-		  MAKE_DIRECTORY(${CMAKE_CURRENT_BINARY_DIR}/locale/${_poBasename}/LC_MESSAGES)
-	      SET(_gmoFile ${CMAKE_CURRENT_BINARY_DIR}/locale/${_poBasename}/LC_MESSAGES/${PACKAGE_NAME}.mo)
+	MACRO(GETTEXT_BUILD_MO _poFile _lang)
+		GET_FILENAME_COMPONENT(_absFile ${_poFile} ABSOLUTE)
+		GET_FILENAME_COMPONENT(_poBasename ${_absFile} NAME_WE)
+		SET(_gmoFile ${CMAKE_CURRENT_BINARY_DIR}/${_poBasename}.mo)
 
-	      ADD_CUSTOM_COMMAND(
-		 OUTPUT ${_gmoFile}
-		 COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --check -o ${_gmoFile} ${_absFile}
-		 DEPENDS ${_absFile}
-		 COMMENT "${I18N_NAME}-i18n [${_poBasename}]: Created mo file."
-	      )
+		ADD_CUSTOM_COMMAND(
+			OUTPUT ${_gmoFile}
+			COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --check -o ${_gmoFile} ${_absFile}
+			DEPENDS ${_absFile}
+			COMMENT "${I18N_NAME}-i18n [${_poBasename}]: Created mo file."
+			)
 
-	IF(APPLE)
-	      INSTALL(FILES ${_gmoFile} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/CsMapFX.app/Contents/Resources/${_poBasename}.lproj)
-	ELSE(APPLE)
-	      INSTALL(FILES ${_gmoFile} DESTINATION ${PREFIX_LOCALE}/${_poBasename}/LC_MESSAGES)
-	ENDIF(APPLE)
+		IF(APPLE)
+			INSTALL(
+				FILES ${_gmoFile}
+				DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/CsMapFX.app/Contents/Resources/${_lang}.lproj
+				RENAME ${PACKAGE_NAME}.mo)
+		ELSE(APPLE)
+			INSTALL(
+				FILES ${_gmoFile}
+				DESTINATION ${PREFIX_LOCALE}/${_lang}/LC_MESSAGES
+				RENAME ${PACKAGE_NAME}.mo)
+		ENDIF(APPLE)
 
-	      SET(_gmoFiles ${_gmoFiles} ${_gmoFile})
-	   ENDFOREACH (_poFile )
+		SET(_gmoFiles ${_gmoFiles} ${_gmoFile})
 	ENDMACRO(GETTEXT_BUILD_MO)
 
 	if(GETTEXT_MSGFMT_EXECUTABLE)
-	   FILE(GLOB PACKAGE_PO_FILES po/*.po)
-	   GETTEXT_BUILD_MO(${PACKAGE_PO_FILES})
-	   ADD_CUSTOM_TARGET(${I18N_NAME}-i18n COMMENT "${PACKAGE_NAME}-i18n: Done." DEPENDS ${_gmoFiles})
-	   ADD_DEPENDENCIES(${PACKAGE_NAME} ${I18N_NAME}-i18n)
+		GETTEXT_BUILD_MO(po/${PACKAGE_NAME}_de_DE.po de)
+		# GETTEXT_BUILD_MO(po/${PACKAGE_NAME}_nb_NO.po nb_NO)
+		ADD_CUSTOM_TARGET(${I18N_NAME}-i18n COMMENT "${PACKAGE_NAME}-i18n: Done." DEPENDS ${_gmoFiles})
+		ADD_DEPENDENCIES(${PACKAGE_NAME} ${I18N_NAME}-i18n)
 	ENDIF(GETTEXT_MSGFMT_EXECUTABLE)
 ENDFUNCTION()

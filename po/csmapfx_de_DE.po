@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: csmapfx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-28 11:36+0200\n"
+"POT-Creation-Date: 2021-09-29 16:32+0200\n"
 "PO-Revision-Date: 2021-09-29 12:26+0200\n"
 "Last-Translator: Enno Rehling <enno@eressea.de>\n"
 "Language-Team: German <enno@eressea.de>\n"
@@ -15,11 +15,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: csmap.cpp:269
+#
 msgid "&File"
 msgstr "&Datei"
-
-#: csmap.cpp:272
+#
 msgid "&Open...\tCtrl-O\tOpen a report."
 msgstr "Ö&ffnen...\tStrg-O\tEinen Report öffnen."
