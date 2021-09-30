@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: csmapfx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-29 16:32+0200\n"
+"POT-Creation-Date: 2021-09-30 11:45+0200\n"
 "PO-Revision-Date: 2021-09-29 12:26+0200\n"
 "Last-Translator: Enno Rehling <enno@eressea.de>\n"
 "Language-Team: German <enno@eressea.de>\n"
@@ -16,8 +16,17 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 #
+msgid "&Add map...\tCtrl+M\tLoad an additional report with map information."
+msgstr "Karte &hinzufügen...\tCtrl+M\tLädt einen Karten-Report in den aktuellen Report."
+#
 msgid "&File"
 msgstr "&Datei"
 #
-msgid "&Open...\tCtrl-O\tOpen a report."
-msgstr "Ö&ffnen...\tStrg-O\tEinen Report öffnen."
+msgid "&Load orders...\tCtrl+Shift+O\tLoad orders from a text file."
+msgstr "Befehle &laden...\tCtrl+Shift+O\tBefehle aus einer Textdatei laden."
+#
+msgid "&Open...\tCtrl+O\tOpen a report."
+msgstr "Ö&ffnen...\tStrg+O\tEinen Report öffnen."
+#
+msgid "&Save orders\tCtrl+S\tSave orders to a text file."
+msgstr "Befehle &speichern\tCtrl+S\tBefehlsdatei speichern."

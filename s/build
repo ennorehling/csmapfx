@@ -2,12 +2,12 @@
 
 TYPE=Debug
 
-if [ ! -z "$1" ]; then
+if [ -n "$1" ]; then
 TYPE="$1"
 fi
 
-mkdir -p build/$TYPE
-cd build/$TYPE
-cmake -DCMAKE_BUILD_TYPE=$TYPE ../..
+mkdir -p "build/$TYPE"
+cd "build/$TYPE" || exit
+cmake -DCMAKE_BUILD_TYPE="$TYPE" ../..
 make -k csmapfx
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: csmapfx \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-29 16:32+0200\n"
+"POT-Creation-Date: 2021-09-30 11:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,5 +22,17 @@ msgid "&File"
 msgstr ""
 
 #: csmap.cpp:272
-msgid "&Open...\tCtrl-O\tOpen a report."
+msgid "&Open...\tCtrl+O\tOpen a report."
+msgstr ""
+
+#: csmap.cpp:278
+msgid "&Add map...\tCtrl+M\tLoad an additional report with map information."
+msgstr ""
+
+#: csmap.cpp:282
+msgid "&Load orders...\tCtrl+Shift+O\tLoad orders from a text file."
+msgstr ""
+
+#: csmap.cpp:286
+msgid "&Save orders\tCtrl+S\tSave orders to a text file."
 msgstr ""

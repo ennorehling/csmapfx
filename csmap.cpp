@@ -268,28 +268,28 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 	// File menu
 	filemenu = new FXMenuPane(this);
 	new FXMenuTitle(menubar, _("&File"),NULL,filemenu);
-	new FXMenuCommand(
+	(new FXMenuCommand(
 		filemenu,
-        _("&Open...\tCtrl-O\tOpen a report."),
+        _("&Open...\tCtrl+O\tOpen a report."),
         icons.open,
 		this,
-		ID_FILE_OPEN);
-    new FXMenuCommand(
+		ID_FILE_OPEN))->addHotKey(FXHotKey(MKUINT(KEY_O, CONTROLMASK)));
+    (new FXMenuCommand(
 		filemenu,
-		FXString(L"Karte h&inzuf\u00fcgen...\tCtrl-I\tL\u00e4dt einen Karten-Report in den aktuellen Report."),
-        icons.merge, this, ID_FILE_MERGE);
-    new FXMenuCommand(
+        _("&Add map...\tCtrl+M\tLoad an additional report with map information."),
+        icons.merge, this, ID_FILE_MERGE))->addHotKey(FXHotKey(MKUINT(KEY_M, CONTROLMASK)));
+    (new FXMenuCommand(
         filemenu,
-        FXString(L"Befehle &laden...\tCtrl-Shift-O\tBefehle aus einer Textdatei laden."),
-        icons.open, this, ID_FILE_LOAD_ORDERS);
-    new FXMenuCommand(
+        _("&Load orders...\tCtrl+Shift+O\tLoad orders from a text file."),
+        icons.open, this, ID_FILE_LOAD_ORDERS))->addHotKey(FXHotKey(MKUINT(KEY_O, CONTROLMASK|SHIFTMASK)));
+    (new FXMenuCommand(
         filemenu,
-        FXString(L"Befehle &speichern\tCtrl-S\tBefehlsdatei speichern."),
-        icons.save, this, ID_FILE_SAVE_ORDERS);
-    new FXMenuCommand(
+        _("&Save orders\tCtrl+S\tSave orders to a text file."),
+        icons.save, this, ID_FILE_SAVE_ORDERS))->addHotKey(FXHotKey(MKUINT(KEY_S, CONTROLMASK)));
+    (new FXMenuCommand(
         filemenu,
-        FXString(L"Karte sp&eichern...\tCtrl-E\tDaten als Karten-Report speichern."),
-        icons.save, this, ID_FILE_SAVE_MAP);
+        FXString(L"Karte sp&eichern...\tCtrl+E\tDaten als Karten-Report speichern."),
+        icons.save, this, ID_FILE_SAVE_MAP))->addHotKey(FXHotKey(MKUINT(KEY_E, CONTROLMASK)));
 	new FXMenuCommand(
 		filemenu,
 		FXString(L"Sch&liessen\t\tDie aktuelle Datei schliessen."),
@@ -328,7 +328,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 	viewmenu = new FXMenuPane(this);
 	new FXMenuTitle(menubar,"&Ansicht",NULL,viewmenu);
 	menu.toolbar = new FXMenuCheck(viewmenu,"Tool&bar\tCtrl-T\tToolbar ein- bzw. ausblenden.", toolbar,ID_TOGGLESHOWN);
-	menu.maponly = new FXMenuCheck(viewmenu,"&Nur Karte anzeigen\tCtrl-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this,ID_VIEW_MAPONLY,0);
+	menu.maponly = new FXMenuCheck(viewmenu,"&Nur Karte anzeigen\tF2\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this,ID_VIEW_MAPONLY,0);
 	menu.messages = new FXMenuCheck(viewmenu,"&Meldungen\tCtrl-V\tRegionsmeldungen ein- bzw. ausblenden.", this,ID_VIEW_MESSAGES);
 	menu.calc = new FXMenuCheck(viewmenu,"&Taschenrechner\tCtrl-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
 	menu.minimap = new FXMenuCheck(viewmenu,FXString(L"\u00dcbersichts&karte\tCtrl-N\t\u00dcbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
@@ -337,10 +337,10 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 	menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tAlt-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
     menu.colorizeUnits = new FXMenuCheck(viewmenu, "Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
     new FXMenuSeparatorEx(viewmenu, "Karte");
-	menu.streets = new FXMenuCheck(viewmenu,"&Strassen zeigen\tAlt-S\tStrassen auf der Karte anzeigen.");
-	menu.visibility = new FXMenuCheck(viewmenu,FXString(L"&Sichtbarkeit zeigen\tAlt-V\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise)."));
-	menu.shiptravel = new FXMenuCheck(viewmenu,"&Durchschiffung\tAlt-T\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
-	menu.shadowRegions = new FXMenuCheck(viewmenu,"Regionen ab&dunkeln\tAlt-F\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.");
+	menu.streets = new FXMenuCheck(viewmenu,"&Strassen zeigen\tF3\tStrassen auf der Karte anzeigen.");
+	menu.visibility = new FXMenuCheck(viewmenu,FXString(L"&Sichtbarkeit zeigen\tF4\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise)."));
+	menu.shiptravel = new FXMenuCheck(viewmenu,"&Durchschiffung\tF5\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
+	menu.shadowRegions = new FXMenuCheck(viewmenu,"Regionen ab&dunkeln\tF6\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.");
 	menu.islands = new FXMenuCheck(viewmenu,"&Inselnamen zeigen\tAlt-I\tInselnamen auf der Karte zeigen.");
 	menu.minimap_islands = new FXMenuCheck(viewmenu,"&Inseln auf Minikarte\t\tInselnamen auf der Minikarte zeigen.");
 

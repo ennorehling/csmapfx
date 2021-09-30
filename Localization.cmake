@@ -5,7 +5,7 @@ FUNCTION(PROGRAM_LOCALIZATION)
     IF (GETTEXT_XGETTEXT_EXECUTABLE)
 	ADD_CUSTOM_COMMAND(
 	   OUTPUT po/${PACKAGE_NAME}.pot.dummy
-	   COMMAND ${GETTEXT_XGETTEXT_EXECUTABLE} --force-po --package-name=${PACKAGE_NAME} --package-version="${PACKAGE_VERSION}" --output=po/${PACKAGE_NAME}.pot  --keyword=_ --width=80 --files-from=${CMAKE_CURRENT_SOURCE_DIR}/po/POTFILES.in
+	   COMMAND ${GETTEXT_XGETTEXT_EXECUTABLE} --force-po --package-name=${PACKAGE_NAME} --package-version="${PACKAGE_VERSION}" --output=po/${PACKAGE_NAME}.pot --keyword=_ --width=80 --files-from=${CMAKE_CURRENT_SOURCE_DIR}/po/POTFILES.in
 	   DEPENDS po/POTFILES.in po/${PACKAGE_NAME}.pot
 	   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 	   COMMENT "${I18N_NAME}-pot-update [${PACKAGE_NAME}]: Generated pot file."
