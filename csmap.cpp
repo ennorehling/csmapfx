@@ -280,19 +280,19 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
         icons.merge, this, ID_FILE_MERGE))->addHotKey(FXHotKey(MKUINT(KEY_M, CONTROLMASK)));
     (new FXMenuCommand(
         filemenu,
-        _("&Load orders...\tCtrl+Shift+O\tLoad orders from a text file."),
-        icons.open, this, ID_FILE_LOAD_ORDERS))->addHotKey(FXHotKey(MKUINT(KEY_O, CONTROLMASK|SHIFTMASK)));
+        _("&Load orders...\tCtrl+L\tLoad orders from a text file."),
+        icons.open, this, ID_FILE_LOAD_ORDERS))->addHotKey(FXHotKey(MKUINT(KEY_L, CONTROLMASK)));
     (new FXMenuCommand(
         filemenu,
         _("&Save orders\tCtrl+S\tSave orders to a text file."),
         icons.save, this, ID_FILE_SAVE_ORDERS))->addHotKey(FXHotKey(MKUINT(KEY_S, CONTROLMASK)));
     (new FXMenuCommand(
         filemenu,
-        FXString(L"Karte sp&eichern...\tCtrl+E\tDaten als Karten-Report speichern."),
+        _("&Export Map...\tCtrl+E\tSave map data as a new report."),
         icons.save, this, ID_FILE_SAVE_MAP))->addHotKey(FXHotKey(MKUINT(KEY_E, CONTROLMASK)));
 	new FXMenuCommand(
 		filemenu,
-		FXString(L"Sch&liessen\t\tDie aktuelle Datei schliessen."),
+		FXString("Sch&liessen\t\tDie aktuelle Datei schliessen."),
         icons.close, this, ID_FILE_CLOSE);
 
 	new FXMenuSeparatorEx(filemenu);
