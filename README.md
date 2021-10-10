@@ -1,31 +1,35 @@
-Wenn er sich das denn antun will :wink:
-er braucht das Fox Toolkit und Ruby.
-die Versionen weiss ich nicht, aber ich nehme an, dass es sowas wie Ruby 1.9 war.
-Xolgrimheute um 20:14 Uhr
-thx
-Einschränkungen/Vorgaben
-oder kann das veröffentlicht werden?
-Phygonheute um 20:15 Uhr
-erstmal nur an Enno
+## Kurze Geschichte
 
-2020-03-29 Enno:
-Habe ein Release build mit VS2013 gemacht mit Ruby 1.9.1, 
-Fox 1.6.57 und boost 1.66
+Dieser Source wurde mir Anfang 2020 übergeben mit den Worten:
+	Wenn er sich das denn antun will :wink:
+	er braucht das Fox Toolkit und Ruby.
+	die Versionen weiss ich nicht, aber ich nehme an, dass es sowas wie Ruby 1.9 war.
 
-Der gemeinste Trick war, dass der Code für boost::signals im source
-tree mit drin ist, und nicht gelinkt werden darf.
+Die Abhängigkeit von Ruby habe ich ersetzt durch Javascript (via TinyJS), 
+es wurde praktisch nur für den Mini-Rechner benutzt.
 
-Fox habe ich aus Sourcen kompiliert, mit dem selben Compiler und gleicher CRT (Multihreaded).
+Die Abhängigkeit von Boost habe ich ersetzt, indem ich die signals entfernt, 
+und smart pointer durch die von C++ ersetzt habe.
 
-Kein Debug Build bisher (runtime libraries sind Dreck).
+Ursprünglich wurde eine libpng 1.2 benutzt, die aber schon lange nicht mehr
+aktuell ist, ich habe daher den Code auf 1.6 umgeschrieben.
 
-Kein libpng, es wird 1.2 benötigt, und ich habe keine binaries dafür gefunden.
+Die Unterstützung für bzip Reporte habe ich entfernt, weil ich kein libbz2 zur
+Hand hatte, und das ohnehin ein kaum genutztes Feature ist.
 
-Kein Support für bzip reporte, weil ich kein libbz2 zur Hand hatte. Suchen im Source 
-nach HAVE_BZ2LIB_H um das zu reaktiveieren.
+Danach habe ich CMake für den Linux Build konfiguriert, unter Linux gibt es
+fertige Pakete für fox-1.6.
 
-Mein ruby ist aus der Zeit vom Wechsel zwischen 1.9.1 nach 1.9.2, da
-fehlten ein paar Symbole, deshalb mit TODO_RUBY einzelne Teile entfernt.
+Unter Windows ist es komplizierter, da funktioniert die Kombination aus CMake 
+und vcpkg nicht, weil vcpkg (noch) kein Paket für Fox hat, und es entsprechend
+kein find_package(fox) gibt. Daher hat das CMake File eine WIN32 Sektion, die
+auf Grund der Environment-Variablen FOX_ROOT nach dem lib und include 
+Verzeichnis sucht.
 
-Weil mein ruby nicht fuer diesen Compiler war, war das config.h unpassend,
-und ich habe mir ein eigenes von Hadn gemacht und ins Projekt getan.
+Da auch das nicht immer klappt, gibt es noch ein CSMapFX.sln Projekt, mit dem
+VS2019 ein .EXE bauen kann.
+
+Ich habe vorübergehend ein Visual Studio Projekt aufgesetzt, Fox habe ich aus
+den Sourcen selber kompiliert, mit dem selben Compiler und gleicher CRT 
+(Multihreaded), und verweise direkt auf das Verzeichnis, in das ich es lokal
+installiert habe. Das sollte bei Gelegenheit besser gemacht werden.

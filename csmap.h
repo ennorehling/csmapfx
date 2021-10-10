@@ -196,7 +196,8 @@ public:
 	};
 
 private: 
-    bool fileExists(const char *filename);
+    int unlink(const char *pathname);
+
 	// Menubar
 	FXMenuBar		*menubar;
 	FXMenuPane		*filemenu, *recentmenu, *viewmenu, *regionmenu, *factionmenu;

@@ -1,8 +1,8 @@
-#include <climits>
+#define _CRT_SECURE_NO_WARNINGS
+
 #ifdef WIN32
 #include <windows.h>
 #include <shlobj_core.h>
-#include <shlwapi.h>
 #elif defined (HAVE_UNISTD_H)
 #include <unistd.h>
 #include <sys/stat.h>
@@ -29,6 +29,7 @@
 #include <stdexcept>
 #include <fstream>
 #include <string>
+#include <climits>
 #include <cstdio>
 #include <cstring>
 #include <curl/curl.h>
@@ -642,7 +643,7 @@ void CSMap::create()
             FXString exefile;
             path.append("\\Eressea\\Echeck");
             exefile = path + "\\echeckw.exe";
-            if (PathFileExists(exefile.text())) {
+            if (FXStat::exists(exefile)) {
                 settings.echeck_dir = path;
             }
         }
@@ -1045,17 +1046,12 @@ bool CSMap::mergeFile(FXString filename)
 	return true;
 }
 
-bool CSMap::fileExists(const char *filename) {
-    struct stat buf;
-    return (stat(filename, &buf) == 0);
-}
-
 bool CSMap::saveFile(FXString filename, bool merge_commands /*= false*/)
 {
 	if (filename.empty() || !report)
 		return false;
 
-	if (fileExists(filename.text())) {
+	if (FXStat::exists(filename)) {
 		FXString text;
 		text = filename + FXString(L" existiert bereits.\n\nM\u00f6chten Sie sie ersetzen?");
 
@@ -2171,6 +2167,14 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
 	return 1;
 }
 
+int CSMap::unlink(const char *pathname) {
+#ifdef WIN32
+    return _unlink(pathname);
+#else
+    return ::unlink(pathname);
+#endif
+}
+
 long CSMap::onFileSaveMap(FXObject*, FXSelector, void*)
 {
 	FXFileDialog dlg(this, "Speichern unter...", DLGEX_SAVE);
@@ -2262,7 +2266,7 @@ long CSMap::onFileSaveCommands(FXObject*, FXSelector, void* ptr)
             FXString patterns(L"Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nM\u00f6gliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)");
             filename = askFileName("Befehle speichern unter...", patterns);
             if (filename.empty()) return 0;
-            if (fileExists(filename.text())) {
+            if (FXStat::exists(filename)) {
                 FXString text;
                 text = "Die Datei " + filename + FXString(L" existiert bereits.\n\nM\u00f6chten Sie sie ersetzen?");
                 FXuint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
@@ -2434,7 +2438,7 @@ void CSMap::saveCommandsDlg(bool stripped, bool replace)
             FXString(L"Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nM\u00f6gliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
 	}
     if (!filename.empty()) {
-        if (!replace && fileExists(filename.text())) {
+        if (!replace && FXStat::exists(filename)) {
             FXString text;
             text = "Die Datei " + filename + FXString(L" existiert bereits.\n\nM\u00f6chten Sie sie ersetzen?");
 
