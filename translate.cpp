@@ -1,4 +1,7 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "translate.h"
+#include "fxhelper.h"
 #ifdef HAVE_INTL
 #include "whereami.c"
 #endif
@@ -11,17 +14,11 @@
 #include <cstdio>
 #include <cstring>
 
-static bool fileexists(const char *path) {
-  FXStat stats;
-  FXString name(path);
-  return FXStat::stat(name, stats);
-}
-
 void init_intl(void) {
 #ifdef HAVE_INTL
     const char *reldir = "locale";
 
-    if (fileexists(reldir)) {
+    if (FXStat::exists(reldir)) {
         bindtextdomain("csmapfx", reldir);
     }
     else {
@@ -40,7 +37,7 @@ void init_intl(void) {
                 pos = strrchr(path, PATH_SEP);
                 if (pos) {
                     strcpy(pos + 1, reldir);
-                    if (!fileexists(path)) {
+                    if (!FXStat::isDirectory(path)) {
                         free(path);
                         path = NULL;
                     }
