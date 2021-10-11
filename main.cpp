@@ -89,8 +89,6 @@ int main(int argc, char *argv[])
 	CSApp.init(argc, argv); 
 	CSApp.create();
 
-	CSApp.setTranslator(new GermanTranslation(&CSApp));
-
 	// hide programm file name
 	argv++; argc--;
 
