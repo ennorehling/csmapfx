@@ -1,3 +1,9 @@
+csmapfx (0.8.2-1) stable; urgency=low
+
+  * remove non-functional translation support.
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 11 Oct 2021 20:40:00 +0200
+
 csmapfx (0.8.1-4) stable; urgency=low
 
   * fix bullseye libc6 dependencies.
