@@ -37,7 +37,6 @@ set (SOURCES
 	statsinfos.cpp
 	symbols.cpp
 	tradeinfos.cpp
-	translator.cpp
 	unitlist.cpp
 	tinyjs/TinyJS.cpp
 	tinyjs/TinyJS_Functions.cpp
