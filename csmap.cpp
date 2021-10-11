@@ -1112,9 +1112,9 @@ bool CSMap::saveCommands(const FXString &filename, bool stripped)
         return false;
 	}
     last_save_time = 0;
-    // TODO: why? the map has not changed?
-//	mapChange();
-	return true;
+    report->modifiedCmds(false);
+    updateFileNames();
+    return true;
 }
 
 extern FXbool csmap_savePNG(FXStream& store, FXCSMap& map, FXImage& image, FXProgressDialog& win);
@@ -1556,6 +1556,67 @@ long CSMap::onUpdMapSetModus(FXObject* sender, FXSelector, void* ptr)
 	return 1;
 }
 
+void CSMap::updateFileNames() {
+    // change window title and status bar
+    FXString titlestr;
+
+    // get report file name
+    FXString filenames = FXPath::name(report->filename());
+
+    // append command file name, if any
+    if (!report->cmdfilename().empty())
+    {
+        filenames += ", ";
+        filenames += FXPath::name(report->cmdfilename());
+
+        // mark modified command file with an asterisk
+        if (report->modifiedCmds())
+            filenames += "*";
+    }
+    else if (report->modifiedCmds())
+        filenames += ", *";
+
+    // put the filenames in the title
+    titlestr += " - [" + filenames + "]";
+
+    // update filename in statusbar
+    status_file->setText(filenames);
+    status_file->show(), status_lfile->show();
+
+    if (selection.selected & selection.MULTIPLE_REGIONS)
+    {
+        titlestr.append(FXString().format(" - [%zu Regionen markiert]", selection.regionsSelected.size()));
+    }
+
+
+    if (selection.selected & (selection.REGION | selection.UNKNOWN_REGION))
+    {
+        FXString label, name, terrain = "Unbekannt";
+
+        if (selection.selected & selection.REGION)
+        {
+            const datablock &region = *selection.region;
+
+            name = region.value(datakey::TYPE_NAME);
+            terrain = region.terrainString();
+        }
+
+        if (name.empty())
+            label.format(" - %s (%d,%d)", terrain.text(), selection.sel_x, selection.sel_y);
+        else
+            label.format(" - %s von %s (%d,%d)", terrain.text(), name.text(), selection.sel_x, selection.sel_y);
+
+        titlestr.append(label);
+    }
+
+    if (titlestr.empty())
+        titlestr = CSMAP_APP_TITLE_VERSION;
+    else
+        titlestr = CSMAP_APP_TITLE + titlestr;
+
+    handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &titlestr);
+}
+
 long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 {
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
@@ -1825,32 +1886,8 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 		selection.sel_plane = selection.region->info();
 	}
 
-	// change window title and status bar
-	FXString titlestr;
-
     if (report) {
-		// get report file name
-		FXString filenames = FXPath::name(report->filename());
-
-		// append command file name, if any
-		if (!report->cmdfilename().empty())
-		{
-			filenames += ", ";
-			filenames += FXPath::name(report->cmdfilename());
-
-			// mark modified command file with an asterisk
-			if (report->modifiedCmds())
-				filenames += "*";
-		}
-		else if (report->modifiedCmds())
-			filenames += ", *";
-
-		// put the filenames in the title
-		titlestr += " - [" + filenames + "]";
-
-		// update filename in statusbar
-		status_file->setText(filenames);
-		status_file->show(), status_lfile->show();
+        updateFileNames();
 	}
 	else
 	{
@@ -1877,39 +1914,6 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 		status_turn->hide(), status_lturn->hide();
 		status->recalc();
 	}
-
-	if (selection.selected & selection.MULTIPLE_REGIONS)
-	{
-		titlestr.append(FXString().format(" - [%zu Regionen markiert]", selection.regionsSelected.size()));
-	}
-
-
-	if (selection.selected & (selection.REGION|selection.UNKNOWN_REGION))
-	{
-		FXString label, name, terrain = "Unbekannt";
-
-		if (selection.selected & selection.REGION)
-		{
-			const datablock& region = *selection.region;
-
-			name = region.value(datakey::TYPE_NAME);
-			terrain = region.terrainString();
-		}
-
-		if (name.empty())
-			label.format(" - %s (%d,%d)", terrain.text(), selection.sel_x,selection.sel_y);
-		else
-			label.format(" - %s von %s (%d,%d)", terrain.text(), name.text(), selection.sel_x,selection.sel_y);
-
-		titlestr.append(label);
-	}
-
-	if (titlestr.empty())
-		titlestr = CSMAP_APP_TITLE_VERSION;
-	else
-		titlestr = CSMAP_APP_TITLE + titlestr;
-
-	handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &titlestr);
 
 	return 1;
 }

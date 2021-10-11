@@ -1,6 +1,7 @@
 csmapfx (0.8.2-1) stable; urgency=low
 
   * remove non-functional translation support.
+  * reset the file modification indicator after saving.
 
  -- Enno Rehling <enno@eressea.de>  Mon, 11 Oct 2021 20:40:00 +0200
 

@@ -51,6 +51,7 @@ public:
     bool updateCommands(const FXString &filename);
     bool saveCommands(const FXString &filename, bool stripped);
 	bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
+    void updateFileNames();
 
 public:		// this functions are slots for menu commands
 	long onFileOpen(FXObject*, FXSelector, void*);
