@@ -69,6 +69,12 @@ FXDEFMAP(CSMap) MessageMap[]=
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_VIEW_MESSAGES,        CSMap::onViewMessages),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_VIEW_MESSAGES,        CSMap::updViewMessages),
 
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_VIEW_PROPERTIES,      CSMap::onViewRightFrame),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_VIEW_PROPERTIES,      CSMap::updViewRightFrame),
+
+	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_VIEW_REGIONLIST,      CSMap::onViewLeftFrame),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_VIEW_REGIONLIST,      CSMap::updViewLeftFrame),
+
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_VIEW_MINIMAP,         CSMap::onViewMiniMap),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_VIEW_MINIMAP,         CSMap::updViewMiniMap),
 
@@ -328,7 +334,9 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 	new FXMenuTitle(menubar,"&Ansicht",NULL,viewmenu);
 	menu.toolbar = new FXMenuCheck(viewmenu,"Tool&bar\tCtrl-T\tToolbar ein- bzw. ausblenden.", toolbar,ID_TOGGLESHOWN);
 	menu.maponly = new FXMenuCheck(viewmenu,"&Nur Karte anzeigen\tCtrl-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this,ID_VIEW_MAPONLY,0);
-	menu.messages = new FXMenuCheck(viewmenu,"&Meldungen\tCtrl-V\tRegionsmeldungen ein- bzw. ausblenden.", this,ID_VIEW_MESSAGES);
+	menu.messages = new FXMenuCheck(viewmenu,"&Meldungen\t\tRegionsmeldungen ein- bzw. ausblenden.", this, ID_VIEW_MESSAGES);
+	menu.show_left = new FXMenuCheck(viewmenu,"&Regionsliste\t\tRegionsliste ein- bzw. ausblenden.", this, ID_VIEW_REGIONLIST);
+	menu.show_right = new FXMenuCheck(viewmenu,"&Eigenschaften\t\tEinheiten- und Regionsdetails ein- bzw. ausblenden.", this, ID_VIEW_PROPERTIES);
 	menu.calc = new FXMenuCheck(viewmenu,"&Taschenrechner\tCtrl-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
 	menu.minimap = new FXMenuCheck(viewmenu,FXString(L"\u00dcbersichts&karte\tCtrl-N\t\u00dcbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
 	menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tCtrl-B\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
@@ -689,44 +697,40 @@ void CSMap::create()
 	statistics->loadState(reg);
 
 	// reload menu options
-	FXint show_toolbar = reg.readUnsignedEntry("SHOW", "TOOLBAR", 1);
-	if (!show_toolbar)
+	if (!reg.readUnsignedEntry("SHOW", "TOOLBAR", 1))
 		toolbar->handle(this, FXSEL(SEL_COMMAND, FXToolBar::ID_TOGGLESHOWN), NULL);
 
-	FXint show_msg = reg.readUnsignedEntry("SHOW", "MESSAGES", 1);
-	if (!show_msg)
+	if (!reg.readUnsignedEntry("SHOW", "MESSAGES", 1))
 		handle(this, FXSEL(SEL_COMMAND, ID_VIEW_MESSAGES), NULL);
 
-	FXint show_calc = reg.readUnsignedEntry("SHOW", "CALCULATOR", 1);
-	if (!show_calc)
+	if (!reg.readUnsignedEntry("SHOW", "PROPERTIES", 1))
+		handle(this, FXSEL(SEL_COMMAND, ID_VIEW_PROPERTIES), NULL);
+
+	if (!reg.readUnsignedEntry("SHOW", "REGIONLIST", 1))
+		handle(this, FXSEL(SEL_COMMAND, ID_VIEW_REGIONLIST), NULL);
+
+	if (!reg.readUnsignedEntry("SHOW", "CALCULATOR", 1))
 		mathbar->handle(this, FXSEL(SEL_COMMAND, FXCalculator::ID_TOGGLESHOWN), NULL);
 
-	FXint show_streets = reg.readUnsignedEntry("SHOW", "STREETS", 1);
-	if (show_streets)
+	if (reg.readUnsignedEntry("SHOW", "STREETS", 1))
 		map->handle(this, FXSEL(SEL_COMMAND, FXCSMap::ID_TOGGLESTREETS), NULL);
 
-	FXint show_visibility = reg.readUnsignedEntry("SHOW", "VISIBILITYSYMBOL", 1);
-	if (show_visibility)
+	if (reg.readUnsignedEntry("SHOW", "VISIBILITYSYMBOL", 1))
 		map->handle(this, FXSEL(SEL_COMMAND, FXCSMap::ID_TOGGLEVISIBILITYSYMBOL), NULL);
 
-	FXint show_shiptravel = reg.readUnsignedEntry("SHOW", "SHIPTRAVEL", 1);
-	if (show_shiptravel)
+	if (reg.readUnsignedEntry("SHOW", "SHIPTRAVEL", 1))
 		map->handle(this, FXSEL(SEL_COMMAND, FXCSMap::ID_TOGGLESHIPTRAVEL), NULL);
 
-	FXint show_shadowRegions = reg.readUnsignedEntry("SHOW", "SHADOWREGIONS", 1);
-	if (show_shadowRegions)
+	if (reg.readUnsignedEntry("SHOW", "SHADOWREGIONS", 1))
 		map->handle(this, FXSEL(SEL_COMMAND, FXCSMap::ID_TOGGLESHADOWREGIONS), NULL);
 
-	FXint show_regdescription = reg.readUnsignedEntry("SHOW", "REGDESCRIPTION", 1);
-	if (show_regdescription)
+	if (reg.readUnsignedEntry("SHOW", "REGDESCRIPTION", 1))
 		regioninfos->handle(this, FXSEL(SEL_COMMAND, FXRegionInfos::ID_TOGGLEDESCRIPTION), NULL);
 
-	FXint show_ownFactionGroup = reg.readUnsignedEntry("SHOW", "OWNFACTIONGROUP", 1);
-	if (show_ownFactionGroup)
+	if (reg.readUnsignedEntry("SHOW", "OWNFACTIONGROUP", 1))
 		regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLEOWNFACTIONGROUP), NULL);
 
-    FXint colorize_units = reg.readUnsignedEntry("SHOW", "COLORIZEUNITS", 1);
-    if (colorize_units)
+    if (reg.readUnsignedEntry("SHOW", "COLORIZEUNITS", 1))
         regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLEUNITCOLORS), NULL);
 
     FXint coll_regioninfos = reg.readUnsignedEntry("TABS", "REGIONINFOS", 0);
@@ -802,6 +806,8 @@ void CSMap::create()
 	// save menu options state
     reg.writeUnsignedEntry("SHOW", "TOOLBAR", menu.toolbar->getCheck());
     reg.writeUnsignedEntry("SHOW", "MESSAGES", menu.messages->getCheck());
+    reg.writeUnsignedEntry("SHOW", "PROPERTIES", menu.show_right->getCheck());
+    reg.writeUnsignedEntry("SHOW", "REGIONLIST", menu.show_left->getCheck());
     reg.writeUnsignedEntry("SHOW", "CALCULATOR", menu.calc->getCheck());
     reg.writeUnsignedEntry("SHOW", "STREETS", menu.streets->getCheck());
     reg.writeUnsignedEntry("SHOW", "VISIBILITYSYMBOL", menu.visibility->getCheck());
@@ -1232,6 +1238,48 @@ long CSMap::onViewMessages(FXObject*, FXSelector, void*)
 long CSMap::updViewMessages(FXObject* sender, FXSelector, void*)
 {
 	sender->handle(this, FXSEL(SEL_COMMAND, messages->shown()?ID_CHECK:ID_UNCHECK), NULL);
+	return 1;
+}
+
+long CSMap::onViewRightFrame(FXObject*, FXSelector, void*)
+{
+	if (rightframe->shown())
+	{
+        rightframe->hide();
+	}
+	else
+	{
+        rightframe->show();
+	}
+    map->recalc();
+
+	return 1;
+}
+
+long CSMap::updViewRightFrame(FXObject* sender, FXSelector, void*)
+{
+	sender->handle(this, FXSEL(SEL_COMMAND, rightframe->shown()?ID_CHECK:ID_UNCHECK), NULL);
+	return 1;
+}
+
+long CSMap::onViewLeftFrame(FXObject*, FXSelector, void*)
+{
+	if (leftframe->shown())
+	{
+        leftframe->hide();
+	}
+	else
+	{
+        leftframe->show();
+	}
+    map->recalc();
+
+	return 1;
+}
+
+long CSMap::updViewLeftFrame(FXObject* sender, FXSelector, void*)
+{
+	sender->handle(this, FXSEL(SEL_COMMAND, leftframe->shown()?ID_CHECK:ID_UNCHECK), NULL);
 	return 1;
 }
 
@@ -1813,27 +1861,6 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 		{
 			if (menu.faction->isEnabled())
 				menu.faction->disable();
-		}
-
-		// automatic map-mode switch on NEWFILE flag
-		if (report && (state->map & selection.NEWFILE)) {
-			if (selection.map & selection.ACTIVEFACTION)
-			{
-				// faction report: show regionlist/info
-				leftframe->show();
-				if (messages->shown())
-					msgBorder->show();
-				rightframe->show();
-				map->recalc();
-			}
-			else
-			{
-				// map only report: hide regionlist/info
-				leftframe->hide();
-				msgBorder->hide();
-				rightframe->hide();
-				map->recalc();
-			}
 		}
 	}
 

@@ -60,7 +60,7 @@ public:
 
 	// parses str and create datakey object
 	static int parseType(const FXString& type);
-	bool parse(FXchar* str);
+	bool parse(char* str);
 
 	typedef std::vector<datakey/*, boost::pool_allocator<datakey>*/ > list_type;
 	typedef list_type::iterator itor;
@@ -189,9 +189,9 @@ public:
 	
 	const FXString terrainString() const;
 
-	const FXString value(const FXchar* key) const;
+	const FXString value(const char* key) const;
 	const FXString value(int key) const;
-	int valueInt(const FXchar* key, int def = 0) const;
+	int valueInt(const char* key, int def = 0) const;
 	int valueInt(int key, int def = 0) const;
 	const datakey* valueKey(int key) const;
 
@@ -291,7 +291,7 @@ public:
 	static int parseTerrain(const FXString& str);			// Plains, Mountains, ... Volcano
 	static int parseSpecialTerrain(const FXString& str);	// Active volcano, ... (terrain that uses image of another terrain)
 	static FXString planeName(int plane);					// Eressea,Astralraum,Weihnachtsinsel...
-	bool parse(FXchar* str);
+	bool parse(char* str);
 
 	typedef std::list<datablock/*, boost::fast_pool_allocator<datablock>*/ > list_type;
 	typedef list_type::iterator itor;
@@ -308,7 +308,7 @@ protected:
 	struct blocknames
 	{
 		int id;
-		const FXchar *name;
+		const char *name;
 	};
 	static blocknames BLOCKNAMES[];
 };
@@ -331,8 +331,8 @@ public:
 	int recruitment() const { return m_recruitment; }
 	datablock::itor activefaction() { return m_activefaction; }
 
-	int load(const FXchar* filename);
-	int save(const FXchar* filename, bool map_filter);
+	int load(const char* filename);
+	int save(const char* filename, bool map_filter);
 	void createHierarchy();
 	void createHashTables();
 

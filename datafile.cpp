@@ -148,7 +148,7 @@ int datakey::getInt() const
 }
 
 // parses str and returns created datakey object or NULL pointer
-bool datakey::parse(FXchar* str)
+bool datakey::parse(char* str)
 {
 	if (!str)
 		return false;
@@ -428,7 +428,7 @@ const FXString datablock::terrainString() const
 }
 
 // parses str and returns created datablock object or NULL pointer
-bool datablock::parse(FXchar* str)
+bool datablock::parse(char* str)
 {
 	if (!str)
 		return false;
@@ -510,8 +510,8 @@ const FXString datablock::string() const
 // return info() as base36
 FXString datablock::id() const
 {
-	FXchar buf[35], b36[] = "0123456789abcdefghijkLmnopqrstuvwxyz";
-	FXchar *p=buf+34;
+	char buf[35], b36[] = "0123456789abcdefghijkLmnopqrstuvwxyz";
+	char *p=buf+34;
 	int nn=(int)info();
 	bool negativ = false;
 	if (nn < 0)
@@ -584,7 +584,7 @@ void datablock::attachment(::attachment* attach)
 	m_attachment = attach;
 }
 
-const FXString datablock::value(const FXchar* key) const
+const FXString datablock::value(const char* key) const
 {
 	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
 		if (srch->key() == key)
@@ -602,7 +602,7 @@ const FXString datablock::value(int key) const
 	return "";
 }
 
-int datablock::valueInt(const FXchar* key, int def /* = 0 */) const
+int datablock::valueInt(const char* key, int def /* = 0 */) const
 {
 	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
 		if (srch->key() == key)
@@ -655,10 +655,10 @@ static inline char* getNextLine(char* str)
 	return next;
 }
 
-const FXchar* UTF8BOM = "\xEF\xBB\xBF";
+const char* UTF8BOM = "\xEF\xBB\xBF";
 
 // loads file, parses it and returns number of block
-int datafile::load(const FXchar* filename)
+int datafile::load(const char* filename)
 {
 	this->filename(filename);
 
@@ -695,7 +695,7 @@ int datafile::load(const FXchar* filename)
 	m_blocks.clear();
 	datablock *block = NULL, newblock;
 	datakey key;
-	FXchar *ptr, *next = &data[0];
+	char *ptr, *next = &data[0];
 
 	// check for utf8 BOM: EF BB BF
 	if (!strncmp(next, UTF8BOM, strlen(UTF8BOM))) {
@@ -745,7 +745,7 @@ int datafile::load(const FXchar* filename)
 }
 
 // saves file
-int datafile::save(const FXchar* filename, bool map_filter)
+int datafile::save(const char* filename, bool map_filter)
 {
 	if (!filename)
 		return 0;
@@ -820,7 +820,7 @@ int datafile::save(const FXchar* filename, bool map_filter)
 
 				for (int i = 0; i < name.length(); i++)
 				{
-					FXchar c = name[i];
+					char c = name[i];
 
 					if (c == '\\' || c == '\"')
 						file << '\\';
@@ -884,7 +884,7 @@ int datafile::save(const FXchar* filename, bool map_filter)
 					*/
 					for (int i = 0; i < value.length(); i++)
 					{
-						FXchar c = value[i];
+						char c = value[i];
 
 						if (c == '\\' || c == '\"')
 							file << '\\';
@@ -948,7 +948,7 @@ int datafile::save(const FXchar* filename, bool map_filter)
 				*/
 				for (int i = 0; i < value.length(); i++)
 				{
-					FXchar c = value[i];
+					char c = value[i];
 
 					if (c == '\\' || c == '\"')
 						file << '\\';
@@ -1032,7 +1032,7 @@ int datafile::loadCmds(const FXString &filename)
 	file.close();
 
 	// read in the data
-	FXchar *ptr, *next = &data[0];
+	char *ptr, *next = &data[0];
 
 	// check for utf8 BOM: EF BB BF
 	if (!strncmp(next, UTF8BOM, strlen(UTF8BOM))) {

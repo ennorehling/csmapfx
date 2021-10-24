@@ -1,3 +1,10 @@
+csmapfx (0.8.3-1) stable; urgency=low
+
+  * do not auto-hide left and right frame for map reports.
+  * add menu options to hide/show UI elements.
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 24 Oct 2021 20:25:00 +0200
+
 csmapfx (0.8.2-1) stable; urgency=low
 
   * remove non-functional translation support.

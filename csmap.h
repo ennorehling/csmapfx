@@ -78,6 +78,12 @@ public:		// this functions are slots for menu commands
 	long onViewMessages(FXObject*, FXSelector, void* ptr);
 	long updViewMessages(FXObject*, FXSelector, void* ptr);
 
+	long onViewLeftFrame(FXObject*, FXSelector, void* ptr);
+	long updViewLeftFrame(FXObject*, FXSelector, void* ptr);
+
+	long onViewRightFrame(FXObject*, FXSelector, void* ptr);
+	long updViewRightFrame(FXObject*, FXSelector, void* ptr);
+
 	long onViewMiniMap(FXObject*, FXSelector, void* ptr);
 	long updViewMiniMap(FXObject*, FXSelector, void* ptr);
 
@@ -155,6 +161,8 @@ public:
 		// View menu
 		ID_VIEW_MAPONLY,
 		ID_VIEW_MESSAGES,
+        ID_VIEW_REGIONLIST,
+        ID_VIEW_PROPERTIES,
 		ID_VIEW_MINIMAP,
 		ID_VIEW_INFODLG,
 		ID_VIEW_SEARCHDLG,
@@ -270,6 +278,8 @@ private:
 		FXMenuCheck	*minimap;		// show minimap
 		FXMenuCheck	*infodlg;		// show info dialog
 		FXMenuCheck	*messages;		// show messages window
+		FXMenuCheck	*show_left;		// show left frame (regions)
+		FXMenuCheck	*show_right;	// show right frame (properties)
 		FXMenuCheck	*calc;			// show calculator
 		FXMenuCheck	*streets;		// show streets on the map
 		FXMenuCheck *visibility;	// show symbols for visibility of a region
