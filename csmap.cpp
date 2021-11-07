@@ -141,6 +141,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 	CSMap_instance = this;
 
     last_save_time = 0;
+    reload_mode = CSMap::RELOAD_ASK;
     app->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, NULL);
 	// create main window icon
 	FXIcon* ico = new FXICOIcon(app, data::csmap);
@@ -2016,15 +2017,21 @@ long CSMap::onSearchInfo(FXObject *, FXSelector, void *ptr)
 }
 
 bool CSMap::updateCommands(const FXString &filename) {
-    FXString ask = L"Eine andere Anwendung hat die Datei %s ge\u00e4ndert.\nNeu laden?";
-    if (report->modifiedCmds()) {
-        ask = L"Eine andere Anwendung hat die Datei %s ge\u00e4ndert.\nNeu laden und die in CSMap gemachten \u00c4nderungen verlieren?";
+    bool modified = report->modifiedCmds();
+    if (reload_mode == CSMap::RELOAD_ASK) {
+        FXString ask = modified ?
+            L"Eine andere Anwendung hat die Datei %s ge\u00e4ndert.\nNeu laden und die in CSMap gemachten \u00c4nderungen verlieren?" :
+            L"Eine andere Anwendung hat die Datei %s ge\u00e4ndert.\nNeu laden?";
+        FXuint res = FXMessageBox::question(this,
+            (FXuint)MBOX_YES_NO, CSMAP_APP_TITLE,
+            ask.text(),
+            filename.text());
+        if (res != MBOX_CLICKED_NO) {
+            return loadCommands(filename);
+        }
+        reload_mode = CSMap::RELOAD_NEVER;
     }
-    FXuint res = FXMessageBox::question(this,
-        (FXuint)MBOX_YES_NO, CSMAP_APP_TITLE,
-        ask.text(),
-        filename.text());
-    if (res != MBOX_CLICKED_NO) {
+    else if (reload_mode == CSMap::RELOAD_AUTO) {
         return loadCommands(filename);
     }
     return false;
@@ -2032,7 +2039,7 @@ bool CSMap::updateCommands(const FXString &filename) {
 
 long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
 {
-    if (report) {
+    if (report && reload_mode != CSMap::RELOAD_NEVER) {
         FXString filename = report->cmdfilename();
         if (!filename.empty()) {
             struct stat buf;
@@ -2050,7 +2057,9 @@ long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
             }
         }
     }
-    getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, NULL);
+    if (reload_mode != CSMap::RELOAD_NEVER) {
+        getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, NULL);
+    }
     return 0;
 }
 

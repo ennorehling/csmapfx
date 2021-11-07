@@ -8,10 +8,10 @@
 #define CSMAP_APP_TITLE      "Coast'n'Sea Mapper"
 
 	// current application version and subversion revision
-#define CSMAP_APP_VERSION    0, 8, 3
+#define CSMAP_APP_VERSION    0, 8, 4
 
 	// application version string
-#define CSMAP_APP_VERSIONSTR "v0.8.3"
+#define CSMAP_APP_VERSIONSTR "v0.8.4"
 
 	// application title with full version string
 #define CSMAP_APP_TITLE_VERSION CSMAP_APP_TITLE " " CSMAP_APP_VERSIONSTR
