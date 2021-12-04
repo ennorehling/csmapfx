@@ -181,7 +181,7 @@ void FXCSMap::calculateContentSize()
 	for (datablock::itor block = mapFile->blocks().begin(); block != mapFile->blocks().end(); block++)
 	{
 		// handle only regions
-		if (block->type() != datablock::TYPE_REGION)
+		if (block->type() != block_type::TYPE_REGION)
 			continue;
 
 		// handle only the actually visible plane
@@ -1061,7 +1061,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 
 			FXString label, name, terrainString = region->terrainString();
 
-			name = region->value(datakey::TYPE_NAME);
+			name = region->value(TYPE_NAME);
 			if (name.empty())
 				label.format("%s (%d,%d)", terrainString.text(), popup_x,popup_y);
 			else
@@ -1199,7 +1199,7 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 					// change island name
 					datakey::itor key;
 					for (key = region->data().begin(); key != region->data().end(); key++)
-						if (key->type() == datakey::TYPE_ISLAND)
+						if (key->type() == TYPE_ISLAND)
 						{
 							if (input.getText().empty())
 								region->data().erase(key);
@@ -1223,7 +1223,7 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 					{
 						region = *itor;
 						for (key = region->data().begin(); key != region->data().end(); key++)
-							if (key->type() == datakey::TYPE_ISLAND)
+							if (key->type() == TYPE_ISLAND)
 							{
 								region->data().erase(key);
 								break;
@@ -1251,14 +1251,14 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 				if (cmd == POPUP_SETISLAND)
 				{
 					FXInputDialog input(this, "Insel benennen", "Wie soll die Insel heissen?");
-					input.setText(region->value(datakey::TYPE_ISLAND));
+					input.setText(region->value(TYPE_ISLAND));
 
 					if (input.execute(PLACEMENT_SCREEN))
 					{
 						// change island name
 						datakey::itor key;
 						for (key = region->data().begin(); key != region->data().end(); key++)
-							if (key->type() == datakey::TYPE_ISLAND)
+							if (key->type() == TYPE_ISLAND)
 							{
 								if (input.getText().empty())
 									region->data().erase(key);
@@ -1288,14 +1288,14 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 				else if (cmd == POPUP_RENAME)
 				{
 					FXInputDialog input(this, "Region umbenennen", "Wie soll die Region heissen?");
-					input.setText(region->value(datakey::TYPE_NAME));
+					input.setText(region->value(TYPE_NAME));
 
 					if (input.execute(PLACEMENT_SCREEN))
 					{
 						// change name
 						datakey::itor key;
 						for (key = region->data().begin(); key != region->data().end(); key++)
-							if (key->type() == datakey::TYPE_NAME)
+							if (key->type() == TYPE_NAME)
 							{
 								if (input.getText().empty())
 									region->data().erase(key);
@@ -1346,7 +1346,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 
 			// delete ;terrain tags (they are for special terrain names)
 			for (datakey::itor key = region->data().begin(); key != region->data().end(); key++)
-				if (key->type() == datakey::TYPE_TERRAIN)
+				if (key->type() == TYPE_TERRAIN)
 				{
 					region->data().erase(key);
 					break;
@@ -1365,7 +1365,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 	{
 		for (iregion = mapFile->blocks().begin(); iregion != end; iregion++)
 		{
-			if (iregion->type() != datablock::TYPE_REGION)
+			if (iregion->type() != block_type::TYPE_REGION)
 				continue;
 
 			if (iregion->x() == x && iregion->y() == y && iregion->info() == plane)
@@ -1383,7 +1383,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 
 			// delete ;terrain tags (they are for special terrain names)
 			for (datakey::itor key = iregion->data().begin(); key != iregion->data().end(); key++)
-				if (key->type() == datakey::TYPE_TERRAIN)
+				if (key->type() == TYPE_TERRAIN)
 				{
                     iregion->data().erase(key);
 					break;
@@ -1398,7 +1398,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 			for (datablock::itor block = mapFile->blocks().begin(); block != mapFile->blocks().end(); block++)
 			{
 				// handle only regions
-				if (block->type() != datablock::TYPE_REGION)
+				if (block->type() != block_type::TYPE_REGION)
 					continue;
 
 				if (iregion != block)
@@ -1503,7 +1503,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
         {
             // handle only regions
             // handle only the actually visible plain
-            if (block.type() != datablock::TYPE_REGION ||
+            if (block.type() != block_type::TYPE_REGION ||
                 block.info() != visiblePlane)
                 continue;
 
@@ -1677,7 +1677,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
                 continue;
 
             if (show_names)
-                label = block.value(datakey::TYPE_NAME);
+                label = block.value(TYPE_NAME);
             else
                 label.clear();
 
@@ -1787,7 +1787,7 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, LeftTop offset)
 	{
 		// handle only regions
 		// handle only the actually visible plain
-		if (block.type() != datablock::TYPE_REGION ||
+		if (block.type() != block_type::TYPE_REGION ||
 			block.info() != visiblePlane)
 			continue;
 
@@ -1808,7 +1808,7 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, LeftTop offset)
 
         FXString label;
         if (show_names)
-			label = block.value(datakey::TYPE_NAME);
+			label = block.value(TYPE_NAME);
 		else
 			label.clear();
 
@@ -1866,7 +1866,7 @@ LeftTop FXCSMap::getMapLeftTop()
 	{
 		// handle only regions
 		// handle only the actually visible plain
-		if (block.type() != datablock::TYPE_REGION ||
+		if (block.type() != block_type::TYPE_REGION ||
 			block.info() != visiblePlane)
 			continue;
 
@@ -1896,7 +1896,7 @@ std::map<FXString, IslandPos> FXCSMap::collectIslandNames()
 	{
 		// handle only regions
 		// handle only the actually visible plain
-		if (block.type() != datablock::TYPE_REGION ||
+		if (block.type() != block_type::TYPE_REGION ||
 			block.info() != visiblePlane)
 			continue;
 
@@ -2082,11 +2082,11 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 			datablock::itor end = mapFile->blocks().end();
 			datablock::itor block = unit;
 			for (block++; block != end && block->depth() > unit->depth(); block++)
-				if (block->type() == datablock::TYPE_COMMANDS)
+				if (block->type() == block_type::TYPE_COMMANDS)
 					break;				// found
 
             // found commands block
-			if (block != end && block->type() == datablock::TYPE_COMMANDS)
+			if (block != end && block->type() == block_type::TYPE_COMMANDS)
 			{
 								// NW, NO, O, SO, SW, W
 				/*
@@ -2480,7 +2480,7 @@ long FXCSMap::onQueryHelp(FXObject* sender, FXSelector, void*)
 		FXString name, terrainString = (*block).terrainString();
 
 		// Terrain, Name, Koordinaten
-		name = (*block).value(datakey::TYPE_NAME);
+		name = (*block).value(TYPE_NAME);
 
 		if (name.empty())
 			help.format("%s (%d,%d)", terrainString.text(), x,y);

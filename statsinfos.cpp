@@ -208,7 +208,7 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
 
         for (; block != end && block->depth() > faction->depth(); block++)
         {
-            if (block->type() == datablock::TYPE_MESSAGE)
+            if (block->type() == block_type::TYPE_MESSAGE)
             {
                 int type = block->valueInt("type");
 

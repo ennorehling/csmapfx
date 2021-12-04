@@ -942,7 +942,7 @@ bool CSMap::loadFile(FXString filename)
 		return false;
 	}
 
-	if (report->blocks().front().type() != datablock::TYPE_VERSION)
+	if (report->blocks().front().type() != block_type::TYPE_VERSION)
 	{
         report = nullptr;
         recentFiles.removeFile(filename);
@@ -989,7 +989,7 @@ bool CSMap::mergeFile(FXString filename)
 		return false;
 	}
 
-	if (new_cr.blocks().front().type() != datablock::TYPE_VERSION)
+	if (new_cr.blocks().front().type() != block_type::TYPE_VERSION)
 	{
 		recentFiles.removeFile(filename);
 		FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei hat das falsche Format.");
@@ -1003,7 +1003,7 @@ bool CSMap::mergeFile(FXString filename)
 	for (datablock::itor block = new_cr.blocks().begin(); block != new_cr.blocks().end(); block++)
 	{
 		// handle only regions
-		if (block->type() == datablock::TYPE_REGION)
+		if (block->type() == block_type::TYPE_REGION)
 		{
 			FXint x = block->x();
 			FXint y = block->y();
@@ -1012,8 +1012,8 @@ bool CSMap::mergeFile(FXString filename)
 			datablock::itor oldr = report->region(x, y, plane);
 			if (oldr != report->blocks().end())			// add some info to old cr (island names)
 			{
-				if (const datakey* islandkey = block->valueKey(datakey::TYPE_ISLAND))
-					if (!oldr->valueKey(datakey::TYPE_ISLAND))
+				if (const datakey* islandkey = block->valueKey(TYPE_ISLAND))
+					if (!oldr->valueKey(TYPE_ISLAND))
 					{
 						if (!islandkey->isInt())		// add only Vorlage-style islands (easier)
 							oldr->data().push_back(*islandkey);
@@ -1027,11 +1027,11 @@ bool CSMap::mergeFile(FXString filename)
 				newblock.infostr(FXString().format("%d %d %d", x, y, plane));
 				newblock.terrain(block->terrain());
 
-				FXString name = block->value(datakey::TYPE_NAME);
-				FXString terrain = block->value(datakey::TYPE_TERRAIN);
-				FXString island = block->value(datakey::TYPE_ISLAND);
-				FXString turn = block->value(datakey::TYPE_TURN);
-				FXString id = block->value(datakey::TYPE_ID);
+				FXString name = block->value(TYPE_NAME);
+				FXString terrain = block->value(TYPE_TERRAIN);
+				FXString island = block->value(TYPE_ISLAND);
+				FXString turn = block->value(TYPE_TURN);
+				FXString id = block->value(TYPE_ID);
 
 				datakey key;
 
@@ -1079,7 +1079,7 @@ bool CSMap::saveFile(FXString filename, bool merge_commands /*= false*/)
 		FXuint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
         if (MBOX_CLICKED_YES != answ) return false;
 	}
-    FXint res = report->save(filename.text(), true);
+    FXint res = report->save(filename.text(), map_type::MAP_NORMAL);
     if (res <= 0) {
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
         return false;
@@ -1422,7 +1422,7 @@ long CSMap::onSetOrigin(FXObject*, FXSelector, void*)
 	{
 		datablock &region = *selection.region;
 
-		FXString rname = region.value(datakey::TYPE_NAME);
+		FXString rname = region.value(TYPE_NAME);
 		if (rname.empty())
 			rname = region.terrainString();
 	}
@@ -1442,7 +1442,7 @@ long CSMap::onSetOrigin(FXObject*, FXSelector, void*)
 	for (datablock::itor block = report->blocks().begin(); block != report->blocks().end(); block++)
 	{
 		// handle only regions
-		if (block->type() != datablock::TYPE_REGION)
+		if (block->type() != block_type::TYPE_REGION)
 			continue;
 
 		// handle only the actually selected plain
@@ -1660,7 +1660,7 @@ void CSMap::updateFileNames() {
         {
             const datablock &region = *selection.region;
 
-            name = region.value(datakey::TYPE_NAME);
+            name = region.value(TYPE_NAME);
             terrain = region.terrainString();
         }
 
@@ -1727,7 +1727,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 			for (datablock::itor block = report->blocks().begin(); block != end; block++)
 			{
 				// handle only regions
-				if (block->type() != datablock::TYPE_REGION)
+				if (block->type() != block_type::TYPE_REGION)
 					continue;
 
 				// insert plane into set
@@ -1775,12 +1775,12 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 				selection.activefaction = block;
 
 				// write faction statistics into faction menu
-				FXString name = block->value(datakey::TYPE_FACTIONNAME);
+				FXString name = block->value(TYPE_FACTIONNAME);
 				FXString id = block->id();
 
 				menu.name->setText(name + " (" + id + ")");
 
-				FXString race_type = block->value(datakey::TYPE_TYPE);
+				FXString race_type = block->value(TYPE_TYPE);
 				FXString prefix = block->value("typprefix");
 				if (prefix.length() && race_type.length())
 				{
@@ -1844,7 +1844,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 					delete menu.poolnoitems->getNext();
 
 				++block;
-				if (block->type() == datablock::TYPE_ITEMS)
+				if (block->type() == block_type::TYPE_ITEMS)
 				{
 					datakey::list_type itemlist = block->data();
 
@@ -1905,7 +1905,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 			datablock::itor block = selection.unit;
 			for (; block != end; block--)
 			{
-				if (block->type() == datablock::TYPE_REGION)
+				if (block->type() == block_type::TYPE_REGION)
 					break;
 			}
 
@@ -1941,7 +1941,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 	if (selection.map & selection.ACTIVEFACTION)
 	{
 		// update statusbar
-		FXString faction; faction.format("%s (%s)", selection.activefaction->value(datakey::TYPE_FACTIONNAME).text(),
+		FXString faction; faction.format("%s (%s)", selection.activefaction->value(TYPE_FACTIONNAME).text(),
 			selection.activefaction->id().text());
 
 		status_faction->setText(faction);
@@ -2589,7 +2589,7 @@ long CSMap::onRegionSelAll(FXObject*, FXSelector, void*)
 	for (datablock::itor block = report->blocks().begin(); block != end; block++)
 	{
 		// handle only regions
-		if (block->type() != datablock::TYPE_REGION)
+		if (block->type() != block_type::TYPE_REGION)
 			continue;
 
 		// mark only visible plane
@@ -2628,7 +2628,7 @@ long CSMap::onRegionInvertSel(FXObject*, FXSelector, void*)
 	for (datablock::itor block = report->blocks().begin(); block != end; block++)
 	{
 		// handle only regions
-		if (block->type() != datablock::TYPE_REGION)
+		if (block->type() != block_type::TYPE_REGION)
 			continue;
 
 		// mark only visible plane
@@ -2804,7 +2804,7 @@ long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
 	for (datablock::itor block = report->blocks().begin(); block != end; block++)
 	{
 		// handle only regions
-		if (block->type() != datablock::TYPE_REGION)
+		if (block->type() != block_type::TYPE_REGION)
 			continue;
 
 		// mark only visible plane

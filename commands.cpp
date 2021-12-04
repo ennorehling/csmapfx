@@ -118,16 +118,16 @@ long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
 
 	for (unit--; unit != end; unit--)
 	{
-		if (unit->type() != datablock::TYPE_UNIT)
+		if (unit->type() != block_type::TYPE_UNIT)
 			continue;
 
 		// search command block
 		datablock::itor block = unit;
 		for (block++; block != end && block->depth() > unit->depth(); block++)
-			if (block->type() == datablock::TYPE_COMMANDS)
+			if (block->type() == block_type::TYPE_COMMANDS)
 				break;				// found
 
-		if (block != end && block->type() == datablock::TYPE_COMMANDS)
+		if (block != end && block->type() == block_type::TYPE_COMMANDS)
 		{
 			bool unconfirmed = true;
 
@@ -178,16 +178,16 @@ long FXCommands::onNextUnit(FXObject *, FXSelector, void *)
 
 	for (unit++; unit != end; unit++)
 	{
-		if (unit->type() != datablock::TYPE_UNIT)
+		if (unit->type() != block_type::TYPE_UNIT)
 			continue;
 
 		// search command block
 		datablock::itor block = unit;
 		for (block++; block != end && block->depth() > unit->depth(); block++)
-			if (block->type() == datablock::TYPE_COMMANDS)
+			if (block->type() == block_type::TYPE_COMMANDS)
 				break;				// found
 
-		if (block != end && block->type() == datablock::TYPE_COMMANDS)
+		if (block != end && block->type() == block_type::TYPE_COMMANDS)
 		{
 			bool unconfirmed = true;
 
@@ -274,10 +274,10 @@ void FXCommands::setConfirmed(bool confirmed)
 		datablock::itor end = mapFile->blocks().end();
 		datablock::itor block = unit;
 		for (block++; block != end && block->depth() > unit->depth(); block++)
-			if (block->type() == datablock::TYPE_COMMANDS)
+			if (block->type() == block_type::TYPE_COMMANDS)
 				break;				// found
 
-		if (block != end && block->type() == datablock::TYPE_COMMANDS)
+		if (block != end && block->type() == block_type::TYPE_COMMANDS)
 		{
 			att_commands* cmds = dynamic_cast<att_commands*>(block->attachment());
 			if (cmds)
@@ -314,10 +314,10 @@ int FXCommands::getConfirmed()
 		datablock::itor end = mapFile->blocks().end();
 		datablock::itor block = unit;
 		for (block++; block != end && block->depth() > unit->depth(); block++)
-			if (block->type() == datablock::TYPE_COMMANDS)
+			if (block->type() == block_type::TYPE_COMMANDS)
 				break;				// found
 
-		if (block != end && block->type() == datablock::TYPE_COMMANDS)
+		if (block != end && block->type() == block_type::TYPE_COMMANDS)
 		{
 			if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
 				return cmds->confirmed;
@@ -365,10 +365,10 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 			datablock::itor end = mapFile->blocks().end();
 			datablock::itor block = unit;
 			for (block++; block != end && block->depth() > unit->depth(); block++)
-				if (block->type() == datablock::TYPE_COMMANDS)
+				if (block->type() == block_type::TYPE_COMMANDS)
 					break;				// found
 
-			if (block != end && block->type() == datablock::TYPE_COMMANDS)
+			if (block != end && block->type() == block_type::TYPE_COMMANDS)
 			{
 				att_commands* cmds = dynamic_cast<att_commands*>(block->attachment());
 				if (!cmds)
@@ -544,10 +544,10 @@ void FXCommands::saveCommands()
 		datablock::itor iend = mapFile->end();
 		datablock::itor iblock = selection.unit;
 		for (iblock++; iblock != iend && iblock->depth() > selection.unit->depth(); iblock++)
-			if (iblock->type() == datablock::TYPE_COMMANDS)
+			if (iblock->type() == block_type::TYPE_COMMANDS)
 				break;				// found
 
-		if (iblock == iend || iblock->type() != datablock::TYPE_COMMANDS)
+		if (iblock == iend || iblock->type() != block_type::TYPE_COMMANDS)
 			return;
 
 		if (att_commands* cmds = dynamic_cast<att_commands*>(iblock->attachment()))

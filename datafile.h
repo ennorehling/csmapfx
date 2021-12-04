@@ -10,6 +10,38 @@
 // ==================
 // === datakey class
 
+typedef enum key_type
+{
+    TYPE_UNKNOWN,
+    TYPE_EMPTY,
+    TYPE_NAME,
+    TYPE_DESCRIPTION,
+    TYPE_TERRAIN,
+    TYPE_ISLAND,
+    TYPE_ID,
+    TYPE_FACTION,
+    TYPE_FACTIONNAME,
+    TYPE_NUMBER,
+    TYPE_TYPE,
+    TYPE_SKILL,
+    TYPE_KONFIGURATION,
+    TYPE_VISIBILITY,
+    TYPE_TURN,
+    TYPE_SILVER,
+    TYPE_RECRUITMENTCOST,
+    TYPE_AURA,
+    TYPE_AURAMAX,
+    TYPE_OPTIONS,
+    TYPE_EMAIL,
+    TYPE_BANNER,
+    TYPE_LOCALE,
+    TYPE_ORDERS_CONFIRMED,		// ejcOrdersConfirmed, special tag
+    TYPE_LAST,
+
+    TYPE_MASK = (1 << 7) - 1,
+    TYPE_INTEGER = 1 << 7
+} key_type;
+
 class datakey
 {
 public:
@@ -25,38 +57,6 @@ public:
 
 	bool isInt() const { return (m_type & TYPE_INTEGER) != 0; }
 	int getInt() const;
-
-	enum
-	{
-		TYPE_UNKNOWN,
-		TYPE_EMPTY,
-		TYPE_NAME,
-		TYPE_DESCRIPTION,
-		TYPE_TERRAIN,
-		TYPE_ISLAND,
-		TYPE_ID,
-		TYPE_FACTION,
-		TYPE_FACTIONNAME,
-		TYPE_NUMBER,
-		TYPE_TYPE,
-		TYPE_SKILL,
-		TYPE_KONFIGURATION,
-		TYPE_VISIBILITY,
-		TYPE_TURN,
-		TYPE_SILVER,
-		TYPE_RECRUITMENTCOST,
-		TYPE_AURA,
-		TYPE_AURAMAX,
-		TYPE_OPTIONS,
-		TYPE_EMAIL,
-		TYPE_BANNER,
-		TYPE_LOCALE,
-		TYPE_ORDERS_CONFIRMED,		// ejcOrdersConfirmed, special tag
-		TYPE_LAST,
-
-		TYPE_MASK = (1 << 7) - 1,
-		TYPE_INTEGER = 1 << 7
-	};
 
 	// parses str and create datakey object
 	static int parseType(const FXString& type);
@@ -157,6 +157,45 @@ public:
 // ====================
 // === datablock class
 
+// types of datablocks
+typedef enum class block_type
+{
+    TYPE_UNKNOWN,
+    TYPE_VERSION,
+    TYPE_OPTIONS,
+    TYPE_FACTION,
+    TYPE_GROUP,
+    TYPE_ALLIANCE,
+    TYPE_REGION,
+    TYPE_ISLAND,
+    TYPE_SCHEMEN,
+    TYPE_RESOURCE,
+    TYPE_PRICES,
+    TYPE_DURCHREISE,
+    TYPE_DURCHSCHIFFUNG,
+    TYPE_BORDER,
+    TYPE_SHIP,
+    TYPE_BUILDING,
+    TYPE_UNIT,
+    TYPE_UNITMESSAGES,
+    TYPE_TALENTS,
+    TYPE_SPELLS,
+    TYPE_COMBATSPELL,
+    TYPE_ZAUBER,
+    TYPE_KOMPONENTEN,
+    TYPE_TRANK,
+    TYPE_ZUTATEN,
+    TYPE_ITEMS,
+    TYPE_COMMANDS,
+    TYPE_EFFECTS,
+    TYPE_MESSAGE,
+    TYPE_BATTLE,
+    TYPE_MESSAGETYPE,
+    TYPE_TRANSLATION,
+    TYPE_LAST
+} block_type;
+
+
 // contains information for "NAME Info"
 // like: MESSAGES 36535
 // string() is empty for all type()s, except for TYPE_UNKNOWN!
@@ -166,7 +205,7 @@ public:
 	datablock();
 	~datablock();
 
-	int type() const { return m_type; }
+    block_type type() const { return m_type; }
 	int info() const { return m_info; }	// identifier for UNIT, SCHIFF... plane for REGION
 	FXString id() const;					// identifier as base36
 	int x() const { return m_x; }
@@ -190,48 +229,10 @@ public:
 	const FXString terrainString() const;
 
 	const FXString value(const char* key) const;
-	const FXString value(int key) const;
+	const FXString value(key_type key) const;
 	int valueInt(const char* key, int def = 0) const;
 	int valueInt(int key, int def = 0) const;
 	const datakey* valueKey(int key) const;
-
-	// types of datablocks
-	enum
-	{
-		TYPE_UNKNOWN,
-		TYPE_VERSION,
-		TYPE_OPTIONS,
-		TYPE_FACTION,
-		TYPE_GROUP,
-		TYPE_ALLIANCE,
-		TYPE_REGION,
-		TYPE_ISLAND,
-		TYPE_SCHEMEN,
-		TYPE_RESOURCE,
-		TYPE_PRICES,
-		TYPE_DURCHREISE,
-		TYPE_DURCHSCHIFFUNG,
-		TYPE_BORDER,
-		TYPE_SHIP,
-		TYPE_BUILDING,
-		TYPE_UNIT,
-		TYPE_UNITMESSAGES,
-		TYPE_TALENTS,
-		TYPE_SPELLS,
-		TYPE_COMBATSPELL,
-		TYPE_ZAUBER,
-		TYPE_KOMPONENTEN,
-		TYPE_TRANK,
-		TYPE_ZUTATEN,
-		TYPE_ITEMS,
-		TYPE_COMMANDS,
-		TYPE_EFFECTS,
-		TYPE_MESSAGE,
-		TYPE_BATTLE,
-		TYPE_MESSAGETYPE,
-		TYPE_TRANSLATION,
-		TYPE_LAST
-	};
 
 	// Flags for map icons
 	enum
@@ -287,7 +288,7 @@ public:
 	};
 
 	// parses str and create datablock object
-	static int parseType(const FXString& type);
+	static block_type parseType(const FXString& type);
 	static int parseTerrain(const FXString& str);			// Plains, Mountains, ... Volcano
 	static int parseSpecialTerrain(const FXString& str);	// Active volcano, ... (terrain that uses image of another terrain)
 	static FXString planeName(int plane);					// Eressea,Astralraum,Weihnachtsinsel...
@@ -297,7 +298,8 @@ public:
 	typedef list_type::iterator itor;
 
 protected:
-	int m_type, m_info;
+    block_type m_type;
+    int m_info;
 	int m_x, m_y, m_terrain;
 	int m_flags, m_depth;
 	FXString m_string;
@@ -307,23 +309,21 @@ protected:
 
 	struct blocknames
 	{
-		int id;
+		block_type id;
 		const char *name;
 	};
 	static blocknames BLOCKNAMES[];
 };
 
+typedef enum class map_type {
+    MAP_FULL,
+    MAP_NORMAL,
+    MAP_MINIMAL,
+} map_type;
+
 class datafile
 {
 public:
-    enum {
-        FILTER_NONE = 0,
-        FILTER_UNITS = 1,
-        FILTER_SHIPS = 2,
-        FILTER_BUILDINGS = 4,
-        FILTER_DETAILS = 8
-    } filter_type;
-
 	datafile();
 
 	const FXString& filename() const { return m_filename; }
@@ -340,7 +340,7 @@ public:
 	datablock::itor activefaction() { return m_activefaction; }
 
 	int load(const char* filename);
-	int save(const char* filename, int map_filter);
+	int save(const char* filename, enum map_type map_filter);
 	void createHierarchy();
 	void createHashTables();
 

@@ -203,7 +203,7 @@ void FXRegionInfos::collectData(std::list<Info>& info, datablock::itor region)
 	datablock::itor block = region;
 	for (block++; block != end && block->depth() > region->depth(); block++)
 	{
-		if (block->type() == datablock::TYPE_RESOURCE)
+		if (block->type() == block_type::TYPE_RESOURCE)
 		{
 			/*	RESOURCE 235898859
 				"Eisen";type
@@ -211,7 +211,7 @@ void FXRegionInfos::collectData(std::list<Info>& info, datablock::itor region)
 				5;number	*/
 
 			FXString type = block->value("type");
-			FXString skillStr = block->value(datakey::TYPE_SKILL);
+			FXString skillStr = block->value(TYPE_SKILL);
 			FXString numberStr = block->value("number");
 			FXString infotip = "Resource ";
 				infotip += type;
@@ -233,15 +233,15 @@ void FXRegionInfos::collectData(std::list<Info>& info, datablock::itor region)
 				addEntry(info, type, number, skill, 0, infotip);
 			}
 		}
-		else if (block->type() == datablock::TYPE_UNIT)
+		else if (block->type() == block_type::TYPE_UNIT)
 		{
 			myfaction = false;
-			FXString id = block->value(datakey::TYPE_FACTION);
+			FXString id = block->value(TYPE_FACTION);
 			if (!id.empty())
 				if (factionId == atoi(id.text()))
 					myfaction = true;
 
-			FXString number = block->value(datakey::TYPE_NUMBER);
+			FXString number = block->value(TYPE_NUMBER);
             if (!number.empty())
 			{
 				Personen += atoi(number.text());
@@ -249,7 +249,7 @@ void FXRegionInfos::collectData(std::list<Info>& info, datablock::itor region)
 					Parteipersonen += atoi(number.text());
 			}
 		}
-		else if (block->type() == datablock::TYPE_ITEMS)
+		else if (block->type() == block_type::TYPE_ITEMS)
 		{
 			// Silber der eigenen Partei zum Parteisilber zaehlen
 			if (myfaction)
@@ -311,7 +311,7 @@ void FXRegionInfos::updateData()
 		// show information of newly selected region
 		datablock &region = *selection.region;
 
-		FXString name = region.value(datakey::TYPE_NAME);
+		FXString name = region.value(TYPE_NAME);
 
 		if (name.empty())
 			name = region.terrainString();
@@ -324,7 +324,7 @@ void FXRegionInfos::updateData()
 		label.format("%s von %s (%d,%d)", region.terrainString().text(), name.text(), region.x(), region.y());
 
 		// Beschreibung an den Statusleisten-Text anfuegen.
-		FXString description = region.value(datakey::TYPE_DESCRIPTION);
+		FXString description = region.value(TYPE_DESCRIPTION);
 		if (!description.empty())
 		{
 			FXchar lastc = description.right(1)[0];

@@ -164,11 +164,11 @@ void FXTradeInfos::collectData(std::list<Info>& info, datablock::itor region)
 	datablock::itor end = mapFile->blocks().end();
 	datablock::itor block = region;
 	for (block++; block != end && block->depth() > region->depth(); block++)
-		if (block->type() == datablock::TYPE_PRICES)
+		if (block->type() == block_type::TYPE_PRICES)
 			break;				// found
 
 	// found PREISE block?
-	if (block != end && block->type() == datablock::TYPE_PRICES)
+	if (block != end && block->type() == block_type::TYPE_PRICES)
 	{
 		/*	PREISE
 			96;Balsam		// wird angekauft

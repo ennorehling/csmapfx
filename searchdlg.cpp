@@ -253,12 +253,12 @@ namespace
 
 	bool search_region(const datablock::itor& block, const block_context& context)
 	{
-		if (block->type() != datablock::TYPE_REGION)
+		if (block->type() != block_type::TYPE_REGION)
 			return false;
 
 		const compare_func_t& compare = std::get<5>(context);
 
-		FXString name = block->value(datakey::TYPE_NAME);
+		FXString name = block->value(TYPE_NAME);
 		if (name.empty())
 			name = block->terrainString();
 		if (name.empty())
@@ -273,65 +273,65 @@ namespace
 			return true;
 
 		if (std::get<7>(context))		// compare descriptions?
-			return compare(block->value(datakey::TYPE_DESCRIPTION));
+			return compare(block->value(TYPE_DESCRIPTION));
 
 		return false;
 	}
 	
 	bool search_unit(const datablock::itor& block, const block_context& context)
 	{
-		if (block->type() != datablock::TYPE_UNIT)
+		if (block->type() != block_type::TYPE_UNIT)
 			return false;
 
 		const compare_func_t& compare = std::get<5>(context);
 		const compare_func_t& compare_icase = std::get<6>(context);
 
-		if (compare(block->value(datakey::TYPE_NAME)) || compare_icase(block->id()))
+		if (compare(block->value(TYPE_NAME)) || compare_icase(block->id()))
 			return true;
 
 		if (std::get<7>(context))		// compare descriptions?
-			return compare(block->value(datakey::TYPE_DESCRIPTION));
+			return compare(block->value(TYPE_DESCRIPTION));
 
 		return false;
 	}
 
 	bool search_building(const datablock::itor& block, const block_context& context)
 	{
-		if (block->type() != datablock::TYPE_BUILDING)
+		if (block->type() != block_type::TYPE_BUILDING)
 			return false;
 
 		const compare_func_t& compare = std::get<5>(context);
 		const compare_func_t& compare_icase = std::get<6>(context);
 
-		if (compare(block->value(datakey::TYPE_NAME)) || compare_icase(block->id()))
+		if (compare(block->value(TYPE_NAME)) || compare_icase(block->id()))
 			return true;
 
 		if (std::get<7>(context))		// compare descriptions?
-			return compare(block->value(datakey::TYPE_DESCRIPTION));
+			return compare(block->value(TYPE_DESCRIPTION));
 
 		return false;
 	}
 
 	bool search_ship(const datablock::itor& block, const block_context& context)
 	{
-		if (block->type() != datablock::TYPE_SHIP)
+		if (block->type() != block_type::TYPE_SHIP)
 			return false;
 
 		const compare_func_t& compare = std::get<5>(context);
 		const compare_func_t& compare_icase = std::get<6>(context);
 
-		if (compare(block->value(datakey::TYPE_NAME)) || compare_icase(block->id()))
+		if (compare(block->value(TYPE_NAME)) || compare_icase(block->id()))
 			return true;
 
 		if (std::get<7>(context))		// compare descriptions?
-			return compare(block->value(datakey::TYPE_DESCRIPTION));
+			return compare(block->value(TYPE_DESCRIPTION));
 
 		return false;
 	}
 
 	bool search_commands(const datablock::itor& block, const block_context& context)
 	{
-		if (block->type() != datablock::TYPE_COMMANDS)
+		if (block->type() != block_type::TYPE_COMMANDS)
 			return false;
 
 		const compare_func_t& compare = std::get<5>(context);
@@ -452,22 +452,22 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 	for (datablock::itor block = mapFile->blocks().begin(); block != end; block++)
 	{
 		// pass blocks to search functors
-		if (block->type() == datablock::TYPE_REGION)
+		if (block->type() == block_type::TYPE_REGION)
 		{
 			region = block;
 			building = ship = unit = end;
 		}
-		else if (block->type() == datablock::TYPE_BUILDING)
+		else if (block->type() == block_type::TYPE_BUILDING)
 		{
 			building = block;
 			ship = unit = end;
 		}
-		else if (block->type() == datablock::TYPE_SHIP)
+		else if (block->type() == block_type::TYPE_SHIP)
 		{
 			ship = block;
 			building = unit = end;
 		}
-		else if (block->type() == datablock::TYPE_UNIT)
+		else if (block->type() == block_type::TYPE_UNIT)
 		{
 			unit = block;
 			building = ship = end;
@@ -481,7 +481,7 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 			if (region != end)
 			{
 				FXString terrain = region->terrainString();
-				FXString name = region->value(datakey::TYPE_NAME);
+				FXString name = region->value(TYPE_NAME);
 
 				if (name.empty())
 					name = terrain;
@@ -497,7 +497,7 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 			// add block to results-list in second column
 			if (building != end)
 			{
-				FXString name = building->value(datakey::TYPE_NAME);
+				FXString name = building->value(TYPE_NAME);
 				FXString id = building->id();
 
 				if (name.empty())
@@ -507,7 +507,7 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 			}
 			else if (ship != end)
 			{
-				FXString name = ship->value(datakey::TYPE_NAME);
+				FXString name = ship->value(TYPE_NAME);
 				FXString id = ship->id();
 
 				if (name.empty())
@@ -517,10 +517,10 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 			}
 			else if (unit != end)
 			{
-				FXString name = unit->value(datakey::TYPE_NAME);
+				FXString name = unit->value(TYPE_NAME);
 				FXString id = unit->id();
-				//FXString number = block->value(datakey::TYPE_NUMBER);
-				//FXString type = block->value(datakey::TYPE_TYPE);
+				//FXString number = block->value(TYPE_NUMBER);
+				//FXString type = block->value(TYPE_TYPE);
 
 				if (name.empty())
 					name = "Einheit " + id;
@@ -568,7 +568,7 @@ long FXSearchDlg::onSelectResults(FXObject*, FXSelector, void*)
 
 	for (datablock::itor block = mapFile->blocks().begin(); block != end; block++)
 	{
-		if (block->type() == datablock::TYPE_REGION)
+		if (block->type() == block_type::TYPE_REGION)
 			region = block;
 
 		if (select != &*block)
@@ -582,11 +582,11 @@ long FXSearchDlg::onSelectResults(FXObject*, FXSelector, void*)
 		if (region != end)
 			state.region = region, state.selected |= state.REGION;
 
-		if (block->type() == datablock::TYPE_UNIT)
+		if (block->type() == block_type::TYPE_UNIT)
 			state.unit = block, state.selected |= state.UNIT;
-		else if (block->type() == datablock::TYPE_BUILDING)
+		else if (block->type() == block_type::TYPE_BUILDING)
 			state.building = block, state.selected |= state.BUILDING;
-		else if (block->type() == datablock::TYPE_SHIP)
+		else if (block->type() == block_type::TYPE_SHIP)
 			state.ship = block, state.selected |= state.SHIP;
 
 		getOwner()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);

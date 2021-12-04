@@ -100,15 +100,15 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 			datablock::itor block = unit;
 			for (block++; block != end && block->depth() > unit->depth(); block++)
 			{
-                if (block->type() == datablock::TYPE_ITEMS)
+                if (block->type() == block_type::TYPE_ITEMS)
 					items = block;
-				else if (block->type() == datablock::TYPE_TALENTS)
+				else if (block->type() == block_type::TYPE_TALENTS)
 					talents = block;
-				else if (block->type() == datablock::TYPE_SPELLS)
+				else if (block->type() == block_type::TYPE_SPELLS)
 					spells = block;
-				else if (block->type() == datablock::TYPE_EFFECTS)
+				else if (block->type() == block_type::TYPE_EFFECTS)
 					effects = block;
-				else if (block->type() == datablock::TYPE_COMBATSPELL)
+				else if (block->type() == block_type::TYPE_COMBATSPELL)
 					combatspells[block->info()] = block;
 			}
 
@@ -122,21 +122,21 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 			for (datakey::itor key = unit->data().begin(); key != unit->data().end(); key++)
 			{
-				if (key->type() == datakey::TYPE_NAME)
+				if (key->type() == TYPE_NAME)
 					name = key->value();
-				else if (key->type() == datakey::TYPE_DESCRIPTION)
+				else if (key->type() == TYPE_DESCRIPTION)
 					descr = key->value();
-				else if (key->type() == datakey::TYPE_FACTION)
+				else if (key->type() == TYPE_FACTION)
 					factionId = atoi(key->value().text());
 				else if (key->key() == "Anderepartei")
 					AnotherfactionId = atoi(key->value().text());
-				else if (key->type() == datakey::TYPE_NUMBER)
+				else if (key->type() == TYPE_NUMBER)
 					number = key->value();
-				else if (key->type() == datakey::TYPE_TYPE)
+				else if (key->type() == TYPE_TYPE)
 					race = key->value();
-				else if (key->type() == datakey::TYPE_AURA)
+				else if (key->type() == TYPE_AURA)
 					aura = key->value();
-				else if (key->type() == datakey::TYPE_AURAMAX)
+				else if (key->type() == TYPE_AURAMAX)
 					auramax = key->value();
 				else if (key->key() == "Burg")
 					building = mapFile->building(atoi(key->value().text()));
@@ -188,7 +188,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 				if (faction != end)
 				{
-					name = faction->value(datakey::TYPE_FACTIONNAME);
+					name = faction->value(TYPE_FACTIONNAME);
 					if (name.empty())
 						name = "Partei";
 
@@ -200,7 +200,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					if (!label.empty())
 						label += ", ";
 
-					name = anotherfaction->value(datakey::TYPE_FACTIONNAME);
+					name = anotherfaction->value(TYPE_FACTIONNAME);
 					if (name.empty())
 						name = "Partei";
 
@@ -384,13 +384,13 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 				for (datakey::itor key = building->data().begin(); key != building->data().end(); key++)
 				{
-					if (key->type() == datakey::TYPE_NAME)
+					if (key->type() == TYPE_NAME)
 						name = key->value();
-					else if (key->type() == datakey::TYPE_DESCRIPTION)
+					else if (key->type() == TYPE_DESCRIPTION)
 						descr = key->value();
-					else if (key->type() == datakey::TYPE_FACTION)
+					else if (key->type() == TYPE_FACTION)
 						factionId = atoi(key->value().text());
-					else if (key->type() == datakey::TYPE_TYPE)
+					else if (key->type() == TYPE_TYPE)
 						type = key->value();
 					else if (key->key() == "Groesse")
 						size = key->value();
@@ -421,7 +421,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				block = building;
 				for (block++; block != end && block->depth() > unit->depth(); block++)
 				{
-					if (block->type() == datablock::TYPE_EFFECTS)
+					if (block->type() == block_type::TYPE_EFFECTS)
 						effects = block;
 				}
 
@@ -446,13 +446,13 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 				for (datakey::itor key = ship->data().begin(); key != ship->data().end(); key++)
 				{
-					if (key->type() == datakey::TYPE_NAME)
+					if (key->type() == TYPE_NAME)
 						name = key->value();
-					else if (key->type() == datakey::TYPE_DESCRIPTION)
+					else if (key->type() == TYPE_DESCRIPTION)
 						descr = key->value();
-					else if (key->type() == datakey::TYPE_FACTION)
+					else if (key->type() == TYPE_FACTION)
 						factionId = atoi(key->value().text());
-					else if (key->type() == datakey::TYPE_TYPE)
+					else if (key->type() == TYPE_TYPE)
 						type = key->value();
 					else if (key->key() == "Groesse")
 						size = key->value();
@@ -536,7 +536,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				block = ship;
 				for (block++; block != end && block->depth() > unit->depth(); block++)
 				{
-					if (block->type() == datablock::TYPE_EFFECTS)
+					if (block->type() == block_type::TYPE_EFFECTS)
 						effects = block;
 				}
 

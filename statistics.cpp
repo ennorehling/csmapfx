@@ -114,9 +114,9 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 	datablock::itor block = region;
 	for (block++; block != end && block->depth() > region->depth(); block++)
 	{
-		if (block->type() == datablock::TYPE_SHIP)
+		if (block->type() == block_type::TYPE_SHIP)
 		{
-			FXString fac = block->value(datakey::TYPE_FACTION);
+			FXString fac = block->value(TYPE_FACTION);
 			int faction = -1;
 			if (fac.length())
 				faction = atoi(fac.text());
@@ -126,14 +126,14 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 				int size = atoi(block->value("Groesse").text());
 
 				// <Shiptype>: <Size>
-				FXString type = block->value(datakey::TYPE_TYPE);
+				FXString type = block->value(TYPE_TYPE);
 				if (type.length())
 					ships[type].list.push_back(std::make_pair(block->info(), size));
 			}
 		}
-		else if (block->type() == datablock::TYPE_BUILDING)
+		else if (block->type() == block_type::TYPE_BUILDING)
 		{
-			FXString fac = block->value(datakey::TYPE_FACTION);
+			FXString fac = block->value(TYPE_FACTION);
 			int faction = -1;
 			if (fac.length())
 				faction = atoi(fac.text());
@@ -143,16 +143,16 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 				int size = atoi(block->value("Groesse").text());
 
 				// <Buildingtype>: <Size>
-				FXString type = block->value(datakey::TYPE_TYPE);
+				FXString type = block->value(TYPE_TYPE);
 				if (type.length())
 					buildings[type].list.push_back(std::make_pair(block->info(), size));
 			}
 		}
-		else if (block->type() == datablock::TYPE_UNIT)
+		else if (block->type() == block_type::TYPE_UNIT)
 		{
 			unitId = block->info();
 
-			FXString fac = block->value(datakey::TYPE_FACTION);
+			FXString fac = block->value(TYPE_FACTION);
 			int faction = -1;
 			if (fac.length())
 				faction = atoi(fac.text());
@@ -167,12 +167,12 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 			continue;
 		
 		// collect statistics from this block
-		if (block->type() == datablock::TYPE_UNIT)
+		if (block->type() == block_type::TYPE_UNIT)
 		{
-			FXString val, type = block->value(datakey::TYPE_TYPE);
+			FXString val, type = block->value(TYPE_TYPE);
 
 			// <Race>: #
-			val = block->value(datakey::TYPE_NUMBER);
+			val = block->value(TYPE_NUMBER);
 			if (type.length() && val.length())
 			{
 				personsInUnit = atoi(val.text());
@@ -182,13 +182,13 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 				personsInUnit = 0;
 
 			// Aura: #
-			val = block->value(datakey::TYPE_AURA);
+			val = block->value(TYPE_AURA);
 			if (val.length())
 				items["Aura"].list.push_back(std::make_pair(unitId, atoi(val.text())));
 		}
 
 		// collect statistics from this block
-		if (block->type() == datablock::TYPE_ITEMS)
+		if (block->type() == block_type::TYPE_ITEMS)
 		{
 			// <Item>: #
 			for (datakey::itor itor = block->data().begin(); itor != block->data().end(); itor++)
@@ -197,7 +197,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 		}
 
 		// collect statistics from this block
-		if (block->type() == datablock::TYPE_TALENTS)
+		if (block->type() == block_type::TYPE_TALENTS)
 		{
 			//stats_talents, numberInUnit
 
@@ -480,7 +480,7 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 				continue;
 			}
 
-			FXString name = block->value(datakey::TYPE_NAME);
+			FXString name = block->value(TYPE_NAME);
 			if (name.empty())
 				name = block->id();
 
@@ -530,12 +530,12 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 				break;
 
 			// handle only regions, factions (+alliances), buildings, ships and units
-			if (block->type() != datablock::TYPE_REGION &&
-				block->type() != datablock::TYPE_ALLIANCE &&
-				block->type() != datablock::TYPE_FACTION &&
-				block->type() != datablock::TYPE_BUILDING &&
-				block->type() != datablock::TYPE_SHIP &&
-				block->type() != datablock::TYPE_UNIT)
+			if (block->type() != block_type::TYPE_REGION &&
+				block->type() != block_type::TYPE_ALLIANCE &&
+				block->type() != block_type::TYPE_FACTION &&
+				block->type() != block_type::TYPE_BUILDING &&
+				block->type() != block_type::TYPE_SHIP &&
+				block->type() != block_type::TYPE_UNIT)
 				continue;
 
 			if (dblock && dblock == &*block)
@@ -543,7 +543,7 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 				main = block;
 				dblock = NULL;		// to indicate that block was found.
 			}
-			else if (block->type() == datablock::TYPE_REGION)
+			else if (block->type() == block_type::TYPE_REGION)
 			{
 				iparent = block;
 			}
@@ -565,12 +565,12 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 			// send new selection to main window
 			datafile::SelectionState state;
 
-			if (main->type() == datablock::TYPE_REGION)
+			if (main->type() == block_type::TYPE_REGION)
 			{
 				state.selected = state.REGION;
 				state.region = main;
 			}
-			if (main->type() == datablock::TYPE_FACTION)
+			if (main->type() == block_type::TYPE_FACTION)
 			{
 				state.selected = state.FACTION;
 				state.faction = main;
@@ -581,7 +581,7 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 					state.region = iparent;
 				}
 			}
-			if (main->type() == datablock::TYPE_BUILDING)
+			if (main->type() == block_type::TYPE_BUILDING)
 			{
 				state.selected = state.BUILDING;
 				state.building = main;
@@ -592,7 +592,7 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 					state.region = iparent;
 				}
 			}
-			if (main->type() == datablock::TYPE_SHIP)
+			if (main->type() == block_type::TYPE_SHIP)
 			{
 				state.selected = state.SHIP;
 				state.ship = main;
@@ -603,7 +603,7 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 					state.region = iparent;
 				}
 			}
-			if (main->type() == datablock::TYPE_UNIT)
+			if (main->type() == block_type::TYPE_UNIT)
 			{
 				state.selected = state.UNIT;
 				state.unit = main;
@@ -645,9 +645,9 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 	datablock::itor block = region;
 	for (block++; block != end && block->depth() > region->depth(); block++)
 	{
-		if (block->type() == datablock::TYPE_UNIT)
+		if (block->type() == block_type::TYPE_UNIT)
 		{
-			FXString fac = block->value(datakey::TYPE_FACTION);
+			FXString fac = block->value(TYPE_FACTION);
 			FXival factionId = -1;
 			if (fac.length())
 				factionId = atoi(fac.text());
@@ -659,7 +659,7 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 				FXString name, label;
 				datablock::itor faction = mapFile->faction(factionId);
 
-				name = faction->value(datakey::TYPE_FACTIONNAME);
+				name = faction->value(TYPE_FACTIONNAME);
 				if (name.empty())
 					name = "Unbekannt";
 

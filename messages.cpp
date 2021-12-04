@@ -87,7 +87,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
             std::set<FXint> guard_ids;
 			for (block++; block != end && block->depth() > region->depth(); block++)
 			{
-                if (block->type() == datablock::TYPE_MESSAGE) {
+                if (block->type() == block_type::TYPE_MESSAGE) {
                     /*
                     MESSAGE 324149248
                     "von Figo (g351): 'KABUMM *kicher*'";rendered
@@ -106,14 +106,14 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
                 else if (block->depth() > region->depth() + 1) {
                     continue;
                 }
-                else if (block->type() == datablock::TYPE_UNIT) {
+                else if (block->type() == block_type::TYPE_UNIT) {
                     int guard = block->valueInt("bewacht");
                     if (guard) {
                         FXint faction = block->valueInt("Partei");
                         guard_ids.insert(faction);
                     }
                 }
-				else if (block->type() == datablock::TYPE_EFFECTS)
+				else if (block->type() == block_type::TYPE_EFFECTS)
 				{
 					/*
 					EFFECTS
@@ -123,7 +123,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 					for (datakey::itor msg = block->data().begin(); msg != block->data().end(); msg++)
 						appendItem(groups.effects, msg->value());
 				}
-				else if (block->type() == datablock::TYPE_BORDER)
+				else if (block->type() == block_type::TYPE_BORDER)
 				{
 					/*
 					GRENZE 1
@@ -159,7 +159,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 
 					appendItem(groups.streets, label);
 				}
-				else if (block->type() == datablock::TYPE_DURCHREISE || block->type() == datablock::TYPE_DURCHSCHIFFUNG)
+				else if (block->type() == block_type::TYPE_DURCHREISE || block->type() == block_type::TYPE_DURCHSCHIFFUNG)
 				{
 					/*
 					DURCHREISE
@@ -167,7 +167,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 					*/
 					FXString prefix;
 
-					if (block->type() == datablock::TYPE_DURCHSCHIFFUNG)
+					if (block->type() == block_type::TYPE_DURCHSCHIFFUNG)
 						prefix = "Die ";	// fuer Schiffe
 
 					for (datakey::itor msg = block->data().begin(); msg != block->data().end(); msg++)

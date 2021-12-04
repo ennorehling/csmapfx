@@ -250,57 +250,57 @@ bool datakey::parse(char* str)
 
 /*static*/ datablock::blocknames datablock::BLOCKNAMES[] =
 {
-	{ TYPE_VERSION, "VERSION" },
-	{ TYPE_OPTIONS, "OPTIONEN" },
-	{ TYPE_FACTION, "PARTEI" },
-	{ TYPE_GROUP, "GRUPPE" },
-	{ TYPE_ALLIANCE, "ALLIANZ" },
-	{ TYPE_REGION, "REGION" },
-	{ TYPE_ISLAND, "ISLAND" },
-	{ TYPE_SCHEMEN, "SCHEMEN" },
-	{ TYPE_RESOURCE, "RESOURCE" },
-	{ TYPE_PRICES, "PREISE" },
-	{ TYPE_DURCHREISE, "DURCHREISE" },
-	{ TYPE_DURCHSCHIFFUNG, "DURCHSCHIFFUNG" },
-	{ TYPE_BORDER, "GRENZE" },
-	{ TYPE_BORDER, "BORDER" },
-	{ TYPE_SHIP, "SCHIFF" },
-	{ TYPE_BUILDING, "BURG" },
-	{ TYPE_UNIT, "EINHEIT" },
-	{ TYPE_UNITMESSAGES, "EINHEITSBOTSCHAFTEN" },
-	{ TYPE_TALENTS, "TALENTE" },
-	{ TYPE_SPELLS, "SPRUECHE" },
-	{ TYPE_COMBATSPELL, "KAMPFZAUBER" },
-	{ TYPE_ZAUBER, "ZAUBER" },
-	{ TYPE_KOMPONENTEN, "KOMPONENTEN" },
-	{ TYPE_TRANK, "TRANK" },
-	{ TYPE_ZUTATEN, "ZUTATEN" },
-	{ TYPE_ITEMS, "GEGENSTAENDE" },
-	{ TYPE_COMMANDS, "COMMANDS" },
-	{ TYPE_EFFECTS, "EFFECTS" },
-	{ TYPE_MESSAGE, "MESSAGE" },
-	{ TYPE_BATTLE, "BATTLE" },
-	{ TYPE_MESSAGETYPE, "MESSAGETYPE" },
-	{ TYPE_TRANSLATION, "TRANSLATION" },
-	{ 0, NULL }
+	{ block_type::TYPE_VERSION, "VERSION" },
+	{ block_type::TYPE_OPTIONS, "OPTIONEN" },
+	{ block_type::TYPE_FACTION, "PARTEI" },
+	{ block_type::TYPE_GROUP, "GRUPPE" },
+	{ block_type::TYPE_ALLIANCE, "ALLIANZ" },
+	{ block_type::TYPE_REGION, "REGION" },
+	{ block_type::TYPE_ISLAND, "ISLAND" },
+	{ block_type::TYPE_SCHEMEN, "SCHEMEN" },
+	{ block_type::TYPE_RESOURCE, "RESOURCE" },
+	{ block_type::TYPE_PRICES, "PREISE" },
+	{ block_type::TYPE_DURCHREISE, "DURCHREISE" },
+	{ block_type::TYPE_DURCHSCHIFFUNG, "DURCHSCHIFFUNG" },
+	{ block_type::TYPE_BORDER, "GRENZE" },
+	{ block_type::TYPE_BORDER, "BORDER" },
+	{ block_type::TYPE_SHIP, "SCHIFF" },
+	{ block_type::TYPE_BUILDING, "BURG" },
+	{ block_type::TYPE_UNIT, "EINHEIT" },
+	{ block_type::TYPE_UNITMESSAGES, "EINHEITSBOTSCHAFTEN" },
+	{ block_type::TYPE_TALENTS, "TALENTE" },
+	{ block_type::TYPE_SPELLS, "SPRUECHE" },
+	{ block_type::TYPE_COMBATSPELL, "KAMPFZAUBER" },
+	{ block_type::TYPE_ZAUBER, "ZAUBER" },
+	{ block_type::TYPE_KOMPONENTEN, "KOMPONENTEN" },
+	{ block_type::TYPE_TRANK, "TRANK" },
+	{ block_type::TYPE_ZUTATEN, "ZUTATEN" },
+	{ block_type::TYPE_ITEMS, "GEGENSTAENDE" },
+	{ block_type::TYPE_COMMANDS, "COMMANDS" },
+	{ block_type::TYPE_EFFECTS, "EFFECTS" },
+	{ block_type::TYPE_MESSAGE, "MESSAGE" },
+	{ block_type::TYPE_BATTLE, "BATTLE" },
+	{ block_type::TYPE_MESSAGETYPE, "MESSAGETYPE" },
+	{ block_type::TYPE_TRANSLATION, "TRANSLATION" },
+	{ block_type::TYPE_UNKNOWN, NULL }
 };
 
-/*static*/ int datablock::parseType(const FXString& type)
+/*static*/ block_type datablock::parseType(const FXString& type)
 {
 	// region moved to top (performance)
 	if (type == "REGION")
-		return TYPE_REGION;
+		return block_type::TYPE_REGION;
 
     for (int i = 0; BLOCKNAMES[i].name ; i++)
 		if (type == BLOCKNAMES[i].name)
 			return BLOCKNAMES[i].id;
 	
-	return TYPE_UNKNOWN;
+	return block_type::TYPE_UNKNOWN;
 }
 
 const FXString datablock::terrainString() const
 {
-	const FXString type = value(datakey::TYPE_TERRAIN);
+	const FXString type = value(TYPE_TERRAIN);
 	if (!type.empty())
 		return type;
 
@@ -476,7 +476,7 @@ bool datablock::parse(char* str)
 	return true;
 }
 
-datablock::datablock() : m_type(0), m_info(0), m_x(0),m_y(0), m_terrain(0), m_flags(0), m_depth(0), m_attachment(0)
+datablock::datablock() : m_type(block_type::TYPE_UNKNOWN), m_info(0), m_x(0),m_y(0), m_terrain(0), m_flags(0), m_depth(0), m_attachment(0)
 {
 }
 
@@ -489,7 +489,7 @@ void datablock::string(const FXString& s)
 {
 	m_type = parseType(s);
 
-	if (m_type == TYPE_UNKNOWN)
+	if (m_type == block_type::TYPE_UNKNOWN)
 		m_string = s;
 	else
 		m_string.clear();
@@ -497,7 +497,7 @@ void datablock::string(const FXString& s)
 
 const FXString datablock::string() const
 {
-	if (m_type == TYPE_UNKNOWN)
+	if (m_type == block_type::TYPE_UNKNOWN)
 		return m_string;
 
     for (int i = 0; BLOCKNAMES[i].name; i++)
@@ -593,7 +593,7 @@ const FXString datablock::value(const char* key) const
 	return "";
 }
 
-const FXString datablock::value(int key) const
+const FXString datablock::value(key_type key) const
 {
 	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
 		if (srch->type() == key)
@@ -712,7 +712,7 @@ int datafile::load(const char* filename)
 		{
 			if (block)
 			{
-				if (key.type() == datakey::TYPE_TERRAIN)
+				if (key.type() == TYPE_TERRAIN)
 				{
 					int terrain = datablock::parseTerrain(key.value());
 
@@ -745,12 +745,12 @@ int datafile::load(const char* filename)
 }
 
 // saves file
-int datafile::save(const char* filename, int map_filter)
+int datafile::save(const char* filename, map_type map_filter)
 {
 	if (!filename)
 		return 0;
 
-	// Datei zum Schreiben \u00f6ffnen
+	// open file for writing
 	std::ostringstream file;
 
 	FXFileStream plainfile;
@@ -770,21 +770,22 @@ int datafile::save(const char* filename, int map_filter)
     datablock::itor block = blocks().begin();
 	while ( block != end) {
 		bool hideKeys = false;
+        block_type type = block->type();
 
-        if (map_filter) {
+        if (map_filter != map_type::MAP_FULL) {
             /* do not include these blocks at all */
-            if (block->type() == datablock::TYPE_EFFECTS
-                || block->type() == datablock::TYPE_MESSAGE
-                || block->type() == datablock::TYPE_MESSAGETYPE
-                || block->type() == datablock::TYPE_DURCHREISE
-                || block->type() == datablock::TYPE_DURCHSCHIFFUNG) {
+            if (type == block_type::TYPE_EFFECTS
+                || type == block_type::TYPE_MESSAGE
+                || type == block_type::TYPE_MESSAGETYPE
+                || type == block_type::TYPE_DURCHREISE
+                || type == block_type::TYPE_DURCHSCHIFFUNG) {
                 ++block;
                 continue;
             }
             /* skip these blocks with all their children */
-            if (block->type() == datablock::TYPE_UNIT 
-                || block->type() == datablock::TYPE_BATTLE
-                || block->type() == datablock::TYPE_SHIP) {
+            if (type == block_type::TYPE_UNIT
+                || type == block_type::TYPE_BATTLE
+                || type == block_type::TYPE_SHIP) {
                 int depth = block->depth();
                 do {
                     ++block;
@@ -797,23 +798,23 @@ int datafile::save(const char* filename, int map_filter)
 		file << block->string();
 
 		// VERSION auf mindestens 64 hochsetzen
-		if (block->type() == datablock::TYPE_VERSION)
+		if (type == block_type::TYPE_VERSION)
 			if (block->info() < 64)
 				block->infostr("64");
 
-		if (block->type() == datablock::TYPE_REGION || block->type() == datablock::TYPE_BATTLE ||
+		if (type == block_type::TYPE_REGION || type == block_type::TYPE_BATTLE ||
 				block->x() != 0 || block->y() != 0)
 			file << ' ' << block->x() << ' ' << block->y();
 		
-		if (block->type() == datablock::TYPE_COMBATSPELL || block->info())
+		if (type == block_type::TYPE_COMBATSPELL || block->info())
 			file << ' ' << block->info();
 
 		file << std::endl;
 
 		// Name-Tag und Terrain-Tag ausgeben
-		if (block->type() == datablock::TYPE_REGION)
+		if (type == block_type::TYPE_REGION)
 		{
-			FXString name = block->value(datakey::TYPE_NAME);
+			FXString name = block->value(TYPE_NAME);
 			if (!name.empty())
 			{
 				file << '\"';
@@ -835,39 +836,39 @@ int datafile::save(const char* filename, int map_filter)
 			}
 
 			file << '\"' << block->terrainString().text() << "\";Terrain" << std::endl;
-		}
+        }
 		// Konfiguration-Block anpassen und Charset auf ISO-8859-1 setzen
-		else if (block->type() == datablock::TYPE_VERSION)
+		else if (type == block_type::TYPE_VERSION)
 		{
 			for (datakey::itor tags = block->data().begin(); tags != block->data().end(); tags++)
 			{
-				if (tags->type() == datakey::TYPE_KONFIGURATION)
+				if (tags->type() == TYPE_KONFIGURATION)
 				{
                     tags->value(CSMAP_APP_TITLE_VERSION);
 				}
 			}
 		}
-		else if (block->type() == datablock::TYPE_UNIT)
+		else if (type == block_type::TYPE_UNIT)
 		{
 			// search for command block of unit
 			datablock::itor cmd = block;
 			for (cmd++; cmd != end && cmd->depth() > block->depth(); cmd++)
-				if (cmd->type() == datablock::TYPE_COMMANDS)
+				if (cmd->type() == block_type::TYPE_COMMANDS)
 					break;				// found
 
-			bool confirmed = block->valueInt(datakey::TYPE_ORDERS_CONFIRMED) != 0;
+			bool confirmed = block->valueInt(TYPE_ORDERS_CONFIRMED) != 0;
 
-			if (cmd != end && cmd->type() == datablock::TYPE_COMMANDS)
+			if (cmd != end && cmd->type() == block_type::TYPE_COMMANDS)
 			{
 				// att_commands' confirmed attribute overwrites the tag
 				if (att_commands* cmds = dynamic_cast<att_commands*>(cmd->attachment()))
 					confirmed = cmds->confirmed;
 			}
 
-			if (confirmed)	// datakey::TYPE_ORDERS_CONFIRMED
+			if (confirmed)	// TYPE_ORDERS_CONFIRMED
 				file << "1;ejcOrdersConfirmed" << std::endl;
 		}
-		else if (block->type() == datablock::TYPE_COMMANDS)
+		else if (type == block_type::TYPE_COMMANDS)
 		{
 			if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
 			{
@@ -909,28 +910,28 @@ int datafile::save(const char* filename, int map_filter)
 
 		for (; tags != iend; tags++)
 		{
-            if (block->type() == datablock::TYPE_FACTION) {
-                if (map_filter) {
-                    if (tags->type() != datakey::TYPE_BANNER
-                        && tags->type() != datakey::TYPE_LOCALE
-                        && tags->type() != datakey::TYPE_FACTIONNAME
-                        && tags->type() != datakey::TYPE_EMAIL)
+            if (type == block_type::TYPE_FACTION) {
+                if (map_filter != map_type::MAP_FULL) {
+                    if (tags->type() != TYPE_BANNER
+                        && tags->type() != TYPE_LOCALE
+                        && tags->type() != TYPE_FACTIONNAME
+                        && tags->type() != TYPE_EMAIL)
                     {
                         continue;
                     }
                 }
             }
-			else if (block->type() == datablock::TYPE_REGION)
+			else if (type == block_type::TYPE_REGION)
 			{
-                if (map_filter && tags->type() == datakey::TYPE_VISIBILITY)
+                if (map_filter == map_type::MAP_FULL && tags->type() == TYPE_VISIBILITY)
                     continue;
                 // ;Terrain ignorieren. Wird an ;Name angehangen... (s.u.)
-                if (tags->type() == datakey::TYPE_TERRAIN || tags->type() == datakey::TYPE_NAME)
+                if (tags->type() == TYPE_TERRAIN || tags->type() == TYPE_NAME)
 					continue;
 			}
-			else if (block->type() == datablock::TYPE_UNIT)
+			else if (type == block_type::TYPE_UNIT)
 			{
-				if (tags->type() == datakey::TYPE_ORDERS_CONFIRMED)
+				if (tags->type() == TYPE_ORDERS_CONFIRMED)
 					continue;		// will be set above
 			}
 
@@ -976,9 +977,9 @@ int datafile::save(const char* filename, int map_filter)
 		filestr.save(output.c_str(), output.size());
 		file.str("");
 
-        if (map_filter) {
+        if (map_filter != map_type::MAP_FULL) {
             /* skip over child blocks */
-            if (block->type() == datablock::TYPE_FACTION) {
+            if (block->type() == block_type::TYPE_FACTION) {
                 int depth = block->depth();
                 do {
                     ++block;
@@ -1157,7 +1158,7 @@ int datafile::loadCmds(const FXString &filename)
                     throw std::runtime_error(("Einheit nicht gefunden: " + line).text());
                 }
                 for (cmds_list = NULL; block != end() && block->depth() > unitDepth; block++) {
-                    if (block->type() == datablock::TYPE_COMMANDS) {
+                    if (block->type() == block_type::TYPE_COMMANDS) {
                         // TODO: why can't this be a static_cast?
                         if (att_commands *cmds = dynamic_cast<att_commands *>(block->attachment())) {
                             cmds_list = cmds;
@@ -1281,11 +1282,11 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 	std::vector<int> *unit_order = NULL;
 	for (datablock::itor region = end(), block = blocks().begin(); block != end(); block++)
 	{
-		if (block->type() == datablock::TYPE_REGION)
+		if (block->type() == block_type::TYPE_REGION)
 			region = block;
-		else if (block->type() == datablock::TYPE_UNIT)
+		else if (block->type() == block_type::TYPE_UNIT)
 		{
-			if (block->valueInt(datakey::TYPE_FACTION) != factionId)
+			if (block->valueInt(TYPE_FACTION) != factionId)
 				continue;
 
 			// add region to list when first unit of active faction occurs
@@ -1302,7 +1303,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 					if (region->info())
 						cmds->header += "," + FXStringVal(region->info());
 
-                    cmds->header += " ; " + region->value(datakey::TYPE_NAME);
+                    cmds->header += " ; " + region->value(TYPE_NAME);
 					cmds->header += " (" + region->terrainString() + ")";
 
 					//  ; ECheck Lohn 13
@@ -1381,10 +1382,10 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 			// search for command block of unit
 			datablock::itor cmdb = unit;
 			for (cmdb++; cmdb != end() && cmdb->depth() > unit->depth(); cmdb++)
-				if (cmdb->type() == datablock::TYPE_COMMANDS)
+				if (cmdb->type() == block_type::TYPE_COMMANDS)
 					break;				// found
 
-			if (cmdb == end() || cmdb->type() != datablock::TYPE_COMMANDS)
+			if (cmdb == end() || cmdb->type() != block_type::TYPE_COMMANDS)
 			{
 				out << "  ; Einheit " << unit->id() << " hat keinen Befehlsblock!\n";
 				continue;
@@ -1403,18 +1404,18 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 		
 				datablock::itor items = unit;
 				for (items++; items != end() && items->depth() > unit->depth(); items++)
-					if (items->type() == datablock::TYPE_ITEMS)
+					if (items->type() == block_type::TYPE_ITEMS)
 					{
-						silver = items->valueInt(datakey::TYPE_SILVER);
+						silver = items->valueInt(TYPE_SILVER);
 						break;
 					}
 
 				// output unit header
 				out << "EINHEIT " << unit->id();
 
-				out << ";  " << (unit->value(datakey::TYPE_NAME)).text();
+				out << ";  " << (unit->value(TYPE_NAME)).text();
 			
-				out << " " << "[" << unit->valueInt(datakey::TYPE_NUMBER) << "," << silver << "$]";
+				out << " " << "[" << unit->valueInt(TYPE_NUMBER) << "," << silver << "$]";
 
 				out << "\n";
 			}
@@ -1530,62 +1531,62 @@ datablock::itor datafile::dummyToItor(const datablock* block)
 
 void datafile::createHierarchy()
 {
-	typedef std::vector<int> stack;
-	typedef std::set<int> tset;
-	typedef std::map<int, tset> types_to_tset;
+	typedef std::vector<block_type> stack;
+	typedef std::set<block_type> tset;
+	typedef std::map<block_type, tset> types_to_tset;
 
 	types_to_tset enclosed;				// map of PARENT-BLOCK -> set of CHILD_BLOCKs
 	
 	// fill map
-	for (int type = datablock::TYPE_UNKNOWN+1; type != datablock::TYPE_LAST; type++)
-		enclosed[type].insert(datablock::TYPE_UNKNOWN);
+	for (int type = (int) block_type::TYPE_UNKNOWN+1; type != (int)block_type::TYPE_LAST; type++)
+		enclosed[(block_type)type].insert(block_type::TYPE_UNKNOWN);
 
-	enclosed[datablock::TYPE_VERSION].insert(datablock::TYPE_BATTLE);
-		enclosed[datablock::TYPE_BATTLE].insert(datablock::TYPE_MESSAGE);
-	enclosed[datablock::TYPE_VERSION].insert(datablock::TYPE_MESSAGETYPE);
-	enclosed[datablock::TYPE_VERSION].insert(datablock::TYPE_ISLAND);
-	enclosed[datablock::TYPE_VERSION].insert(datablock::TYPE_TRANSLATION);
-	enclosed[datablock::TYPE_VERSION].insert(datablock::TYPE_REGION);
-		enclosed[datablock::TYPE_REGION].insert(datablock::TYPE_SCHEMEN);
-		enclosed[datablock::TYPE_REGION].insert(datablock::TYPE_BORDER);
-		enclosed[datablock::TYPE_REGION].insert(datablock::TYPE_RESOURCE);
-		enclosed[datablock::TYPE_REGION].insert(datablock::TYPE_ITEMS);
-		enclosed[datablock::TYPE_REGION].insert(datablock::TYPE_UNIT);
-			enclosed[datablock::TYPE_UNIT].insert(datablock::TYPE_EFFECTS);
-			enclosed[datablock::TYPE_UNIT].insert(datablock::TYPE_COMMANDS);
-			enclosed[datablock::TYPE_UNIT].insert(datablock::TYPE_ITEMS);
-			enclosed[datablock::TYPE_UNIT].insert(datablock::TYPE_SPELLS);
-			enclosed[datablock::TYPE_UNIT].insert(datablock::TYPE_COMBATSPELL);
-			enclosed[datablock::TYPE_UNIT].insert(datablock::TYPE_UNITMESSAGES);
-			enclosed[datablock::TYPE_UNIT].insert(datablock::TYPE_TALENTS);
-		enclosed[datablock::TYPE_REGION].insert(datablock::TYPE_BUILDING);
-			enclosed[datablock::TYPE_BUILDING].insert(datablock::TYPE_EFFECTS);
-		enclosed[datablock::TYPE_REGION].insert(datablock::TYPE_DURCHREISE);
-		enclosed[datablock::TYPE_REGION].insert(datablock::TYPE_DURCHSCHIFFUNG);
-		enclosed[datablock::TYPE_REGION].insert(datablock::TYPE_SHIP);
-			enclosed[datablock::TYPE_SHIP].insert(datablock::TYPE_EFFECTS);
-		enclosed[datablock::TYPE_REGION].insert(datablock::TYPE_PRICES);
-		enclosed[datablock::TYPE_REGION].insert(datablock::TYPE_EFFECTS);
-		enclosed[datablock::TYPE_REGION].insert(datablock::TYPE_MESSAGE);
-	enclosed[datablock::TYPE_FACTION].insert(datablock::TYPE_ZAUBER);
-		enclosed[datablock::TYPE_ZAUBER].insert(datablock::TYPE_KOMPONENTEN);
-	enclosed[datablock::TYPE_VERSION].insert(datablock::TYPE_TRANK);
-		enclosed[datablock::TYPE_TRANK].insert(datablock::TYPE_ZUTATEN);
-	enclosed[datablock::TYPE_VERSION].insert(datablock::TYPE_FACTION);
-		enclosed[datablock::TYPE_FACTION].insert(datablock::TYPE_GROUP);
-			enclosed[datablock::TYPE_GROUP].insert(datablock::TYPE_ALLIANCE);
-		enclosed[datablock::TYPE_FACTION].insert(datablock::TYPE_ALLIANCE);
-		enclosed[datablock::TYPE_FACTION].insert(datablock::TYPE_BATTLE);
-		enclosed[datablock::TYPE_FACTION].insert(datablock::TYPE_MESSAGE);
-		enclosed[datablock::TYPE_FACTION].insert(datablock::TYPE_OPTIONS);
-		enclosed[datablock::TYPE_FACTION].insert(datablock::TYPE_ITEMS);
+	enclosed[block_type::TYPE_VERSION].insert(block_type::TYPE_BATTLE);
+		enclosed[block_type::TYPE_BATTLE].insert(block_type::TYPE_MESSAGE);
+	enclosed[block_type::TYPE_VERSION].insert(block_type::TYPE_MESSAGETYPE);
+	enclosed[block_type::TYPE_VERSION].insert(block_type::TYPE_ISLAND);
+	enclosed[block_type::TYPE_VERSION].insert(block_type::TYPE_TRANSLATION);
+	enclosed[block_type::TYPE_VERSION].insert(block_type::TYPE_REGION);
+		enclosed[block_type::TYPE_REGION].insert(block_type::TYPE_SCHEMEN);
+		enclosed[block_type::TYPE_REGION].insert(block_type::TYPE_BORDER);
+		enclosed[block_type::TYPE_REGION].insert(block_type::TYPE_RESOURCE);
+		enclosed[block_type::TYPE_REGION].insert(block_type::TYPE_ITEMS);
+		enclosed[block_type::TYPE_REGION].insert(block_type::TYPE_UNIT);
+			enclosed[block_type::TYPE_UNIT].insert(block_type::TYPE_EFFECTS);
+			enclosed[block_type::TYPE_UNIT].insert(block_type::TYPE_COMMANDS);
+			enclosed[block_type::TYPE_UNIT].insert(block_type::TYPE_ITEMS);
+			enclosed[block_type::TYPE_UNIT].insert(block_type::TYPE_SPELLS);
+			enclosed[block_type::TYPE_UNIT].insert(block_type::TYPE_COMBATSPELL);
+			enclosed[block_type::TYPE_UNIT].insert(block_type::TYPE_UNITMESSAGES);
+			enclosed[block_type::TYPE_UNIT].insert(block_type::TYPE_TALENTS);
+		enclosed[block_type::TYPE_REGION].insert(block_type::TYPE_BUILDING);
+			enclosed[block_type::TYPE_BUILDING].insert(block_type::TYPE_EFFECTS);
+		enclosed[block_type::TYPE_REGION].insert(block_type::TYPE_DURCHREISE);
+		enclosed[block_type::TYPE_REGION].insert(block_type::TYPE_DURCHSCHIFFUNG);
+		enclosed[block_type::TYPE_REGION].insert(block_type::TYPE_SHIP);
+			enclosed[block_type::TYPE_SHIP].insert(block_type::TYPE_EFFECTS);
+		enclosed[block_type::TYPE_REGION].insert(block_type::TYPE_PRICES);
+		enclosed[block_type::TYPE_REGION].insert(block_type::TYPE_EFFECTS);
+		enclosed[block_type::TYPE_REGION].insert(block_type::TYPE_MESSAGE);
+	enclosed[block_type::TYPE_FACTION].insert(block_type::TYPE_ZAUBER);
+		enclosed[block_type::TYPE_ZAUBER].insert(block_type::TYPE_KOMPONENTEN);
+	enclosed[block_type::TYPE_VERSION].insert(block_type::TYPE_TRANK);
+		enclosed[block_type::TYPE_TRANK].insert(block_type::TYPE_ZUTATEN);
+	enclosed[block_type::TYPE_VERSION].insert(block_type::TYPE_FACTION);
+		enclosed[block_type::TYPE_FACTION].insert(block_type::TYPE_GROUP);
+			enclosed[block_type::TYPE_GROUP].insert(block_type::TYPE_ALLIANCE);
+		enclosed[block_type::TYPE_FACTION].insert(block_type::TYPE_ALLIANCE);
+		enclosed[block_type::TYPE_FACTION].insert(block_type::TYPE_BATTLE);
+		enclosed[block_type::TYPE_FACTION].insert(block_type::TYPE_MESSAGE);
+		enclosed[block_type::TYPE_FACTION].insert(block_type::TYPE_OPTIONS);
+		enclosed[block_type::TYPE_FACTION].insert(block_type::TYPE_ITEMS);
 
 	// build hierarchy
 	stack parents;						// parent block types. size() == depth in hierarchy.
 
 	for (datablock::itor block = blocks().begin(); block != end(); block++)
 	{
-		int type = block->type();
+        block_type type = block->type();
 
 		while (parents.size())
 		{
@@ -1636,22 +1637,22 @@ void datafile::createHashTables()
 	for (block = blocks().begin(); block != end(); block++)
 	{
 		// set turn number to that found in version block
-		if (block->type() == datablock::TYPE_VERSION)
-			m_turn = block->valueInt(datakey::TYPE_TURN, m_turn);
+		if (block->type() == block_type::TYPE_VERSION)
+			m_turn = block->valueInt(TYPE_TURN, m_turn);
 
 		// set faction as active faction (for ally-state)
-		if (block->type() == datablock::TYPE_FACTION)
+		if (block->type() == block_type::TYPE_FACTION)
 		{
 			if (m_activefaction == end())
-				if (/*block->value(datakey::TYPE_TYPE) != "" ||*/ block->value(datakey::TYPE_OPTIONS) != "")
+				if (/*block->value(TYPE_TYPE) != "" ||*/ block->value(TYPE_OPTIONS) != "")
 				{
 					m_activefaction = block;		// set active faction here
 
 					// get turn from faction block if VERSION block has none
 					if (!m_turn)
-						m_turn = block->valueInt(datakey::TYPE_TURN, m_turn);
+						m_turn = block->valueInt(TYPE_TURN, m_turn);
 					if (!m_recruitment)
-						m_recruitment = block->valueInt(datakey::TYPE_RECRUITMENTCOST, m_recruitment);
+						m_recruitment = block->valueInt(TYPE_RECRUITMENTCOST, m_recruitment);
 					break;
 				}
 		}
@@ -1664,7 +1665,7 @@ void datafile::createHashTables()
 		block = activefaction();
 		for (block++; block != end() && block->depth() > factionDepth; block++)
 		{
-            if (block->type() == datablock::TYPE_ALLIANCE) {
+            if (block->type() == block_type::TYPE_ALLIANCE) {
                 int status = block->valueInt("Status", 0);
                 allied_status[block->info()] = status;
             }
@@ -1674,7 +1675,7 @@ void datafile::createHashTables()
 	for (block = blocks().begin(); block != end(); block++)
 	{
         // add region to region list
-        if (block->type() == datablock::TYPE_REGION)
+        if (block->type() == block_type::TYPE_REGION)
 		{
 			if (region)
 			{
@@ -1712,20 +1713,20 @@ void datafile::createHashTables()
 			region->flags(region->flags() & (datablock::FLAG_BLOCKID_BIT0|datablock::FLAG_BLOCKID_BIT1));	// unset all flags except BLOCKID flags
 			region_own = region_ally = region_enemy = 0;
 
-			if (block->value(datakey::TYPE_VISIBILITY) == "lighthouse")
+			if (block->value(TYPE_VISIBILITY) == "lighthouse")
 				region->setFlags(datablock::FLAG_LIGHTHOUSE);		// region is seen by lighthouse
-			else if (block->value(datakey::TYPE_VISIBILITY) == "travel")
+			else if (block->value(TYPE_VISIBILITY) == "travel")
 				region->setFlags(datablock::FLAG_TRAVEL);			// region is seen by traveling throu
 
 			// put newest region into map
 			if (m_regions.find(koordinates(block->x(), block->y(), block->info())) !=
 					m_regions.end())
 			{
-				int region_turn = block->valueInt(datakey::TYPE_TURN, m_turn);
+				int region_turn = block->valueInt(TYPE_TURN, m_turn);
 
 				datablock::itor oldregion = m_regions[koordinates(block->x(),block->y(), block->info())];
 
-				int old_region_turn = oldregion->valueInt(datakey::TYPE_TURN, m_turn);
+				int old_region_turn = oldregion->valueInt(TYPE_TURN, m_turn);
 
 				if (region_turn >= old_region_turn)
 					m_regions[koordinates(block->x(), block->y(), block->info())] = block;
@@ -1748,13 +1749,13 @@ void datafile::createHashTables()
 		}
 
         // add ships and buildings to their lists
-        if (block->type() == datablock::TYPE_SHIP)
+        if (block->type() == block_type::TYPE_SHIP)
 			m_ships[block->info()] = block;
-        else if (block->type() == datablock::TYPE_BUILDING)
+        else if (block->type() == block_type::TYPE_BUILDING)
 			m_buildings[block->info()] = block;
 
 		// generate list of units that got a "got taxes" message (E3 only)
-        if (block->type() == datablock::TYPE_MESSAGE)
+        if (block->type() == block_type::TYPE_MESSAGE)
 			if (block->value("type") == "1264208711")
 			{
 				//std::set<int> unit_got_taxes;
@@ -1763,11 +1764,11 @@ void datafile::createHashTables()
 			}
 
         // add units to unit list
-        if (block->type() == datablock::TYPE_UNIT)
+        if (block->type() == block_type::TYPE_UNIT)
 		{
 			m_units[block->info()] = block;
 
-			int factionId = block->valueInt(datakey::TYPE_FACTION, -1);
+			int factionId = block->valueInt(TYPE_FACTION, -1);
 
 			if (faction(factionId) == end())
 			{
@@ -1793,16 +1794,16 @@ void datafile::createHashTables()
 				// search for command block of unit
 				datablock::itor cmd = block;
 				for (cmd++; cmd != end() && cmd->depth() > block->depth(); cmd++)
-					if (cmd->type() == datablock::TYPE_COMMANDS)
+					if (cmd->type() == block_type::TYPE_COMMANDS)
 						break;				// found
 
 				// add att_commands to command block
-				if (cmd != end() && cmd->type() == datablock::TYPE_COMMANDS && !cmd->attachment())
+				if (cmd != end() && cmd->type() == block_type::TYPE_COMMANDS && !cmd->attachment())
 				{
 					att_commands* cmds = new att_commands;
 					cmd->attachment(cmds);
 					
-					cmds->confirmed = block->valueInt(datakey::TYPE_ORDERS_CONFIRMED) != 0;
+					cmds->confirmed = block->valueInt(TYPE_ORDERS_CONFIRMED) != 0;
 
 					datakey::list_type &list = cmd->data();
 
@@ -1813,24 +1814,24 @@ void datafile::createHashTables()
 		}
 
 		// .. and factions to faction list
-		if (block->type() == datablock::TYPE_FACTION)
+		if (block->type() == block_type::TYPE_FACTION)
 			m_factions[block->info()] = block;
 		// alliance as placeholder-faction
-        if (block->type() == datablock::TYPE_ALLIANCE)
+        if (block->type() == block_type::TYPE_ALLIANCE)
 			if (faction(block->info()) == end())
 				m_factions[block->info()] = block;
 		// .. and islands to island list
-		if (block->type() == datablock::TYPE_ISLAND)
+		if (block->type() == block_type::TYPE_ISLAND)
 			m_islands[block->info()] = block;
 
 		if (region)
 		{
-			if (block->type() == datablock::TYPE_UNIT)
+			if (block->type() == block_type::TYPE_UNIT)
 			{
 				region->setFlags(datablock::FLAG_TROOPS);			// region has units
 
 				// count persons
-				int number = block->valueInt(datakey::TYPE_NUMBER, 0);
+				int number = block->valueInt(TYPE_NUMBER, 0);
 
 				enum
 				{
@@ -1841,7 +1842,7 @@ void datafile::createHashTables()
 
 				if (activefaction() != end())
 				{
-					int factionId = block->valueInt(datakey::TYPE_FACTION, -1);
+					int factionId = block->valueInt(TYPE_FACTION, -1);
 					if (factionId == activefaction()->info())
 					{
 						region_own += number;
@@ -1872,43 +1873,43 @@ void datafile::createHashTables()
 				if (unit_got_taxes.find( block->info() ) != unit_got_taxes.end())
 					region->setFlags(datablock::FLAG_REGION_TAXES);
 
-				if (block->value(datakey::TYPE_FACTION) == "0")
+				if (block->value(TYPE_FACTION) == "0")
 					region->setFlags(datablock::FLAG_MONSTER);		// Monster (0) in region
-				if (block->value(datakey::TYPE_FACTION) == "666")
+				if (block->value(TYPE_FACTION) == "666")
 					region->setFlags(datablock::FLAG_MONSTER);		// Monster (ii) in region
-				if (block->valueInt(datakey::TYPE_FACTION) == 0 || block->valueInt(datakey::TYPE_FACTION) == 666
-					|| block->value(datakey::TYPE_FACTION) == "")
+				if (block->valueInt(TYPE_FACTION) == 0 || block->valueInt(TYPE_FACTION) == 666
+					|| block->value(TYPE_FACTION) == "")
 				{
-					if (block->value(datakey::TYPE_TYPE) == "Skelette" ||
-							block->value(datakey::TYPE_TYPE) == "Skelettherren" ||
-							block->value(datakey::TYPE_TYPE) == "Zombies" ||
-							block->value(datakey::TYPE_TYPE) == "Juju-Zombies" ||
-							block->value(datakey::TYPE_TYPE) == "Ghoule" ||
-							block->value(datakey::TYPE_TYPE) == "Ghaste" ||
-							block->value(datakey::TYPE_TYPE) == "Ents" ||
-							block->value(datakey::TYPE_TYPE) == "Bauern" ||
-							block->value(datakey::TYPE_TYPE) == FXString(L"Hirnt\u00f6ter"))
+					if (block->value(TYPE_TYPE) == "Skelette" ||
+							block->value(TYPE_TYPE) == "Skelettherren" ||
+							block->value(TYPE_TYPE) == "Zombies" ||
+							block->value(TYPE_TYPE) == "Juju-Zombies" ||
+							block->value(TYPE_TYPE) == "Ghoule" ||
+							block->value(TYPE_TYPE) == "Ghaste" ||
+							block->value(TYPE_TYPE) == "Ents" ||
+							block->value(TYPE_TYPE) == "Bauern" ||
+							block->value(TYPE_TYPE) == FXString(L"Hirnt\u00f6ter"))
 						region->setFlags(datablock::FLAG_MONSTER);		// monsters in the region
-					else if (block->value(datakey::TYPE_TYPE) == "Seeschlangen")
+					else if (block->value(TYPE_TYPE) == "Seeschlangen")
 						region->setFlags(datablock::FLAG_SEASNAKE);		// sea snake in region
-					else if (block->value(datakey::TYPE_TYPE) == "Jungdrachen" ||
-							block->value(datakey::TYPE_TYPE) == "Drachen" ||
-							block->value(datakey::TYPE_TYPE) == "Wyrme")
+					else if (block->value(TYPE_TYPE) == "Jungdrachen" ||
+							block->value(TYPE_TYPE) == "Drachen" ||
+							block->value(TYPE_TYPE) == "Wyrme")
 						region->setFlags(datablock::FLAG_DRAGON);		// a dragon is in the region!
 				}
 			}
-			else if (block->type() == datablock::TYPE_DURCHSCHIFFUNG)
+			else if (block->type() == block_type::TYPE_DURCHSCHIFFUNG)
 				region->setFlags(datablock::FLAG_SHIPTRAVEL);		// region has travelled by ship
-			else if (block->type() == datablock::TYPE_BUILDING)
+			else if (block->type() == block_type::TYPE_BUILDING)
 			{
 				region->setFlags(datablock::FLAG_CASTLE);			// region has a building
 				
-				if (block->value(datakey::TYPE_TYPE) == "Wurmloch")
+				if (block->value(TYPE_TYPE) == "Wurmloch")
 					region->setFlags(datablock::FLAG_WORMHOLE);		// a wormhole is in the region!
 			}
-			else if (block->type() == datablock::TYPE_SHIP)
+			else if (block->type() == block_type::TYPE_SHIP)
 				region->setFlags(datablock::FLAG_SHIP);				// region has ships inside
-			else if (block->type() == datablock::TYPE_BORDER)
+			else if (block->type() == block_type::TYPE_BORDER)
 			{
 				const FXString& type = block->value("typ");
 
@@ -1932,11 +1933,11 @@ void datafile::createHashTables()
 
 	for (block = blocks().begin(); block != end(); block++)
 	{
-        if (block->type() != datablock::TYPE_REGION)
+        if (block->type() != block_type::TYPE_REGION)
 			continue;
         
 		// get regions name
-		if (const datakey* islandkey = block->valueKey(datakey::TYPE_ISLAND))
+		if (const datakey* islandkey = block->valueKey(TYPE_ISLAND))
 		{
 			FXString name;
 
@@ -1944,7 +1945,7 @@ void datafile::createHashTables()
 			{
 				datablock::itor island = this->island(islandkey->getInt());
 				if (island != end())
-					name = island->value(datakey::TYPE_NAME);
+					name = island->value(TYPE_NAME);
 				else
 					name = "Insel " + FXStringVal(islandkey->getInt());
 			}
