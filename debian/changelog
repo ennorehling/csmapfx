@@ -1,3 +1,10 @@
+csmapfx (0.8.4-1) stable; urgency=low
+
+  * stop asking about modified files after user says No.
+  * re-arrange menu items.
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 4 Dec 2021 20:25:00 +0200
+
 csmapfx (0.8.3-1) stable; urgency=low
 
   * do not auto-hide left and right frame for map reports.

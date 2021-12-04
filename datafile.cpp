@@ -745,7 +745,7 @@ int datafile::load(const char* filename)
 }
 
 // saves file
-int datafile::save(const char* filename, bool map_filter)
+int datafile::save(const char* filename, int map_filter)
 {
 	if (!filename)
 		return 0;

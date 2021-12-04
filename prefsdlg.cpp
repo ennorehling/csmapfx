@@ -25,3 +25,9 @@ long FXPrefsDlg::onAccept(FXObject* sender, FXSelector sel, void* ptr)
 {
     return FXDialogBox::onCmdAccept(sender, sel, ptr);
 }
+
+void FXPrefsDlg::create()
+{
+    FXDialogBox::create();
+}
+

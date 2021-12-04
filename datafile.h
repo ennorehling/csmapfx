@@ -316,6 +316,14 @@ protected:
 class datafile
 {
 public:
+    enum {
+        FILTER_NONE = 0,
+        FILTER_UNITS = 1,
+        FILTER_SHIPS = 2,
+        FILTER_BUILDINGS = 4,
+        FILTER_DETAILS = 8
+    } filter_type;
+
 	datafile();
 
 	const FXString& filename() const { return m_filename; }
@@ -332,7 +340,7 @@ public:
 	datablock::itor activefaction() { return m_activefaction; }
 
 	int load(const char* filename);
-	int save(const char* filename, bool map_filter);
+	int save(const char* filename, int map_filter);
 	void createHierarchy();
 	void createHashTables();
 
