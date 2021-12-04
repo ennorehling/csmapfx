@@ -26,8 +26,8 @@ FXDEFMAP(FXInfoDlg) MessageMap[]=
 
 FXIMPLEMENT(FXInfoDlg,FXDialogBox,MessageMap, ARRAYNUMBER(MessageMap))
 
-FXInfoDlg::FXInfoDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint opts, FXint x,FXint y,FXint w,FXint h)
-		: FXDialogBox(owner, name, opts, x,y,w,h, 10,10,10,10, 10,10)
+FXInfoDlg::FXInfoDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint opts, FXint x, FXint y, FXint w, FXint h)
+		: FXDialogBox(owner, name, opts, x, y, w, h)
 {
 	setIcon(icon);
 

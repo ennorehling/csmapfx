@@ -11,9 +11,6 @@
 #include "messages.h"
 #include "calc.h"
 #include "map.h"
-#include "exportdlg.h"
-#include "infodlg.h"
-#include "searchdlg.h"
 #include "terrain.h"
 
 #include "FXSplitterEx.h"
@@ -21,6 +18,9 @@
 #include <fx.h>
 
 #include <ctime>
+
+class FXInfoDlg;
+class FXSearchDlg;
 
 class CSMap : public FXMainWindow
 { 
@@ -62,7 +62,8 @@ public:		// this functions are slots for menu commands
 	long onFileSaveMap(FXObject*, FXSelector, void*);
 	long onFileClose(FXObject*, FXSelector, void*);
 	long onFileMapExport(FXObject*, FXSelector, void*);
-	
+    long onFilePreferences(FXObject*, FXSelector, void*);
+
 	long onFileOpenCommands(FXObject*, FXSelector, void* ptr);
 	long onFileSaveCommands(FXObject*, FXSelector, void* ptr);
     long onFileExportCommands(FXObject*, FXSelector, void* ptr);
@@ -108,7 +109,6 @@ public:		// this functions are slots for menu commands
 	long onUpdateZoom(FXObject*, FXSelector, void* ptr);
 
 	long onSetOrigin(FXObject*, FXSelector, void* ptr);
-	long onMakeMap(FXObject*, FXSelector, void* ptr);
 
     long onErrorSelected(FXObject*, FXSelector, void* ptr);
 	
@@ -142,6 +142,7 @@ public:
 		ID_CALCULATOR,
 
 		// File menu
+		ID_FILE_PREFERENCES,
 		ID_FILE_RECENT,
 		ID_FILE_OPEN,
 		ID_FILE_MERGE,
@@ -267,8 +268,8 @@ private:
 	// Floating
 	FXDialogBox		*minimap_frame;
 	FXCSMap			*minimap;
-	FXInfoDlg		*infodlg;
-	FXSearchDlg		*searchdlg;
+	class FXInfoDlg	*infodlg;
+	class FXSearchDlg *searchdlg;
     time_t last_save_time;
     enum { RELOAD_NEVER, RELOAD_AUTO, RELOAD_ASK } reload_mode;
 

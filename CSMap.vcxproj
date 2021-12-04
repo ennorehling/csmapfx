@@ -48,7 +48,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>Release\</OutDir>
     <IntDir>Release\</IntDir>
-    <IncludePath>C:\homebrew\installed\x86-windows\fox-1.6.57\include</IncludePath>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
     <LibraryPath>C:\homebrew\installed\x86-windows\fox-1.6.57\lib;$(LibraryPath)</LibraryPath>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
@@ -56,7 +55,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>Debug\</OutDir>
     <IntDir>Debug\</IntDir>
-    <IncludePath>C:\homebrew\installed\x86-windows\fox-1.6.57\include</IncludePath>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
     <LibraryPath>C:\homebrew\installed\x86-windows\fox-1.6.57\lib;$(LibraryPath)</LibraryPath>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
@@ -195,6 +193,7 @@
     <ClCompile Include="regionlist.cpp" />
     <ClCompile Include="scout.cpp" />
     <ClCompile Include="searchdlg.cpp" />
+    <ClCompile Include="prefsdlg.cpp" />
     <ClCompile Include="statistics.cpp" />
     <ClCompile Include="statsinfos.cpp" />
     <ClCompile Include="symbols.cpp" />
@@ -227,6 +226,7 @@
     <ClInclude Include="regionlist.h" />
     <ClInclude Include="scout.h" />
     <ClInclude Include="searchdlg.h" />
+    <ClInclude Include="prefsdlg.h" />
     <ClInclude Include="statistics.h" />
     <ClInclude Include="statsinfos.h" />
     <ClInclude Include="symbols.h" />

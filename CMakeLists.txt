@@ -29,6 +29,7 @@ set (SOURCES
 	mapcanvas.cpp
 	map.cpp
 	messages.cpp
+  prefsdlg.cpp
 	regioninfos.cpp
 	regionlist.cpp
 	scout.cpp

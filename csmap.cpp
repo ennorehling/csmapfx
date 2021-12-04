@@ -20,6 +20,11 @@
 #include "datafile.h"
 #include "symbols.h"
 
+#include "exportdlg.h"
+#include "infodlg.h"
+#include "searchdlg.h"
+#include "prefsdlg.h"
+
 #include "fxkeys.h"
 #include "FXMenuSeparatorEx.h"
 #include "FXFileDialogEx.h"
@@ -48,6 +53,7 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_ORDERS,   CSMap::onFileExportCommands),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_UPLOAD_ORDERS,   CSMap::onFileUploadCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_RECENT,		    CSMap::onFileRecent),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_PREFERENCES,     CSMap::onFilePreferences),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_QUIT,		    CSMap::onQuit),
 
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_MERGE,		    CSMap::updOpenFile),
@@ -318,7 +324,13 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 		filemenu,
 		L"Karte exportieren...\t\tDie Karte als PNG speichern.",
 		NULL, this, ID_FILE_EXPORT_MAP);
-	new FXMenuSeparatorEx(filemenu);
+    /*
+    new FXMenuCommand(
+		filemenu,
+		L"Einstellungen...\tCtrl-Shift-.\tEinstellungen verwalten.",
+		NULL, this, ID_FILE_PREFERENCES);
+    */
+    new FXMenuSeparatorEx(filemenu);
 
 	recentmenu = new FXMenuPane(this);
 	for (int i = 0; i < 6; i++)
@@ -335,12 +347,12 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
 	new FXMenuTitle(menubar,"&Ansicht",NULL,viewmenu);
 	menu.toolbar = new FXMenuCheck(viewmenu,"Tool&bar\tCtrl-T\tToolbar ein- bzw. ausblenden.", toolbar,ID_TOGGLESHOWN);
 	menu.maponly = new FXMenuCheck(viewmenu,"&Nur Karte anzeigen\tCtrl-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this,ID_VIEW_MAPONLY,0);
-	menu.messages = new FXMenuCheck(viewmenu,"&Meldungen\t\tRegionsmeldungen ein- bzw. ausblenden.", this, ID_VIEW_MESSAGES);
+	menu.messages = new FXMenuCheck(viewmenu,"&Meldungen\tCtrl-Shift-V\tRegionsmeldungen ein- bzw. ausblenden.", this, ID_VIEW_MESSAGES);
 	menu.show_left = new FXMenuCheck(viewmenu,"&Regionsliste\t\tRegionsliste ein- bzw. ausblenden.", this, ID_VIEW_REGIONLIST);
 	menu.show_right = new FXMenuCheck(viewmenu,"&Eigenschaften\t\tEinheiten- und Regionsdetails ein- bzw. ausblenden.", this, ID_VIEW_PROPERTIES);
-	menu.calc = new FXMenuCheck(viewmenu,"&Taschenrechner\tCtrl-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
-	menu.minimap = new FXMenuCheck(viewmenu,FXString(L"\u00dcbersichts&karte\tCtrl-N\t\u00dcbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
-	menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tCtrl-B\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
+	menu.calc = new FXMenuCheck(viewmenu,"&Taschenrechner\tCtrl-Shift-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
+	menu.minimap = new FXMenuCheck(viewmenu,FXString(L"\u00dcbersichts&karte\tCtrl-Shift-N\t\u00dcbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
+	menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tCtrl-Shift-B\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
 	new FXMenuSeparatorEx(viewmenu, "Liste");
 	menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tAlt-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
     menu.colorizeUnits = new FXMenuCheck(viewmenu, "Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
@@ -2490,9 +2502,19 @@ void CSMap::saveCommandsDlg(bool stripped, bool replace)
     }
 }
 
+long CSMap::onFilePreferences(FXObject*, FXSelector, void*)
+{
+    FXPrefsDlg dlg(this, "Einstellungen", icon, DECOR_ALL & ~(DECOR_MENU | DECOR_MAXIMIZE), 100, 100, 250, 250);
+    FXint res = dlg.execute(PLACEMENT_SCREEN);
+    if (!res) {
+        return 0;
+    }
+    return 1;
+}
+
 long CSMap::onFileMapExport(FXObject *, FXSelector, void *)
 {
-    FXExportDlg exp(this, "Karte exportieren...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100,100, 400,250);
+    FXExportDlg exp(this, "Karte exportieren...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100, 100, 400, 250);
 	FXint res = exp.execute(PLACEMENT_SCREEN);
 	if (!res)
 		return 0;

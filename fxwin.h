@@ -12,12 +12,6 @@
 
 #include <windows.h>
 
-#ifdef NDEBUG
-#pragma comment(lib,"fox-1.6.lib")
-#else
-#pragma comment(lib,"foxd-1.6.lib")
-#endif
-
 #endif // WIN32
 
 #ifdef CSMAP_MAIN
