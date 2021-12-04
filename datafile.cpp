@@ -766,30 +766,49 @@ int datafile::save(const char* filename, map_type map_filter)
 		return -1;
 	}
 
-	const datablock::itor end = blocks().end();
-    datablock::itor block = blocks().begin();
-	while ( block != end) {
+    datablock::itor block;
+    datablock::itor last_block = blocks().end();
+    int maxDepth = 0;
+    for (block = blocks().begin(); block != last_block; ++block) {
 		bool hideKeys = false;
         block_type type = block->type();
 
-        if (map_filter != map_type::MAP_FULL) {
+        if (maxDepth) {
+            if (block->depth() > maxDepth) {
+                // reset the skip-child behavior
+                maxDepth = 0;
+            }
+            else {
+                // do not print child-blocks now
+                ++block;
+                continue;
+            }
+        }
+
+        if (map_filter == map_type::MAP_MINIMAL) {
+            /* skip over anything except version or region  */
+            if (type == block_type::TYPE_REGION) {
+                hideKeys = true;
+            }
+            else if (type != block_type::TYPE_VERSION) {
+                continue;
+            }
+        }
+        else if (map_filter != map_type::MAP_FULL) {
             /* do not include these blocks at all */
             if (type == block_type::TYPE_EFFECTS
                 || type == block_type::TYPE_MESSAGE
                 || type == block_type::TYPE_MESSAGETYPE
                 || type == block_type::TYPE_DURCHREISE
                 || type == block_type::TYPE_DURCHSCHIFFUNG) {
-                ++block;
                 continue;
             }
+
             /* skip these blocks with all their children */
             if (type == block_type::TYPE_UNIT
                 || type == block_type::TYPE_BATTLE
                 || type == block_type::TYPE_SHIP) {
-                int depth = block->depth();
-                do {
-                    ++block;
-                } while (block != end && block->depth() > depth);
+                maxDepth = block->depth();
                 continue;
             }
         }
@@ -852,13 +871,13 @@ int datafile::save(const char* filename, map_type map_filter)
 		{
 			// search for command block of unit
 			datablock::itor cmd = block;
-			for (cmd++; cmd != end && cmd->depth() > block->depth(); cmd++)
+			for (cmd++; cmd != last_block && cmd->depth() > block->depth(); cmd++)
 				if (cmd->type() == block_type::TYPE_COMMANDS)
 					break;				// found
 
 			bool confirmed = block->valueInt(TYPE_ORDERS_CONFIRMED) != 0;
 
-			if (cmd != end && cmd->type() == block_type::TYPE_COMMANDS)
+			if (cmd != last_block && cmd->type() == block_type::TYPE_COMMANDS)
 			{
 				// att_commands' confirmed attribute overwrites the tag
 				if (att_commands* cmds = dynamic_cast<att_commands*>(cmd->attachment()))
@@ -976,18 +995,6 @@ int datafile::save(const char* filename, map_type map_filter)
 		std::string output = file.str();		
 		filestr.save(output.c_str(), output.size());
 		file.str("");
-
-        if (map_filter != map_type::MAP_FULL) {
-            /* skip over child blocks */
-            if (block->type() == block_type::TYPE_FACTION) {
-                int depth = block->depth();
-                do {
-                    ++block;
-                } while (block != end && block->depth() > depth);
-                continue;
-            }
-        }
-        ++block;
 	}
 
 	return blocks().size();
