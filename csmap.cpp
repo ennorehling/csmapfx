@@ -646,6 +646,22 @@ CSMap::~CSMap()
 		delete icons.terrain[i];
 }
 
+#ifdef WIN32
+static FXString echeck_locate(const GUID folderId) {
+    PWSTR wPath = NULL;
+    if (S_OK == SHGetKnownFolderPath(folderId, 0, NULL, &wPath)) {
+        FXString path(wPath);
+        FXString exefile;
+        path.append("\\Eressea\\Echeck");
+        exefile = path + "\\echeckw.exe";
+        if (FXStat::exists(exefile)) {
+            return path;
+        }
+    }
+    CoTaskMemFree(wPath);
+    return "";
+}
+#endif
 // Create and initialize
 void CSMap::create()
 {
@@ -660,17 +676,15 @@ void CSMap::create()
     }
 #ifdef WIN32
     else {
-        PWSTR wPath = NULL;
-        if (S_OK == SHGetKnownFolderPath(FOLDERID_ProgramFiles, 0, NULL, &wPath)) {
-            FXString path(wPath);
-            FXString exefile;
-            path.append("\\Eressea\\Echeck");
-            exefile = path + "\\echeckw.exe";
-            if (FXStat::exists(exefile)) {
-                settings.echeck_dir = path;
-            }
+        FXString path;
+        path = echeck_locate(FOLDERID_ProgramFiles);
+        if (path.empty()) {
+            path = echeck_locate(FOLDERID_ProgramFilesX64);
         }
-        CoTaskMemFree(wPath);
+        if (path.empty()) {
+            path = echeck_locate(FOLDERID_ProgramFilesX86);
+        }
+        settings.echeck_dir = path;
     }
 #endif
     const FXchar *passwd = reg.readStringEntry("settings", "password", NULL);
@@ -1493,7 +1507,7 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
 
     if (!report)
         return 0;
-    if (info->unit_id) {
+    if (info && info->unit_id) {
         datafile::SelectionState state;
         state.selected = selection.UNIT;
         state.unit = report->unit(info->unit_id);
@@ -2156,9 +2170,19 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
         cmdline = "echeck";
     }
 #endif
-    if (!cmdline.empty()) {
-        if (u_mkstemp(infile) && report->saveCmds(infile, "", true) > 0) {
-            if (u_mkstemp(outfile)) {
+    errorList->clearItems();
+    if (cmdline.empty()) {
+        errorList->appendItem("Could not find the echeck executable.");
+    }
+    else {
+        if (!u_mkstemp(infile) || report->saveCmds(infile, "", true) > 0) {
+            errorList->appendItem("Could not save commands for analysis.");
+        }
+        else {
+            if (!u_mkstemp(outfile)) {
+                errorList->appendItem("Could not create output file for analysis.");
+            }
+            else {
                 // Echeck it:
                 cmdline.append(" -w3 -c -Lde -Re2 -O");
                 cmdline.append(outfile);
@@ -2186,7 +2210,6 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
                     throw std::runtime_error("echeck call failed");
                 }
 #endif
-                errorList->clearItems();
                 for (auto error : output) delete error;
                 output.clear();
                 outputTabs->setCurrent(1);
