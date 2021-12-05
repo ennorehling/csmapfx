@@ -8,16 +8,16 @@
 #define CSMAP_APP_TITLE      "Coast'n'Sea Mapper"
 
 	// current application version and subversion revision
-#define CSMAP_APP_VERSION    0, 8, 4
+#define CSMAP_APP_VERSION    0, 9, 0
 
 	// application version string
-#define CSMAP_APP_VERSIONSTR "v0.8.4"
+#define CSMAP_APP_VERSIONSTR "v0.9.0"
 
 	// application title with full version string
 #define CSMAP_APP_TITLE_VERSION CSMAP_APP_TITLE " " CSMAP_APP_VERSIONSTR
 
 	// used as legal copyright (version.rc) and command line welcome text (main.cpp)
-#define CSMAP_APP_COPYRIGHT  "Copyright (c) 2004-2010 Thomas J. Gritzan\nCopyright (c) 2021 Enno Rehling"
+#define CSMAP_APP_COPYRIGHT  "Copyright (c) 2004-2010 Thomas J. Gritzan\nCopyright (c) 2021-2022 Enno Rehling"
 	// used as company name (version.rc) and in the About Box (csmap.cpp)
 #define CSMAP_APP_URL        "https://github.com/ennorehling/csmapfx"
 
