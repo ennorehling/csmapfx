@@ -1460,7 +1460,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 	}
 
 	out << "\nNAECHSTER\n";
-	return true;
+	return 0;
 }
 
 // block hash tables

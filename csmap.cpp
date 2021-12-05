@@ -2141,17 +2141,15 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
     // save to a temporary file:
     char infile[PATH_MAX];
     char outfile[PATH_MAX];
-    FXString cmdline;
+    FXString cmdline("echeck");
 #ifdef WIN32
+    cmdline += "w.exe";
     if (!settings.echeck_dir.empty()) {
-        cmdline = "\"" + settings.echeck_dir + "\\echeckw.exe\"";
+        cmdline = "\"" + settings.echeck_dir + "\\" + cmdline + "\"";
     }
 #else
     if (!settings.echeck_dir.empty()) {
         cmdline = settings.echeck_dir + "/echeck";
-    }
-    else {
-        cmdline = "echeck";
     }
 #endif
     errorList->clearItems();
@@ -2159,7 +2157,7 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
         errorList->appendItem("Could not find the echeck executable.");
     }
     else {
-        if (!u_mkstemp(infile) || report->saveCmds(infile, "", true) > 0) {
+        if (!u_mkstemp(infile) || report->saveCmds(infile, "", true) != 0) {
             errorList->appendItem("Could not save commands for analysis.");
         }
         else {
@@ -2180,7 +2178,7 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
                 si.cb = sizeof(si);
                 ZeroMemory(&pi, sizeof(pi));
                 if (!CreateProcess(NULL, (LPSTR)cmdline.text(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
-                    throw std::runtime_error("CreateProcess failed");
+                    errorList->appendItem("CreateProcess failed: " + cmdline);
                 }
 
                 // Wait until child process exits.
@@ -2191,7 +2189,7 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
                 CloseHandle(pi.hThread);
 #else
                 if (system(cmdline.text()) < 0) {
-                    throw std::runtime_error("echeck call failed");
+                    errorList->appendItem("echeck system call failed: " + cmdline);
                 }
 #endif
                 for (auto error : output) delete error;
