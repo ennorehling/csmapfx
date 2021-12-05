@@ -1113,6 +1113,7 @@ bool CSMap::loadCommands(const FXString& filename)
         return false;
     }
 
+    reload_mode = CSMap::reload_type::RELOAD_ASK;
     mapChange(true);    // new file flag
     return true;
 }
@@ -2039,12 +2040,12 @@ bool CSMap::updateCommands(const FXString &filename) {
             ask.text(),
             filename.text());
         if (res != MBOX_CLICKED_NO) {
-            return loadCommands(filename);
+            return true;
         }
         reload_mode = CSMap::reload_type::RELOAD_NEVER;
     }
     else if (reload_mode == CSMap::reload_type::RELOAD_AUTO) {
-        return loadCommands(filename);
+        return true;
     }
     return false;
 }
@@ -2060,6 +2061,10 @@ long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
                     if (last_save_time != 0) {
                         if (updateCommands(filename)) {
                             last_save_time = buf.st_mtime;
+                            if (stat(filename.text(), &buf) == 0) {
+                                last_save_time = buf.st_mtime;
+                            }
+                            loadCommands(filename);
                             getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, NULL);
                             return 1;
                         }
