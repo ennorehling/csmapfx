@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
 					{
 						arg++;
 						if (csmap)
-							csmap->saveFile(FXString(argv[arg]));
+							csmap->saveReport(FXString(argv[arg]), map_type::MAP_FULL);
 						startgui = false;
 						break;
 					}

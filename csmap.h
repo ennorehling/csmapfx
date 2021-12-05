@@ -35,15 +35,12 @@ public:
 
     static CSMap* getInstance();
 
-    FXString getPassword();
-    void setPassword(const FXString &password);
-
-	void mapChange(bool newfile = false);
+    bool saveReport(const FXString& filename, map_type mode, bool merge_commands = false);
+    void mapChange(bool newfile = false);
 	bool haveActiveFaction() const;
 	bool loadFile(FXString filename);
 	bool mergeFile(FXString filename);
-	bool saveFile(FXString filename, bool merge_commands = false);
-	bool closeFile();
+    bool closeFile();
     void saveCommandsDlg(bool stripped, bool replace);
     FXString askFileName(const FXString &title, const FXString &patterns);
     FXString askPasswordDlg(const FXString &faction_id);
@@ -60,8 +57,9 @@ public:		// this functions are slots for menu commands
 
 	long onFileMerge(FXObject*, FXSelector, void*);
 	long onFileSaveMap(FXObject*, FXSelector, void*);
-	long onFileClose(FXObject*, FXSelector, void*);
-	long onFileMapExport(FXObject*, FXSelector, void*);
+    long onFileExportMap(FXObject*, FXSelector, void*);
+	long onFileExportImage(FXObject*, FXSelector, void*);
+    long onFileClose(FXObject*, FXSelector, void*);
     long onFilePreferences(FXObject*, FXSelector, void*);
 
 	long onFileOpenCommands(FXObject*, FXSelector, void* ptr);
@@ -134,7 +132,7 @@ public:		// this functions are slots for menu commands
 	
 	long onCalculator(FXObject*, FXSelector, void* ptr);
 
-public: 
+public:
 	enum
 	{
 		ID_REGIONS = FXMainWindow::ID_LAST,
@@ -147,8 +145,9 @@ public:
 		ID_FILE_OPEN,
 		ID_FILE_MERGE,
 		ID_FILE_SAVE_MAP,
-		ID_FILE_CLOSE,
-		ID_FILE_EXPORT_MAP,
+        ID_FILE_EXPORT_MAP,
+        ID_FILE_EXPORT_IMAGE,
+        ID_FILE_CLOSE,
         ID_FILE_LOAD_ORDERS,
         ID_FILE_SAVE_ORDERS,
         ID_FILE_CHECK_ORDERS,
@@ -207,6 +206,7 @@ public:
 
 private: 
     int unlink(const char *pathname);
+    FXString askSaveFileName(const FXString& dlgTitle);
 
 	// Menubar
 	FXMenuBar		*menubar;

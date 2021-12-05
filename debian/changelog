@@ -1,7 +1,9 @@
-csmapfx (0.8.4-1) stable; urgency=low
+csmapfx (0.9.0-1) stable; urgency=low
 
   * stop asking about modified files after user says No.
   * re-arrange menu items.
+  * add separate menu items for full and partial map exports.
+  * print an error message if echeck cannot be found.
 
  -- Enno Rehling <enno@eressea.de>  Mon, 4 Dec 2021 20:25:00 +0200
 

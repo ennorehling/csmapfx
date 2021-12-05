@@ -44,12 +44,13 @@ FXDEFMAP(CSMap) MessageMap[]=
 	//________Message_Type_____________________ID_______________Message_Handler_______
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_OPEN,		    CSMap::onFileOpen),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_MERGE,		    CSMap::onFileMerge),
-	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_MAP,		CSMap::onFileSaveMap),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_LOAD_ORDERS,	    CSMap::onFileOpenCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ORDERS,	    CSMap::onFileSaveCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_CLOSE,		    CSMap::onFileClose),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_CHECK_ORDERS,    CSMap::onFileCheckCommands),
-    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_MAP,	    CSMap::onFileMapExport),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_MAP,		CSMap::onFileSaveMap),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_MAP,	    CSMap::onFileExportMap),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_IMAGE,    CSMap::onFileExportImage),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_ORDERS,   CSMap::onFileExportCommands),
 	FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_UPLOAD_ORDERS,   CSMap::onFileUploadCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_RECENT,		    CSMap::onFileRecent),
@@ -59,6 +60,7 @@ FXDEFMAP(CSMap) MessageMap[]=
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_MERGE,		    CSMap::updOpenFile),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_MAP,		CSMap::updOpenFile),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_CLOSE,		    CSMap::updOpenFile),
+	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_IMAGE,	CSMap::updOpenFile),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_MAP,	    CSMap::updOpenFile),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_ORDERS,   CSMap::updOpenFile),
 	FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_UPLOAD_ORDERS,   CSMap::updOpenFile),
@@ -294,10 +296,6 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
         filemenu,
         FXString(L"Befehle &speichern\tCtrl-S\tBefehlsdatei speichern."),
         icons.save, this, ID_FILE_SAVE_ORDERS);
-    new FXMenuCommand(
-        filemenu,
-        FXString(L"Karte sp&eichern...\tCtrl-E\tDaten als Karten-Report speichern."),
-        icons.save, this, ID_FILE_SAVE_MAP);
 	new FXMenuCommand(
 		filemenu,
 		FXString(L"Sch&liessen\t\tDie aktuelle Datei schliessen."),
@@ -313,9 +311,9 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
         L"Befehle einsenden...\t\tDie Befehle an den Server versenden.",
         NULL, this, ID_FILE_UPLOAD_ORDERS);
     new FXMenuCommand(
-		filemenu,
-		L"Karte exportieren...\t\tDie Karte als PNG speichern.",
-		NULL, this, ID_FILE_EXPORT_MAP);
+        filemenu,
+        L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",
+        NULL, this, ID_FILE_EXPORT_ORDERS);
     /*
     new FXMenuCommand(
 		filemenu,
@@ -339,12 +337,20 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
     new FXMenuTitle(menubar, "&Karte", NULL, mapmenu);
     new FXMenuCommand(
         mapmenu,
-        FXString(L"Karte h&inzuf\u00fcgen...\tCtrl-I\tL\u00e4dt einen Karten-Report in den aktuellen Report."),
+        FXString(L"H&inzuf\u00fcgen...\tCtrl-I\tL\u00e4dt einen Karten-Report in den aktuellen Report."),
         icons.merge, this, ID_FILE_MERGE);
     new FXMenuCommand(
         mapmenu,
-        L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",
-        NULL, this, ID_FILE_EXPORT_ORDERS);
+        FXString(L"Sp&eichern...\t\tDetailierten Karten-Report speichern."),
+        icons.save, this, ID_FILE_SAVE_MAP);
+    new FXMenuCommand(
+        mapmenu,
+        FXString(L"E&xportieren...\t\tKarte ohne Details speichern."),
+        icons.save, this, ID_FILE_EXPORT_MAP);
+    new FXMenuCommand(
+        mapmenu,
+        L"Als &PNG exportieren...\t\tDie Karte als PNG speichern.",
+        NULL, this, ID_FILE_EXPORT_IMAGE);
 
     new FXMenuSeparatorEx(mapmenu, "Regionsmarker");
     new FXMenuCommand(mapmenu, "&Ursprung setzen\t\tDen Kartenursprung (0/0) auf die markierte Region setzen.", NULL, this, ID_MAP_SETORIGIN, 0);
@@ -1079,28 +1085,6 @@ bool CSMap::mergeFile(FXString filename)
     report->createHashTables();
 	mapChange();
 	return true;
-}
-
-bool CSMap::saveFile(FXString filename, bool merge_commands /*= false*/)
-{
-	if (filename.empty() || !report)
-		return false;
-
-	if (FXStat::exists(filename)) {
-		FXString text;
-		text = filename + FXString(L" existiert bereits.\n\nM\u00f6chten Sie sie ersetzen?");
-
-		FXuint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
-        if (MBOX_CLICKED_YES != answ) return false;
-	}
-    FXint res = report->save(filename.text(), map_type::MAP_NORMAL);
-    if (res <= 0) {
-        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
-        return false;
-    }
-    recentFiles.appendFile(filename);
-    mapChange();
-    return true;
 }
 
 bool CSMap::loadCommands(const FXString& filename)
@@ -2252,42 +2236,51 @@ int CSMap::unlink(const char *pathname) {
 #endif
 }
 
+bool CSMap::saveReport(const FXString& filename, map_type mode, bool merge_commands /*= false*/)
+{
+    if (filename.empty() || !report)
+        return false;
+
+    if (FXStat::exists(filename)) {
+        FXString text;
+        text = filename + FXString(L" existiert bereits.\n\nM\u00f6chten Sie sie ersetzen?");
+
+        FXuint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
+        if (MBOX_CLICKED_YES != answ) return false;
+    }
+    FXint res = report->save(filename.text(), mode);
+    if (res <= 0) {
+        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
+        return false;
+    }
+    recentFiles.appendFile(filename);
+    mapChange();
+    return true;
+}
+
+FXString CSMap::askSaveFileName(const FXString &dlgTitle)
+{
+    return askFileName(dlgTitle, "Eressea Computer Report (*.cr)\nAlle Dateien (*)");
+}
+
 long CSMap::onFileSaveMap(FXObject*, FXSelector, void*)
 {
-	FXFileDialog dlg(this, "Speichern unter...", DLGEX_SAVE);
-	dlg.setIcon(icons.save);
-	dlg.setDirectory(dialogDirectory);
-	dlg.setPatternList(FXString(L"Eressea Computer Report (*.cr)\nAlle Dateien (*)"));
-	FXint res = dlg.execute(PLACEMENT_SCREEN);
-	dialogDirectory = dlg.getDirectory();
-	if (res)
-	{
-		FXString filename = dlg.getFilename();
-		FXString pattern = dlg.getPattern();
-
-		// Pr\u00fcft, ob Dateiname bereits Endung enth\u00e4lt.
-		FXString ext = filename.rafter('.');
-		for (int i = 0; ; i++)
-		{
-			FXString patt = pattern.section(',',i);
-			if (patt.empty())
-			{
-                // Der Dateiname endet nicht mit ".cr" o.\u00e4., deshalb wird Endung angehangen.
-				ext = pattern.section(',',0).after('.');
-				if (!ext.empty())
-					filename += "." + ext;
-				break;
-			}
-
-			// Dateiname endet auf ".cr" o.\u00e4.
-            if (ext == patt.after('.'))
-				break;
-		}
-
-		saveFile(filename);
+    FXString filename = askSaveFileName("Speichern unter...");
+    if (!filename.empty()) {
+		saveReport(filename, map_type::MAP_NORMAL);
         return 1;
     }
 	return 0;
+}
+
+long CSMap::onFileExportMap(FXObject*, FXSelector, void*)
+{
+    FXString filename = askSaveFileName("Speichern unter...");
+    if (!filename.empty()) {
+        saveReport(filename, map_type::MAP_MINIMAL);
+        return 1;
+    }
+    return 0;
 }
 
 long CSMap::onFileClose(FXObject*, FXSelector, void*)
@@ -2537,7 +2530,7 @@ long CSMap::onFilePreferences(FXObject*, FXSelector, void*)
     return 1;
 }
 
-long CSMap::onFileMapExport(FXObject *, FXSelector, void *)
+long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
 {
     FXExportDlg exp(this, "Karte exportieren...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100, 100, 400, 250);
 	FXint res = exp.execute(PLACEMENT_SCREEN);
