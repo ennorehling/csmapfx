@@ -1104,6 +1104,15 @@ bool CSMap::loadCommands(const FXString& filename)
             mapChange(false);
             return false;
         }
+        FXString password = report->getPassword();
+        if (!password.empty()) {
+            settings.password = password;
+        }
+        int factionId = report->getFactionId();
+        if (factionId > 0) {
+            char buffer[10];
+            settings.faction_id = FXString(itoa(factionId, buffer, 36));
+        }
     }
     catch(const std::runtime_error& err)
     {

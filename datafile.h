@@ -340,12 +340,15 @@ public:
 	datablock::itor activefaction() { return m_activefaction; }
 
 	int load(const char* filename);
-	int save(const char* filename, enum map_type map_filter);
+	int save(const char* filename, map_type map_filter);
 	void createHierarchy();
 	void createHashTables();
 
 	int loadCmds(const FXString &filename);
 	int saveCmds(const FXString &filename, const FXString &passwd, bool stripped);
+
+    FXString getPassword() const { return m_password; }
+    int getFactionId() const { return m_factionId; }
 
 	datablock::list_type& blocks() { return m_blocks; }
 
@@ -398,12 +401,10 @@ public:
 		};
 
 		// mini-c'tor
-		SelectionState() : selected(0),map(0), selChange(0),fileChange(0) {}
+		SelectionState() : selected(0), map(0), sel_x(0), sel_y(0), sel_plane(0), selChange(0), fileChange(0) {}
 	};
 
 protected:
-	// file names of report and command files
-    FXString m_filename, m_cmdfilename;
 
 	struct koordinates
 	{
@@ -450,8 +451,12 @@ protected:
 	// the data blocks
 	datablock::list_type m_blocks;
 
-	// some collected information
-	int m_recruitment;
+    // file names of report and command files, password (from commands)
+    FXString m_filename, m_cmdfilename;
+    // some collected information
+    FXString m_password;
+    int m_factionId;
+    int m_recruitment;
 	int m_turn;
 	datablock::itor m_activefaction;
 

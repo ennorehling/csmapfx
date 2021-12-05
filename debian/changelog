@@ -1,8 +1,9 @@
 csmapfx (0.9.1-1) stable; urgency=low
 
   * refresh last modified time after dialog has closed
+  * read password and faction settings from order files.
 
- -- Enno Rehling <enno@eressea.de>  Mon, 5 Dec 2021 17:55:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Mon, 5 Dec 2021 21:20:00 +0200
 
 csmapfx (0.9.0-1) stable; urgency=low
 

@@ -632,7 +632,7 @@ const datakey* datablock::valueKey(int key) const
 // ===========================
 // === datafile implementation
 
-datafile::datafile() : m_cmds(), m_recruitment(0), m_turn(0), m_activefaction(end())
+datafile::datafile() : m_factionId(0), m_recruitment(0), m_turn(0), m_activefaction(end())
 {
 	m_cmds.modified = false;
 }
@@ -1070,9 +1070,20 @@ int datafile::loadCmds(const FXString &filename)
 	// parse header line:
 	// ERESSEA ioen "PASSWORT"
 	FXString id36 = line.section(' ', 1);
+    FXString password = line.section(' ', 2);
+
+    FXint pos = password.find('"', 0);
+    while (pos >= 0) {
+        password.erase(pos);
+        pos = password.find('"', pos);
+    }
+    if (!password.empty()) {
+        m_password = password;
+    }
 
 	char* endptr;
 	int factionId = strtol(id36.text(), &endptr, 36);
+    m_factionId = factionId;
 
     if (endptr && *endptr)		// id36 string has to be consumed by strtol
 		throw std::runtime_error((L"Keine g\u00fcltige Parteinummer: " + id36).text());
