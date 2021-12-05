@@ -271,7 +271,7 @@ private:
 	class FXInfoDlg	*infodlg;
 	class FXSearchDlg *searchdlg;
     time_t last_save_time;
-    enum { RELOAD_NEVER, RELOAD_AUTO, RELOAD_ASK } reload_mode;
+    enum class reload_type { RELOAD_NEVER, RELOAD_AUTO, RELOAD_ASK } reload_mode;
 
 	struct
 	{

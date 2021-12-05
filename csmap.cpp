@@ -149,7 +149,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
     CSMap_instance = this;
 
     last_save_time = 0;
-    reload_mode = CSMap::RELOAD_ASK;
+    reload_mode = CSMap::reload_type::RELOAD_ASK;
     app->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, NULL);
     // create main window icon
     FXIcon* ico = new FXICOIcon(app, data::csmap);
@@ -2030,7 +2030,7 @@ long CSMap::onSearchInfo(FXObject *, FXSelector, void *ptr)
 
 bool CSMap::updateCommands(const FXString &filename) {
     bool modified = report->modifiedCmds();
-    if (reload_mode == CSMap::RELOAD_ASK) {
+    if (reload_mode == CSMap::reload_type::RELOAD_ASK) {
         FXString ask = modified ?
             L"Eine andere Anwendung hat die Datei %s ge\u00e4ndert.\nNeu laden und die in CSMap gemachten \u00c4nderungen verlieren?" :
             L"Eine andere Anwendung hat die Datei %s ge\u00e4ndert.\nNeu laden?";
@@ -2041,9 +2041,9 @@ bool CSMap::updateCommands(const FXString &filename) {
         if (res != MBOX_CLICKED_NO) {
             return loadCommands(filename);
         }
-        reload_mode = CSMap::RELOAD_NEVER;
+        reload_mode = CSMap::reload_type::RELOAD_NEVER;
     }
-    else if (reload_mode == CSMap::RELOAD_AUTO) {
+    else if (reload_mode == CSMap::reload_type::RELOAD_AUTO) {
         return loadCommands(filename);
     }
     return false;
@@ -2051,7 +2051,7 @@ bool CSMap::updateCommands(const FXString &filename) {
 
 long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
 {
-    if (report && reload_mode != CSMap::RELOAD_NEVER) {
+    if (report && reload_mode != CSMap::reload_type::RELOAD_NEVER) {
         FXString filename = report->cmdfilename();
         if (!filename.empty()) {
             struct stat buf;
@@ -2069,7 +2069,7 @@ long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
             }
         }
     }
-    if (reload_mode != CSMap::RELOAD_NEVER) {
+    if (reload_mode != CSMap::reload_type::RELOAD_NEVER) {
         getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, NULL);
     }
     return 0;
