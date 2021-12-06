@@ -2399,7 +2399,7 @@ long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
 
     FXString id = report->activefaction()->id();
     FXString passwd = askPasswordDlg(id);
-    if (u_mkstemp(infile) && report->saveCmds(infile, passwd, true) > 0) {
+    if (u_mkstemp(infile) && report->saveCmds(infile, passwd, true) == 0) {
         CURL *ch;
         CURLcode success;
         ch = curl_easy_init();

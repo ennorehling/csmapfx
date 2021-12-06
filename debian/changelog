@@ -1,3 +1,9 @@
+csmapfx (0.9.2-1) stable; urgency=low
+
+  * regression fixed: unable to send orders.
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 6 Dec 2021 19:30:00 +0200
+
 csmapfx (0.9.1-1) stable; urgency=low
 
   * refresh last modified time after dialog has closed
