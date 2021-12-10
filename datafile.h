@@ -25,6 +25,7 @@ typedef enum key_type
     TYPE_TYPE,
     TYPE_SKILL,
     TYPE_KONFIGURATION,
+    TYPE_CHARSET,
     TYPE_VISIBILITY,
     TYPE_TURN,
     TYPE_SILVER,
@@ -46,6 +47,7 @@ class datakey
 {
 public:
 	datakey() : m_type(0) {}
+	datakey(int type, const FXString& value) : m_type(type), m_value(value) {}
 	~datakey() {}
 
 	const FXString& value() const { return m_value; }
@@ -60,7 +62,7 @@ public:
 
 	// parses str and create datakey object
 	static int parseType(const FXString& type);
-	bool parse(char* str);
+	bool parse(char* str, bool isUtf8 = true);
 
 	typedef std::vector<datakey/*, boost::pool_allocator<datakey>*/ > list_type;
 	typedef list_type::iterator itor;

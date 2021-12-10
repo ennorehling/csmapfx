@@ -1270,9 +1270,7 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 						// if no name set, add a Insel key
 						if (key == region->data().end() && input.getText().length())
 						{
-							datakey namekey;
-							namekey.key("Insel");
-							namekey.value(input.getText());
+							datakey namekey(key_type::TYPE_ISLAND, input.getText());
 							region->data().push_back(namekey);
 						}
 

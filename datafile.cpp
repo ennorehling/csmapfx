@@ -62,6 +62,8 @@ void datakey::value(const FXString& s)
 		return TYPE_SKILL;
 	if (type == "Konfiguration")
 		return TYPE_KONFIGURATION;
+	if (type == "charset")
+		return TYPE_CHARSET;
 	if (type == "visibility")
 		return TYPE_VISIBILITY;
 	if (type == "Runde")
@@ -116,6 +118,8 @@ const FXString datakey::key() const
 		return "skill";
 	else if (type() == TYPE_KONFIGURATION)
 		return "Konfiguration";
+	else if (type() == TYPE_CHARSET)
+		return "charset";
 	else if (type() == TYPE_VISIBILITY)
 		return "visibility";
 	else if (type() == TYPE_TURN)
@@ -148,7 +152,7 @@ int datakey::getInt() const
 }
 
 // parses str and returns created datakey object or NULL pointer
-bool datakey::parse(char* str)
+bool datakey::parse(char* str, bool isUtf8)
 {
 	if (!str)
 		return false;
@@ -240,6 +244,9 @@ bool datakey::parse(char* str)
 
 	val.length(ptr - &val[0]);
 	
+    if (!isUtf8) {
+        val = iso2utf(val);
+    }
 	value(val);						// Wert speichern
 
 	return true;
@@ -695,6 +702,7 @@ int datafile::load(const char* filename)
 	m_blocks.clear();
 	datablock *block = NULL, newblock;
 	datakey key;
+    bool utf8 = true;
 	char *ptr, *next = &data[0];
 
 	// check for utf8 BOM: EF BB BF
@@ -708,26 +716,34 @@ int datafile::load(const char* filename)
 		next = getNextLine(ptr);
 
 		// erster versuch: enth\u00e4lt die Zeile einen datakey?
-		if (key.parse(ptr))
+		if (key.parse(ptr, utf8))
 		{
 			if (block)
 			{
-				if (key.type() == TYPE_TERRAIN)
-				{
-					int terrain = datablock::parseTerrain(key.value());
+                int terrain;
+                switch (key.type())
+                {
+                case TYPE_CHARSET:
+                    if (utf8 && key.value() != "UTF-8")
+                    {
+                        utf8 = false;
+                    }
+                    break;
+                case TYPE_TERRAIN:
+                    terrain = datablock::parseTerrain(key.value());
 
-					if (terrain == data::TERRAIN_UNKNOWN)
-					{
-						block->data().push_back(key);		// need textual representation of terrain type
-					
-						terrain = datablock::parseSpecialTerrain(key.value());
-					}
-					
-					block->terrain(terrain);
-				}
-				else
-					block->data().push_back(key);			// appends "Value";Key - tags
+                    if (terrain == data::TERRAIN_UNKNOWN)
+                    {
+                        block->data().push_back(key);		// need textual representation of terrain type
 
+                        terrain = datablock::parseSpecialTerrain(key.value());
+                    }
+
+                    block->terrain(terrain);
+                    break;
+                default:
+                    block->data().push_back(key);			// appends "Value";Key - tags
+                }
 			}
 		}
 		// zweiter versuch: enth\u00e4lt die Zeile einen datablock-header?
@@ -785,6 +801,12 @@ int datafile::save(const char* filename, map_type map_filter)
             }
         }
 
+        if (type == block_type::TYPE_ISLAND)
+        {
+            // No support for Magellan-style islands
+            continue;
+        }
+
         if (map_filter == map_type::MAP_MINIMAL) {
             /* skip over anything except version or region  */
             if (type == block_type::TYPE_REGION) {
@@ -827,8 +849,8 @@ int datafile::save(const char* filename, map_type map_filter)
 		
 		if (type == block_type::TYPE_COMBATSPELL || block->info())
 			file << ' ' << block->info();
-
 		file << std::endl;
+		file << "\"UTF-8\";charset" << std::endl;
 
 		// Name-Tag und Terrain-Tag ausgeben
 		if (type == block_type::TYPE_REGION)
@@ -855,6 +877,10 @@ int datafile::save(const char* filename, map_type map_filter)
 			}
 
 			file << '\"' << block->terrainString().text() << "\";Terrain" << std::endl;
+            if (const datakey* islandkey = block->valueKey(TYPE_ISLAND))
+            {
+                file << '\"' << islandkey->value().text() << "\";" << islandkey->key().text() << std::endl;
+            }
         }
 		// Konfiguration-Block anpassen und Charset auf ISO-8859-1 setzen
 		else if (type == block_type::TYPE_VERSION)

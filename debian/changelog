@@ -1,3 +1,10 @@
+csmapfx (0.9.3-1) stable; urgency=low
+
+  * write islands in map exports.
+  * handle old iso-8859-1 CRs.
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 10 Dec 2021 21:05:00 +0200
+
 csmapfx (0.9.2-1) stable; urgency=low
 
   * regression fixed: unable to send orders.
