@@ -94,3 +94,22 @@ void showError(const std::string& str)
 	std::cerr << str << std::endl;
 #endif
 }
+
+FXString FXStringValEx(FXulong num, unsigned int base)
+{
+    if (base <= 16)
+    {
+        return FXStringVal(num, base);
+    }
+    else {
+        char buf[40], b36[] = "0123456789abcdefghijkLmnopqrstuvwxyz";
+        char* p = buf + sizeof(buf) - 1;
+        *p = '\0';
+        do {
+            *--p = b36[num % 36];
+            num /= 36;
+        } while (num);
+
+        return FXString(p, buf + sizeof(buf) - 1 - p);
+    }
+}

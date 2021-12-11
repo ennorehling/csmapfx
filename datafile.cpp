@@ -517,25 +517,8 @@ const FXString datablock::string() const
 // return info() as base36
 FXString datablock::id() const
 {
-	char buf[35], b36[] = "0123456789abcdefghijkLmnopqrstuvwxyz";
-	char *p=buf+34;
-	int nn=(int)info();
-	bool negativ = false;
-	if (nn < 0)
-	{
-        nn = -nn;
-		negativ = true;
-	}
-	*p='\0';
-	do{
-		*--p=b36[nn%36];
-		nn/=36;
-	}
-	while(nn);
-	if (negativ)
-		*--p='-';
-	FXASSERT(buf<=p);
-	return FXString(p,buf+34-p);
+	int nn = info();
+	return FXStringValEx(nn, 36);
 }
 
 void datablock::infostr(const FXString& s)

@@ -1110,8 +1110,7 @@ bool CSMap::loadCommands(const FXString& filename)
         }
         int factionId = report->getFactionId();
         if (factionId > 0) {
-            char buffer[10];
-            settings.faction_id = FXString(itoa(factionId, buffer, 36));
+            settings.faction_id = FXStringValEx(factionId, 36);
         }
     }
     catch(const std::runtime_error& err)

@@ -2,6 +2,7 @@ csmapfx (0.9.3-2) stable; urgency=low
 
   * write islands in map exports.
   * handle old iso-8859-1 CRs.
+  * itoa is not portable
 
  -- Enno Rehling <enno@eressea.de>  Mon, 11 Dec 2021 05:35:00 +0200
 
