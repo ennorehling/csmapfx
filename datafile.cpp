@@ -850,7 +850,11 @@ int datafile::save(const char* filename, map_type map_filter)
 		if (type == block_type::TYPE_COMBATSPELL || block->info())
 			file << ' ' << block->info();
 		file << std::endl;
-		file << "\"UTF-8\";charset" << std::endl;
+
+        if (type == block_type::TYPE_VERSION)
+        {
+            file << "\"UTF-8\";charset" << std::endl;
+        }
 
 		// Name-Tag und Terrain-Tag ausgeben
 		if (type == block_type::TYPE_REGION)
