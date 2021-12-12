@@ -787,12 +787,13 @@ void CSMap::create()
         maximize();
 }
 
-/*virtual*/ FXbool CSMap::close(FXbool notify)
+FXbool CSMap::close(FXbool notify)
 {
     // Dateien schliessen, Speicher frei geben
     if (!closeFile()) {
         return false;
     }
+    mapChange();
 
     FXRegistry &reg = getApp()->reg();
 
@@ -926,17 +927,8 @@ bool CSMap::haveActiveFaction() const
     return true;
 }
 
-bool CSMap::loadFile(FXString filename)
+bool CSMap::loadFile(const FXString& filename)
 {
-    if (filename.empty())
-        return false;
-
-    // vorherige Dateien schliessen, Speicher frei geben
-    if (report) {
-        closeFile();
-        mapChange();
-    }
-
     report = new datafile();
 
     FXString app_title = CSMAP_APP_TITLE " - lade " + filename;
@@ -971,11 +963,10 @@ bool CSMap::loadFile(FXString filename)
     }
 
     recentFiles.appendFile(filename);
-    mapChange(true);    // new file flag
     return true;
 }
 
-bool CSMap::mergeFile(FXString filename)
+bool CSMap::mergeFile(const FXString& filename)
 {
     // zuerst: Datei normal laden
     datafile new_cr;
@@ -1075,8 +1066,6 @@ bool CSMap::mergeFile(FXString filename)
         }
     }
 
-    report->createHashTables();
-    mapChange();
     return true;
 }
 
@@ -1684,6 +1673,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 {
     datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
+    getApp()->beginWaitCursor();
     // reset state
     selection.selected = 0;
 
@@ -1957,6 +1947,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         status->recalc();
     }
 
+    getApp()->endWaitCursor();
     return 1;
 }
 
@@ -2105,7 +2096,10 @@ long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
     dialogDirectory = dlg.getDirectory();
     if (res) {
         getApp()->beginWaitCursor();
-        loadFile(dlg.getFilename());
+        // vorherige Dateien schliessen, Speicher frei geben
+        if (closeFile()) {
+            mapChange(loadFile(dlg.getFilename()));
+        }
         getApp()->endWaitCursor();
     }
     return 1;
@@ -2124,17 +2118,25 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
     {
         FXString* filenames = dlg.getFilenames();
         if (filenames) {
+            bool newfile = false;
             getApp()->beginWaitCursor();
-            for (int i = 0; filenames[i].length(); i++) {
-                FXString const& filename = filenames[i];
-                if (!filename.empty()) {
-                    if (!report) {
-                        loadFile(filename);    // normal laden, wenn vorher keine Datei geladen ist.
-                    }
-                    else {
-                        mergeFile(filenames[i]);
+
+            if (closeFile()) {
+                for (int i = 0; filenames[i].length(); i++) {
+                    FXString const& filename = filenames[i];
+                    if (!filename.empty()) {
+                        if (!report) {
+                            newfile |= loadFile(filename);    // normal laden, wenn vorher keine Datei geladen ist.
+                        }
+                        else {
+                            newfile |= mergeFile(filenames[i]);
+                        }
                     }
                 }
+                if (report) {
+                    report->createHashTables();
+                }
+                mapChange(newfile);
             }
             getApp()->endWaitCursor();
         }
@@ -2304,7 +2306,9 @@ long CSMap::onFileExportMap(FXObject*, FXSelector, void*)
 
 long CSMap::onFileClose(FXObject*, FXSelector, void*)
 {
-    return closeFile() ? 1 : 0;
+    bool res = closeFile();
+    mapChange();
+    return res ? 1 : 0;
 }
 
 bool CSMap::closeFile()
@@ -2328,7 +2332,6 @@ bool CSMap::closeFile()
     }
     delete report;
     report = nullptr;
-    mapChange();
     return true;
 }
 
@@ -2598,10 +2601,14 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
 
 long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
 {
-    const char* filename = (const char*)ptr;
+    FXString filename((const char *)ptr);
 
     getApp()->beginWaitCursor();
-    loadFile(filename);
+    if (closeFile()) {
+        if (loadFile(filename)) {
+            mapChange(true);
+        }
+    }
     getApp()->endWaitCursor();
     return 1;
 }

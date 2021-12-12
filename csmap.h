@@ -38,8 +38,8 @@ public:
     bool saveReport(const FXString& filename, map_type mode, bool merge_commands = false);
     void mapChange(bool newfile = false);
 	bool haveActiveFaction() const;
-	bool loadFile(FXString filename);
-	bool mergeFile(FXString filename);
+	bool loadFile(const FXString& filename);
+	bool mergeFile(const FXString& filename);
     bool closeFile();
     void saveCommandsDlg(bool stripped, bool replace);
     FXString askFileName(const FXString &title, const FXString &patterns);

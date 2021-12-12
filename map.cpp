@@ -2023,7 +2023,8 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 {
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
-	bool datachanged = false, scroll = false;
+    getApp()->beginWaitCursor();
+    bool datachanged = false, scroll = false;
 
 	if (selection.fileChange != state->fileChange)
 	{
@@ -2197,7 +2198,8 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         map->update();
 	}
 
-	return 1;
+    getApp()->endWaitCursor();
+    return 1;
 }
 
 FXint FXCSMap::sendRouteCmds(const FXString& str, int which)

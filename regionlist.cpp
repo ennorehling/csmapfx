@@ -592,7 +592,8 @@ FXTreeItem* FXRegionList::findTreeItem(FXTreeItem* item, void* udata)
 
 long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 {
-	datafile::SelectionState *sel_state = (datafile::SelectionState*)ptr;
+    getApp()->beginWaitCursor();
+    datafile::SelectionState *sel_state = (datafile::SelectionState*)ptr;
 
 	// any data changed, so need to update list?
 	if (selection.fileChange != sel_state->fileChange)
@@ -876,6 +877,7 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 			}
 		}
 	}
+    getApp()->endWaitCursor();
 
 	return 1;
 }

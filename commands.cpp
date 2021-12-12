@@ -334,7 +334,7 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 {
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
-	// any data changed, so need to update list?
+    // any data changed, so need to update list?
 	if (selection.fileChange != state->fileChange)
 	{
 		selection.fileChange = state->fileChange;
@@ -344,7 +344,8 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 
 	if (selection.selChange != state->selChange)
 	{
-		selection.selChange = state->selChange;
+        getApp()->beginWaitCursor();
+        selection.selChange = state->selChange;
 		selection.selected = state->selected;
 		
 		selection.region = state->region;
@@ -401,9 +402,9 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 			setBackColor(getApp()->getBackColor());
 		else
 			setBackColor(getApp()->getBaseColor());
-	}
-
-	return 1;
+        getApp()->endWaitCursor();
+    }
+    return 1;
 }
 
 long FXCommands::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
