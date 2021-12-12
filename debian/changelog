@@ -1,3 +1,10 @@
+csmapfx (0.9.5-1) stable; urgency=low
+
+  * bugfix: saved CR was containing broken units without the EINHEIT block.
+  * show hourglass cursor during wait times.
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 12 Dec 2021 19:00:00 +0200
+
 csmapfx (0.9.4-1) stable; urgency=low
 
   * show island names on map again.
