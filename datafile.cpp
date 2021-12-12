@@ -773,7 +773,7 @@ int datafile::save(const char* filename, map_type map_filter)
         block_type type = block->type();
 
         if (maxDepth) {
-            if (block->depth() > maxDepth) {
+            if (block->depth() <= maxDepth) {
                 // reset the skip-child behavior
                 maxDepth = 0;
             }
