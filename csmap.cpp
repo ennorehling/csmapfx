@@ -962,7 +962,6 @@ bool CSMap::loadFile(const FXString& filename)
         return false;
     }
 
-    recentFiles.appendFile(filename);
     return true;
 }
 
@@ -2100,7 +2099,9 @@ long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
         getApp()->beginWaitCursor();
         // vorherige Dateien schliessen, Speicher frei geben
         if (closeFile()) {
-            mapChange(loadFile(dlg.getFilename()));
+            FXString filename = dlg.getFilename();
+            mapChange(loadFile(filename));
+            recentFiles.appendFile(filename);
         }
         getApp()->endWaitCursor();
     }
