@@ -977,13 +977,6 @@ bool CSMap::loadFile(FXString filename)
 
 bool CSMap::mergeFile(FXString filename)
 {
-    if (filename.empty())
-        return false;
-
-    if (!report) {
-        return loadFile(filename);    // normal laden, wenn vorher keine Datei geladen ist.
-    }
-
     // zuerst: Datei normal laden
     datafile new_cr;
 
@@ -2110,8 +2103,11 @@ long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
     dlg.setPatternList(FXString(L"Eressea Computer Report (*.cr)\nAlle Dateien (*)"));
     FXint res = dlg.execute(PLACEMENT_SCREEN);
     dialogDirectory = dlg.getDirectory();
-    if (res)
+    if (res) {
+        getApp()->beginWaitCursor();
         loadFile(dlg.getFilename());
+        getApp()->endWaitCursor();
+    }
     return 1;
 }
 
@@ -2126,10 +2122,22 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
     dialogDirectory = dlg.getDirectory();
     if (res)
     {
-        FXString *filenames = dlg.getFilenames();
-        if (filenames)
-            for (int i = 0; filenames[i].length(); i++)
-                mergeFile(filenames[i]);
+        FXString* filenames = dlg.getFilenames();
+        if (filenames) {
+            getApp()->beginWaitCursor();
+            for (int i = 0; filenames[i].length(); i++) {
+                FXString const& filename = filenames[i];
+                if (!filename.empty()) {
+                    if (!report) {
+                        loadFile(filename);    // normal laden, wenn vorher keine Datei geladen ist.
+                    }
+                    else {
+                        mergeFile(filenames[i]);
+                    }
+                }
+            }
+            getApp()->endWaitCursor();
+        }
     }
     return 1;
 }
@@ -2592,7 +2600,9 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
 {
     const char* filename = (const char*)ptr;
 
+    getApp()->beginWaitCursor();
     loadFile(filename);
+    getApp()->endWaitCursor();
     return 1;
 }
 
