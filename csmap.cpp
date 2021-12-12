@@ -1428,6 +1428,7 @@ long CSMap::onSetOrigin(FXObject*, FXSelector, void*)
     if (res != MBOX_CLICKED_YES)
         return 1;
 
+    getApp()->beginWaitCursor();
     for (datablock::itor block = report->blocks().begin(); block != report->blocks().end(); block++)
     {
         // handle only regions
@@ -1446,6 +1447,7 @@ long CSMap::onSetOrigin(FXObject*, FXSelector, void*)
     selection.sel_x = 0, selection.sel_y = 0;    // its the origin now
 
     mapChange();
+    getApp()->endWaitCursor();
     return 1;
 }
 
@@ -2288,7 +2290,9 @@ long CSMap::onFileSaveMap(FXObject*, FXSelector, void*)
 {
     FXString filename = askSaveFileName("Speichern unter...");
     if (!filename.empty()) {
+        getApp()->beginWaitCursor();
         saveReport(filename, map_type::MAP_NORMAL);
+        getApp()->endWaitCursor();
         return 1;
     }
     return 0;
@@ -2298,7 +2302,9 @@ long CSMap::onFileExportMap(FXObject*, FXSelector, void*)
 {
     FXString filename = askSaveFileName("Speichern unter...");
     if (!filename.empty()) {
+        getApp()->beginWaitCursor();
         saveReport(filename, map_type::MAP_MINIMAL);
+        getApp()->endWaitCursor();
         return 1;
     }
     return 0;
@@ -2344,7 +2350,9 @@ long CSMap::onFileOpenCommands(FXObject *, FXSelector, void *)
     FXint res = dlg.execute(PLACEMENT_SCREEN);
     dialogDirectory = dlg.getDirectory();
     if (res) {
+        getApp()->beginWaitCursor();
         loadCommands(dlg.getFilename());
+        getApp()->endWaitCursor();
         return 1;
     }
     return 0;
@@ -2365,8 +2373,10 @@ long CSMap::onFileSaveCommands(FXObject*, FXSelector, void* ptr)
                 if (MBOX_CLICKED_YES != answ) return 0;
             }
         }
+        getApp()->beginWaitCursor();
         saveCommands(filename, false);
         report->cmdfilename(filename);
+        getApp()->endWaitCursor();
         return 1;
     }
     return 0;
@@ -2593,7 +2603,9 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
                 break;
         }
 
+        getApp()->beginWaitCursor();
         exportMapFile(filename, scale, show_names, show_koords, show_islands, color);
+        getApp()->endWaitCursor();
     }
 
     return 1;
