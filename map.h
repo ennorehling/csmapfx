@@ -16,7 +16,7 @@
 
 struct LeftTop
 {
-	FXint left, top;
+	FXshort left, top;
 };
 
 struct IslandPos
@@ -36,8 +36,8 @@ public:
 
 	LeftTop getMapLeftTop();
 	std::map<FXString, IslandPos> collectIslandNames();
-	void paintIslandNames(FXDrawable* buffer, LeftTop offset, std::map<FXString, IslandPos> const& islands);
-	void paintMapLines(FXDrawable* buffer, LeftTop offset);
+	void paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, std::map<FXString, IslandPos> const& islands);
+	void paintMapLines(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br);
 
 	virtual void moveContents(FXint x,FXint y);
 

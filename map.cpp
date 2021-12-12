@@ -1720,7 +1720,9 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
         }
     }
 
-	paintIslandNames(buffer, LeftTop{0, 0}, islands);
+    FXPoint tl(0, 0);
+    FXPoint br((FXshort)buffer->getWidth(), (FXshort)buffer->getHeight());
+    paintIslandNames(dc, tl, br, islands);
 
 	if (minimap)
 	{
@@ -1764,19 +1766,14 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 	return true;
 }
 
-void FXCSMap::paintMapLines(FXDrawable* buffer, LeftTop offset)
+void FXCSMap::paintMapLines(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br)
 {
-	// create DC and empty buffer
-	FXDCWindow dc(buffer);
-
 	dc.setFont(font.get());
-	dc.setForeground(getBackColor());
-	dc.fillRectangle(0, 0, buffer->getWidth(), buffer->getHeight());
 	dc.setForeground(map->getBackColor());
 
 	// init vars and set font
 	FXRectangle clip(0, 0, FXshort(64*scale), FXshort(64*scale));
-	FXint w = buffer->getWidth(), h = buffer->getHeight();
+	FXint w = br.x - tl.x, h = br.y - tl.y;
 
 	FXint regionSize = FXint(64*scale);
 
@@ -1790,8 +1787,8 @@ void FXCSMap::paintMapLines(FXDrawable* buffer, LeftTop offset)
 			continue;
 
 		// map coordinates to screen
-		FXint scr_x = GetScreenFromHexX(block.x(), block.y()) - offset.left;
-		FXint scr_y = GetScreenFromHexY(block.x(), block.y()) - offset.top;
+		FXint scr_x = GetScreenFromHexX(block.x(), block.y()) - tl.x;
+		FXint scr_y = GetScreenFromHexY(block.x(), block.y()) - tl.y;
 
 		// clip regions outside of view
 		if (scr_x < -regionSize || scr_y < -regionSize || scr_x > w || scr_y > h)
@@ -1857,7 +1854,7 @@ LeftTop FXCSMap::getMapLeftTop()
 	if (!mapFile) return LeftTop{0, 0};
 
 	// initialize to 'impossible' values
-	FXint min_x = 0x0FFFFFFF, min_y = 0x0FFFFFFF;
+	FXshort min_x = SHRT_MAX, min_y = SHRT_MAX;
 
 	// iterate throu all datafiles and all regions
 	for (datablock& block : mapFile->blocks())
@@ -1868,8 +1865,8 @@ LeftTop FXCSMap::getMapLeftTop()
 			block.info() != visiblePlane)
 			continue;
 
-		FXint scr_x = GetScreenFromHexX(block.x(), block.y());
-		FXint scr_y = GetScreenFromHexY(block.x(), block.y());
+        FXshort scr_x = (FXshort)GetScreenFromHexX(block.x(), block.y());
+        FXshort scr_y = (FXshort)GetScreenFromHexY(block.x(), block.y());
 
 		if (scr_x < min_x) min_x = scr_x;
 		if (scr_y < min_y) min_y = scr_y;
@@ -1927,13 +1924,11 @@ std::map<FXString, IslandPos> FXCSMap::collectIslandNames()
 	return islands;
 }
 
-void FXCSMap::paintIslandNames(FXDrawable* buffer, LeftTop offset, std::map<FXString, IslandPos> const& islands)
+void FXCSMap::paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, std::map<FXString, IslandPos> const& islands)
 {
 	if (!show_islands) return;
 
 	// create DC and setup font
-	FXDCWindow dc(buffer);
-
 	dc.setFont(islandfont.get());
 	dc.setForeground(map->getBackColor());
 
@@ -1943,16 +1938,16 @@ void FXCSMap::paintIslandNames(FXDrawable* buffer, LeftTop offset, std::map<FXSt
 		const IslandPos& is = entry.second;
 
 		//  skip islands outside of view
-		if (is.right - offset.left < 0 || is.left - offset.left > buffer->getWidth() ||
-			is.bottom - offset.top < 0 || is.top - offset.top > buffer->getHeight()) {
+		if (is.right < tl.x || is.left > br.x ||
+			is.bottom < tl.y || is.top > br.y) {
 			continue;
 		}
 
 		FXint textWidth = islandfont->getTextWidth(label.text(),  label.length());
 		FXint textHeight = islandfont->getTextHeight(label.text(), label.length());
 
-		FXint label_x = is.left + (is.right - is.left) / 2 - textWidth / 2 - offset.left;
-		FXint label_y = is.top  + (is.bottom - is.top) / 2 + textHeight / 3 - offset.top;
+		FXint label_x = is.left + (is.right - is.left) / 2 - textWidth / 2 - tl.x;
+		FXint label_y = is.top  + (is.bottom - is.top) / 2 + textHeight / 3 - tl.y;
 
 		dc.drawText(label_x, label_y, label.text(), label.length());
 	}

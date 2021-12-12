@@ -50,9 +50,9 @@ FXbool csmap_savePNG(FXStream& store, FXCSMap& map, FXImage& image, FXProgressDi
 	png_bytep *row_pointers = nullptr;
 
 	// what size the image is?
-	int width = map.getContentWidth();
-	int height = map.getContentHeight();
-	int stepsize = image.getHeight();
+    FXint width = map.getContentWidth();
+    FXint height = map.getContentHeight();
+	FXint stepsize = image.getHeight();
 
 	LeftTop mapOffset = map.getMapLeftTop();
 	std::map<FXString, IslandPos> islands = map.collectIslandNames();
@@ -92,12 +92,16 @@ FXbool csmap_savePNG(FXStream& store, FXCSMap& map, FXImage& image, FXProgressDi
 	dlg.setTotal(height);
 	dlg.getApp()->runModalWhileEvents(&dlg);
 
-	// paint it slice by slice
-	for (int y = 0; y < height && !dlg.isCancelled(); y+=stepsize)
+    FXDCWindow dc(&image);
+    // paint it slice by slice
+	for (FXint y = 0; y < height && !dlg.isCancelled(); y+=stepsize)
 	{
-		LeftTop sliceOffset{mapOffset.left, mapOffset.top + y};
-		map.paintMapLines(&image, sliceOffset);
-		map.paintIslandNames(&image, sliceOffset, islands);
+        FXPoint tl(mapOffset.left, FXshort(mapOffset.top + y));
+        FXPoint br(FXshort(tl.x + image.getWidth()), FXshort(tl.y + stepsize));
+        dc.setForeground(map.getBackColor());
+        dc.fillRectangle(0, 0, image.getWidth(), image.getHeight());
+        map.paintMapLines(dc, tl, br);
+        map.paintIslandNames(dc, tl, br, islands);
 		image.restore();
 
 		FXColor* data = image.getData();
