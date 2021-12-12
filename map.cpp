@@ -1,5 +1,6 @@
 #include <sstream>
 #include <cmath>
+#include <climits>
 
 #include "version.h"
 #include "main.h"
