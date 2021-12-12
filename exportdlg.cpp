@@ -51,7 +51,7 @@ FXExportDlg::FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 
 	colorbox = new FXComboBox(backgrcolor, 0, NULL,0, COMBOBOX_STATIC|FRAME_NORMAL);
 	colorbox->appendItem(FXString("Schwarz"), (void*)0);
-	colorbox->appendItem(FXString("Wei\u00df"), (void*)1);
+	colorbox->appendItem(FXString(L"Wei\u00df"), (void*)1);
 	colorbox->setCurrentItem(0);
 	colorbox->setNumVisible(colorbox->getNumItems());
 }
