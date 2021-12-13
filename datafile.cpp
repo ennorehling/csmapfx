@@ -650,8 +650,6 @@ const char* UTF8BOM = "\xEF\xBB\xBF";
 // loads file, parses it and returns number of block
 int datafile::load(const char* filename)
 {
-	this->filename(filename);
-
 	if (!filename)
 		return 0;
 
@@ -663,7 +661,6 @@ int datafile::load(const char* filename)
 	file.open(filename,FXStreamLoad);
 	if (file.status() != FXStreamOK)
 	{
-		this->filename("");
 		throw std::runtime_error(FXString(L"Datei konnte nicht ge\u00f6ffnet werden.").text());
 	}
 

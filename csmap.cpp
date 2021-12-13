@@ -936,7 +936,9 @@ bool CSMap::loadFile(const FXString& filename)
 
     try
     {
-        report->load(filename.text());
+        if (report->load(filename.text()) <= 0) {
+            return false;
+        }
     }
     catch(const std::runtime_error& err)
     {
@@ -2100,8 +2102,11 @@ long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
         // vorherige Dateien schliessen, Speicher frei geben
         if (closeFile()) {
             FXString filename = dlg.getFilename();
-            mapChange(loadFile(filename));
-            recentFiles.appendFile(filename);
+            if (loadFile(filename)) {
+                report->filename(filename);
+                mapChange(true);
+                recentFiles.appendFile(filename);
+            }
         }
         getApp()->endWaitCursor();
     }
@@ -2124,23 +2129,21 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
             bool newfile = false;
             getApp()->beginWaitCursor();
 
-            if (closeFile()) {
-                for (int i = 0; filenames[i].length(); i++) {
-                    FXString const& filename = filenames[i];
-                    if (!filename.empty()) {
-                        if (!report) {
-                            newfile |= loadFile(filename);    // normal laden, wenn vorher keine Datei geladen ist.
-                        }
-                        else {
-                            newfile |= mergeFile(filenames[i]);
-                        }
+            for (int i = 0; filenames[i].length(); i++) {
+                FXString const& filename = filenames[i];
+                if (!filename.empty()) {
+                    if (!report) {
+                        newfile |= loadFile(filename);    // normal laden, wenn vorher keine Datei geladen ist.
+                    }
+                    else {
+                        newfile |= mergeFile(filenames[i]);
                     }
                 }
-                if (report) {
-                    report->createHashTables();
-                }
-                mapChange(newfile);
             }
+            if (report) {
+                report->createHashTables();
+            }
+            mapChange(newfile);
             getApp()->endWaitCursor();
         }
     }
@@ -2277,7 +2280,6 @@ bool CSMap::saveReport(const FXString& filename, map_type mode, bool merge_comma
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
         return false;
     }
-    recentFiles.appendFile(filename);
     mapChange();
     return true;
 }
@@ -2619,6 +2621,7 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
     getApp()->beginWaitCursor();
     if (closeFile()) {
         if (loadFile(filename)) {
+            report->filename(filename);
             mapChange(true);
         }
     }
