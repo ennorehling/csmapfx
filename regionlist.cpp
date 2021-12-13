@@ -592,13 +592,13 @@ FXTreeItem* FXRegionList::findTreeItem(FXTreeItem* item, void* udata)
 
 long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 {
-    getApp()->beginWaitCursor();
     datafile::SelectionState *sel_state = (datafile::SelectionState*)ptr;
 
 	// any data changed, so need to update list?
 	if (selection.fileChange != sel_state->fileChange)
 	{
-		selection.fileChange = sel_state->fileChange;
+        getApp()->beginWaitCursor();
+        selection.fileChange = sel_state->fileChange;
 		selection.map = sel_state->map;
 		selection.activefaction = sel_state->activefaction;
 
@@ -802,11 +802,13 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                     removeItem(act_faction);
             }
         }
-	}
+        getApp()->endWaitCursor();
+    }
 
 	if (selection.selChange != sel_state->selChange)
 	{
-		selection.selChange = sel_state->selChange;
+        getApp()->beginWaitCursor();
+        selection.selChange = sel_state->selChange;
 		selection.selected = sel_state->selected;
 		
 		selection.region = sel_state->region;
@@ -876,8 +878,8 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				item = father;
 			}
 		}
-	}
-    getApp()->endWaitCursor();
+        getApp()->endWaitCursor();
+    }
 
 	return 1;
 }
