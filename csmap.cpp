@@ -2339,6 +2339,7 @@ bool CSMap::closeFile()
                 return false;
         }
     }
+    selection.selected = 0;
     delete report;
     report = nullptr;
     return true;
