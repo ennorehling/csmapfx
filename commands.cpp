@@ -344,7 +344,6 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 
 	if (selection.selChange != state->selChange)
 	{
-        getApp()->beginWaitCursor();
         selection.selChange = state->selChange;
 		selection.selected = state->selected;
 		
@@ -360,7 +359,8 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 
 		if (mapFile && selection.selected & selection.UNIT)
 		{
-			datablock::itor unit = selection.unit;
+            getApp()->beginWaitCursor();
+            datablock::itor unit = selection.unit;
 
 			// search for command block of unit
 			datablock::itor end = mapFile->blocks().end();
@@ -396,13 +396,13 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 				setModified(false);
 				enable();
 			}
-		}
+            getApp()->endWaitCursor();
+        }
 
 		if (isEnabled())
 			setBackColor(getApp()->getBackColor());
 		else
 			setBackColor(getApp()->getBaseColor());
-        getApp()->endWaitCursor();
     }
     return 1;
 }

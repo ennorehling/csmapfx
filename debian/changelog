@@ -1,6 +1,7 @@
 csmapfx (0.9.7-1) stable; urgency=low
 
   * bugfix: missing regions in saved maps.
+  * reduce excessive use of wait cursor.
 
  -- Enno Rehling <enno@eressea.de>  Tue, 14 Dec 2021 16:15:00 +0200
 

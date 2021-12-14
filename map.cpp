@@ -2024,7 +2024,6 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 {
 	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
-    getApp()->beginWaitCursor();
     bool datachanged = false, scroll = false;
 
 	if (selection.fileChange != state->fileChange)
@@ -2071,7 +2070,8 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
 		if (mapFile && (selection.selected & selection.REGION) && (selection.selected & selection.UNIT))
 		{
-			// parse commands of selected unit and show traveller arrows
+            getApp()->beginWaitCursor();
+            // parse commands of selected unit and show traveller arrows
 			datablock::itor unit = selection.unit;
 
 			datablock::itor end = mapFile->blocks().end();
@@ -2157,7 +2157,8 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
 				//arrows.insert(arrows.end(), unitArrows.begin(), unitArrows.end());
 			}
-		}
+            getApp()->endWaitCursor();
+        }
 
 		map->update();
 	}
@@ -2199,7 +2200,6 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         map->update();
 	}
 
-    getApp()->endWaitCursor();
     return 1;
 }
 

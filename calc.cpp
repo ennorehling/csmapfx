@@ -152,8 +152,6 @@ long FXCalculator::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 {
     datafile::SelectionState *state = (datafile::SelectionState*)ptr;
 
-    getApp()->beginWaitCursor();
-
     bool needUpdate = false;
 
     if (selection.fileChange != state->fileChange)
@@ -184,7 +182,6 @@ long FXCalculator::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
         onChanged(this, 0, NULL);
     }
     
-    getApp()->endWaitCursor();
     return 1;
 }
 
