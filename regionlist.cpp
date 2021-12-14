@@ -807,7 +807,6 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 	if (selection.selChange != sel_state->selChange)
 	{
-        getApp()->beginWaitCursor();
         selection.selChange = sel_state->selChange;
 		selection.selected = sel_state->selected;
 		
@@ -878,7 +877,6 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				item = father;
 			}
 		}
-        getApp()->endWaitCursor();
     }
 
 	return 1;

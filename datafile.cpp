@@ -776,7 +776,6 @@ int datafile::save(const char* filename, map_type map_filter)
             }
             else {
                 // do not print child-blocks now
-                ++block;
                 continue;
             }
         }

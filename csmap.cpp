@@ -1954,9 +1954,11 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     return 1;
 }
 
-long CSMap::onQueryMap(FXObject* sender, FXSelector, void*)
+long CSMap::onQueryMap(FXObject* sender, FXSelector sel, void*)
 {
-    sender->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
+    if (report) {
+        sender->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
+    }
     return 1;
 }
 

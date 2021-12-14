@@ -1,10 +1,16 @@
+csmapfx (0.9.7-1) stable; urgency=low
+
+  * bugfix: missing regions in saved maps.
+
+ -- Enno Rehling <enno@eressea.de>  Tue, 14 Dec 2021 16:15:00 +0200
+
 csmapfx (0.9.6-1) stable; urgency=low
 
   * bugfix: merging maps was not working as intended.
   * bugfix: exported maps were added to MRU list.
   * bugfix: map merge was changing the current report name.
 
- -- Enno Rehling <enno@eressea.de>  Sun, 13 Dec 2021 19:25:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Mon, 13 Dec 2021 19:25:00 +0200
 
 csmapfx (0.9.5-1) stable; urgency=low
 
