@@ -244,12 +244,14 @@ int main(int argc, char *argv[])
 				csmap->loadFile(FXString(argv[arg]));
 			else
 				csmap->mergeFile(FXString(argv[arg]));
-
 			numfiles++;
 			startgui = true;
 		}
 	}
 
+    if (numfiles > 0) {
+        csmap->mapChange(true);
+    }
 	// Programm ohne GUI beenden?
 	if (!startgui && !calculator)
 		return 0;

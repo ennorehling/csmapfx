@@ -866,15 +866,18 @@ void CSMap::mapChange(bool newfile /*= false*/)
 {
     // map changed, let selection-function handle this
     datafile::SelectionState state = selection;
-    if (!report) {
+    if (report) {
+        report->createHashTables();
+    }
+    else {
         state.selected = 0;
         state.map = 0;
     }
     state.map |= state.MAPCHANGED;
 
-    if (newfile)
+    if (newfile) {
         state.map |= state.NEWFILE;
-
+    }
     if (!(state.selected & (state.REGION|state.UNKNOWN_REGION)))
     {
         state.selected |= state.UNKNOWN_REGION;
@@ -2141,9 +2144,6 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
                         newfile |= mergeFile(filenames[i]);
                     }
                 }
-            }
-            if (report) {
-                report->createHashTables();
             }
             mapChange(newfile);
             getApp()->endWaitCursor();

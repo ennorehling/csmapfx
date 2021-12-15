@@ -1,12 +1,13 @@
 csmapfx (0.9.8-1) stable; urgency=low
 
-  * bugfix: do not try to show faction id of display anonymous units
+  * bugfix (7): do not try to show faction id of display anonymous units.
+  * bugfix (6): refresh map after loading files from the command line.
 
  -- Enno Rehling <enno@eressea.de>  Wed, 15 Dec 2021 17:30:00 +0200
 
 csmapfx (0.9.7-1) stable; urgency=low
 
-  * bugfix: missing regions in saved maps.
+  * bugfix (5): missing regions in saved maps.
   * reduce excessive use of wait cursor.
 
  -- Enno Rehling <enno@eressea.de>  Tue, 14 Dec 2021 16:15:00 +0200

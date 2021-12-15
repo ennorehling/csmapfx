@@ -9,7 +9,9 @@
     <LocalDebuggerWorkingDirectory>.</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerWorkingDirectory>.</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>..\..\..\Downloads\xolgrim</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>1246-777.cr 1246-ioen.cr</LocalDebuggerCommandArguments>
+    <RemoteDebuggerCommandArguments>1246-777.cr 1246-ioen.cr</RemoteDebuggerCommandArguments>
   </PropertyGroup>
 </Project>
