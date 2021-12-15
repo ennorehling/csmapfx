@@ -190,9 +190,9 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				{
 					name = faction->value(TYPE_FACTIONNAME);
 					if (name.empty())
-						name = "Partei";
-
-					label.format("%s (%s)", name.text(), faction->id().text());
+                        label.assign("Parteigetarnt");
+                    else
+    					label.format("%s (%s)", name.text(), faction->id().text());
 				}
 
 				if (anotherfaction != end)
@@ -201,11 +201,11 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 						label += ", ";
 
 					name = anotherfaction->value(TYPE_FACTIONNAME);
-					if (name.empty())
-						name = "Partei";
-
-					FXString label2;
-					label2.format("%s (%s)", name.text(), faction->id().text());
+                    FXString label2;
+                    if (name.empty())
+                        label2.assign("Parteigetarnt");
+                    else
+    					label2.format("%s (%s)", name.text(), faction->id().text());
 
 					label += label2;
 				}

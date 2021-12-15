@@ -518,7 +518,7 @@ const FXString datablock::string() const
 FXString datablock::id() const
 {
 	int nn = info();
-	return FXStringValEx(nn, 36);
+	return (nn > 0) ? FXStringValEx(nn, 36) : "0";
 }
 
 void datablock::infostr(const FXString& s)

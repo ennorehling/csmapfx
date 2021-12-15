@@ -661,9 +661,9 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 
 				name = faction->value(TYPE_FACTIONNAME);
 				if (name.empty())
-					name = "Unbekannt";
-
-				label.format("%s (%s)", name.text(), faction->id().text());
+                    label.assign("Parteigetarnt");
+                else
+    				label.format("%s (%s)", name.text(), faction->id().text());
 
                 factionBox->appendItem(label, (void*)factionId);
 

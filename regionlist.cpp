@@ -667,8 +667,9 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                             else
                             {
                                 if (name.empty())
-                                    name = "Unbekannt";
-                                label.format("%s (%s)", name.text(), faction->id().text());
+                                    label.assign("Parteigetarnt");
+                                else
+                                    label.format("%s (%s)", name.text(), faction->id().text());
                             }
                         }
                         else
@@ -708,6 +709,7 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                                 // change icon to green, if alliance status to faction is set
                                 icon = green;
                             }
+
                         }
 
                         // add region only if it has units in it
