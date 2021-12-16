@@ -877,6 +877,7 @@ void CSMap::mapChange(bool newfile /*= false*/)
 
     if (newfile) {
         state.map |= state.NEWFILE;
+        updateFileNames();
     }
     if (!(state.selected & (state.REGION|state.UNKNOWN_REGION)))
     {
@@ -942,6 +943,7 @@ bool CSMap::loadFile(const FXString& filename)
         if (report->load(filename.text()) <= 0) {
             return false;
         }
+        report->filename(filename);
     }
     catch(const std::runtime_error& err)
     {
@@ -1924,11 +1926,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         selection.sel_plane = selection.region->info();
     }
 
-    if (report) {
-        updateFileNames();
-    }
-    else
-    {
+    if (!report) {
         status_file->hide(), status_lfile->hide();
         status->recalc();
     }
@@ -2108,7 +2106,6 @@ long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
         if (closeFile()) {
             FXString filename = dlg.getFilename();
             if (loadFile(filename)) {
-                report->filename(filename);
                 mapChange(true);
                 recentFiles.appendFile(filename);
             }
@@ -2624,7 +2621,6 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
     getApp()->beginWaitCursor();
     if (closeFile()) {
         if (loadFile(filename)) {
-            report->filename(filename);
             mapChange(true);
         }
     }
