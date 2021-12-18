@@ -1009,8 +1009,8 @@ bool CSMap::mergeFile(const FXString& filename)
     // dann: Datei an den aktuellen CR anfuegen (nur Karteninformationen)
     datablock regionblock;
     regionblock.string("REGION");
-
-    for (datablock::itor block = new_cr.blocks().begin(); block != new_cr.blocks().end(); block++)
+    datablock::itor new_end = new_cr.blocks().end();
+    for (datablock::itor block = new_cr.blocks().begin(); block != new_end;)
     {
         // handle only regions
         if (block->type() == block_type::TYPE_REGION)
@@ -1022,14 +1022,37 @@ bool CSMap::mergeFile(const FXString& filename)
             datablock::itor oldr = report->region(x, y, plane);
             if (oldr != report->blocks().end())            // add some info to old cr (island names)
             {
-                if (const datakey* islandkey = block->valueKey(TYPE_ISLAND))
+                if (const datakey* islandkey = block->valueKey(TYPE_ISLAND)) {
                     if (!oldr->valueKey(TYPE_ISLAND))
                     {
                         if (!islandkey->isInt())        // add only Vorlage-style islands (easier)
                             oldr->data().push_back(*islandkey);
                     }
+                }
+                // copy child blocks if we don't have them
+                for (block++; block != new_end && block->type() != block_type::TYPE_REGION; ++block) {
+                    block_type type = block->type();
+                    if (type == block_type::TYPE_PRICES) {
+                        datablock::itor old_end = report->blocks().end();
+                        datablock::itor child = oldr;
+                        for (child++; child != old_end && child->type() != block_type::TYPE_REGION; ++child) {
+                            if (child->type() == type) {
+                                // we already have a block of this type
+                                break;
+                            }
+                        }
+                        if (child == new_end || child->type() != type) {
+                            // we do not have this kind of block
+                            report->blocks().insert(++oldr, *block);
+                        }
+                    }
+                }
+                if (block == new_end) {
+                    break;
+                }
+                continue;
             }
-            else //if (oldr == file->blocks().end())    // add region to old cr
+            else // add region to old cr
             {
                 report->blocks().push_back(regionblock);
                 datablock& newblock = report->blocks().back();
@@ -1070,6 +1093,7 @@ bool CSMap::mergeFile(const FXString& filename)
                 newblock.data().push_back(key);
             }
         }
+        ++block;
     }
 
     return true;

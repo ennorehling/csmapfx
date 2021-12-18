@@ -204,7 +204,10 @@ typedef enum class block_type
 class datablock
 {
 public:
-	datablock();
+    typedef std::list<datablock/*, boost::fast_pool_allocator<datablock>*/ > list_type;
+    typedef list_type::iterator itor;
+    
+    datablock();
 	~datablock();
 
     block_type type() const { return m_type; }
@@ -236,7 +239,7 @@ public:
 	int valueInt(int key, int def = 0) const;
 	const datakey* valueKey(int key) const;
 
-	// Flags for map icons
+    // Flags for map icons
 	enum
 	{
 		FLAG_CASTLE	= (1 << 0),		// there is a building/tower/castle in this region
@@ -296,8 +299,6 @@ public:
 	static FXString planeName(int plane);					// Eressea,Astralraum,Weihnachtsinsel...
 	bool parse(char* str);
 
-	typedef std::list<datablock/*, boost::fast_pool_allocator<datablock>*/ > list_type;
-	typedef list_type::iterator itor;
 
 protected:
     block_type m_type;
