@@ -972,6 +972,23 @@ bool CSMap::loadFile(const FXString& filename)
     return true;
 }
 
+void CSMap::mergeBlock(datablock::itor& block, datablock::itor& begin, const datablock::itor& end, block_type parent_type)
+{
+    block_type type = block->type();
+    datablock::itor child = begin;
+    for (child++; child != end && child->type() != parent_type; ++child) {
+        if (child->type() == type) {
+            // we already have a block of this type
+            break;
+        }
+    }
+    if (child == end || child->type() != type) {
+        // we do not have this kind of block
+        report->blocks().insert(++begin, *block);
+    }
+
+}
+
 bool CSMap::mergeFile(const FXString& filename)
 {
     // zuerst: Datei normal laden
@@ -1018,33 +1035,30 @@ bool CSMap::mergeFile(const FXString& filename)
             FXint x = block->x();
             FXint y = block->y();
             FXint plane = block->info();
-
             datablock::itor oldr = report->region(x, y, plane);
+            bool is_seen = !!(block->flags() & datablock::FLAG_REGION_SEEN);
+
             if (oldr != report->blocks().end())            // add some info to old cr (island names)
             {
                 if (const datakey* islandkey = block->valueKey(TYPE_ISLAND)) {
                     if (!oldr->valueKey(TYPE_ISLAND))
                     {
-                        if (!islandkey->isInt())        // add only Vorlage-style islands (easier)
+                        if (islandkey && !islandkey->isInt())        // add only Vorlage-style islands (easier)
                             oldr->data().push_back(*islandkey);
                     }
                 }
                 // copy child blocks if we don't have them
                 for (block++; block != new_end && block->type() != block_type::TYPE_REGION; ++block) {
+                    datablock::itor old_end = report->blocks().end();
                     block_type type = block->type();
-                    if (type == block_type::TYPE_PRICES) {
-                        datablock::itor old_end = report->blocks().end();
-                        datablock::itor child = oldr;
-                        for (child++; child != old_end && child->type() != block_type::TYPE_REGION; ++child) {
-                            if (child->type() == type) {
-                                // we already have a block of this type
-                                break;
-                            }
+                    if (type == block_type::TYPE_BORDER || type == block_type::TYPE_RESOURCE) {
+                        if (!is_seen) {
+                            // we cannot see this region, should we replace what we know?
+                            mergeBlock(block, oldr, old_end, block_type::TYPE_REGION);
                         }
-                        if (child == new_end || child->type() != type) {
-                            // we do not have this kind of block
-                            report->blocks().insert(++oldr, *block);
-                        }
+                    }
+                    else if (type == block_type::TYPE_PRICES) {
+                        mergeBlock(block, oldr, old_end, block_type::TYPE_REGION);
                     }
                 }
                 if (block == new_end) {

@@ -39,6 +39,7 @@ public:
     void mapChange(bool newfile = false);
 	bool haveActiveFaction() const;
 	bool loadFile(const FXString& filename);
+    void mergeBlock(datablock::itor& block, datablock::itor& begin, const datablock::itor& end, block_type parent_type);
 	bool mergeFile(const FXString& filename);
     bool closeFile();
     void saveCommandsDlg(bool stripped, bool replace);
