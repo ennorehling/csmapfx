@@ -1,3 +1,9 @@
+csmapfx (0.9.12-1) stable; urgency=low
+
+  * import was adding roads and resources to the wrong parent region.
+
+ -- Enno Rehling <enno@eressea.de>  Tue, 28 Dec 2021 18:45:00 +0200
+
 csmapfx (0.9.11-1) stable; urgency=low
 
   * fix import of roads and resources when merging.
