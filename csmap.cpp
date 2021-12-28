@@ -972,10 +972,11 @@ bool CSMap::loadFile(const FXString& filename)
     return true;
 }
 
-void CSMap::mergeBlock(datablock::itor& block, datablock::itor& begin, const datablock::itor& end, block_type parent_type)
+void CSMap::mergeBlock(datablock::itor& block, const datablock::itor& begin, const datablock::itor& end, block_type parent_type)
 {
     block_type type = block->type();
     datablock::itor child = begin;
+    datablock::itor insert = begin;
     for (child++; child != end && child->type() != parent_type; ++child) {
         if (child->type() == type) {
             // we already have a block of this type
@@ -984,7 +985,7 @@ void CSMap::mergeBlock(datablock::itor& block, datablock::itor& begin, const dat
     }
     if (child == end || child->type() != type) {
         // we do not have this kind of block
-        report->blocks().insert(++begin, *block);
+        report->blocks().insert(++insert, *block);
     }
 
 }
