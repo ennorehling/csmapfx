@@ -52,6 +52,7 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ORDERS,         CSMap::onFileSaveCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_CLOSE,               CSMap::onFileClose),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_CHECK_ORDERS,        CSMap::onFileCheckCommands),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ALL,            CSMap::onFileSaveAll),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_MAP,            CSMap::onFileSaveMap),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_MAP,          CSMap::onFileExportMap),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_IMAGE,        CSMap::onFileExportImage),
@@ -62,6 +63,7 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_QUIT,                CSMap::onQuit),
 
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_MERGE,               CSMap::updOpenFile),
+    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ALL,            CSMap::updOpenFile),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_MAP,            CSMap::updOpenFile),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_CLOSE,               CSMap::updOpenFile),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_IMAGE,        CSMap::updOpenFile),
@@ -290,6 +292,12 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
         ID_FILE_OPEN);
     new FXMenuCommand(
         filemenu,
+        FXString(L"Speichern...\tCtrl-Shift-S\tAktuellen Zustand speichern."),
+        icons.open,
+        this,
+        ID_FILE_SAVE_ALL);
+    new FXMenuCommand(
+        filemenu,
         FXString(L"Befehle &laden...\tCtrl-Shift-O\tBefehle aus einer Textdatei laden."),
         icons.open, this, ID_FILE_LOAD_ORDERS);
     new FXMenuCommand(
@@ -314,12 +322,6 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
         filemenu,
         L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",
         NULL, this, ID_FILE_EXPORT_ORDERS);
-    /*
-    new FXMenuCommand(
-        filemenu,
-        L"Einstellungen...\tCtrl-Shift-.\tEinstellungen verwalten.",
-        NULL, this, ID_FILE_PREFERENCES);
-    */
     new FXMenuSeparatorEx(filemenu);
 
     recentmenu = new FXMenuPane(this);
@@ -2333,6 +2335,19 @@ long CSMap::onFileSaveMap(FXObject*, FXSelector, void*)
     if (!filename.empty()) {
         getApp()->beginWaitCursor();
         saveReport(filename, map_type::MAP_NORMAL);
+        getApp()->endWaitCursor();
+        return 1;
+    }
+    return 0;
+}
+
+long CSMap::onFileSaveAll(FXObject*, FXSelector, void*)
+{
+    FXString filename = askSaveFileName("Speichern unter...");
+    if (!filename.empty()) {
+        getApp()->beginWaitCursor();
+        saveReport(filename, map_type::MAP_FULL);
+        recentFiles.appendFile(filename);
         getApp()->endWaitCursor();
         return 1;
     }

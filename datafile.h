@@ -408,6 +408,7 @@ public:
 	};
 
 protected:
+    const char* getConfigurationName(map_type type);
 
 	struct koordinates
 	{

@@ -872,7 +872,7 @@ int datafile::save(const char* filename, map_type map_filter)
 			{
 				if (tags->type() == TYPE_KONFIGURATION)
 				{
-                    tags->value(CSMAP_APP_TITLE_VERSION);
+                    tags->value(getConfigurationName(map_filter));
 				}
 			}
 		}
@@ -1007,6 +1007,17 @@ int datafile::save(const char* filename, map_type map_filter)
 	}
 
 	return blocks().size();
+}
+
+const char* datafile::getConfigurationName(map_type type)
+{
+    if (type == map_type::MAP_NORMAL) {
+        return "CSMapFX:Export";
+    }
+    if (type == map_type::MAP_MINIMAL) {
+        return "CSMapFX:Map";
+    }
+    return "CSMapFX";
 }
 
 // ====================================
