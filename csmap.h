@@ -208,8 +208,12 @@ public:
 	};
 
 private: 
+    typedef enum class reload_type { RELOAD_NEVER, RELOAD_AUTO, RELOAD_ASK } reload_type;
+    reload_type reload_mode;
+
     int unlink(const char *pathname);
     FXString askSaveFileName(const FXString& dlgTitle);
+    void setAutoReload(reload_type mode);
     bool allowReplaceFile(const FXString& filename);
 
 	// Menubar
@@ -275,7 +279,6 @@ private:
 	class FXInfoDlg	*infodlg;
 	class FXSearchDlg *searchdlg;
     time_t last_save_time;
-    enum class reload_type { RELOAD_NEVER, RELOAD_AUTO, RELOAD_ASK } reload_mode;
 
 	struct
 	{

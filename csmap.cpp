@@ -151,8 +151,7 @@ CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL
     CSMap_instance = this;
 
     last_save_time = 0;
-    reload_mode = CSMap::reload_type::RELOAD_ASK;
-    app->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, NULL);
+    setAutoReload(CSMap::reload_type::RELOAD_ASK);
     // create main window icon
     FXIcon* ico = new FXICOIcon(app, data::csmap);
     setMiniIcon(ico);
@@ -2082,7 +2081,7 @@ bool CSMap::updateCommands(const FXString &filename) {
         if (res != MBOX_CLICKED_NO) {
             return true;
         }
-        reload_mode = CSMap::reload_type::RELOAD_NEVER;
+        setAutoReload(CSMap::reload_type::RELOAD_NEVER);
     }
     else if (reload_mode == CSMap::reload_type::RELOAD_AUTO) {
         return true;
@@ -2325,6 +2324,25 @@ bool CSMap::saveReport(const FXString& filename, map_type mode, bool merge_comma
 FXString CSMap::askSaveFileName(const FXString &dlgTitle)
 {
     return askFileName(dlgTitle, "Eressea Computer Report (*.cr)\nAlle Dateien (*)");
+}
+
+void CSMap::setAutoReload(CSMap::reload_type mode)
+{
+    if (reload_mode != mode) {
+        if (mode != CSMap::reload_type::RELOAD_NEVER) {
+            if (report) {
+                FXString filename = report->cmdfilename();
+                struct stat buf;
+                if (stat(filename.text(), &buf) == 0) {
+                    last_save_time = buf.st_mtime;
+                }
+            }
+        }
+        if (reload_mode == CSMap::reload_type::RELOAD_NEVER) {
+            getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, NULL);
+        }
+        reload_mode = mode;
+    }
 }
 
 bool CSMap::allowReplaceFile(const FXString& filename)
