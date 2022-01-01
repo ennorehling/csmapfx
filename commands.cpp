@@ -539,55 +539,52 @@ long FXCommands::updRowCol(FXObject* sender,FXSelector,void*)
 
 void FXCommands::saveCommands()
 {
-	if (selection.selected & selection.UNIT)
-	{
-		// search for command block of unit
-		datablock::itor iend = mapFile->end();
-		datablock::itor iblock = selection.unit;
-		for (iblock++; iblock != iend && iblock->depth() > selection.unit->depth(); iblock++)
-			if (iblock->type() == block_type::TYPE_COMMANDS)
-				break;				// found
+    if (selection.selected & selection.UNIT)
+    {
+        // search for command block of unit
+        datablock::itor iend = mapFile->end();
+        datablock::itor iblock = selection.unit;
+        for (iblock++; iblock != iend && iblock->depth() > selection.unit->depth(); iblock++) {
+            if (iblock->type() == block_type::TYPE_COMMANDS) {
+                if (att_commands* cmds = dynamic_cast<att_commands*>(iblock->attachment()))
+                {
+                    cmds->commands.clear();
 
-		if (iblock == iend || iblock->type() != block_type::TYPE_COMMANDS)
-			return;
+                    int begin = 0, end;
+                    do
+                    {
+                        end = lineEnd(begin);
 
-		if (att_commands* cmds = dynamic_cast<att_commands*>(iblock->attachment()))
-		{
-			cmds->commands.clear();
+                        FXString str;
+                        extractText(str, begin, end - begin);
+                        cmds->commands.push_back(str);
 
-			int begin = 0, end;
-			do
-			{
-				end = lineEnd(begin);
+                        begin = nextLine(end);
+                    } while (begin != end);
 
-				FXString str;
-				extractText(str, begin, end-begin);
-				cmds->commands.push_back(str);
+                    // remove trailing empty lines
+                    while (!cmds->commands.empty())
+                    {
+                        FXString line = cmds->commands.back();
+                        if (line.simplify().length())
+                            break;
+                        cmds->commands.pop_back();
+                    }
+                }
+                setModified(false);
+                // notify application that commands were modified
+                if (!mapFile->modifiedCmds())
+                {
+                    mapFile->modifiedCmds(true);
 
-                begin = nextLine(end);
-			} while (begin != end);
+                    datafile::SelectionState state = selection;
+                    getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+                }
 
-			// remove trailing empty lines
-			while (!cmds->commands.empty())
-			{
-				FXString line = cmds->commands.back();
-				if (line.simplify().length())
-					break;
-				cmds->commands.pop_back();
-			}
-		}
-
-		setModified(false);
-
-		// notify application, that commands were modified
-		if (!mapFile->modifiedCmds())
-		{
-			mapFile->modifiedCmds(true);
-			
-			datafile::SelectionState state = selection;
-			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
-		}
-	}
+                break;
+            }
+        }
+    }
 }
 
 void FXCommands::mapShowRoute()

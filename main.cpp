@@ -250,7 +250,8 @@ int main(int argc, char *argv[])
 	}
 
     if (numfiles > 0) {
-        csmap->mapChange(true);
+        csmap->updateFileNames();
+        csmap->mapChange();
     }
 	// Programm ohne GUI beenden?
 	if (!startgui && !calculator)

@@ -864,7 +864,7 @@ FXbool CSMap::close(FXbool notify)
     return FXMainWindow::close(notify);
 }
 
-void CSMap::mapChange(bool newfile /*= false*/)
+void CSMap::mapChange()
 {
     // map changed, let selection-function handle this
     datafile::SelectionState state = selection;
@@ -877,10 +877,6 @@ void CSMap::mapChange(bool newfile /*= false*/)
     }
     state.map |= state.MAPCHANGED;
 
-    if (newfile) {
-        state.map |= state.NEWFILE;
-        updateFileNames();
-    }
     if (!(state.selected & (state.REGION|state.UNKNOWN_REGION)))
     {
         state.selected |= state.UNKNOWN_REGION;
@@ -1130,7 +1126,7 @@ bool CSMap::loadCommands(const FXString& filename)
         if (res < 0)
         {
             FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht gelesen werden.");
-            mapChange(false);
+            mapChange();
             return false;
         }
         FXString password = report->getPassword();
@@ -1146,12 +1142,13 @@ bool CSMap::loadCommands(const FXString& filename)
     {
         FXString msg(err.what());
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", msg.text());
-        mapChange(false);
+        mapChange();
         return false;
     }
 
     reload_mode = CSMap::reload_type::RELOAD_ASK;
-    mapChange(true);    // new file flag
+    updateFileNames();
+    mapChange();
     return true;
 }
 
@@ -1726,6 +1723,10 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     // reset state
     selection.selected = 0;
 
+    if (report) {
+        updateFileNames();
+    }
+
     // file change notification
     if (state->map & selection.MAPCHANGED)
     {
@@ -2147,7 +2148,8 @@ long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
         if (closeFile()) {
             FXString filename = dlg.getFilename();
             if (loadFile(filename)) {
-                mapChange(true);
+                updateFileNames();
+                mapChange();
                 recentFiles.appendFile(filename);
             }
         }
@@ -2183,7 +2185,10 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
                     }
                 }
             }
-            mapChange(newfile);
+            if (newfile) {
+                updateFileNames();
+            }
+            mapChange();
             getApp()->endWaitCursor();
         }
     }
@@ -2308,13 +2313,6 @@ bool CSMap::saveReport(const FXString& filename, map_type mode, bool merge_comma
     if (filename.empty() || !report)
         return false;
 
-    if (FXStat::exists(filename)) {
-        FXString text;
-        text = filename + FXString(L" existiert bereits.\n\nM\u00f6chten Sie sie ersetzen?");
-
-        FXuint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
-        if (MBOX_CLICKED_YES != answ) return false;
-    }
     FXint res = report->save(filename.text(), mode);
     if (res <= 0) {
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
@@ -2329,10 +2327,24 @@ FXString CSMap::askSaveFileName(const FXString &dlgTitle)
     return askFileName(dlgTitle, "Eressea Computer Report (*.cr)\nAlle Dateien (*)");
 }
 
+bool CSMap::allowReplaceFile(const FXString& filename)
+{
+    if (FXStat::exists(filename)) {
+        FXString text;
+        text = filename + FXString(L" existiert bereits.\n\nM\u00f6chten Sie sie ersetzen?");
+
+        FXuint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
+        if (MBOX_CLICKED_YES != answ) {
+            return false;
+        }
+    }
+    return true;
+}
+
 long CSMap::onFileSaveMap(FXObject*, FXSelector, void*)
 {
     FXString filename = askSaveFileName("Speichern unter...");
-    if (!filename.empty()) {
+    if (!filename.empty() && allowReplaceFile(filename)) {
         getApp()->beginWaitCursor();
         saveReport(filename, map_type::MAP_NORMAL);
         getApp()->endWaitCursor();
@@ -2344,10 +2356,12 @@ long CSMap::onFileSaveMap(FXObject*, FXSelector, void*)
 long CSMap::onFileSaveAll(FXObject*, FXSelector, void*)
 {
     FXString filename = askSaveFileName("Speichern unter...");
-    if (!filename.empty()) {
+    if (!filename.empty() && allowReplaceFile(filename)) {
         getApp()->beginWaitCursor();
-        saveReport(filename, map_type::MAP_FULL);
-        recentFiles.appendFile(filename);
+        if (saveReport(filename, map_type::MAP_FULL)) {
+            recentFiles.appendFile(filename);
+            report->filename(filename);
+        }
         getApp()->endWaitCursor();
         return 1;
     }
@@ -2357,7 +2371,7 @@ long CSMap::onFileSaveAll(FXObject*, FXSelector, void*)
 long CSMap::onFileExportMap(FXObject*, FXSelector, void*)
 {
     FXString filename = askSaveFileName("Speichern unter...");
-    if (!filename.empty()) {
+    if (!filename.empty() && allowReplaceFile(filename)) {
         getApp()->beginWaitCursor();
         saveReport(filename, map_type::MAP_MINIMAL);
         getApp()->endWaitCursor();
@@ -2675,7 +2689,8 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
     getApp()->beginWaitCursor();
     if (closeFile()) {
         if (loadFile(filename)) {
-            mapChange(true);
+            updateFileNames();
+            mapChange();
         }
     }
     getApp()->endWaitCursor();

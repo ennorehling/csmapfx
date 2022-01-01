@@ -36,7 +36,7 @@ public:
     static CSMap* getInstance();
 
     bool saveReport(const FXString& filename, map_type mode, bool merge_commands = false);
-    void mapChange(bool newfile = false);
+    void mapChange();
 	bool haveActiveFaction() const;
 	bool loadFile(const FXString& filename);
     void mergeBlock(datablock::itor& block, const datablock::itor& begin, const datablock::itor& end, block_type parent_type);
@@ -210,6 +210,7 @@ public:
 private: 
     int unlink(const char *pathname);
     FXString askSaveFileName(const FXString& dlgTitle);
+    bool allowReplaceFile(const FXString& filename);
 
 	// Menubar
 	FXMenuBar		*menubar;

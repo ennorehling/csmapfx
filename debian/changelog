@@ -1,6 +1,15 @@
+csmapfx (0.9.14-1) stable; urgency=low
+
+  * do not show wait cursor while asking to replace a file.
+  * show the file modification marker in the title bar again.
+  * after saving, change the current report file name.
+
+ -- Enno Rehling <enno@eressea.de>  Tue, 01 Jan 2022 02:20:00 +0200
+
 csmapfx (0.9.13-1) stable; urgency=low
 
   * bring back the option to save current state.
+  * different "Konfiguration" tags in the CR depending on amap contents.
 
  -- Enno Rehling <enno@eressea.de>  Tue, 29 Dec 2021 18:40:00 +0200
 
