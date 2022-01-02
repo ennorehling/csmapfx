@@ -358,14 +358,15 @@ public:
 
 	datablock::list_type& blocks() { return m_blocks; }
 
-	datablock::itor region(int x, int y, int plane);
-	datablock::itor unit(int id);
-	datablock::itor faction(int id);
-	datablock::itor building(int id);
-	datablock::itor ship(int id);
-	datablock::itor island(int id);
-
-	datablock::itor dummyToItor(const datablock* block);
+    datablock::itor getUnit(int id);
+	datablock::itor getBuilding(int id);
+	datablock::itor getShip(int id);
+	datablock::itor getFaction(int id);
+	datablock::itor getIsland(int id);
+	datablock::itor getRegion(int x, int y, int plane);
+    bool hasRegion(int x, int y, int plane) const;
+    bool deleteRegion(datablock* region);
+    datablock::itor dummyToItor(const datablock* block);
 
 	typedef std::list<datafile>::iterator itor;
 
@@ -412,6 +413,13 @@ public:
 protected:
     void mergeBlock(datablock::itor& block, const datablock::itor& begin, const datablock::itor& end, block_type parent_type);
     const char* getConfigurationName(map_type type);
+
+    datablock::itor unit(int id);
+    datablock::itor building(int id);
+    datablock::itor ship(int id);
+    datablock::itor faction(int id);
+    datablock::itor island(int id);
+    datablock::itor region(int x, int y, int plane);
 
 	struct koordinates
 	{

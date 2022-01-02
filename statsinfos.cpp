@@ -281,13 +281,14 @@ void FXStatsInfos::updateData()
 		datablock::itor notfound = mapFile->blocks().end();
 		for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
 		{
-			datablock::itor region = mapFile->region((*itor)->x(), (*itor)->y(), (*itor)->info());
-
-			if (region != notfound)
-			{
-				// collect
-				collectData(info, region);
-			}
+            try
+            {
+                datablock::itor region = mapFile->getRegion((*itor)->x(), (*itor)->y(), (*itor)->info());
+                collectData(info, region);
+            }
+            catch (...) {
+                // user has selected a blank tile
+            }
 		}
 
 		// "Lohn" makes no sense here. Remove.

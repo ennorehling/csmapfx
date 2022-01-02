@@ -1037,11 +1037,11 @@ void datafile::merge(datafile& new_cr)
         // handle only regions
         if (block->type() == block_type::TYPE_REGION)
         {
+            bool is_seen = !!(block->flags() & datablock::FLAG_REGION_SEEN);
             FXint x = block->x();
             FXint y = block->y();
             FXint plane = block->info();
-            datablock::itor oldr = this->region(x, y, plane);
-            bool is_seen = !!(block->flags() & datablock::FLAG_REGION_SEEN);
+            datablock::itor oldr = region(x, y, plane);
 
             if (oldr != m_blocks.end())            // add some info to old cr (island names)
             {
@@ -1614,15 +1614,60 @@ datablock::itor datafile::region(int x, int y, int plane)
 
 	return region->second;
 }
+
+datablock::itor datafile::getRegion(int x, int y, int plane)
+{
+    datablock::itor block = region(x, y, plane);
+    if (block == m_blocks.end()) {
+        throw std::runtime_error("region not found");
+    }
+
+    return block;
+}
+
+bool datafile::hasRegion(int x, int y, int plane) const
+{
+    std::map<koordinates, datablock::itor>::const_iterator region;
+    region = m_regions.find(koordinates(x, y, plane));
+    return (region != m_regions.end());
+}
+
+bool datafile::deleteRegion(datablock* block)
+{
+    datablock::itor first = region(block->x(), block->y(), block->info());
+    // found the region. delete all blocks until next region.
+    datablock::itor last = first;
+    for (++last; last != m_blocks.end(); ++last) {
+        // block is in region?
+        if (last->depth() <= first->depth()) {
+            m_blocks.erase(first, last);
+            return true;
+        }
+    }
+    return false;
+}
+
 datablock::itor datafile::unit(int id)
 { 
 	std::map<int, datablock::itor>::iterator unit = m_units.find(id);
 
-	if (unit == m_units.end())
-		return m_blocks.end();
+	if (unit == m_units.end()) {
+        return m_blocks.end();
+    }
 
 	return unit->second;
 }
+
+datablock::itor datafile::getUnit(int id)
+{
+    datablock::itor block = unit(id);
+    if (block == m_blocks.end()) {
+        throw std::runtime_error("unit not found");
+    }
+
+    return block;
+}
+
 datablock::itor datafile::faction(int id)
 {
 	std::map<int, datablock::itor>::iterator faction = m_factions.find(id);
@@ -1632,23 +1677,57 @@ datablock::itor datafile::faction(int id)
 
 	return faction->second;
 }
-datablock::itor datafile::building(int id)
-{ 
-	std::map<int, datablock::itor>::iterator building = m_buildings.find(id);
 
-	if (building == m_buildings.end())
-		return m_blocks.end();
+datablock::itor datafile::getFaction(int id)
+{
+    datablock::itor block = faction(id);
+    if (block == m_blocks.end()) {
+        throw std::runtime_error("faction not found");
+    }
 
-	return building->second;
+    return block;
 }
+
+datablock::itor datafile::building(int id)
+{
+    std::map<int, datablock::itor>::iterator building = m_buildings.find(id);
+
+    if (building == m_buildings.end()) {
+        return m_blocks.end();
+    }
+
+    return building->second;
+}
+
+datablock::itor datafile::getBuilding(int id)
+{ 
+    datablock::itor block = building(id);
+    if (block == m_blocks.end()) {
+        throw std::runtime_error("building not found");
+    }
+
+	return block;
+}
+
 datablock::itor datafile::ship(int id)
 { 
 	std::map<int, datablock::itor>::iterator ship = m_ships.find(id);
 
-	if (ship == m_ships.end())
-		return m_blocks.end();
+    if (ship == m_ships.end()) {
+        return m_blocks.end();
+    }
 
 	return ship->second;
+}
+
+datablock::itor datafile::getShip(int id)
+{
+    datablock::itor block = ship(id);
+    if (block == m_blocks.end()) {
+        throw std::runtime_error("ship not found");
+    }
+
+    return block;
 }
 
 datablock::itor datafile::island(int id)
@@ -1659,6 +1738,16 @@ datablock::itor datafile::island(int id)
 		return m_blocks.end();
 
 	return island->second;
+}
+
+datablock::itor datafile::getIsland(int id)
+{
+    datablock::itor block = island(id);
+    if (block == m_blocks.end()) {
+        throw std::runtime_error("island not found");
+    }
+
+    return block;
 }
 
 datablock::itor datafile::dummyToItor(const datablock* block)

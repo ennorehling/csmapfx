@@ -138,10 +138,20 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					aura = key->value();
 				else if (key->type() == TYPE_AURAMAX)
 					auramax = key->value();
-				else if (key->key() == "Burg")
-					building = mapFile->building(atoi(key->value().text()));
-				else if (key->key() == "Schiff")
-					ship = mapFile->ship(atoi(key->value().text()));
+                else if (key->key() == "Burg") {
+                    try {
+                        building = mapFile->getBuilding(atoi(key->value().text()));
+                    }
+                    catch (...) {
+                    }
+                }
+                else if (key->key() == "Schiff") {
+                    try {
+                        ship = mapFile->getShip(atoi(key->value().text()));
+                    }
+                    catch (...) {
+                    }
+                }
 				else if (key->key() == "weight")
 					weight = key->value();
 				else if (key->key() == "gruppe")
@@ -181,36 +191,45 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 			if (factionId != -1 || AnotherfactionId != -1 || !group.empty())
 			{
-				datablock::itor faction = mapFile->faction(factionId);
-				datablock::itor anotherfaction = mapFile->faction(AnotherfactionId);
+                datablock::itor faction, anotherfaction;
 
-				label = "";
+                if (factionId > 0) {
+                    try
+                    {
+                        faction = mapFile->getFaction(factionId);
+                        name = faction->value(TYPE_FACTIONNAME);
+                        if (name.empty())
+                            label.assign("Parteigetarnt");
+                        else
+                            label.format("%s (%s)", name.text(), faction->id().text());
+                    }
+                    catch (std::runtime_error ex) {
+                        label.format("Unbekannt (%s)", name.text(), FXStringValEx(factionId, 36).text());
+                    }
+                }
 
-				if (faction != end)
-				{
-					name = faction->value(TYPE_FACTIONNAME);
-					if (name.empty())
-                        label.assign("Parteigetarnt");
-                    else
-    					label.format("%s (%s)", name.text(), faction->id().text());
-				}
+                if (AnotherfactionId > 0) {
+                    try
+                    {
+                        anotherfaction = mapFile->getFaction(AnotherfactionId);
+                        if (!label.empty())
+                            label += ", ";
 
-				if (anotherfaction != end)
-				{
-					if (!label.empty())
-						label += ", ";
+                        name = anotherfaction->value(TYPE_FACTIONNAME);
+                        FXString label2;
+                        if (name.empty())
+                            label2.assign("Parteigetarnt");
+                        else
+                            label2.format("%s (%s)", name.text(), faction->id().text());
 
-					name = anotherfaction->value(TYPE_FACTIONNAME);
-                    FXString label2;
-                    if (name.empty())
-                        label2.assign("Parteigetarnt");
-                    else
-    					label2.format("%s (%s)", name.text(), faction->id().text());
+                        label += label2;
+                    }
+                    catch (std::runtime_error ex) {
+                        label.format("Unbekannt (%s)", name.text(), FXStringValEx(AnotherfactionId, 36).text());
+                    }
+                }
 
-					label += label2;
-				}
-
-				if (!group.empty())
+                if (!group.empty())
 				{
 					if (!label.empty())
 						label += ", ";

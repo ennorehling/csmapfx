@@ -233,12 +233,14 @@ void FXStatistics::updateList()
 		datablock::itor notfound = mapFile->blocks().end();
 		for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
 		{
-			datablock::itor region = mapFile->region((*itor)->x(), (*itor)->y(), (*itor)->info());
-			if (region != notfound)
-			{
+            try {
+    			datablock::itor region = mapFile->getRegion((*itor)->x(), (*itor)->y(), (*itor)->info());
 				// collect if selected
 				collectData(persons, items, talents, ships, buildings, region);
 			}
+            catch (...) {
+                // user selected a blank tile
+            }
 		}
 	}
 	else if (selection.selected & selection.REGION)
@@ -467,20 +469,22 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 		{
 			datablock::itor block;
 
-			if (entryType == 0)
-				block = mapFile->unit(itor->first);		// get unit
-			else if (entryType == 1)
-				block = mapFile->building(itor->first);	// get building/castle
-			else if (entryType == 2)
-				block = mapFile->ship(itor->first);		// get ship
+            try {
+                if (entryType == 0)
+                    block = mapFile->getUnit(itor->first);		// get unit
+                else if (entryType == 1)
+                    block = mapFile->getBuilding(itor->first);	// get building/castle
+                else if (entryType == 2)
+                    block = mapFile->getShip(itor->first);		// get ship
+            }
+            catch (std::runtime_error ex) {
+                FXString error;
+                error.format("- error: %s - ", ex.what());
+                new FXMenuCommand(menu, error.text(), NULL, this, ID_POPUP_CLICKED);
+                continue;
+            }
 
-			if (block == mapFile->blocks().end())
-			{
-				new FXMenuCommand(menu, "- error: not found -", NULL, this,ID_POPUP_CLICKED);
-				continue;
-			}
-
-			FXString name = block->value(TYPE_NAME);
+            FXString name = block->value(TYPE_NAME);
 			if (name.empty())
 				name = block->id();
 
@@ -656,18 +660,23 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 			{
 				factions.insert(factionId);
 
-				FXString name, label;
-				datablock::itor faction = mapFile->faction(factionId);
+                FXString label;
+                try {
+                    datablock::itor faction = mapFile->getFaction(factionId);
+                    FXString name = faction->value(TYPE_FACTIONNAME);
 
-				name = faction->value(TYPE_FACTIONNAME);
-				if (name.empty())
-                    label.assign("Parteigetarnt");
-                else
-    				label.format("%s (%s)", name.text(), faction->id().text());
+                    if (name.empty())
+                        label.assign("Parteigetarnt");
+                    else
+                        label.format("%s (%s)", name.text(), faction->id().text());
 
+                }
+                catch (std::runtime_error ex) {
+                    // missing PARTEI block in report? how?
+                    label.assign(ex.what());
+                }
                 factionBox->appendItem(label, (void*)factionId);
-
-				// select previously selected faction again
+                // select previously selected faction again
 				if (select.faction == factionId)
                     factionBox->setCurrentItem(factionBox->getNumItems()-1);
 			}
@@ -731,12 +740,14 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				datablock::itor notfound = mapFile->blocks().end();
 				for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
 				{
-					datablock::itor region = mapFile->region((*itor)->x(), (*itor)->y(), (*itor)->info());
-					if (region != notfound)
+					try
 					{
-						// collect if selected
+                        datablock::itor region = mapFile->getRegion((*itor)->x(), (*itor)->y(), (*itor)->info());
 						collectFactionList(factions, region);
 					}
+                    catch (...) {
+                        // user has selected a blank tile
+                    }
 				}
 			}
 			else if (selection.selected & selection.REGION)

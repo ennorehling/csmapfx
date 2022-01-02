@@ -1424,10 +1424,8 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
     if (info && info->unit_id) {
         datafile::SelectionState state;
         state.selected = selection.UNIT;
-        state.unit = report->unit(info->unit_id);
-        if (state.unit != report->blocks().end()) {
-            handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
-        }
+        state.unit = report->getUnit(info->unit_id);
+        handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
     }
     return 1;
 }
@@ -1500,16 +1498,14 @@ long CSMap::onMapMoveMarker(FXObject*, FXSelector sel, void*)
 
     // set new marked region
     datafile::SelectionState state;
-
-    state.selected = 0;
-    state.region = report->region(x, y, plane);
-
+    state.selected = state.REGION;
     state.sel_x = x, state.sel_y = y, state.sel_plane = plane;
-
-    if (state.region != report->blocks().end())
-        state.selected = state.REGION;
-    else
+    try {
+        state.region = report->getRegion(x, y, plane);
+    }
+    catch (...) {
         state.selected = state.UNKNOWN_REGION;
+    }
 
     // dont touch multiregions selected
     if (selection.selected & selection.MULTIPLE_REGIONS)
@@ -2691,6 +2687,17 @@ long CSMap::onRegionInvertSel(FXObject*, FXSelector, void*)
     return 1;
 }
 
+// each of the six hex directions
+static const int hex_offset[6][2] = {
+    {0, 1},
+    {1, 0},
+    {1, -1},
+    {0, -1},
+    {-1, 0},
+    {-1, 1},
+};
+
+
 long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
 {
     if (!(selection.selected & selection.MULTIPLE_REGIONS))
@@ -2704,7 +2711,6 @@ long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
 
     int visiblePlane = map->getVisiblePlane();
 
-    datablock::itor notfound = report->blocks().end();
     for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
     {
         // all previously selected regions are selected here, too
@@ -2721,30 +2727,14 @@ long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
 
         datablock::itor region;
 
-        // each of the six hex directions
-        region = report->region(x, y+1, visiblePlane);
-        if (region != notfound)
-            state.regionsSelected.insert(&*region);
-
-        region = report->region(x+1, y, visiblePlane);
-        if (region != notfound)
-            state.regionsSelected.insert(&*region);
-
-        region = report->region(x+1, y-1, visiblePlane);
-        if (region != notfound)
-            state.regionsSelected.insert(&*region);
-
-        region = report->region(x, y-1, visiblePlane);
-        if (region != notfound)
-            state.regionsSelected.insert(&*region);
-
-        region = report->region(x-1, y, visiblePlane);
-        if (region != notfound)
-            state.regionsSelected.insert(&*region);
-
-        region = report->region(x-1, y+1, visiblePlane);
-        if (region != notfound)
-            state.regionsSelected.insert(&*region);
+        for (int d = 0; d != 6; ++d) {
+            try {
+                region = report->getRegion(x + hex_offset[d][0], y + hex_offset[d][1], visiblePlane);
+                state.regionsSelected.insert(&*region);
+            }
+            catch (...) {
+            }
+        }
     }
 
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
@@ -2787,41 +2777,19 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
             datablock::itor region;
 
             // each of the six hex directions
-            region = report->region(x, y+1, visiblePlane);
-            if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
-                && region->terrain() != data::TERRAIN_FIREWALL)
-                if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
-                    state.regionsSelected.insert(&*region), changed = true;
-
-            region = report->region(x+1, y, visiblePlane);
-            if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
-                && region->terrain() != data::TERRAIN_FIREWALL)
-                if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
-                    state.regionsSelected.insert(&*region), changed = true;
-
-            region = report->region(x+1, y-1, visiblePlane);
-            if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
-                && region->terrain() != data::TERRAIN_FIREWALL)
-                if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
-                    state.regionsSelected.insert(&*region), changed = true;
-
-            region = report->region(x, y-1, visiblePlane);
-            if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
-                && region->terrain() != data::TERRAIN_FIREWALL)
-                if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
-                    state.regionsSelected.insert(&*region), changed = true;
-
-            region = report->region(x-1, y, visiblePlane);
-            if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
-                && region->terrain() != data::TERRAIN_FIREWALL)
-                if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
-                    state.regionsSelected.insert(&*region), changed = true;
-
-            region = report->region(x-1, y+1, visiblePlane);
-            if (region != notfound && region->terrain() != data::TERRAIN_OCEAN
-                && region->terrain() != data::TERRAIN_FIREWALL)
-                if (state.regionsSelected.find(&*region) == state.regionsSelected.end())
-                    state.regionsSelected.insert(&*region), changed = true;
+            for (int d = 0; d != 6; ++d) {
+                try {
+                    region = report->getRegion(x + hex_offset[d][0], y + hex_offset[d][1], visiblePlane);
+                    if (region->terrain() != data::TERRAIN_OCEAN
+                        && region->terrain() != data::TERRAIN_FIREWALL)
+                        if (state.regionsSelected.find(&*region) == state.regionsSelected.end()) {
+                            state.regionsSelected.insert(&*region);
+                            changed = true;
+                        }
+                }
+                catch (...) {
+                }
+            }
         }
 
     } while (changed);
@@ -2898,24 +2866,12 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
                 selection.selected &= ~selection.REGION;
 
         // delete this region
-        datablock::itor end = report->blocks().end();
-        datablock::itor block = report->region(region->x(), region->y(), region->info());
-        if (block == end)
-            continue;
-
-        // found the region. delete all blocks until next region.
-        datablock::itor srch = block;
-        for (srch++; srch != end && srch->depth() > block->depth(); srch++)
-        {
-            // block is in region
-        }
-
-        report->blocks().erase(block, srch);
+        report->deleteRegion(region);
     }
 
     report->createHashTables();
 
-    // Markierung auch l\u00f6schen
+    // Markierung auch loeschen
     selection.selected &= ~selection.MULTIPLE_REGIONS;
     selection.regionsSelected.clear();
 

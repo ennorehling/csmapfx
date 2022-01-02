@@ -650,47 +650,47 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                     FXTreeItem *&entry = factions[factionId];
                     if (!entry)
                     {
-                        datablock::itor faction = mapFile->faction(factionId);
-                        datablock *facPtr = NULL;
-                        if (faction != mapFile->blocks().end())
-                            facPtr = &*faction;
-
-                        if (faction != mapFile->blocks().end())
-                        {
-                            name = faction->value(TYPE_FACTIONNAME);
-                            if (faction->info() < 0)
-                            {
-                                if (name.empty())
-                                    name = "Parteigetarnt";
-                                label.format("%s", name.text());
-                            }
-                            else
-                            {
-                                if (name.empty())
-                                    label.assign("Parteigetarnt");
-                                else
-                                    label.format("%s (%s)", name.text(), faction->id().text());
-                            }
-                        }
-                        else
-                        {
-                            datablock block;
-                            block.infostr(FXStringVal(factionId));
-
-                            label.format("Unbekannt (%s)", block.id().text());
-                        }
-
-                        FXIcon *icon = red;
-                        if (factionId == 0)
+                        FXIcon* icon = red;
+                        datablock* facPtr = nullptr;
+                        if (factionId == 0) {
                             icon = black;
-                        else if (factionId == -1)
+                        }
+                        else if (factionId < 0) {
                             icon = gray;
+                        }
+                        else {
+                            try {
+                                datablock::itor faction = mapFile->getFaction(factionId);
+                                facPtr = &*faction;
 
+                                if (faction == selection.activefaction) {
+                                    icon = blue;
+                                }
+                                name = faction->value(TYPE_FACTIONNAME);
+                                if (faction->info() < 0)
+                                {
+                                    if (name.empty())
+                                        name = "Parteigetarnt";
+                                    label.format("%s", name.text());
+                                }
+                                else
+                                {
+                                    if (name.empty())
+                                        label.assign("Parteigetarnt");
+                                    else
+                                        label.format("%s (%s)", name.text(), faction->id().text());
+                                }
+                            }
+                            catch (...)
+                            {
+                                datablock block;
+                                block.infostr(FXStringVal(factionId));
+
+                                label.format("Unbekannt (%s)", block.id().text());
+                            }
+                        }
                         if (selection.map & selection.ACTIVEFACTION)
                         {
-                            if (faction == selection.activefaction)
-                                icon = blue;
-
                             datablock::itor block = selection.activefaction;
                             for (block++; block != mapFile->blocks().end(); block++)
                             {
