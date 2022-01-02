@@ -440,7 +440,7 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 	}
 
 	// do the search
-	datablock::itor end = mapFile->end();
+	datablock::itor end = mapFile->blocks().end();
 
 	datablock::itor region = end,			// initialize last-block-of-typ holder
 					building = end,

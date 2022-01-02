@@ -105,15 +105,13 @@ long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
 	if (!mapFile)
 		return 0;
 
-	datablock::itor end = mapFile->end();
-	datablock::itor unit = mapFile->end();
-	unit--;
+	datablock::citor end = mapFile->blocks().end();
+	datablock::itor unit;
 	if (selection.selected & selection.UNIT)
 		unit = selection.unit;
 	else if (selection.selected & selection.REGION)
 		unit = selection.region;
-
-	if (unit == end)	// sanity check
+    else
 		return 0;
 
 	for (unit--; unit != end; unit--)
@@ -166,15 +164,14 @@ long FXCommands::onNextUnit(FXObject *, FXSelector, void *)
 	if (!mapFile)
 		return 0;
 
-	datablock::itor end = mapFile->blocks().end();
-	datablock::itor unit = mapFile->blocks().begin();
+	datablock::citor end = mapFile->blocks().end();
+	datablock::itor unit;
 	if (selection.selected & selection.UNIT)
 		unit = selection.unit;
 	else if (selection.selected & selection.REGION)
 		unit = selection.region;
-
-	if (unit == end)	// sanity check
-		return 0;
+    else
+        return 0;
 
 	for (unit++; unit != end; unit++)
 	{
@@ -182,7 +179,7 @@ long FXCommands::onNextUnit(FXObject *, FXSelector, void *)
 			continue;
 
 		// search command block
-		datablock::itor block = unit;
+		datablock::citor block = unit;
 		for (block++; block != end && block->depth() > unit->depth(); block++)
 			if (block->type() == block_type::TYPE_COMMANDS)
 				break;				// found
@@ -542,7 +539,7 @@ void FXCommands::saveCommands()
     if (selection.selected & selection.UNIT)
     {
         // search for command block of unit
-        datablock::itor iend = mapFile->end();
+        datablock::itor iend = mapFile->blocks().end();
         datablock::itor iblock = selection.unit;
         for (iblock++; iblock != iend && iblock->depth() > selection.unit->depth(); iblock++) {
             if (iblock->type() == block_type::TYPE_COMMANDS) {

@@ -177,7 +177,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
             if (!guard_ids.empty()) {
                 for (FXint id : guard_ids) {
                     datablock::itor faction = mapFile->faction(id);
-                    if (faction != mapFile->end()) {
+                    if (faction != mapFile->blocks().end()) {
                         FXString label = faction->value("Parteiname") + " (" + faction->id() + ")";
                         appendItem(groups.guards, label);
                     }

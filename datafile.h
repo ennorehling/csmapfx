@@ -206,6 +206,7 @@ class datablock
 public:
     typedef std::list<datablock/*, boost::fast_pool_allocator<datablock>*/ > list_type;
     typedef list_type::iterator itor;
+    typedef list_type::const_iterator citor;
     
     datablock();
 	~datablock();
@@ -363,7 +364,6 @@ public:
 	datablock::itor building(int id);
 	datablock::itor ship(int id);
 	datablock::itor island(int id);
-	datablock::itor end();
 
 	datablock::itor dummyToItor(const datablock* block);
 

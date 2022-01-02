@@ -622,7 +622,7 @@ const datakey* datablock::valueKey(int key) const
 // ===========================
 // === datafile implementation
 
-datafile::datafile() : m_factionId(0), m_recruitment(0), m_turn(0), m_activefaction(end())
+datafile::datafile() : m_factionId(0), m_recruitment(0), m_turn(0), m_activefaction(m_blocks.end())
 {
 	m_cmds.modified = false;
 }
@@ -1140,7 +1140,7 @@ int datafile::loadCmds(const FXString &filename)
 	if (filename.empty())
 		return 0;
 
-	if (activefaction() == end())
+	if (activefaction() == m_blocks.end())
 		throw std::runtime_error("Kein Report geladen, kann Befehlsdatei nicht einlesen.");
 
 
@@ -1295,7 +1295,7 @@ int datafile::loadCmds(const FXString &filename)
 				// search for command block of unit
 				int unitDepth = -1;
 				datablock::itor block = unit(unitId);
-				if (block != end())
+				if (block != m_blocks.end())
 				{
 					unitDepth = block->depth();
 					block++;
@@ -1303,7 +1303,7 @@ int datafile::loadCmds(const FXString &filename)
                 else {
                     throw std::runtime_error(("Einheit nicht gefunden: " + line).text());
                 }
-                for (cmds_list = NULL; block != end() && block->depth() > unitDepth; block++) {
+                for (cmds_list = NULL; block != m_blocks.end() && block->depth() > unitDepth; block++) {
                     if (block->type() == block_type::TYPE_COMMANDS) {
                         // TODO: why can't this be a static_cast?
                         if (att_commands *cmds = dynamic_cast<att_commands *>(block->attachment())) {
@@ -1377,7 +1377,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 	if (filename.empty())
 		return -1;
 
-    if (activefaction() == end())
+    if (activefaction() == m_blocks.end())
 		return -1;
 
 	// Datei zum Schreiben \u00f6ffnen
@@ -1426,7 +1426,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 	int factionId = activefaction()->info();
 
 	std::vector<int> *unit_order = NULL;
-	for (datablock::itor region = end(), block = blocks().begin(); block != end(); block++)
+	for (datablock::itor region = m_blocks.end(), block = blocks().begin(); block != m_blocks.end(); block++)
 	{
 		if (block->type() == block_type::TYPE_REGION)
 			region = block;
@@ -1436,7 +1436,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 				continue;
 
 			// add region to list when first unit of active faction occurs
-			if (region != end())
+			if (region != m_blocks.end())
 			{
 				koordinates koord(region->x(), region->y(), region->info());
 
@@ -1472,7 +1472,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 						}
 				}
 
-				region = end();		// add region only before the first unit
+				region = m_blocks.end();		// add region only before the first unit
 			}
 
 			// add unit
@@ -1518,7 +1518,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 		for (std::vector<int>::iterator uid = order.begin(); uid != order.end(); uid++)
 		{
 			datablock::itor unit = this->unit(*uid);
-			if (unit == end())
+			if (unit == m_blocks.end())
 			{
 				// no unit there is. problem we have.
 				out << "  ; Einheit " << *uid << " (base10) nicht gefunden!\n";
@@ -1527,11 +1527,11 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 
 			// search for command block of unit
 			datablock::itor cmdb = unit;
-			for (cmdb++; cmdb != end() && cmdb->depth() > unit->depth(); cmdb++)
+			for (cmdb++; cmdb != m_blocks.end() && cmdb->depth() > unit->depth(); cmdb++)
 				if (cmdb->type() == block_type::TYPE_COMMANDS)
 					break;				// found
 
-			if (cmdb == end() || cmdb->type() != block_type::TYPE_COMMANDS)
+			if (cmdb == m_blocks.end() || cmdb->type() != block_type::TYPE_COMMANDS)
 			{
 				out << "  ; Einheit " << unit->id() << " hat keinen Befehlsblock!\n";
 				continue;
@@ -1549,7 +1549,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 				int silver = 0;
 		
 				datablock::itor items = unit;
-				for (items++; items != end() && items->depth() > unit->depth(); items++)
+				for (items++; items != m_blocks.end() && items->depth() > unit->depth(); items++)
 					if (items->type() == block_type::TYPE_ITEMS)
 					{
 						silver = items->valueInt(TYPE_SILVER);
@@ -1610,7 +1610,7 @@ datablock::itor datafile::region(int x, int y, int plane)
 	region = m_regions.find(koordinates(x, y, plane));
 
 	if (region == m_regions.end())
-		return end();
+		return m_blocks.end();
 
 	return region->second;
 }
@@ -1619,7 +1619,7 @@ datablock::itor datafile::unit(int id)
 	std::map<int, datablock::itor>::iterator unit = m_units.find(id);
 
 	if (unit == m_units.end())
-		return end();
+		return m_blocks.end();
 
 	return unit->second;
 }
@@ -1628,7 +1628,7 @@ datablock::itor datafile::faction(int id)
 	std::map<int, datablock::itor>::iterator faction = m_factions.find(id);
 
 	if (faction == m_factions.end())
-		return end();
+		return m_blocks.end();
 
 	return faction->second;
 }
@@ -1637,7 +1637,7 @@ datablock::itor datafile::building(int id)
 	std::map<int, datablock::itor>::iterator building = m_buildings.find(id);
 
 	if (building == m_buildings.end())
-		return end();
+		return m_blocks.end();
 
 	return building->second;
 }
@@ -1646,7 +1646,7 @@ datablock::itor datafile::ship(int id)
 	std::map<int, datablock::itor>::iterator ship = m_ships.find(id);
 
 	if (ship == m_ships.end())
-		return end();
+		return m_blocks.end();
 
 	return ship->second;
 }
@@ -1656,14 +1656,9 @@ datablock::itor datafile::island(int id)
 	std::map<int, datablock::itor>::iterator island = m_islands.find(id);
 
 	if (island == m_islands.end())
-		return end();
+		return m_blocks.end();
 
 	return island->second;
-}
-
-datablock::itor datafile::end()
-{
-	return blocks().end();
 }
 
 datablock::itor datafile::dummyToItor(const datablock* block)
@@ -1672,7 +1667,7 @@ datablock::itor datafile::dummyToItor(const datablock* block)
 		if (block == &*itor)
 			return itor;
 
-	return end();
+	return m_blocks.end();
 }
 
 void datafile::createHierarchy()
@@ -1730,7 +1725,7 @@ void datafile::createHierarchy()
 	// build hierarchy
 	stack parents;						// parent block types. size() == depth in hierarchy.
 
-	for (datablock::itor block = blocks().begin(); block != end(); block++)
+	for (datablock::itor block = blocks().begin(); block != m_blocks.end(); block++)
 	{
         block_type type = block->type();
 
@@ -1762,7 +1757,7 @@ void datafile::createHashTables()
 	m_islands.clear();
 	m_dummyBlocks.clear();
 
-	m_activefaction = end();
+	m_activefaction = m_blocks.end();
 	m_recruitment = 0;
 	m_turn = 0;
 
@@ -1780,7 +1775,7 @@ void datafile::createHashTables()
 	*/
 
 	datablock::itor block;
-	for (block = blocks().begin(); block != end(); block++)
+	for (block = blocks().begin(); block != m_blocks.end(); block++)
 	{
 		// set turn number to that found in version block
 		if (block->type() == block_type::TYPE_VERSION)
@@ -1789,7 +1784,7 @@ void datafile::createHashTables()
 		// set faction as active faction (for ally-state)
 		if (block->type() == block_type::TYPE_FACTION)
 		{
-			if (m_activefaction == end())
+			if (m_activefaction == m_blocks.end())
 				if (/*block->value(TYPE_TYPE) != "" ||*/ block->value(TYPE_OPTIONS) != "")
 				{
 					m_activefaction = block;		// set active faction here
@@ -1805,11 +1800,11 @@ void datafile::createHashTables()
 	}
 
 	// continue to evaluate ALLIANCE blocks for active faction
-	if (activefaction() != end())
+	if (activefaction() != m_blocks.end())
 	{
 		int factionDepth = activefaction()->depth();
 		block = activefaction();
-		for (block++; block != end() && block->depth() > factionDepth; block++)
+		for (block++; block != m_blocks.end() && block->depth() > factionDepth; block++)
 		{
             if (block->type() == block_type::TYPE_ALLIANCE) {
                 int status = block->valueInt("Status", 0);
@@ -1818,7 +1813,7 @@ void datafile::createHashTables()
 		}
 	}
 
-	for (block = blocks().begin(); block != end(); block++)
+	for (block = blocks().begin(); block != m_blocks.end(); block++)
 	{
         // add region to region list
         if (block->type() == block_type::TYPE_REGION)
@@ -1881,7 +1876,7 @@ void datafile::createHashTables()
 				m_regions[koordinates(block->x(), block->y(), block->info())] = block;
 
 			// get region owner (E3 only)
-			if (activefaction() != end())
+			if (activefaction() != m_blocks.end())
 			{
 				int ownerId = block->valueInt("owner", -1);
 				if (ownerId == activefaction()->info())
@@ -1916,7 +1911,7 @@ void datafile::createHashTables()
 
 			int factionId = block->valueInt(TYPE_FACTION, -1);
 
-			if (faction(factionId) == end())
+			if (faction(factionId) == m_blocks.end())
 			{
 				datablock faction;
 				faction.string("PARTEI");
@@ -1935,16 +1930,16 @@ void datafile::createHashTables()
 			}
 
 			// set attachment for unit of active faction
-			if (activefaction() != end() && factionId == activefaction()->info())
+			if (activefaction() != m_blocks.end() && factionId == activefaction()->info())
 			{
 				// search for command block of unit
 				datablock::itor cmd = block;
-				for (cmd++; cmd != end() && cmd->depth() > block->depth(); cmd++)
+				for (cmd++; cmd != m_blocks.end() && cmd->depth() > block->depth(); cmd++)
 					if (cmd->type() == block_type::TYPE_COMMANDS)
 						break;				// found
 
 				// add att_commands to command block
-				if (cmd != end() && cmd->type() == block_type::TYPE_COMMANDS && !cmd->attachment())
+				if (cmd != m_blocks.end() && cmd->type() == block_type::TYPE_COMMANDS && !cmd->attachment())
 				{
 					att_commands* cmds = new att_commands;
 					cmd->attachment(cmds);
@@ -1964,7 +1959,7 @@ void datafile::createHashTables()
 			m_factions[block->info()] = block;
 		// alliance as placeholder-faction
         if (block->type() == block_type::TYPE_ALLIANCE)
-			if (faction(block->info()) == end())
+			if (faction(block->info()) == m_blocks.end())
 				m_factions[block->info()] = block;
 		// .. and islands to island list
 		if (block->type() == block_type::TYPE_ISLAND)
@@ -1986,7 +1981,7 @@ void datafile::createHashTables()
 					UNIT_ALLY,
 				} owner = UNIT_ENEMY;
 
-				if (activefaction() != end())
+				if (activefaction() != m_blocks.end())
 				{
 					int factionId = block->valueInt(TYPE_FACTION, -1);
 					if (factionId == activefaction()->info())
@@ -2077,7 +2072,7 @@ void datafile::createHashTables()
 	// islands
 	std::list<datablock::itor> floodislands;		// regions whose island names flood the island
 
-	for (block = blocks().begin(); block != end(); block++)
+	for (block = blocks().begin(); block != m_blocks.end(); block++)
 	{
         if (block->type() != block_type::TYPE_REGION)
 			continue;
@@ -2090,7 +2085,7 @@ void datafile::createHashTables()
 			if (islandkey->isInt())		// Magellan-style: integer-Island-tags and ISLAND blocks with names
 			{
 				datablock::itor island = this->island(islandkey->getInt());
-				if (island != end())
+				if (island != m_blocks.end())
 					name = island->value(TYPE_NAME);
 				else
 					name = "Insel " + FXStringVal(islandkey->getInt());
@@ -2132,7 +2127,7 @@ void datafile::createHashTables()
 			int nx = x + offsets[i][0], ny = y + offsets[i][1];
 
 			datablock::itor neighbour = this->region(nx, ny, z);
-			if (neighbour != end())
+			if (neighbour != m_blocks.end())
 			{
 				// only flood to "Festland"
 				if (neighbour->terrain() == data::TERRAIN_OCEAN ||

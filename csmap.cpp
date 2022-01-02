@@ -1425,7 +1425,7 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
         datafile::SelectionState state;
         state.selected = selection.UNIT;
         state.unit = report->unit(info->unit_id);
-        if (state.unit != report->end()) {
+        if (state.unit != report->blocks().end()) {
             handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
         }
     }
@@ -1700,7 +1700,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
             planes->setNumVisible(planes->getNumItems());
 
             // get info about active faction
-            if (report->activefaction() != report->end()) {
+            if (report->activefaction() != report->blocks().end()) {
                 datablock::itor block = report->activefaction();
 
                 // set first faction in file to active faction
