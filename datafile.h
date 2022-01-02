@@ -344,7 +344,9 @@ public:
 
 	int load(const char* filename);
 	int save(const char* filename, map_type map_filter);
-	void createHierarchy();
+    void merge(datafile& new_cr);
+
+    void createHierarchy();
 	void createHashTables();
 
 	int loadCmds(const FXString &filename);
@@ -408,6 +410,7 @@ public:
 	};
 
 protected:
+    void mergeBlock(datablock::itor& block, const datablock::itor& begin, const datablock::itor& end, block_type parent_type);
     const char* getConfigurationName(map_type type);
 
 	struct koordinates

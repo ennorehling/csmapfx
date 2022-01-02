@@ -968,25 +968,6 @@ bool CSMap::loadFile(const FXString& filename)
 
     return true;
 }
-
-void CSMap::mergeBlock(datablock::itor& block, const datablock::itor& begin, const datablock::itor& end, block_type parent_type)
-{
-    block_type type = block->type();
-    datablock::itor child = begin;
-    datablock::itor insert = begin;
-    for (child++; child != end && child->type() != parent_type; ++child) {
-        if (child->type() == type) {
-            // we already have a block of this type
-            break;
-        }
-    }
-    if (child == end || child->type() != type) {
-        // we do not have this kind of block
-        report->blocks().insert(++insert, *block);
-    }
-
-}
-
 bool CSMap::mergeFile(const FXString& filename)
 {
     // zuerst: Datei normal laden
@@ -1020,94 +1001,7 @@ bool CSMap::mergeFile(const FXString& filename)
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei hat das falsche Format.");
         return false;
     }
-
-    // dann: Datei an den aktuellen CR anfuegen (nur Karteninformationen)
-    datablock regionblock;
-    regionblock.string("REGION");
-    datablock::itor new_end = new_cr.blocks().end();
-    for (datablock::itor block = new_cr.blocks().begin(); block != new_end;)
-    {
-        // handle only regions
-        if (block->type() == block_type::TYPE_REGION)
-        {
-            FXint x = block->x();
-            FXint y = block->y();
-            FXint plane = block->info();
-            datablock::itor oldr = report->region(x, y, plane);
-            bool is_seen = !!(block->flags() & datablock::FLAG_REGION_SEEN);
-
-            if (oldr != report->blocks().end())            // add some info to old cr (island names)
-            {
-                if (const datakey* islandkey = block->valueKey(TYPE_ISLAND)) {
-                    if (!oldr->valueKey(TYPE_ISLAND))
-                    {
-                        if (islandkey && !islandkey->isInt())        // add only Vorlage-style islands (easier)
-                            oldr->data().push_back(*islandkey);
-                    }
-                }
-                // copy child blocks if we don't have them
-                for (block++; block != new_end && block->type() != block_type::TYPE_REGION; ++block) {
-                    datablock::itor old_end = report->blocks().end();
-                    block_type type = block->type();
-                    if (type == block_type::TYPE_BORDER || type == block_type::TYPE_RESOURCE) {
-                        if (!is_seen) {
-                            // we cannot see this region, should we replace what we know?
-                            mergeBlock(block, oldr, old_end, block_type::TYPE_REGION);
-                        }
-                    }
-                    else if (type == block_type::TYPE_PRICES) {
-                        mergeBlock(block, oldr, old_end, block_type::TYPE_REGION);
-                    }
-                }
-                if (block == new_end) {
-                    break;
-                }
-                continue;
-            }
-            else // add region to old cr
-            {
-                report->blocks().push_back(regionblock);
-                datablock& newblock = report->blocks().back();
-
-                newblock.infostr(FXString().format("%d %d %d", x, y, plane));
-                newblock.terrain(block->terrain());
-
-                FXString name = block->value(TYPE_NAME);
-                FXString terrain = block->value(TYPE_TERRAIN);
-                FXString island = block->value(TYPE_ISLAND);
-                FXString turn = block->value(TYPE_TURN);
-                FXString id = block->value(TYPE_ID);
-
-                datakey key;
-
-                if (!name.empty())
-                {
-                    key.key("Name"); key.value(name); newblock.data().push_back(key);
-                }
-                if (!terrain.empty())
-                {
-                    key.key("Terrain"); key.value(terrain); newblock.data().push_back(key);
-                }
-                if (!island.empty())
-                {
-                    key.key("Insel"); key.value(island); newblock.data().push_back(key);
-                }
-                if (!id.empty())
-                {
-                    key.key("id"); key.value(id); newblock.data().push_back(key);
-                }
-
-                key.key("Runde");
-                if (turn.empty())
-                    key.value(FXStringVal(report->turn()));
-                else
-                    key.value(turn);
-                newblock.data().push_back(key);
-            }
-        }
-        ++block;
-    }
-
+    report->merge(new_cr);
     return true;
 }
 
