@@ -179,18 +179,18 @@ void FXCSMap::calculateContentSize()
 
 	FXint regionSize = FXint(64*scale);
 
-	for (datablock::itor block = mapFile->blocks().begin(); block != mapFile->blocks().end(); block++)
+	for (const datablock& block : mapFile->blocks())
 	{
 		// handle only regions
-		if (block->type() != block_type::TYPE_REGION)
+		if (block.type() != block_type::TYPE_REGION)
 			continue;
 
 		// handle only the actually visible plane
-		if (block->info() != visiblePlane)
+		if (block.info() != visiblePlane)
 			continue;
 
-		FXint scr_x = GetScreenFromHexX(block->x(), block->y());
-		FXint scr_y = GetScreenFromHexY(block->x(), block->y());
+		FXint scr_x = GetScreenFromHexX(block.x(), block.y());
+		FXint scr_y = GetScreenFromHexY(block.x(), block.y());
 
 		if (scr_x < min_x)	min_x = scr_x;
 		if (scr_y < min_y)	min_y = scr_y;

@@ -737,7 +737,7 @@ int datafile::load(const char* filename)
 	createHierarchy();		// set depth field of blocks
 	createHashTables();		// creates hash tables and set region flags
 
-	return blocks().size();
+	return m_blocks.size();
 }
 
 // saves file
@@ -763,9 +763,9 @@ int datafile::save(const char* filename, map_type map_filter)
 	}
 
     datablock::itor block;
-    datablock::itor last_block = blocks().end();
+    datablock::itor last_block = m_blocks.end();
     int maxDepth = 0;
-    for (block = blocks().begin(); block != last_block; ++block) {
+    for (block = m_blocks.begin(); block != last_block; ++block) {
 		bool hideKeys = false;
         block_type type = block->type();
 
@@ -1006,7 +1006,7 @@ int datafile::save(const char* filename, map_type map_filter)
 		file.str("");
 	}
 
-	return blocks().size();
+	return m_blocks.size();
 }
 
 void datafile::mergeBlock(datablock::itor& block, const datablock::itor& begin, const datablock::itor& end, block_type parent_type)
@@ -1031,8 +1031,8 @@ void datafile::merge(datafile& new_cr)
     // dann: Datei an den aktuellen CR anfuegen (nur Karteninformationen)
     datablock regionblock;
     regionblock.string("REGION");
-    datablock::itor new_end = new_cr.blocks().end();
-    for (datablock::itor block = new_cr.blocks().begin(); block != new_end;)
+    datablock::itor new_end = new_cr.m_blocks.end();
+    for (datablock::itor block = new_cr.m_blocks.begin(); block != new_end;)
     {
         // handle only regions
         if (block->type() == block_type::TYPE_REGION)
@@ -1394,8 +1394,8 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 		m_recruitment = 100;
 
 	// save header and echeck information	// "Eressea";Spiel
-	if (blocks().front().value("Spiel") == "Eressea"
-		|| blocks().front().value("Spiel") == "E3")
+	if (m_blocks.front().value("Spiel") == "Eressea"
+		|| m_blocks.front().value("Spiel") == "E3")
 		out << "ERESSEA";
 	else
 		out << "PARTEI";
@@ -1426,7 +1426,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 	int factionId = activefaction()->info();
 
 	std::vector<int> *unit_order = NULL;
-	for (datablock::itor region = m_blocks.end(), block = blocks().begin(); block != m_blocks.end(); block++)
+	for (datablock::itor region = m_blocks.end(), block = m_blocks.begin(); block != m_blocks.end(); block++)
 	{
 		if (block->type() == block_type::TYPE_REGION)
 			region = block;
@@ -1814,7 +1814,7 @@ void datafile::createHierarchy()
 	// build hierarchy
 	stack parents;						// parent block types. size() == depth in hierarchy.
 
-	for (datablock::itor block = blocks().begin(); block != m_blocks.end(); block++)
+	for (datablock::itor block = m_blocks.begin(); block != m_blocks.end(); block++)
 	{
         block_type type = block->type();
 
@@ -1864,7 +1864,7 @@ void datafile::createHashTables()
 	*/
 
 	datablock::itor block;
-	for (block = blocks().begin(); block != m_blocks.end(); block++)
+	for (block = m_blocks.begin(); block != m_blocks.end(); block++)
 	{
 		// set turn number to that found in version block
 		if (block->type() == block_type::TYPE_VERSION)
@@ -1902,7 +1902,7 @@ void datafile::createHashTables()
 		}
 	}
 
-	for (block = blocks().begin(); block != m_blocks.end(); block++)
+	for (block = m_blocks.begin(); block != m_blocks.end(); block++)
 	{
         // add region to region list
         if (block->type() == block_type::TYPE_REGION)
@@ -2161,7 +2161,7 @@ void datafile::createHashTables()
 	// islands
 	std::list<datablock::itor> floodislands;		// regions whose island names flood the island
 
-	for (block = blocks().begin(); block != m_blocks.end(); block++)
+	for (block = m_blocks.begin(); block != m_blocks.end(); block++)
 	{
         if (block->type() != block_type::TYPE_REGION)
 			continue;
