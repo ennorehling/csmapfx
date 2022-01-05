@@ -184,31 +184,57 @@ long FXCalculator::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 }
 
 static double ev_result;
-void ffi_ev(double v) {
+static void ffi_ev(double v) {
     ev_result = v;
 }
 
-void* my_dlsym(void* handle, const char* name) {
+static void* my_dlsym(void* handle, const char* name) {
     if (strcmp(name, "ev") == 0) return ffi_ev;
     return NULL;
 }
 
+static std::string ev_format(double v) {
+    FXString x = FXStringFormat("%lf", v);
+    FXint pos = x.length();
+    while(--pos > 0) {
+        if (x[pos] != '0') break;
+    }
+    if (x[pos] == '.') --pos;
+    x.trunc(pos+1);
+    return std::string(x.text());
+}
+
 static std::string evaluate(const char* expr)
 {
-    char buf[1024];
-    int bytes = snprintf(buf, sizeof(buf), "let f = ffi('void ev(double)'); f(%s)", expr);
-    if (bytes >= 0 && bytes < sizeof(buf)) {
+    FXString text(expr);
+    if (!text.trim().empty()) {
+        FXString script = FXStringFormat("let _ = ffi('void ev(double)'); _(%s)", text.text());
         struct mjs* mjs = mjs_create();
         mjs_set_ffi_resolver(mjs, my_dlsym);
-        mjs_err_t err = mjs_exec(mjs, buf, NULL);
-        if (err == MJS_OK) {
-            FXString x;
-            x.format("%lf", ev_result);
-            return std::string(x.text());
+        mjs_err_t err = mjs_exec(mjs, script.text(), nullptr);
+        mjs_destroy(mjs);
+        switch (err) {
+        case MJS_OK:
+            return ev_format(ev_result);
+        case MJS_SYNTAX_ERROR:
+            return std::string("Syntax Error");
+        case MJS_REFERENCE_ERROR:
+            return std::string("Reference Error");
+        case MJS_TYPE_ERROR:
+            return std::string("Type Error");
+        case MJS_OUT_OF_MEMORY:
+            return std::string("Out Of Memory");
+        case MJS_INTERNAL_ERROR:
+            return std::string("Internal Error");
+        case MJS_NOT_IMPLEMENTED_ERROR:
+            return std::string("Not Implemented");
+        case MJS_BAD_ARGS_ERROR:
+            return std::string("Bad Arguments");
+        default:
+            return std::string("Unknown Error");
         }
-        return std::string("Syntax Error");
     }
-    return std::string("Out Of Memory");
+    return std::string("");
 }
 
 long FXCalculator::onChanged(FXObject*, FXSelector, void*)
