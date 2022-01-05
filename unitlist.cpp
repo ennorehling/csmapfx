@@ -204,7 +204,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                             label.format("%s (%s)", name.text(), faction->id().text());
                     }
                     catch (std::runtime_error ex) {
-                        label.format("Unbekannt (%s)", name.text(), FXStringValEx(factionId, 36).text());
+                        label.format("Unbekannt (%s)", FXStringValEx(factionId, 36).text());
                     }
                 }
 
@@ -225,7 +225,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                         label += label2;
                     }
                     catch (std::runtime_error ex) {
-                        label.format("Unbekannt (%s)", name.text(), FXStringValEx(AnotherfactionId, 36).text());
+                        label.format("Unbekannt (%s)", FXStringValEx(AnotherfactionId, 36).text());
                     }
                 }
 

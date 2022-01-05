@@ -81,6 +81,7 @@ target_link_libraries(${PROJECT_NAME}
   ${PNG_LIBRARIES}
   ${CURL_LIBRARIES}
   ${FOX_LIBRARIES}
+  ${CMAKE_DL_LIBS} 
 )
 if (FOX_LIBRARY_DIRS)
   target_link_libraries(${PROJECT_NAME} -L${FOX_LIBRARY_DIRS})

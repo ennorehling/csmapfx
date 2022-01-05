@@ -189,7 +189,7 @@ static void ffi_ev(double v) {
 }
 
 static void* my_dlsym(void* handle, const char* name) {
-    if (strcmp(name, "ev") == 0) return ffi_ev;
+    if (strcmp(name, "ev") == 0) return (void*)ffi_ev;
     return NULL;
 }
 
