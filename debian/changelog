@@ -1,3 +1,9 @@
+csmapfx (0.9.16-1) stable; urgency=low
+
+  * replace javascript engine with mjs.
+
+ -- Enno Rehling <enno@eressea.de>  Wed, 05 Jan 2022 20:50:00 +0200
+
 csmapfx (0.9.15-1) stable; urgency=low
 
   * enable automatic reload after loading orders.
