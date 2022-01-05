@@ -5,9 +5,7 @@
 #include "fxhelper.h"
 #include "calc.h"
 #include "symbols.h"
-#include "tinyjs/TinyJS.h"
-#include "tinyjs/TinyJS_MathFunctions.h"
-#include "tinyjs/TinyJS_Functions.h"
+#include "mjs/mjs.h"
 
 // *********************************************************************************************************
 // *** FXCalculator implementation
@@ -185,6 +183,60 @@ long FXCalculator::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
     return 1;
 }
 
+static double ev_result;
+static void ffi_ev(double v) {
+    ev_result = v;
+}
+
+static void* my_dlsym(void* handle, const char* name) {
+    if (strcmp(name, "ev") == 0) return (void*)ffi_ev;
+    return NULL;
+}
+
+static std::string ev_format(double v) {
+    FXString x = FXStringFormat("%lf", v);
+    FXint pos = x.length();
+    while(--pos > 0) {
+        if (x[pos] != '0') break;
+    }
+    if (x[pos] == '.') --pos;
+    x.trunc(pos+1);
+    return std::string(x.text());
+}
+
+static std::string evaluate(const char* expr)
+{
+    FXString text(expr);
+    if (!text.trim().empty()) {
+        FXString script = FXStringFormat("let _ = ffi('void ev(double)'); _(%s)", text.text());
+        struct mjs* mjs = mjs_create();
+        mjs_set_ffi_resolver(mjs, my_dlsym);
+        mjs_err_t err = mjs_exec(mjs, script.text(), nullptr);
+        mjs_destroy(mjs);
+        switch (err) {
+        case MJS_OK:
+            return ev_format(ev_result);
+        case MJS_SYNTAX_ERROR:
+            return std::string("Syntax Error");
+        case MJS_REFERENCE_ERROR:
+            return std::string("Reference Error");
+        case MJS_TYPE_ERROR:
+            return std::string("Type Error");
+        case MJS_OUT_OF_MEMORY:
+            return std::string("Out Of Memory");
+        case MJS_INTERNAL_ERROR:
+            return std::string("Internal Error");
+        case MJS_NOT_IMPLEMENTED_ERROR:
+            return std::string("Not Implemented");
+        case MJS_BAD_ARGS_ERROR:
+            return std::string("Bad Arguments");
+        default:
+            return std::string("Unknown Error");
+        }
+    }
+    return std::string("");
+}
+
 long FXCalculator::onChanged(FXObject*, FXSelector, void*)
 {
     FXString exp = formula->getText();
@@ -228,19 +280,7 @@ long FXCalculator::onChanged(FXObject*, FXSelector, void*)
         }
     }
 
-    std::string resultstr;
-    CTinyJS s;
-    registerFunctions(&s);
-    registerMathFunctions(&s);
-    try {
-        std::string code(exp.text());
-        resultstr = s.evaluate(code);
-    }
-    catch (CScriptException *e) {
-        resultstr.assign(e->text.c_str());
-        delete e;
-    }
-
+    std::string resultstr = evaluate(exp.text());
     if (resultstr.size() > 15)
     {
         result->setText("");

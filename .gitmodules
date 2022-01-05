@@ -1,0 +1,3 @@
+[submodule "mjs"]
+	path = mjs
+	url = https://github.com/cesanta/mjs
