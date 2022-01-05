@@ -39,9 +39,7 @@ set (SOURCES
 	symbols.cpp
 	tradeinfos.cpp
 	unitlist.cpp
-	tinyjs/TinyJS.cpp
-	tinyjs/TinyJS_Functions.cpp
-	tinyjs/TinyJS_MathFunctions.cpp
+  mjs/mjs.c
 )
 
 if (WIN32)

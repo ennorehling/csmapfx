@@ -189,6 +189,10 @@
     <ClCompile Include="map.cpp" />
     <ClCompile Include="mapcanvas.cpp" />
     <ClCompile Include="messages.cpp" />
+    <ClCompile Include="mjs\mjs.c">
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Level2</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Level2</WarningLevel>
+    </ClCompile>
     <ClCompile Include="regioninfos.cpp" />
     <ClCompile Include="regionlist.cpp" />
     <ClCompile Include="scout.cpp" />
@@ -197,11 +201,6 @@
     <ClCompile Include="statistics.cpp" />
     <ClCompile Include="statsinfos.cpp" />
     <ClCompile Include="symbols.cpp" />
-    <ClCompile Include="tinyjs\TinyJS.cpp">
-      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Level3</WarningLevel>
-    </ClCompile>
-    <ClCompile Include="tinyjs\TinyJS_Functions.cpp" />
-    <ClCompile Include="tinyjs\TinyJS_MathFunctions.cpp" />
     <ClCompile Include="tradeinfos.cpp" />
     <ClCompile Include="unitlist.cpp" />
   </ItemGroup>
@@ -222,6 +221,7 @@
     <ClInclude Include="map.h" />
     <ClInclude Include="mapcanvas.h" />
     <ClInclude Include="messages.h" />
+    <ClInclude Include="mjs\mjs.h" />
     <ClInclude Include="regioninfos.h" />
     <ClInclude Include="regionlist.h" />
     <ClInclude Include="scout.h" />
@@ -230,9 +230,6 @@
     <ClInclude Include="statistics.h" />
     <ClInclude Include="statsinfos.h" />
     <ClInclude Include="symbols.h" />
-    <ClInclude Include="tinyjs\TinyJS.h" />
-    <ClInclude Include="tinyjs\TinyJS_Functions.h" />
-    <ClInclude Include="tinyjs\TinyJS_MathFunctions.h" />
     <ClInclude Include="tradeinfos.h" />
     <ClInclude Include="unitlist.h" />
     <ClInclude Include="version.h" />

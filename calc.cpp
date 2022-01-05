@@ -5,9 +5,7 @@
 #include "fxhelper.h"
 #include "calc.h"
 #include "symbols.h"
-#include "tinyjs/TinyJS.h"
-#include "tinyjs/TinyJS_MathFunctions.h"
-#include "tinyjs/TinyJS_Functions.h"
+#include "mjs/mjs.h"
 
 // *********************************************************************************************************
 // *** FXCalculator implementation
@@ -185,6 +183,34 @@ long FXCalculator::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
     return 1;
 }
 
+static double ev_result;
+void ffi_ev(double v) {
+    ev_result = v;
+}
+
+void* my_dlsym(void* handle, const char* name) {
+    if (strcmp(name, "ev") == 0) return ffi_ev;
+    return NULL;
+}
+
+static std::string evaluate(const char* expr)
+{
+    char buf[1024];
+    int bytes = snprintf(buf, sizeof(buf), "let f = ffi('void ev(double)'); f(%s)", expr);
+    if (bytes >= 0 && bytes < sizeof(buf)) {
+        struct mjs* mjs = mjs_create();
+        mjs_set_ffi_resolver(mjs, my_dlsym);
+        mjs_err_t err = mjs_exec(mjs, buf, NULL);
+        if (err == MJS_OK) {
+            FXString x;
+            x.format("%lf", ev_result);
+            return std::string(x.text());
+        }
+        return std::string("Syntax Error");
+    }
+    return std::string("Out Of Memory");
+}
+
 long FXCalculator::onChanged(FXObject*, FXSelector, void*)
 {
     FXString exp = formula->getText();
@@ -228,19 +254,7 @@ long FXCalculator::onChanged(FXObject*, FXSelector, void*)
         }
     }
 
-    std::string resultstr;
-    CTinyJS s;
-    registerFunctions(&s);
-    registerMathFunctions(&s);
-    try {
-        std::string code(exp.text());
-        resultstr = s.evaluate(code);
-    }
-    catch (CScriptException *e) {
-        resultstr.assign(e->text.c_str());
-        delete e;
-    }
-
+    std::string resultstr = evaluate(exp.text());
     if (resultstr.size() > 15)
     {
         result->setText("");
