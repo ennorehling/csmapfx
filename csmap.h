@@ -109,6 +109,9 @@ public:		// this functions are slots for menu commands
 
 	long onSetOrigin(FXObject*, FXSelector, void* ptr);
 
+    long onModifyCheck(FXObject*, FXSelector, void* ptr);
+    long updModifyCheck(FXObject*, FXSelector, void* ptr);
+
     long onErrorSelected(FXObject*, FXSelector, void* ptr);
 	
 	long onSetVisiblePlane(FXObject*, FXSelector, void* ptr);
@@ -155,6 +158,7 @@ public:
         ID_FILE_CHECK_ORDERS,
         ID_FILE_EXPORT_ORDERS,
         ID_FILE_UPLOAD_ORDERS,
+        ID_FILE_MODIFY_CHECK,
         ID_FILE_QUIT,
 
         // ECheck error list
@@ -281,6 +285,7 @@ private:
 
 	struct
 	{
+		FXMenuCheck	*modifycheck;	// check if orders are externally modified
 		FXMenuCheck	*toolbar;		// show toolbar
 		FXMenuCheck	*maponly;		// show only map
 		FXMenuCheck	*minimap;		// show minimap

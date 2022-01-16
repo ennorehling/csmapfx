@@ -77,6 +77,9 @@ FXDEFMAP(CSMap) MessageMap[]=
 
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_ERRROR_SELECTED,          CSMap::onErrorSelected),
 
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_MODIFY_CHECK,        CSMap::onModifyCheck),
+    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_MODIFY_CHECK,        CSMap::updModifyCheck),
+
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_VIEW_MAPONLY,             CSMap::onViewMapOnly),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_VIEW_MAPONLY,             CSMap::updViewMapOnly),
 
@@ -287,33 +290,33 @@ CSMap::CSMap(FXApp *app) :
     new FXMenuTitle(menubar,"&Datei",NULL,filemenu);
     new FXMenuCommand(
         filemenu,
-        FXString(L"\u00d6&ffnen...\tCtrl-O\tEinen Report \u00f6ffnen."),
+        L"\u00d6&ffnen...\tCtrl-O\tEinen Report \u00f6ffnen.",
         icons.open,
         this,
         ID_FILE_OPEN);
     new FXMenuCommand(
         filemenu,
-        FXString(L"Speichern...\tCtrl-Shift-S\tAktuellen Zustand speichern."),
+        L"Speichern...\tCtrl-Shift-S\tAktuellen Zustand speichern.",
         icons.open,
         this,
         ID_FILE_SAVE_ALL);
     new FXMenuCommand(
         filemenu,
-        FXString(L"Befehle &laden...\tCtrl-Shift-O\tBefehle aus einer Textdatei laden."),
+        L"Befehle &laden...\tCtrl-Shift-O\tBefehle aus einer Textdatei laden.",
         icons.open, this, ID_FILE_LOAD_ORDERS);
     new FXMenuCommand(
         filemenu,
-        FXString(L"Befehle &speichern\tCtrl-S\tBefehlsdatei speichern."),
+        L"Befehle &speichern\tCtrl-S\tBefehlsdatei speichern.",
         icons.save, this, ID_FILE_SAVE_ORDERS);
     new FXMenuCommand(
         filemenu,
-        FXString(L"Sch&liessen\t\tDie aktuelle Datei schliessen."),
+        L"Sch&liessen\t\tDie aktuelle Datei schliessen.",
         icons.close, this, ID_FILE_CLOSE);
 
     new FXMenuSeparatorEx(filemenu);
     new FXMenuCommand(
         filemenu,
-        FXString(L"Befehle pr\u00fcfen\t\tPr\u00fct die Befehle."),
+        L"Befehle pr\u00fcfen\t\tPr\u00fct die Befehle.",
         NULL, this, ID_FILE_CHECK_ORDERS);
     new FXMenuCommand(
         filemenu,
@@ -323,13 +326,15 @@ CSMap::CSMap(FXApp *app) :
         filemenu,
         L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",
         NULL, this, ID_FILE_EXPORT_ORDERS);
+    menu.modifycheck = new FXMenuCheck(filemenu, 
+        L"\u00c4nderungserkennung\t\tAutomatische \u00c4nderungserkennung.", this, ID_FILE_MODIFY_CHECK);
     new FXMenuSeparatorEx(filemenu);
 
     recentmenu = new FXMenuPane(this);
     for (int i = 0; i < 6; i++)
         new FXMenuCommand(recentmenu, "", NULL, &recentFiles,FXRecentFiles::ID_FILE_1+i);
 
-    new FXMenuCascade(filemenu, FXString(L"&Zuletzt ge\u00f6ffnet"), NULL, recentmenu, 0);
+    new FXMenuCascade(filemenu, L"&Zuletzt ge\u00f6ffnet", NULL, recentmenu, 0);
     new FXMenuSeparatorEx(filemenu);
     new FXMenuCommand(filemenu,
         L"B&eenden\tCtrl-Q\tDas Programm beenden.", NULL,
@@ -340,15 +345,15 @@ CSMap::CSMap(FXApp *app) :
     new FXMenuTitle(menubar, "&Karte", NULL, mapmenu);
     new FXMenuCommand(
         mapmenu,
-        FXString(L"H&inzuf\u00fcgen...\tCtrl-I\tL\u00e4dt einen Karten-Report in den aktuellen Report."),
+        L"H&inzuf\u00fcgen...\tCtrl-I\tL\u00e4dt einen Karten-Report in den aktuellen Report.",
         icons.merge, this, ID_FILE_MERGE);
     new FXMenuCommand(
         mapmenu,
-        FXString(L"Sp&eichern...\t\tDetailierten Karten-Report speichern."),
+        L"Sp&eichern...\t\tDetailierten Karten-Report speichern.",
         icons.save, this, ID_FILE_SAVE_MAP);
     new FXMenuCommand(
         mapmenu,
-        FXString(L"E&xportieren...\t\tKarte ohne Details speichern."),
+        L"E&xportieren...\t\tKarte ohne Details speichern.",
         icons.save, this, ID_FILE_EXPORT_MAP);
     new FXMenuCommand(
         mapmenu,
@@ -357,7 +362,7 @@ CSMap::CSMap(FXApp *app) :
 
     new FXMenuSeparatorEx(mapmenu, "Regionsmarker");
     new FXMenuCommand(mapmenu, "&Ursprung setzen\t\tDen Kartenursprung (0/0) auf die markierte Region setzen.", NULL, this, ID_MAP_SETORIGIN, 0);
-    new FXMenuCommand(mapmenu, FXString(L"Markierte &ausw\u00e4hlen\tCtrl-Space\tMarkierte Region ausw\u00e4hlen."), NULL, this, ID_MAP_SELECTMARKED, 0);
+    new FXMenuCommand(mapmenu, L"Markierte &ausw\u00e4hlen\tCtrl-Space\tMarkierte Region ausw\u00e4hlen.", NULL, this, ID_MAP_SELECTMARKED, 0);
 
     // View menu
     viewmenu = new FXMenuPane(this);
@@ -1327,6 +1332,31 @@ long CSMap::onUpdateZoom(FXObject* sender, FXSelector, void*)
     FXint scale = FXint(map->getScale()*64);
 
     sender->handle(this, FXSEL(SEL_COMMAND, (value==scale)?ID_CHECK:ID_UNCHECK), NULL);
+    return 1;
+}
+
+long CSMap::onModifyCheck(FXObject*, FXSelector, void*)
+{
+    if (reload_mode != CSMap::reload_type::RELOAD_NEVER) {
+        setAutoReload(CSMap::reload_type::RELOAD_NEVER);
+    }
+    else {
+        setAutoReload(CSMap::reload_type::RELOAD_ASK);
+    }
+    return 1;
+}
+
+long CSMap::updModifyCheck(FXObject* sender, FXSelector, void*)
+{
+    bool checked;
+
+    if (reload_mode == CSMap::reload_type::RELOAD_NEVER)
+        checked = false;
+    else
+        checked = true;
+
+    sender->handle(this, FXSEL(SEL_COMMAND, checked ? ID_CHECK : ID_UNCHECK), NULL);
+
     return 1;
 }
 
