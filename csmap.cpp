@@ -144,13 +144,15 @@ FXIMPLEMENT(CSMap,FXMainWindow,MessageMap,ARRAYNUMBER(MessageMap))
 static CSMap* CSMap_instance = NULL;
 
 // Construct a MainWindow
-CSMap::CSMap(FXApp *app) : FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL, DECOR_ALL, 0, 0, 800, 600)
+CSMap::CSMap(FXApp *app) :
+    FXMainWindow(app, CSMAP_APP_TITLE_VERSION, NULL, NULL, DECOR_ALL, 0, 0, 800, 600),
+    reload_mode(CSMap::reload_type::RELOAD_NEVER),
+    last_save_time(0),
+    report(nullptr)
 {
-    report = nullptr;
     // set "singleton"
     CSMap_instance = this;
 
-    last_save_time = 0;
     setAutoReload(CSMap::reload_type::RELOAD_ASK);
     // create main window icon
     FXIcon* ico = new FXICOIcon(app, data::csmap);
@@ -1108,8 +1110,7 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
     progress.create();
     getApp()->refresh();
     progress.show(PLACEMENT_SCREEN);
-
-        csmap_savePNG(file, *csmap, image, progress);
+    csmap_savePNG(file, *csmap, image, progress);
     file.close();
 
     delete csmap;
