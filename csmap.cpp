@@ -2013,23 +2013,25 @@ bool CSMap::updateCommands(const FXString &filename) {
 long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
 {
     if (report && reload_mode != CSMap::reload_type::RELOAD_NEVER) {
-        FXString filename = report->cmdfilename();
-        if (!filename.empty()) {
-            struct stat buf;
-            if (stat(filename.text(), &buf) == 0) {
-                if (buf.st_mtime > last_save_time) {
-                    if (last_save_time != 0) {
-                        if (updateCommands(filename)) {
-                            last_save_time = buf.st_mtime;
-                            if (stat(filename.text(), &buf) == 0) {
+        if (hasFocus()) {
+            FXString filename = report->cmdfilename();
+            if (!filename.empty()) {
+                struct stat buf;
+                if (stat(filename.text(), &buf) == 0) {
+                    if (buf.st_mtime > last_save_time) {
+                        if (last_save_time != 0) {
+                            if (updateCommands(filename)) {
                                 last_save_time = buf.st_mtime;
+                                if (stat(filename.text(), &buf) == 0) {
+                                    last_save_time = buf.st_mtime;
+                                }
+                                loadCommands(filename);
+                                getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, NULL);
+                                return 1;
                             }
-                            loadCommands(filename);
-                            getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, NULL);
-                            return 1;
                         }
+                        last_save_time = buf.st_mtime;
                     }
-                    last_save_time = buf.st_mtime;
                 }
             }
         }
@@ -2053,7 +2055,6 @@ long CSMap::onCalculator(FXObject *, FXSelector, void *)
 
     return 1;
 }
-
 long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
 {
     FXFileDialog dlg(this, FXString(L"\u00d6ffnen..."));
@@ -2625,9 +2626,11 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
 {
     FXString filename((const char *)ptr);
 
+    recentFiles.removeFile(filename);
     getApp()->beginWaitCursor();
     if (closeFile()) {
         if (loadFile(filename)) {
+            recentFiles.appendFile(filename);
             updateFileNames();
             mapChange();
         }

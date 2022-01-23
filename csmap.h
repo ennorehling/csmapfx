@@ -51,8 +51,8 @@ public:
     void updateFileNames();
 
 public:		// this functions are slots for menu commands
-	long onFileOpen(FXObject*, FXSelector, void*);
-	long updOpenFile(FXObject *sender, FXSelector, void *);
+    long onFileOpen(FXObject*, FXSelector, void*);
+    long updOpenFile(FXObject *sender, FXSelector, void *);
 	long updActiveFaction(FXObject *sender, FXSelector, void *);
 
 	long onFileMerge(FXObject*, FXSelector, void*);
