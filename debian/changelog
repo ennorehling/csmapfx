@@ -57,6 +57,7 @@ csmapfx (0.9.17-1) stable; urgency=low
 
   * bugfix: automatic file change detection on by default
   * add a menu item to turn file change detection on/off
+  * check hasFocus before asking to reload orders
 
  -- Enno Rehling <enno@eressea.de>  Sun, 16 Jan 2022 14:30:00 +0200
 
