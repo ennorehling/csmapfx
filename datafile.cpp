@@ -84,6 +84,8 @@ void datakey::value(const FXString& s)
 		return TYPE_BANNER;
 	if (type == "locale")
 		return TYPE_LOCALE;
+	if (type == "Besitzer")
+		return TYPE_OWNER;
 	if (type == "ejcOrdersConfirmed")
 		return TYPE_ORDERS_CONFIRMED;
 	
@@ -140,6 +142,8 @@ const FXString datakey::key() const
 		return "banner";
     else if (type() == TYPE_LOCALE)
         return "locale";
+    else if (type() == TYPE_OWNER)
+        return "Besitzer";
     else if (type() == TYPE_ORDERS_CONFIRMED)
 		return "ejcOrdersConfirmed";
 

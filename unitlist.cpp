@@ -432,7 +432,25 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				// list unhandled keys
 				for (std::vector<datakey::itor>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
 				{
-					label.format("%s: %s", (*itag)->key().text(), (*itag)->value().text());
+                    const datakey::itor& t = *itag;
+                    if (t->type() == TYPE_OWNER) {
+                        FXint uid = FXIntVal(t->value());
+                        try {
+                            datablock::itor unit_owner = mapFile->getUnit(uid);
+                            FXint fid = FXIntVal(unit_owner->value(TYPE_FACTION));
+                            datablock::itor faction_owner = mapFile->getFaction(fid);
+                            label.format("%s: %s (%s), %s (%s)", t->key().text(),
+                                unit_owner->value(TYPE_NAME).text(), FXStringValEx(uid, 36).text(),
+                                faction_owner->value(TYPE_FACTIONNAME).text(), FXStringValEx(fid, 36).text()
+                                );
+                        }
+                        catch (std::runtime_error) {
+                            label.format("%s: %s", t->key().text(), t->value().text());
+                        }
+                    }
+                    else {
+                        label.format("%s: %s", t->key().text(), t->value().text());
+                    }
 					item = list->appendItem(node, label.text());
 				}
 

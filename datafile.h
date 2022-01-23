@@ -36,6 +36,7 @@ typedef enum key_type
     TYPE_EMAIL,
     TYPE_BANNER,
     TYPE_LOCALE,
+    TYPE_OWNER,
     TYPE_ORDERS_CONFIRMED,		// ejcOrdersConfirmed, special tag
     TYPE_LAST,
 
