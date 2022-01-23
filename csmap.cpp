@@ -1137,7 +1137,7 @@ long CSMap::onViewMapOnly(FXObject*, FXSelector, void*)
     else
     {
         leftframe->show();
-        if (messages->shown())
+        if (outputTabs->shown())
             msgBorder->show();
         rightframe->show();
         map->recalc();
@@ -1162,15 +1162,15 @@ long CSMap::updViewMapOnly(FXObject* sender, FXSelector, void*)
 
 long CSMap::onViewMessages(FXObject*, FXSelector, void*)
 {
-    if (messages->shown())
+    if (outputTabs->shown())
     {
-        messages->hide();
+        outputTabs->hide();
         msgBorder->hide();
         msgBorder->recalc();
     }
     else
     {
-        messages->show();
+        outputTabs->show();
 
         if (leftframe->shown() || rightframe->shown())
         {
@@ -1184,7 +1184,7 @@ long CSMap::onViewMessages(FXObject*, FXSelector, void*)
 
 long CSMap::updViewMessages(FXObject* sender, FXSelector, void*)
 {
-    sender->handle(this, FXSEL(SEL_COMMAND, messages->shown()?ID_CHECK:ID_UNCHECK), NULL);
+    sender->handle(this, FXSEL(SEL_COMMAND, outputTabs->shown()?ID_CHECK:ID_UNCHECK), NULL);
     return 1;
 }
 
