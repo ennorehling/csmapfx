@@ -1,5 +1,6 @@
 csmapfx (0.9.19-1) stable; urgency=low
 
+  * show top-level report messages
   * fix message log visibiity
 
  -- Enno Rehling <enno@eressea.de>  Sun, 23 Jan 2022 16:20:00 +0200

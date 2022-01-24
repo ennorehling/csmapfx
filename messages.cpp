@@ -17,11 +17,11 @@ FXDEFMAP(FXMessages) MessageMap[]=
 
 FXIMPLEMENT(FXMessages,FXTreeList,MessageMap, ARRAYNUMBER(MessageMap))
 
-FXMessages::FXMessages(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h)
-		: FXTreeList(p, tgt,sel, opts|TREELIST_SINGLESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES, x,y,w,h)
+FXMessages::FXMessages(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h) :
+    FXTreeList(p, tgt,sel, opts|TREELIST_SINGLESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES, x,y,w,h)
 {
 	// init variables
-	mapFile = NULL;
+	mapFile = nullptr;
 
 	// set styles...
 	setNumVisible(7);
@@ -29,11 +29,12 @@ FXMessages::FXMessages(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 	setSelTextColor(getTextColor());
 	setSelBackColor(getBackColor());
 
-	groups.effects = appendItem(NULL, "Effekte");
-	groups.travel = appendItem(NULL, "Durchreise");
-	groups.other = appendItem(NULL, "Sonstiges");
-	groups.streets = appendItem(NULL, FXString(L"Stra\u00dfen"));
-	groups.guards = appendItem(NULL, "Bewacher");
+	groups.messages = appendItem(nullptr, "Meldungen");
+	groups.effects = appendItem(nullptr, "Effekte");
+	groups.travel = appendItem(nullptr, "Durchreise");
+	groups.other = appendItem(nullptr, "Sonstiges");
+	groups.streets = appendItem(nullptr, FXString(L"Stra\u00dfen"));
+	groups.guards = appendItem(nullptr, "Bewacher");
 }
 
 void FXMessages::create()
@@ -47,7 +48,44 @@ FXMessages::~FXMessages()
 
 void FXMessages::setMapFile(datafile *f)
 {
-    mapFile = f;
+    if (f != mapFile) {
+        datablock::itor block, end;
+        mapFile = f;
+        clearSiblings(groups.messages);
+        end = mapFile->blocks().end();
+        for (block = mapFile->blocks().begin(); block != end; ++block) {
+            if (block->type() == block_type::TYPE_FACTION) {
+                datablock::itor child;
+                for (child = block; child != end; ++child) {
+                    if (child->type() == block_type::TYPE_MESSAGE) {
+                        addMessage(groups.messages, child);
+                    }
+                }
+                break;
+            }
+        }
+    }
+}
+
+void FXMessages::addMessage(FXTreeItem* group, datablock::itor& block)
+{
+    FXTreeItem* item = appendItem(group, block->value("rendered"));
+    FXival unit = block->valueInt("target");
+
+    if (unit <= 0)
+        unit = block->valueInt("unit");
+    if (unit <= 0)
+        unit = block->valueInt("mage");
+    if (unit <= 0)
+        unit = block->valueInt("spy");
+    if (unit <= 0)
+        unit = block->valueInt("teacher");
+    if (unit > 0) {
+        item->setData((void*)unit);
+    }
+    else {
+        item->setData(nullptr);
+    }
 }
 
 long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
@@ -93,15 +131,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
                     "von Figo (g351): 'KABUMM *kicher*'";rendered
                     */
 
-                    FXTreeItem *item = appendItem(groups.other, block->value("rendered"));
-
-                    FXival unit = block->valueInt("unit");
-                    if (!unit)
-                        unit = block->valueInt("mage");
-                    if (!unit)
-                        unit = block->valueInt("teacher");
-
-                    item->setData((void *)unit);
+                    addMessage(groups.other, block);
                 }
                 else if (block->depth() > region->depth() + 1) {
                     continue;

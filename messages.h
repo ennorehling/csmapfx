@@ -29,8 +29,11 @@ protected:
 
     datafile *mapFile;
 
-	struct
+    void addMessage(FXTreeItem*, datablock::itor& block);
+
+    struct
 	{
+        FXTreeItem *messages;
 		FXTreeItem *effects;
 		FXTreeItem *streets;
 		FXTreeItem *travel;
@@ -42,8 +45,8 @@ protected:
 	void clearSiblings(FXTreeItem* parent);
 
 protected:
-	FXMessages(){}
-	FXMessages(const FXMessages&) {}
+	FXMessages() : mapFile(0) {}
+	FXMessages(const FXMessages&) : mapFile(0) {}
 
 };
 
