@@ -32,7 +32,7 @@ FXMessages::FXMessages(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 	groups.messages = appendItem(nullptr, "Meldungen");
 	groups.effects = appendItem(nullptr, "Effekte");
 	groups.travel = appendItem(nullptr, "Durchreise");
-	groups.other = appendItem(nullptr, "Sonstiges");
+    groups.other = nullptr;
 	groups.streets = appendItem(nullptr, FXString(L"Stra\u00dfen"));
 	groups.guards = appendItem(nullptr, "Bewacher");
 }
@@ -116,7 +116,11 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 		clearSiblings(groups.effects);
 		clearSiblings(groups.streets);
 		clearSiblings(groups.travel);
-		clearSiblings(groups.other);
+        if (groups.other) {
+            clearSiblings(groups.other);
+            removeItem(groups.other);
+            groups.other = nullptr;
+        }
 		clearSiblings(groups.guards);
 
 		if (mapFile && selection.selected & selection.REGION)
@@ -132,6 +136,9 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
                     MESSAGE 324149248
                     "von Figo (g351): 'KABUMM *kicher*'";rendered
                     */
+                    if (!groups.other) {
+                        groups.other = appendItem(nullptr, "Sonstiges");
+                    }
 
                     addMessage(groups.other, block);
                 }
