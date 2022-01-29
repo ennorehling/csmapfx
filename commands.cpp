@@ -329,28 +329,14 @@ int FXCommands::getConfirmed()
 
 long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 {
-	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
+	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
     // any data changed, so need to update list?
-	if (selection.fileChange != state->fileChange)
+	if (selection.fileChange != pstate->fileChange || selection.selChange != pstate->selChange)
 	{
-		selection.fileChange = state->fileChange;
-		selection.map = state->map;
-		selection.activefaction = state->activefaction;
-	}
+        selection = *pstate;
 
-	if (selection.selChange != state->selChange)
-	{
-        selection.selChange = state->selChange;
-		selection.selected = state->selected;
-		
-		selection.region = state->region;
-		selection.faction = state->faction;
-		selection.building = state->building;
-		selection.ship = state->ship;
-		selection.unit = state->unit;
-
-		setText("");
+        setText("");
 		setModified(false);
 		disable();
 

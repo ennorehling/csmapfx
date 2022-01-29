@@ -365,6 +365,7 @@ public:
 	datablock::itor getFaction(int id);
 	datablock::itor getIsland(int id);
 	datablock::itor getRegion(int x, int y, int plane);
+	datablock::itor getBattle(int x, int y, int plane);
     bool hasRegion(int x, int y, int plane) const;
     bool deleteRegion(datablock* region);
     datablock::itor dummyToItor(const datablock* block);
@@ -397,6 +398,7 @@ public:
 			BUILDING = (1<<4),
 			SHIP = (1<<5),
 			UNIT = (1<<6),
+			BATTLE = (1<<7),
 		};
 
 		// map flags
@@ -409,6 +411,20 @@ public:
 
 		// mini-c'tor
 		SelectionState() : selected(0), map(0), sel_x(0), sel_y(0), sel_plane(0), selChange(0), fileChange(0) {}
+        SelectionState(const SelectionState& state) {
+            sel_x = state.sel_x;
+            sel_y = state.sel_y;
+            sel_plane = state.sel_plane;
+            selChange = state.selChange;
+            fileChange = state.fileChange;
+            selected = state.selected;
+            region = state.region;
+            faction = state.faction;
+            building = state.building;
+            ship = state.ship;
+            unit = state.unit;
+            map = state.map;
+        }
 	};
 
 protected:
@@ -421,6 +437,7 @@ protected:
     datablock::itor faction(int id);
     datablock::itor island(int id);
     datablock::itor region(int x, int y, int plane);
+    datablock::itor battle(int x, int y, int plane);
 
 	struct koordinates
 	{
@@ -479,6 +496,7 @@ protected:
 	// hash tables
 	std::map<int, datablock::itor> m_units, m_factions, m_buildings, m_ships, m_islands;
 	std::map<koordinates, datablock::itor> m_regions;
+	std::map<koordinates, datablock::itor> m_battles;
 
 	// temporaries (like FACTION block that don't exist in CR)
 	datablock::list_type m_dummyBlocks;

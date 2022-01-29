@@ -148,35 +148,12 @@ long FXCalculator::onFocusPrev(FXObject* sender, FXSelector sel, void* ptr)
 
 long FXCalculator::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 {
-    datafile::SelectionState *state = (datafile::SelectionState*)ptr;
+    datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
-    bool needUpdate = false;
-
-    if (selection.fileChange != state->fileChange)
+    if (selection.fileChange != pstate->fileChange || selection.selChange != pstate->selChange)
     {
-        selection.fileChange = state->fileChange;
-        selection.map = state->map;
-        selection.activefaction = state->activefaction;
+        selection = *pstate;
 
-        needUpdate = true;
-    }
-
-    if (selection.selChange != state->selChange)
-    {
-        selection.selChange = state->selChange;
-        selection.selected = state->selected;
-        
-        selection.region = state->region;
-        selection.faction = state->faction;
-        selection.building = state->building;
-        selection.ship = state->ship;
-        selection.unit = state->unit;
-
-        needUpdate = true;
-    }
-
-    if (needUpdate)
-    {
         onChanged(this, 0, NULL);
     }
     

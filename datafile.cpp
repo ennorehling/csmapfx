@@ -1619,6 +1619,17 @@ datablock::itor datafile::region(int x, int y, int plane)
 	return region->second;
 }
 
+datablock::itor datafile::battle(int x, int y, int plane)
+{ 
+	std::map<koordinates, datablock::itor>::iterator block;
+    block = m_battles.find(koordinates(x, y, plane));
+
+	if (block == m_battles.end())
+		return m_blocks.end();
+
+	return block->second;
+}
+
 datablock::itor datafile::getRegion(int x, int y, int plane)
 {
     datablock::itor block = region(x, y, plane);
@@ -1627,6 +1638,11 @@ datablock::itor datafile::getRegion(int x, int y, int plane)
     }
 
     return block;
+}
+
+datablock::itor datafile::getBattle(int x, int y, int plane)
+{
+    return battle(x, y, plane);
 }
 
 bool datafile::hasRegion(int x, int y, int plane) const
@@ -1842,6 +1858,7 @@ void datafile::createHierarchy()
 
 void datafile::createHashTables()
 {
+	m_battles.clear();
 	m_regions.clear();
 	m_units.clear();
 	m_factions.clear();
@@ -1908,8 +1925,13 @@ void datafile::createHashTables()
 
 	for (block = m_blocks.begin(); block != m_blocks.end(); block++)
 	{
+        // add battle to list
+        if (block->type() == block_type::TYPE_BATTLE)
+        {
+            m_battles[koordinates(block->x(), block->y(), block->info())] = block;
+        }
         // add region to region list
-        if (block->type() == block_type::TYPE_REGION)
+        else if (block->type() == block_type::TYPE_REGION)
 		{
 			if (region)
 			{
@@ -1983,22 +2005,22 @@ void datafile::createHashTables()
 		}
 
         // add ships and buildings to their lists
-        if (block->type() == block_type::TYPE_SHIP)
+        else if (block->type() == block_type::TYPE_SHIP)
 			m_ships[block->info()] = block;
         else if (block->type() == block_type::TYPE_BUILDING)
 			m_buildings[block->info()] = block;
 
 		// generate list of units that got a "got taxes" message (E3 only)
-        if (block->type() == block_type::TYPE_MESSAGE)
-			if (block->value("type") == "1264208711")
-			{
-				//std::set<int> unit_got_taxes;
-				int unitId = block->valueInt("unit", -1);
-				unit_got_taxes.insert(unitId);
-			}
-
+        else if (block->type() == block_type::TYPE_MESSAGE) {
+            if (block->value("type") == "1264208711")
+            {
+                //std::set<int> unit_got_taxes;
+                int unitId = block->valueInt("unit", -1);
+                unit_got_taxes.insert(unitId);
+            }
+        }
         // add units to unit list
-        if (block->type() == block_type::TYPE_UNIT)
+        else if (block->type() == block_type::TYPE_UNIT)
 		{
 			m_units[block->info()] = block;
 
@@ -2048,15 +2070,19 @@ void datafile::createHashTables()
 		}
 
 		// .. and factions to faction list
-		if (block->type() == block_type::TYPE_FACTION)
-			m_factions[block->info()] = block;
-		// alliance as placeholder-faction
-        if (block->type() == block_type::TYPE_ALLIANCE)
-			if (faction(block->info()) == m_blocks.end())
-				m_factions[block->info()] = block;
+        else if (block->type() == block_type::TYPE_FACTION) {
+            m_factions[block->info()] = block;
+        }
+        else if (block->type() == block_type::TYPE_ALLIANCE) {
+            // alliance as placeholder-faction
+            if (faction(block->info()) == m_blocks.end()) {
+                m_factions[block->info()] = block;
+            }
+        }
 		// .. and islands to island list
-		if (block->type() == block_type::TYPE_ISLAND)
-			m_islands[block->info()] = block;
+        else if (block->type() == block_type::TYPE_ISLAND) {
+            m_islands[block->info()] = block;
+        }
 
 		if (region)
 		{

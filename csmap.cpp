@@ -1529,12 +1529,12 @@ long CSMap::onMapMoveMarker(FXObject*, FXSelector sel, void*)
 
     // set new marked region
     datafile::SelectionState state;
-    state.selected = state.REGION;
     state.sel_x = x, state.sel_y = y, state.sel_plane = plane;
     try {
         state.region = report->getRegion(x, y, plane);
+        state.selected = state.REGION;
     }
-    catch (...) {
+    catch (std::runtime_error ex) {
         state.selected = state.UNKNOWN_REGION;
     }
 
@@ -1637,7 +1637,7 @@ void CSMap::updateFileNames() {
 
 long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 {
-    datafile::SelectionState *state = (datafile::SelectionState*)ptr;
+    datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
     getApp()->beginWaitCursor();
     // reset state
@@ -1648,7 +1648,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     }
 
     // file change notification
-    if (state->map & selection.MAPCHANGED)
+    if (pstate->map & selection.MAPCHANGED)
     {
         // notify info dialog of new game type
         FXString name_of_game;
@@ -1662,7 +1662,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
         // store flags
         selection.fileChange++;
-        selection.map = state->map & ~(selection.ACTIVEFACTION|selection.MAPCHANGED|selection.NEWFILE);
+        selection.map = pstate->map & ~(selection.ACTIVEFACTION|selection.MAPCHANGED|selection.NEWFILE);
 
         // delete all planes except default
         planes->clearItems();        // clear planes
@@ -1840,19 +1840,15 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     }
 
     // save new selection state
-    selection.selChange++;
-    selection.selected = state->selected;
-    selection.region = state->region;
-    selection.faction = state->faction;
-    selection.building = state->building;
-    selection.ship = state->ship;
-    selection.unit = state->unit;
+    selection.selected = pstate->selected;
+    selection.region = pstate->region;
+    selection.faction = pstate->faction;
+    selection.building = pstate->building;
+    selection.ship = pstate->ship;
+    selection.unit = pstate->unit;
 
-    selection.regionsSelected = state->regionsSelected;
-
-    selection.sel_x = state->sel_x;
-    selection.sel_y = state->sel_y;
-    selection.sel_plane = state->sel_plane;
+    selection.regionsSelected = pstate->regionsSelected;
+    ++selection.selChange;
 
     // make sure that a region is always selected (when something in it is selected)
     if (!(selection.selected & selection.REGION))
