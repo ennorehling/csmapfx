@@ -1,3 +1,10 @@
+csmapfx (0.9.20-1) stable; urgency=low
+
+  * show an icon for battles
+  * show battle report in the region's messages
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 30 Jan 2022 15:00:00 +0200
+
 csmapfx (0.9.19-1) stable; urgency=low
 
   * show top-level report messages
