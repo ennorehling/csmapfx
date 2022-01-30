@@ -28,6 +28,7 @@ namespace data
 	extern const unsigned char lighthouse[];
 	extern const unsigned char travel[];
 	extern const unsigned char monster[];
+	extern const unsigned char battle[];
 	extern const unsigned char seasnake[];
 	extern const unsigned char dragon[];
 	extern const unsigned char wormhole[];

@@ -323,53 +323,41 @@ void FXStatsInfos::updateData()
 
 long FXStatsInfos::onMapChange(FXObject*, FXSelector, void* ptr)
 {
-	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
+	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
 	bool needUpdate = false;
 
 	// any data changed, so need to update list?
-	if (selection.fileChange != state->fileChange)
+	if (selection.fileChange != pstate->fileChange)
 	{
-		selection.fileChange = state->fileChange;
-		selection.map = state->map;
-		selection.activefaction = state->activefaction;
+		selection.fileChange = pstate->fileChange;
+		selection.map = pstate->map;
+		selection.activefaction = pstate->activefaction;
 
 		needUpdate = true;
 	}
 
-	if (selection.selChange != state->selChange)
+	if (selection.selChange != pstate->selChange)
 	{
-		selection.selChange = state->selChange;
-
-		if ((selection.selected & selection.REGION) != (state->selected & selection.REGION)
-			|| (selection.selected & selection.REGION && selection.region != state->region))
+		if ((selection.selected & selection.REGION) != (pstate->selected & selection.REGION)
+			|| (selection.selected & selection.REGION && selection.region != pstate->region))
 			needUpdate = true;				// ignore changes that don't change selected region
 
-		if ((selection.selected & selection.UNKNOWN_REGION) != (state->selected & selection.UNKNOWN_REGION))
+		if ((selection.selected & selection.UNKNOWN_REGION) != (pstate->selected & selection.UNKNOWN_REGION))
 			needUpdate = true;				// ignore changes that don't change selected region
 
-		if (selection.selected & selection.UNKNOWN_REGION && (selection.sel_x != state->sel_x ||
-			selection.sel_y != state->sel_y || selection.sel_plane != state->sel_plane))
+		if (selection.selected & selection.UNKNOWN_REGION && (selection.sel_x != pstate->sel_x ||
+			selection.sel_y != pstate->sel_y || selection.sel_plane != pstate->sel_plane))
 			needUpdate = true;				// ignore changes that don't change selected region
 
-		if ((selection.selected & selection.MULTIPLE_REGIONS) != (state->selected & selection.MULTIPLE_REGIONS)
-			|| (selection.selected & selection.MULTIPLE_REGIONS && selection.regionsSelected != state->regionsSelected))
+		if ((selection.selected & selection.MULTIPLE_REGIONS) != (pstate->selected & selection.MULTIPLE_REGIONS)
+			|| (selection.selected & selection.MULTIPLE_REGIONS && selection.regionsSelected != pstate->regionsSelected))
 			needUpdate = true;
 
-		selection.selected = state->selected;
-		
-		selection.region = state->region;
-		selection.faction = state->faction;
-		selection.building = state->building;
-		selection.ship = state->ship;
-		selection.unit = state->unit;
-
-		selection.sel_x = state->sel_x;
-		selection.sel_y = state->sel_y;
-		selection.sel_plane = state->sel_plane;
+        selection = *pstate;
 
 		if (needUpdate) // expensive operation
-			selection.regionsSelected = state->regionsSelected;
+			selection.regionsSelected = pstate->regionsSelected;
 	}
 
 	if (needUpdate)

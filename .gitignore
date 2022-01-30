@@ -15,3 +15,4 @@ Release
 /csmapinst.exe
 *.log
 *.vcxproj.user
+/enc_temp_folder/

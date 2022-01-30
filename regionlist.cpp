@@ -592,15 +592,15 @@ FXTreeItem* FXRegionList::findTreeItem(FXTreeItem* item, void* udata)
 
 long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 {
-    datafile::SelectionState *sel_state = (datafile::SelectionState*)ptr;
+    datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
 	// any data changed, so need to update list?
-	if (selection.fileChange != sel_state->fileChange)
+	if (selection.fileChange != pstate->fileChange)
 	{
         getApp()->beginWaitCursor();
-        selection.fileChange = sel_state->fileChange;
-		selection.map = sel_state->map;
-		selection.activefaction = sel_state->activefaction;
+        selection.fileChange = pstate->fileChange;
+		selection.map = pstate->map;
+		selection.activefaction = pstate->activefaction;
 
 		// clear list and build a new one from data in this->files
 		clearItems();
@@ -807,16 +807,9 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
         getApp()->endWaitCursor();
     }
 
-	if (selection.selChange != sel_state->selChange)
+	if (selection.selChange != pstate->selChange)
 	{
-        selection.selChange = sel_state->selChange;
-		selection.selected = sel_state->selected;
-		
-		selection.region = sel_state->region;
-		selection.faction = sel_state->faction;
-		selection.building = sel_state->building;
-		selection.ship = sel_state->ship;
-		selection.unit = sel_state->unit;
+        selection = *pstate;
 
 		if (selection.selected & selection.REGION)
 		{

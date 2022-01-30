@@ -595,6 +595,7 @@ void FXCSMap::registerImages()
 		&lighthouse, data::lighthouse, 32, 32, scaleable, no_transform,
 		&travel, data::travel, 32, 32, scaleable, no_transform,
 		&monster, data::monster, 32, 32, scaleable, no_transform,
+		&battle, data::battle, 32, 32, scaleable, no_transform,
 		&seasnake, data::seasnake, 32, 32, scaleable, no_transform,
 		&dragon, data::dragon, 32, 32, scaleable, no_transform,
 		&wormhole, data::wormhole, 32, 32, scaleable, no_transform,
@@ -817,6 +818,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 
             try {
     			state.region = mapFile->getRegion(x, y, visiblePlane);
+                state.selected |= state.REGION;
 
                 if ((event->state & CONTROLMASK) || modus == MODUS_SELECT)
 				{
@@ -840,8 +842,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 					}
 				}
 
-				state.selected |= state.REGION;
-			}
+            }
 			catch (...)
 			{
 				// mark unknown region (no region-block in report)
@@ -1660,8 +1661,12 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
                 dc.drawIcon(dragon, scr_x + FXint(regionSize / 4), scr_y + FXint(regionSize / 2));
             else if (block.flags() & datablock::FLAG_SEASNAKE)
                 dc.drawIcon(seasnake, scr_x + FXint(regionSize / 4), scr_y + FXint(regionSize / 2));
-            else if (block.flags() & datablock::FLAG_MONSTER)
+            else if (block.flags() & datablock::FLAG_MONSTER) {
                 dc.drawIcon(monster, scr_x + FXint(regionSize / 4), scr_y + FXint(regionSize / 2));
+            }
+            if (mapFile->hasBattle(block.x(), block.y(), block.info())) {
+                dc.drawIcon(battle, scr_x + FXint(regionSize / 4), scr_y + FXint(regionSize / 18));
+            }
 
             // show symbol for wormhole
             if (block.flags() & datablock::FLAG_WORMHOLE)
@@ -2033,34 +2038,22 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 
 long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 {
-	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
+	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
     bool datachanged = false, scroll = false;
 
-	if (selection.fileChange != state->fileChange)
+	if (selection.fileChange != pstate->fileChange)
 	{
-		selection.fileChange = state->fileChange;
-		selection.map = state->map;
+		selection.fileChange = pstate->fileChange;
+		selection.map = pstate->map;
 
 		datachanged = true;
 	}
 
-	if (selection.selChange != state->selChange)
+	if (selection.selChange != pstate->selChange)
 	{
-		selection.selChange = state->selChange;
-		selection.selected = state->selected;
-
-		selection.region = state->region;
-		selection.faction = state->faction;
-		selection.building = state->building;
-		selection.ship = state->ship;
-		selection.unit = state->unit;
-
-		selection.regionsSelected = state->regionsSelected;
-
-		selection.sel_x = state->sel_x;
-		selection.sel_y = state->sel_y;
-		selection.sel_plane = state->sel_plane;
+        selection = *pstate;
+		selection.regionsSelected = pstate->regionsSelected;
 
 		// does state->region contain valid informaion?
 		if (selection.selected & (selection.REGION|selection.UNKNOWN_REGION))

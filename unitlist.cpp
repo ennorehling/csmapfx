@@ -57,29 +57,22 @@ void FXUnitList::setMapFile(datafile *f)
 
 long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 {
-	datafile::SelectionState *state = (datafile::SelectionState*)ptr;
+	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
 	// any data changed, so need to update list?
-	if (selection.fileChange != state->fileChange)
+	if (selection.fileChange != pstate->fileChange)
 	{
-		selection.fileChange = state->fileChange;
-		selection.map = state->map;
-		selection.activefaction = state->activefaction;
+		selection.fileChange = pstate->fileChange;
+		selection.map = pstate->map;
+		selection.activefaction = pstate->activefaction;
 
 		// clear list and build a new one from data in this->files
 		//clearItems();
 	}
 
-	if (selection.selChange != state->selChange)
+	if (selection.selChange != pstate->selChange)
 	{
-		selection.selChange = state->selChange;
-		selection.selected = state->selected;
-		
-		selection.region = state->region;
-		selection.faction = state->faction;
-		selection.building = state->building;
-		selection.ship = state->ship;
-		selection.unit = state->unit;
+        selection = *pstate;
 
 		list->clearItems();		// clear list and build new
 

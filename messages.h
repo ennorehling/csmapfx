@@ -32,15 +32,15 @@ protected:
     void addMessage(FXTreeItem*, datablock::itor& block);
 
     struct
-	{
-        FXTreeItem *messages;
-		FXTreeItem *effects;
-		FXTreeItem *streets;
-		FXTreeItem *travel;
-		FXTreeItem *other;
-		FXTreeItem *guards;
-
-	}groups;
+    {
+        FXTreeItem* messages;
+        FXTreeItem* effects;
+        FXTreeItem* streets;
+        FXTreeItem* travel;
+        FXTreeItem* other;
+        FXTreeItem* guards;
+        FXTreeItem* battle;
+    } groups;
 
 	void clearSiblings(FXTreeItem* parent);
 
