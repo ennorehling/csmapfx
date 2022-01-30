@@ -1645,6 +1645,13 @@ datablock::itor datafile::getBattle(int x, int y, int plane)
     return battle(x, y, plane);
 }
 
+bool datafile::hasBattle(int x, int y, int plane) const
+{
+    std::map<koordinates, datablock::itor>::const_iterator block;
+    block  = m_battles.find(koordinates(x, y, plane));
+    return (block != m_battles.end());
+}
+
 bool datafile::hasRegion(int x, int y, int plane) const
 {
     std::map<koordinates, datablock::itor>::const_iterator region;

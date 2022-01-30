@@ -161,7 +161,7 @@ protected:
 	FXIcon		*guardown, *guardally, *guardenemy, *guardmixed;
 	FXIcon		*ship, *castle, *shiptravel, *lighthouse, *travel;
 	FXIcon		*castleown, *castleally, *castleenemy, *castlecoins;
-	FXIcon		*monster, *seasnake, *dragon;
+	FXIcon		*monster, *seasnake, *dragon, *battle;
 	FXIcon		*wormhole;
 	FXIcon		*street[6], *street_undone[6];
 	FXIcon		*redarrows[6], *greenarrows[6], *bluearrows[6], *greyarrows[6];

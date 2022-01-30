@@ -245,8 +245,8 @@ public:
 	enum
 	{
 		FLAG_CASTLE	= (1 << 0),		// there is a building/tower/castle in this region
-		//FLAG_GUARDED= (1 << 1),		// unit guard the region
-		FLAG_SHIP	= (1 << 2),		// there are ships in this region
+        FLAG_REGION_TAXES = (1 << 1),	// we got taxes in this region (E3 only)
+        FLAG_SHIP	= (1 << 2),		// there are ships in this region
 		FLAG_SHIPTRAVEL= (1 << 3),	// ships travelled the region
 		
 		FLAG_LIGHTHOUSE= (1 << 4),	// region is seen by lighthouse
@@ -268,8 +268,6 @@ public:
 		FLAG_REGION_ALLY  = (1 << 15),
 		FLAG_REGION_ENEMY = (1 << 16),
 
-		FLAG_REGION_TAXES = (1 << 1),	// we got taxes in this region (E3 only)
-
 		FLAG_STREET = (1 << 17),	// street in region (first)
 		FLAG_STREET_NW= (1 << 17),	// street to north west
 		FLAG_STREET_NO= (1 << 18),	// street to north east
@@ -286,10 +284,10 @@ public:
 		FLAG_STREET_UNDONE_SW= (1 << 27),	// incomplete street to south west
 		FLAG_STREET_UNDONE_W = (1 << 28),	// incomplete street to west
 
-		FLAG_REGION_SEEN = (1 << 31),	// region is seen by own units
-
 		FLAG_BLOCKID_BIT0 = (1 << 29),	// number of ids: +1
 		FLAG_BLOCKID_BIT1 = (1 << 30),	// +2
+
+        FLAG_REGION_SEEN = (1 << 31),	// region is seen by own units
 
 		FLAG_NONE	= 0				// no flags are set
 	};
@@ -364,8 +362,9 @@ public:
 	datablock::itor getShip(int id);
 	datablock::itor getFaction(int id);
 	datablock::itor getIsland(int id);
+    datablock::itor getBattle(int x, int y, int plane);
+    bool hasBattle(int x, int y, int plane) const;
 	datablock::itor getRegion(int x, int y, int plane);
-	datablock::itor getBattle(int x, int y, int plane);
     bool hasRegion(int x, int y, int plane) const;
     bool deleteRegion(datablock* region);
     datablock::itor dummyToItor(const datablock* block);
