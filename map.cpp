@@ -816,8 +816,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 					state.regionsSelected = selection.regionsSelected;
 			}
 
-            try {
-    			state.region = mapFile->getRegion(x, y, visiblePlane);
+            if (mapFile->getRegion(state.region, x, y, visiblePlane)) {
                 state.selected |= state.REGION;
 
                 if ((event->state & CONTROLMASK) || modus == MODUS_SELECT)
@@ -843,8 +842,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 				}
 
             }
-			catch (...)
-			{
+            else {
 				// mark unknown region (no region-block in report)
 				state.sel_x = x, state.sel_y = y, state.sel_plane = visiblePlane;
 				state.selected |= state.UNKNOWN_REGION;
@@ -1055,9 +1053,8 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 			return 1;
 		}
 
-        try {
-    		datablock::itor region = mapFile->getRegion(popup_x, popup_y, visiblePlane);
-
+        datablock::itor region;
+        if (mapFile->getRegion(region, popup_x, popup_y, visiblePlane)) {
             // create popup
 			FXMenuPane *menu = new FXMenuPane(this);
 
@@ -1127,9 +1124,6 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 
 			return 1;
 		}
-        catch (...) {
-            // no region found at screen position
-        }
 	}
 
 	// no region clicked. create popup for new region
@@ -1250,8 +1244,8 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 
 		if (mapFile)
 		{
-            try {
-                datablock::itor region = mapFile->getRegion(popup_x, popup_y, visiblePlane);
+            datablock::itor region;
+            if (mapFile->getRegion(region, popup_x, popup_y, visiblePlane)) {
                 if (cmd == POPUP_SETISLAND) {
 					FXInputDialog input(this, "Insel benennen", "Wie soll die Insel heissen?");
 					input.setText(region->value(TYPE_ISLAND));
@@ -1322,9 +1316,6 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 					return 1;
 				}
 			}
-            catch (...) {
-                // no region at this cursor position
-            }
 		}
 	}
 
@@ -1364,12 +1355,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 
     // TODO: I don't understand what new_terrain is for (enno).
     if (new_terrain) {			// speeds things up but only works when we don't delete
-        try {
-            iregion = mapFile->getRegion(x, y, plane);
-        }
-        catch (...) {
-            iregion = end;
-        }
+        mapFile->getRegion(iregion, x, y, plane);
     }
 
 	if (iregion == end)
@@ -2384,13 +2370,7 @@ long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
         state.selected = 0;
         state.sel_x = x, state.sel_y = y, state.sel_plane = plane;
 
-        try {
-            state.region = mapFile->getRegion(x, y, plane);
-            state.selected = state.REGION;
-        }
-        catch (...) {
-            state.selected = state.UNKNOWN_REGION;
-        }
+        state.selected = mapFile->getRegion(state.region, x, y, plane) ? state.REGION : state.UNKNOWN_REGION;
 
 		// dont touch multiregions selected
 		if (selection.selected & selection.MULTIPLE_REGIONS)
@@ -2474,8 +2454,8 @@ long FXCSMap::onQueryHelp(FXObject* sender, FXSelector, void*)
 
 	// now get the region
     FXString help;
-    try {
-    	datablock::itor block = mapFile->getRegion(x, y, visiblePlane);
+    datablock::itor block;
+    if (mapFile->getRegion(block, x, y, visiblePlane)) {
 		FXString name, terrainString = (*block).terrainString();
 
 		// Terrain, Name, Koordinaten
@@ -2491,7 +2471,7 @@ long FXCSMap::onQueryHelp(FXObject* sender, FXSelector, void*)
 			if (!stats->island.empty())
 				help.append(" auf ").append(stats->island);
 	}
-    catch (...) {
+    else {
         help.format("Unbekannt (%d,%d)", x, y);
     }
 	sender->handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &help);

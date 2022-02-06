@@ -1446,19 +1446,21 @@ long CSMap::onUpdVisiblePlane(FXObject* sender, FXSelector, void* ptr)
 
 long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
 {
-    FXList *list = (FXList *)sender;
-    FXint item = list->getCurrentItem();
-    MessageInfo *info = static_cast<MessageInfo *>(list->getItemData(item));
+    if (report) {
+        FXList *list = (FXList *)sender;
+        FXint item = list->getCurrentItem();
+        MessageInfo *info = static_cast<MessageInfo *>(list->getItemData(item));
 
-    if (!report)
-        return 0;
-    if (info && info->unit_id) {
-        datafile::SelectionState state;
-        state.selected = selection.UNIT;
-        state.unit = report->getUnit(info->unit_id);
-        handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+        if (info && info->unit_id) {
+            datafile::SelectionState state;
+            if (report->getUnit(state.unit, info->unit_id)) {
+                state.selected = selection.UNIT;
+                handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+                return 1;
+            }
+        }
     }
-    return 1;
+    return 0;
 }
 
 long CSMap::onMapSelectMarked(FXObject*, FXSelector, void*)
@@ -1530,11 +1532,10 @@ long CSMap::onMapMoveMarker(FXObject*, FXSelector sel, void*)
     // set new marked region
     datafile::SelectionState state;
     state.sel_x = x, state.sel_y = y, state.sel_plane = plane;
-    try {
-        state.region = report->getRegion(x, y, plane);
+    if (report->getRegion(state.region, x, y, plane)) {
         state.selected = state.REGION;
     }
-    catch (std::runtime_error ex) {
+    else {
         state.selected = state.UNKNOWN_REGION;
     }
 
@@ -2755,14 +2756,10 @@ long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
         int x = (*itor)->x();
         int y = (*itor)->y();
 
-        datablock::itor region;
-
         for (int d = 0; d != 6; ++d) {
-            try {
-                region = report->getRegion(x + hex_offset[d][0], y + hex_offset[d][1], visiblePlane);
+            datablock::itor region;
+            if (report->getRegion(region, x + hex_offset[d][0], y + hex_offset[d][1], visiblePlane)) {
                 state.regionsSelected.insert(&*region);
-            }
-            catch (...) {
             }
         }
     }
@@ -2803,20 +2800,17 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
             int x = (*itor)->x();
             int y = (*itor)->y();
 
-            datablock::itor region;
 
             // each of the six hex directions
             for (int d = 0; d != 6; ++d) {
-                try {
-                    region = report->getRegion(x + hex_offset[d][0], y + hex_offset[d][1], visiblePlane);
+                datablock::itor region;
+                if (report->getRegion(region, x + hex_offset[d][0], y + hex_offset[d][1], visiblePlane)) {
                     if (region->terrain() != data::TERRAIN_OCEAN
                         && region->terrain() != data::TERRAIN_FIREWALL)
                         if (state.regionsSelected.find(&*region) == state.regionsSelected.end()) {
                             state.regionsSelected.insert(&*region);
                             changed = true;
                         }
-                }
-                catch (...) {
                 }
             }
         }

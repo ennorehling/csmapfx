@@ -233,14 +233,11 @@ void FXStatistics::updateList()
 		datablock::itor notfound = mapFile->blocks().end();
 		for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
 		{
-            try {
-    			datablock::itor region = mapFile->getRegion((*itor)->x(), (*itor)->y(), (*itor)->info());
+            datablock::itor region;
+            if (mapFile->getRegion(region, (*itor)->x(), (*itor)->y(), (*itor)->info())) {
 				// collect if selected
 				collectData(persons, items, talents, ships, buildings, region);
 			}
-            catch (...) {
-                // user selected a blank tile
-            }
 		}
 	}
 	else if (selection.selected & selection.REGION)
@@ -469,18 +466,14 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 		{
 			datablock::itor block;
 
-            try {
-                if (entryType == 0)
-                    block = mapFile->getUnit(itor->first);		// get unit
-                else if (entryType == 1)
-                    block = mapFile->getBuilding(itor->first);	// get building/castle
-                else if (entryType == 2)
-                    block = mapFile->getShip(itor->first);		// get ship
-            }
-            catch (std::runtime_error ex) {
-                FXString error;
-                error.format("- error: %s - ", ex.what());
-                new FXMenuCommand(menu, error.text(), NULL, this, ID_POPUP_CLICKED);
+            if (entryType == 0)
+                mapFile->getUnit(block, itor->first);		// get unit
+            else if (entryType == 1)
+                mapFile->getBuilding(block, itor->first);	// get building/castle
+            else if (entryType == 2)
+                mapFile->getShip(block, itor->first);		// get ship
+            else {
+                // something done effed up
                 continue;
             }
 
@@ -661,8 +654,8 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 				factions.insert(factionId);
 
                 FXString label;
-                try {
-                    datablock::itor faction = mapFile->getFaction(factionId);
+                datablock::itor faction;
+                if (mapFile->getFaction(faction, factionId)) {
                     FXString name = faction->value(TYPE_FACTIONNAME);
 
                     if (name.empty())
@@ -671,9 +664,9 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
                         label.format("%s (%s)", name.text(), faction->id().text());
 
                 }
-                catch (std::runtime_error ex) {
+                else {
                     // missing PARTEI block in report? how?
-                    label.assign(ex.what());
+                    label.format("Unbekannt (%s)", FXStringValEx(factionId, 36).text());
                 }
                 factionBox->appendItem(label, (void*)factionId);
                 // select previously selected faction again
@@ -731,14 +724,10 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				datablock::itor notfound = mapFile->blocks().end();
 				for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
 				{
-					try
-					{
-                        datablock::itor region = mapFile->getRegion((*itor)->x(), (*itor)->y(), (*itor)->info());
-						collectFactionList(factions, region);
+                    datablock::itor region;
+                    if (mapFile->getRegion(region, (*itor)->x(), (*itor)->y(), (*itor)->info())) {
+                        collectFactionList(factions, region);
 					}
-                    catch (...) {
-                        // user has selected a blank tile
-                    }
 				}
 			}
 			else if (selection.selected & selection.REGION)

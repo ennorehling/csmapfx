@@ -228,14 +228,10 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
                 }
                 if (!guard_ids.empty()) {
                     for (FXint id : guard_ids) {
-                        try {
-                            datablock::itor faction = mapFile->getFaction(id);
+                        datablock::itor faction;
+                        if (mapFile->getFaction(faction, id)) {
                             FXString label = faction->value("Parteiname") + " (" + faction->id() + ")";
                             appendItem(groups.guards, label);
-                        }
-                        catch (...) {
-                            // how can this happen? do we even need to handle exceptions here?
-                            // only if a unit belongs to a faction that is missing from the report.
                         }
                     }
                 }
@@ -262,13 +258,13 @@ long FXMessages::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 
 		sel_state.selected = selection.selected & selection.REGION;
 		sel_state.region = selection.region;
-
-        try {
-    		datablock::itor unit = mapFile->getUnit(id);
+        
+        datablock::itor unit;
+        if (mapFile->getUnit(unit, id)) {
 			sel_state.unit = unit;
 			sel_state.selected |= sel_state.UNIT;
 		}
-        catch (...) {
+        else {
             return 0;
         }
 

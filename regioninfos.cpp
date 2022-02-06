@@ -293,16 +293,11 @@ void FXRegionInfos::updateData()
 		// collect infos
 		for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
 		{
-
-			try
-			{
-                datablock::itor region = mapFile->getRegion((*itor)->x(), (*itor)->y(), (*itor)->info());
+            datablock::itor region;
+            if (mapFile->getRegion(region, (*itor)->x(), (*itor)->y(), (*itor)->info()))
+            {
 				collectData(info, region);
 			}
-            catch (...)
-            {
-                // user has selected an unknown region
-            }
 		}
 
 		// apply information entries (Bauern, Silber, Pferde...)
