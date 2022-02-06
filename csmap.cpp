@@ -935,81 +935,91 @@ bool CSMap::haveActiveFaction() const
     return true;
 }
 
-bool CSMap::loadFile(const FXString& filename)
+datafile* CSMap::loadFile(const FXString& filename)
 {
-    report = new datafile();
-
-    FXString app_title = CSMAP_APP_TITLE " - lade " + filename;
-    handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &app_title);
+    datafile* cr = new datafile();
 
     try
     {
-        if (report->load(filename.text()) <= 0) {
-            return false;
+        if (cr->load(filename.text()) <= 0) {
+            delete cr;
+            return nullptr;
         }
-        report->filename(filename);
+        cr->filename(filename);
     }
     catch(const std::runtime_error& err)
     {
-        report = nullptr;
         recentFiles.removeFile(filename);
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", err.what());
-        return false;
+        delete cr;
+        return nullptr;
     }
 
-    if (report->blocks().empty())
+    if (cr->blocks().empty())
     {
-        report = nullptr;
         recentFiles.removeFile(filename);
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht gelesen werden.\nM\u00f6glicherweise wird das Format nicht unterst\u00fctzt.");
-        return false;
+        delete cr;
+        return nullptr;
     }
 
-    if (report->blocks().front().type() != block_type::TYPE_VERSION)
+    if (cr->blocks().front().type() != block_type::TYPE_VERSION)
     {
-        report = nullptr;
         recentFiles.removeFile(filename);
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei hat das falsche Format.");
-        return false;
+        delete cr;
+        return nullptr;
     }
 
-    return true;
+    return cr;
 }
-bool CSMap::mergeFile(const FXString& filename)
+
+datafile* CSMap::mergeFile(const FXString& filename)
 {
     // zuerst: Datei normal laden
-    datafile new_cr;
-
+    datafile* new_cr = new datafile;
     FXString app_title = CSMAP_APP_TITLE " - lade " + filename;
+
     handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &app_title);
 
     try
     {
-        new_cr.load(filename.text());
+        new_cr->load(filename.text());
     }
     catch(const std::runtime_error& err)
     {
         recentFiles.removeFile(filename);
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", (filename + ": " + FXString(err.what())).text());
-        return false;
+        delete new_cr;
+        return report;
     }
 
-    if (new_cr.blocks().empty())
+    if (new_cr->blocks().empty())
     {
         recentFiles.removeFile(filename);
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s",
         FXString(L"Die Datei konnte nicht gelesen werden.\nM\u00f6glicherweise wird das Format nicht unterst\u00fctzt.").text());
-        return false;
+        delete new_cr;
+        return report;
     }
 
-    if (new_cr.blocks().front().type() != block_type::TYPE_VERSION)
+    if (new_cr->blocks().front().type() != block_type::TYPE_VERSION)
     {
         recentFiles.removeFile(filename);
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei hat das falsche Format.");
-        return false;
+        delete new_cr;
+        return report;
     }
-    report->merge(new_cr);
-    return true;
+
+    int turn = report->turn();
+    int new_turn = new_cr->turn();
+
+    if (new_turn <= turn) {
+        report->merge(new_cr);
+        return report;
+    }
+    new_cr->merge(report);
+    return new_cr;
 }
 
 bool CSMap::loadCommands(const FXString& filename)
@@ -2065,7 +2075,8 @@ long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
         // vorherige Dateien schliessen, Speicher frei geben
         if (closeFile()) {
             FXString filename = dlg.getFilename();
-            if (loadFile(filename)) {
+            beginLoading(filename);
+            if (nullptr != (report = loadFile(filename))) {
                 updateFileNames();
                 mapChange();
                 recentFiles.appendFile(filename);
@@ -2088,25 +2099,36 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
     if (res)
     {
         FXString* filenames = dlg.getFilenames();
+        datafile* old_cr = report;
         if (filenames) {
-            bool newfile = false;
+            datafile* new_cr = nullptr;
             getApp()->beginWaitCursor();
 
             for (int i = 0; filenames[i].length(); i++) {
                 FXString const& filename = filenames[i];
                 if (!filename.empty()) {
                     if (!report) {
-                        newfile |= loadFile(filename);    // normal laden, wenn vorher keine Datei geladen ist.
+                        new_cr = loadFile(filename);    // normal laden, wenn vorher keine Datei geladen ist.
                     }
                     else {
-                        newfile |= mergeFile(filenames[i]);
+                        new_cr = mergeFile(filenames[i]);
+                    }
+                    if (new_cr && (new_cr != report)) {
+                        report = new_cr;
                     }
                 }
             }
-            if (newfile) {
+
+            if (old_cr != report) {
+                ++selection.fileChange;
+                // TODO: make selection to use the new report instead
+                selection.selected = selection.MAPCHANGED;
+                mapChange();
                 updateFileNames();
             }
-            mapChange();
+            if (old_cr != report) {
+                delete old_cr;
+            }
             getApp()->endWaitCursor();
         }
     }
@@ -2626,7 +2648,8 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
     recentFiles.removeFile(filename);
     getApp()->beginWaitCursor();
     if (closeFile()) {
-        if (loadFile(filename)) {
+        beginLoading(filename);
+        if (nullptr != (report = loadFile(filename))) {
             recentFiles.appendFile(filename);
             updateFileNames();
             mapChange();
@@ -2933,4 +2956,9 @@ long CSMap::onHelpAbout(FXObject*, FXSelector, void*)
     about.execute(PLACEMENT_SCREEN);
 
     return 1;
+}
+void CSMap::beginLoading(const FXString& filename)
+{
+    FXString app_title = CSMAP_APP_TITLE " - lade " + filename;
+    handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &app_title);
 }

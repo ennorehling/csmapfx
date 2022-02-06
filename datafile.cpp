@@ -1029,13 +1029,13 @@ void datafile::mergeBlock(datablock::itor& block, const datablock::itor& begin, 
     }
 }
 
-void datafile::merge(datafile& new_cr)
+void datafile::merge(datafile * new_cr)
 {
     // dann: Datei an den aktuellen CR anfuegen (nur Karteninformationen)
     datablock regionblock;
     regionblock.string("REGION");
-    datablock::itor new_end = new_cr.m_blocks.end();
-    for (datablock::itor block = new_cr.m_blocks.begin(); block != new_end;)
+    datablock::itor new_end = new_cr->m_blocks.end();
+    for (datablock::itor block = new_cr->m_blocks.begin(); block != new_end;)
     {
         // handle only regions
         if (block->type() == block_type::TYPE_REGION)

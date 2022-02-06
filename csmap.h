@@ -38,8 +38,8 @@ public:
     bool saveReport(const FXString& filename, map_type mode, bool merge_commands = false);
     void mapChange();
 	bool haveActiveFaction() const;
-	bool loadFile(const FXString& filename);
-	bool mergeFile(const FXString& filename);
+    datafile* loadFile(const FXString& filename);
+    datafile* mergeFile(const FXString& filename);
     bool closeFile();
     void saveCommandsDlg(bool stripped, bool replace);
     FXString askFileName(const FXString &title, const FXString &patterns);
@@ -352,6 +352,8 @@ private:
 
 protected: 
 	CSMap() {}
+
+    void beginLoading(const FXString& filename);
 };
 
 #endif //_CSMAP

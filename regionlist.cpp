@@ -316,7 +316,9 @@ long FXRegionList::onUpdateUnitColors(FXObject* sender, FXSelector, void* ptr)
 
 void FXRegionList::setMapFile(datafile *f)
 {
-    mapFile = f;
+    if (mapFile != f) {
+        mapFile = f;
+    }
 }
 
 long FXRegionList::onSelected(FXObject*,FXSelector,void*)

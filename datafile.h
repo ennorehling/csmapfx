@@ -344,7 +344,7 @@ public:
 
 	int load(const char* filename);
 	int save(const char* filename, map_type map_filter);
-    void merge(datafile& new_cr);
+    void merge(datafile * new_cr);
 
     void createHierarchy();
 	void createHashTables();
