@@ -848,7 +848,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 				state.selected |= state.UNKNOWN_REGION;
 			}
 
-			if (state.regionsSelected.size())
+			if (!state.regionsSelected.empty())
 				state.selected |= state.MULTIPLE_REGIONS;
 
 			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
@@ -1575,15 +1575,15 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 
                     int rl = scr_x + int(regionSize / 1.5), rt = scr_y + int(regionSize / 1.8);
                     int rw = int(regionSize / 4.2), rh = int(regionSize / 4.2);
-
-                    if (!stats->people.size())
+                    size_t size = stats->people.size();
+                    if (size > 0)
                         stats->people.push_back(0);
-                    else if (stats->people.size() > sizeof(colors) / sizeof(colors[0]))
+                    else if (size > sizeof(colors) / sizeof(colors[0]))
                         stats->people.resize(sizeof(colors) / sizeof(colors[0]));
 
-                    int rw_part = rw / stats->people.size();
+                    int rw_part = rw / size;
 
-                    for (size_t i = 0; i < stats->people.size(); i++)
+                    for (size_t i = 0; i < size; i++)
                     {
                         float val = stats->people[i];
                         if (val < 0) val = 0;
@@ -1594,7 +1594,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 
                     dc.setForeground(map->getBackColor());
 
-                    for (size_t i = 0; i < stats->people.size(); i++)
+                    for (size_t i = 0; i < size; i++)
                     {
                         float val = stats->people[i];
                         if (val < 0) val = 0;
@@ -1733,7 +1733,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 	}
 
 	// draw traveller arrows
-	if (arrows.size())
+	if (!arrows.empty())
 	{
 								// NW, NO, O, SO, SW, W
 		int arrow_offset_x[6] = { 6, 36, 46, 22, -7, -18 };
@@ -2376,7 +2376,7 @@ long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
 		if (selection.selected & selection.MULTIPLE_REGIONS)
 		{
 			state.regionsSelected = selection.regionsSelected;
-			if (state.regionsSelected.size())
+			if (!state.regionsSelected.empty())
 				state.selected |= selection.MULTIPLE_REGIONS;
 		}
 
@@ -2407,7 +2407,7 @@ long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
 		else
 			state.regionsSelected.erase(itor);
 
-		if (state.regionsSelected.size())
+		if (!state.regionsSelected.empty())
 			state.selected |= state.MULTIPLE_REGIONS;
 
 		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);

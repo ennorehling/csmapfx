@@ -174,7 +174,7 @@ long FXInfoDlg::onSearch(FXObject*, FXSelector, void* ptr)
 	{
 		infoblock& block = itor->second;
 
-		if (!block.header.size() && !block.lines.size())
+		if (block.header.empty() && block.lines.empty())
 			continue;
 
 		FXint line = 0;
@@ -242,7 +242,7 @@ void FXInfoDlg::createTable()
 		return;
 
 	blocks.erase("- Fehler -");
-	if (!blocks.size())
+	if (blocks.empty())
 	{
 		blocks["- Fehler -"] = infoblock();
 		infoblock& block = blocks.begin()->second;
@@ -254,7 +254,7 @@ void FXInfoDlg::createTable()
 	{
 		infoblock& block = itor->second;
 
-		if (!block.header.size() && !block.lines.size())
+		if (block.header.empty() && block.lines.empty())
 			continue;
 
 		linked_ptr<FXTabItem> tab(new FXTabItem(tabbook, itor->first));
@@ -377,7 +377,7 @@ bool FXInfoDlg::parseTableData(std::istream& input)
 					row.push_back(entry);
 			}
 
-			if (!row.size())		// Keine leeren Zeilen
+			if (row.empty())		// Keine leeren Zeilen
 				continue;
 
 			// append row to active block.

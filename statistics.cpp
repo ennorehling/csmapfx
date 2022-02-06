@@ -246,11 +246,11 @@ void FXStatistics::updateList()
 	}
 
 	// add statistics to the list
-	bool list_persons = persons.size() && (select.filter & select.FILTER_PERSONS);
-	bool list_items = items.size() && (select.filter & select.FILTER_ITEMS);
-	bool list_talents = talents.size() && (select.filter & select.FILTER_TALENTS);
-	bool list_ships = ships.size() && (select.filter & select.FILTER_SHIPS);
-	bool list_buildings = buildings.size() && (select.filter & select.FILTER_BUILDINGS);
+	bool list_persons = (select.filter & select.FILTER_PERSONS) && !persons.empty();
+	bool list_items = (select.filter & select.FILTER_ITEMS) && !items.empty();
+	bool list_talents = (select.filter & select.FILTER_TALENTS) && !talents.empty();
+	bool list_ships = (select.filter & select.FILTER_SHIPS) && !ships.empty();
+	bool list_buildings = (select.filter & select.FILTER_BUILDINGS) && !buildings.empty();
 
 	// add persons to list if not filtered out
 	if (list_persons)

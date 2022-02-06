@@ -1844,7 +1844,7 @@ void datafile::createHierarchy()
 	{
         block_type type = block->type();
 
-		while (parents.size())
+		while (!parents.empty())
 		{
 			tset& types = enclosed[parents.back()];
 

@@ -314,7 +314,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				}
 			}
 
-			if (combatspells.size())	// do some KAMPFZAUBER blocks exist?
+			if (!combatspells.empty())	// do some KAMPFZAUBER blocks exist?
 			{
 				FXTreeItem *node = list->appendItem(unititem, "Kampfzauber");
 				//node->setExpanded(true);

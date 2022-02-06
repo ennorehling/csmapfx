@@ -994,7 +994,7 @@ bool CSMap::mergeFile(const FXString& filename)
         return false;
     }
 
-    if (!new_cr.blocks().size())
+    if (new_cr.blocks().empty())
     {
         recentFiles.removeFile(filename);
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s",
@@ -1490,7 +1490,7 @@ long CSMap::onMapSelectMarked(FXObject*, FXSelector, void*)
     else
         state.regionsSelected.erase(itor);
 
-    if (state.regionsSelected.size())
+    if (!state.regionsSelected.empty())
         state.selected |= state.MULTIPLE_REGIONS;
 
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
@@ -1543,7 +1543,7 @@ long CSMap::onMapMoveMarker(FXObject*, FXSelector sel, void*)
     if (selection.selected & selection.MULTIPLE_REGIONS)
     {
         state.regionsSelected = selection.regionsSelected;
-        if (state.regionsSelected.size())
+        if (!state.regionsSelected.empty())
             state.selected |= selection.MULTIPLE_REGIONS;
     }
 
@@ -2709,10 +2709,10 @@ long CSMap::onRegionInvertSel(FXObject*, FXSelector, void*)
             state.regionsSelected.erase(srch);
     }
 
-    if (state.regionsSelected.size())
-        state.selected |= state.MULTIPLE_REGIONS;
-    else
+    if (state.regionsSelected.empty())
         state.selected &= ~state.MULTIPLE_REGIONS;
+    else
+        state.selected |= state.MULTIPLE_REGIONS;
 
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
     return 1;
@@ -2857,7 +2857,7 @@ long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
 long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 {
     // markierte Regionen l\u00f6schen
-    if (!(selection.selected & selection.MULTIPLE_REGIONS) || !selection.regionsSelected.size())
+    if (!(selection.selected & selection.MULTIPLE_REGIONS) || selection.regionsSelected.empty())
     {
         FXString txt = "Keine Region markiert!";
 
