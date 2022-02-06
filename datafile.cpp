@@ -839,34 +839,36 @@ int datafile::save(const char* filename, map_type map_filter)
             file << "\"UTF-8\";charset" << std::endl;
         }
 
-		// Name-Tag und Terrain-Tag ausgeben
 		if (type == block_type::TYPE_REGION)
 		{
-			FXString name = block->value(TYPE_NAME);
-			if (!name.empty())
-			{
-				file << '\"';
+            file << '\"' << block->terrainString().text() << "\";Terrain" << std::endl;
+            if (map_filter != map_type::MAP_FULL) {
+                // Nur Name-Tag und Terrain-Tag ausgeben
+                FXString name = block->value(TYPE_NAME);
+                if (!name.empty())
+                {
+                    file << '\"';
 
-				for (int i = 0; i < name.length(); i++)
-				{
-					char c = name[i];
+                    for (int i = 0; i < name.length(); i++)
+                    {
+                        char c = name[i];
 
-					if (c == '\\' || c == '\"')
-						file << '\\';
+                        if (c == '\\' || c == '\"')
+                            file << '\\';
 
-					if (c == '\n')
-						file << "\\n";
-					else
-						file << c;
-				}
+                        if (c == '\n')
+                            file << "\\n";
+                        else
+                            file << c;
+                    }
 
-				file << "\";Name" << std::endl;
-			}
+                    file << "\";Name" << std::endl;
+                }
 
-			file << '\"' << block->terrainString().text() << "\";Terrain" << std::endl;
-            if (const datakey* islandkey = block->valueKey(TYPE_ISLAND))
-            {
-                file << '\"' << islandkey->value().text() << "\";" << islandkey->key().text() << std::endl;
+                if (const datakey* islandkey = block->valueKey(TYPE_ISLAND))
+                {
+                    file << '\"' << islandkey->value().text() << "\";" << islandkey->key().text() << std::endl;
+                }
             }
         }
 		// Konfiguration-Block anpassen und Charset auf ISO-8859-1 setzen
@@ -955,11 +957,8 @@ int datafile::save(const char* filename, map_type map_filter)
             }
 			else if (type == block_type::TYPE_REGION)
 			{
-                if (map_filter == map_type::MAP_FULL && tags->type() == TYPE_VISIBILITY)
+                if (map_filter != map_type::MAP_FULL && tags->type() == TYPE_VISIBILITY)
                     continue;
-                // ;Terrain ignorieren. Wird an ;Name angehangen... (s.u.)
-                if (tags->type() == TYPE_TERRAIN || tags->type() == TYPE_NAME)
-					continue;
 			}
 			else if (type == block_type::TYPE_UNIT)
 			{
