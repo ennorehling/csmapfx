@@ -466,18 +466,14 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 		{
 			datablock::itor block;
 
-            try {
-                if (entryType == 0)
-                    mapFile->getUnit(block, itor->first);		// get unit
-                else if (entryType == 1)
-                    block = mapFile->getBuilding(itor->first);	// get building/castle
-                else if (entryType == 2)
-                    block = mapFile->getShip(itor->first);		// get ship
-            }
-            catch (std::runtime_error ex) {
-                FXString error;
-                error.format("- error: %s - ", ex.what());
-                new FXMenuCommand(menu, error.text(), NULL, this, ID_POPUP_CLICKED);
+            if (entryType == 0)
+                mapFile->getUnit(block, itor->first);		// get unit
+            else if (entryType == 1)
+                mapFile->getBuilding(block, itor->first);	// get building/castle
+            else if (entryType == 2)
+                mapFile->getShip(block, itor->first);		// get ship
+            else {
+                // something done effed up
                 continue;
             }
 

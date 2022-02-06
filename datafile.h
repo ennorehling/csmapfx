@@ -357,11 +357,11 @@ public:
 
 	datablock::list_type& blocks() { return m_blocks; }
 
-    bool getUnit(datablock::itor &out, int id);
-	datablock::itor getBuilding(int id);
-	datablock::itor getShip(int id);
+    bool getUnit(datablock::itor& out, int id);
+	bool getBuilding(datablock::itor& out, int id);
+	bool getShip(datablock::itor& out, int id);
 	bool getFaction(datablock::itor& out, int id);
-	datablock::itor getIsland(int id);
+    bool getIsland(datablock::itor& out, int id);
     datablock::itor getBattle(int x, int y, int plane);
     bool hasBattle(int x, int y, int plane) const;
 	bool getRegion(datablock::itor &out, int x, int y, int plane);

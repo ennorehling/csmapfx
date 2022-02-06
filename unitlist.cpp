@@ -132,18 +132,10 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				else if (key->type() == TYPE_AURAMAX)
 					auramax = key->value();
                 else if (key->key() == "Burg") {
-                    try {
-                        building = mapFile->getBuilding(atoi(key->value().text()));
-                    }
-                    catch (...) {
-                    }
+                    mapFile->getBuilding(building, atoi(key->value().text()));
                 }
                 else if (key->key() == "Schiff") {
-                    try {
-                        ship = mapFile->getShip(atoi(key->value().text()));
-                    }
-                    catch (...) {
-                    }
+                    mapFile->getShip(ship, atoi(key->value().text()));
                 }
 				else if (key->key() == "weight")
 					weight = key->value();

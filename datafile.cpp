@@ -1632,8 +1632,12 @@ datablock::itor datafile::battle(int x, int y, int plane)
 
 bool datafile::getRegion(datablock::itor &out, int x, int y, int plane)
 {
-    out = region(x, y, plane);
-    return out != m_blocks.end();
+    datablock::itor block = region(x, y, plane);
+    if (block != m_blocks.end()) {
+        out = block;
+        return true;
+    }
+    return false;
 }
 
 datablock::itor datafile::getBattle(int x, int y, int plane)
@@ -1683,8 +1687,12 @@ datablock::itor datafile::unit(int id)
 
 bool datafile::getUnit(datablock::itor& out, int id)
 {
-    out = unit(id);
-    return out != m_blocks.end();
+    datablock::itor block = unit(id);
+    if (block != m_blocks.end()) {
+        out = block;
+        return true;
+    }
+    return false;
 }
 
 datablock::itor datafile::faction(int id)
@@ -1699,8 +1707,12 @@ datablock::itor datafile::faction(int id)
 
 bool datafile::getFaction(datablock::itor& out, int id)
 {
-    out = faction(id);
-    return out != m_blocks.end();
+    datablock::itor block = faction(id);
+    if (block != m_blocks.end()) {
+        out = block;
+        return true;
+    }
+    return false;
 }
 
 datablock::itor datafile::building(int id)
@@ -1714,14 +1726,14 @@ datablock::itor datafile::building(int id)
     return building->second;
 }
 
-datablock::itor datafile::getBuilding(int id)
+bool datafile::getBuilding(datablock::itor& out, int id)
 { 
     datablock::itor block = building(id);
-    if (block == m_blocks.end()) {
-        throw std::runtime_error("building not found");
+    if (block != m_blocks.end()) {
+        out = block;
+        return true;
     }
-
-	return block;
+    return false;
 }
 
 datablock::itor datafile::ship(int id)
@@ -1735,14 +1747,14 @@ datablock::itor datafile::ship(int id)
 	return ship->second;
 }
 
-datablock::itor datafile::getShip(int id)
+bool datafile::getShip(datablock::itor& out, int id)
 {
     datablock::itor block = ship(id);
-    if (block == m_blocks.end()) {
-        throw std::runtime_error("ship not found");
+    if (block != m_blocks.end()) {
+        out = block;
+        return true;
     }
-
-    return block;
+    return false;
 }
 
 datablock::itor datafile::island(int id)
@@ -1755,14 +1767,14 @@ datablock::itor datafile::island(int id)
 	return island->second;
 }
 
-datablock::itor datafile::getIsland(int id)
+bool datafile::getIsland(datablock::itor& out, int id)
 {
     datablock::itor block = island(id);
-    if (block == m_blocks.end()) {
-        throw std::runtime_error("island not found");
+    if (block != m_blocks.end()) {
+        out = block;
+        return true;
     }
-
-    return block;
+    return false;
 }
 
 datablock::itor datafile::dummyToItor(const datablock* block)
