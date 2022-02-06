@@ -659,8 +659,8 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                             icon = gray;
                         }
                         else {
-                            try {
-                                datablock::itor faction = mapFile->getFaction(factionId);
+                            datablock::itor faction;
+                            if (mapFile->getFaction(faction, factionId)) {
                                 facPtr = &*faction;
 
                                 if (faction == selection.activefaction) {
@@ -681,8 +681,7 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                                         label.format("%s (%s)", name.text(), faction->id().text());
                                 }
                             }
-                            catch (...)
-                            {
+                            else {
                                 datablock block;
                                 block.infostr(FXStringVal(factionId));
 

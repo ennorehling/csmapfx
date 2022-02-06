@@ -184,27 +184,24 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 			if (factionId != -1 || AnotherfactionId != -1 || !group.empty())
 			{
-                datablock::itor faction, anotherfaction;
+                datablock::itor faction;
 
                 if (factionId > 0) {
-                    try
-                    {
-                        faction = mapFile->getFaction(factionId);
+                    if (mapFile->getFaction(faction, factionId)) {
                         name = faction->value(TYPE_FACTIONNAME);
                         if (name.empty())
                             label.assign("Parteigetarnt");
                         else
                             label.format("%s (%s)", name.text(), faction->id().text());
                     }
-                    catch (std::runtime_error ex) {
+                    else {
                         label.format("Unbekannt (%s)", FXStringValEx(factionId, 36).text());
                     }
                 }
 
                 if (AnotherfactionId > 0) {
-                    try
-                    {
-                        anotherfaction = mapFile->getFaction(AnotherfactionId);
+                    datablock::itor anotherfaction;
+                    if (mapFile->getFaction(anotherfaction, AnotherfactionId)) {
                         if (!label.empty())
                             label += ", ";
 
@@ -213,11 +210,11 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                         if (name.empty())
                             label2.assign("Parteigetarnt");
                         else
-                            label2.format("%s (%s)", name.text(), faction->id().text());
+                            label2.format("%s (%s)", name.text(), FXStringValEx(AnotherfactionId, 36).text());
 
                         label += label2;
                     }
-                    catch (std::runtime_error ex) {
+                    else {
                         label.format("Unbekannt (%s)", FXStringValEx(AnotherfactionId, 36).text());
                     }
                 }
@@ -428,23 +425,33 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                     const datakey::itor& t = *itag;
                     if (t->type() == TYPE_OWNER) {
                         FXint uid = FXIntVal(t->value());
-                        try {
-                            datablock::itor unit_owner = mapFile->getUnit(uid);
+                        datablock::itor unit_owner;
+                        if (mapFile->getUnit(unit_owner, uid)) {
                             FXint fid = FXIntVal(unit_owner->value(TYPE_FACTION));
-                            datablock::itor faction_owner = mapFile->getFaction(fid);
-                            label.format("%s: %s (%s), %s (%s)", t->key().text(),
-                                unit_owner->value(TYPE_NAME).text(), FXStringValEx(uid, 36).text(),
-                                faction_owner->value(TYPE_FACTIONNAME).text(), FXStringValEx(fid, 36).text()
+                            datablock::itor faction_owner;
+                            if (mapFile->getFaction(faction_owner, fid)) {
+                                label.format("%s: %s (%s), %s (%s)",
+                                    t->key().text(),
+                                    unit_owner->value(TYPE_NAME).text(),
+                                    FXStringValEx(uid, 36).text(),
+                                    faction_owner->value(TYPE_FACTIONNAME).text(),
+                                    FXStringValEx(fid, 36).text()
                                 );
-                        }
-                        catch (std::runtime_error) {
-                            label.format("%s: %s", t->key().text(), t->value().text());
+                            }
+                            else {
+                                label.format("%s: %s (%s), Unbekannt (%s)",
+                                    t->key().text(),
+                                    unit_owner->value(TYPE_NAME).text(),
+                                    FXStringValEx(uid, 36).text(),
+                                    FXStringValEx(fid, 36).text()
+                                );
+                            }
                         }
                     }
                     else {
                         label.format("%s: %s", t->key().text(), t->value().text());
                     }
-					item = list->appendItem(node, label.text());
+                    item = list->appendItem(node, label.text());
 				}
 
 				effects = end;

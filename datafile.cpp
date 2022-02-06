@@ -1630,14 +1630,10 @@ datablock::itor datafile::battle(int x, int y, int plane)
 	return block->second;
 }
 
-datablock::itor datafile::getRegion(int x, int y, int plane)
+bool datafile::getRegion(datablock::itor &out, int x, int y, int plane)
 {
-    datablock::itor block = region(x, y, plane);
-    if (block == m_blocks.end()) {
-        throw std::runtime_error("region not found");
-    }
-
-    return block;
+    out = region(x, y, plane);
+    return out != m_blocks.end();
 }
 
 datablock::itor datafile::getBattle(int x, int y, int plane)
@@ -1685,14 +1681,10 @@ datablock::itor datafile::unit(int id)
 	return unit->second;
 }
 
-datablock::itor datafile::getUnit(int id)
+bool datafile::getUnit(datablock::itor& out, int id)
 {
-    datablock::itor block = unit(id);
-    if (block == m_blocks.end()) {
-        throw std::runtime_error("unit not found");
-    }
-
-    return block;
+    out = unit(id);
+    return out != m_blocks.end();
 }
 
 datablock::itor datafile::faction(int id)
@@ -1705,14 +1697,10 @@ datablock::itor datafile::faction(int id)
 	return faction->second;
 }
 
-datablock::itor datafile::getFaction(int id)
+bool datafile::getFaction(datablock::itor& out, int id)
 {
-    datablock::itor block = faction(id);
-    if (block == m_blocks.end()) {
-        throw std::runtime_error("faction not found");
-    }
-
-    return block;
+    out = faction(id);
+    return out != m_blocks.end();
 }
 
 datablock::itor datafile::building(int id)
