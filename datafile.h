@@ -423,6 +423,9 @@ public:
             ship = state.ship;
             unit = state.unit;
             map = state.map;
+            regionsSelected = state.regionsSelected;
+            selected = state.selected;
+
         }
 	};
 

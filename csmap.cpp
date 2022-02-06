@@ -2780,7 +2780,6 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
     datafile::SelectionState state = selection;
 
     int visiblePlane = map->getVisiblePlane();
-
     bool changed;
     do
     {
