@@ -1576,11 +1576,12 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
                     int rl = scr_x + int(regionSize / 1.5), rt = scr_y + int(regionSize / 1.8);
                     int rw = int(regionSize / 4.2), rh = int(regionSize / 4.2);
                     size_t size = stats->people.size();
-                    if (size > 0)
+                    if (size == 0) {
                         stats->people.push_back(0);
-                    else if (size > sizeof(colors) / sizeof(colors[0]))
+                    }
+                    else if (size > sizeof(colors) / sizeof(colors[0])) {
                         stats->people.resize(sizeof(colors) / sizeof(colors[0]));
-
+                    }
                     int rw_part = rw / size;
 
                     for (size_t i = 0; i < size; i++)
