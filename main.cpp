@@ -74,6 +74,8 @@ void showVersion()
 	showError(help.str());
 }
 
+#define MAX_FILES 8
+
 int main(int argc, char *argv[])
 {
     PHYSFS_init(argv[0]);
@@ -192,6 +194,7 @@ int main(int argc, char *argv[])
 		shell->show(PLACEMENT_DEFAULT);
 	
 	int numfiles = 0;
+    FXString filenames[MAX_FILES + 1];
 
 	// load command argument files
 	for (; arg < argc; arg++)
@@ -235,23 +238,17 @@ int main(int argc, char *argv[])
 					showError((std::string)"csmapfx: Ung\u00fcltige Option: -" + c + "\nProbier 'csmapfx --help\' f\u00fcr m\u00f6gliche Optionen");
 			}
 		}
-		else if (argv[arg][0])		// stop here if a filename was found
+		else if (argv[arg][0] && csmap)		// stop here if a filename was found
 		{
-			if (!csmap)
-				continue;
-
-			if (!numfiles)			
-				csmap->loadFile(FXString(argv[arg]));
-			else
-				csmap->mergeFile(FXString(argv[arg]));
-			numfiles++;
+            if (numfiles < MAX_FILES) {
+                filenames[numfiles++].assign(argv[arg]);
+            }
 			startgui = true;
 		}
 	}
 
     if (numfiles > 0) {
-        csmap->updateFileNames();
-        csmap->mapChange();
+        csmap->loadFiles(filenames);
     }
 	// Programm ohne GUI beenden?
 	if (!startgui && !calculator)

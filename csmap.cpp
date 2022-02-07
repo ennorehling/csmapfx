@@ -2087,6 +2087,37 @@ long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
     return 1;
 }
 
+void CSMap::loadFiles(const FXString filenames[])
+{
+    datafile* old_cr = report;
+    if (filenames) {
+        datafile* new_cr = nullptr;
+        getApp()->beginWaitCursor();
+
+        for (int i = 0; !filenames[i].empty(); i++) {
+            FXString const& filename = filenames[i];
+            if (!report) {
+                new_cr = loadFile(filename);    // normal laden, wenn vorher keine Datei geladen ist.
+            }
+            else {
+                new_cr = mergeFile(filenames[i]);
+            }
+            if (new_cr && (new_cr != report)) {
+                report = new_cr;
+            }
+        }
+        if (old_cr != report) {
+            ++selection.fileChange;
+            // TODO: make selection to use the new report instead
+            selection.selected = selection.MAPCHANGED;
+            mapChange();
+            updateFileNames();
+            delete old_cr;
+        }
+        getApp()->endWaitCursor();
+    }
+}
+
 long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
 {
     FXFileDialog dlg(this, FXString(L"Karte hinzuf\u00fcgen..."));
@@ -2099,38 +2130,7 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
     if (res)
     {
         FXString* filenames = dlg.getFilenames();
-        datafile* old_cr = report;
-        if (filenames) {
-            datafile* new_cr = nullptr;
-            getApp()->beginWaitCursor();
-
-            for (int i = 0; filenames[i].length(); i++) {
-                FXString const& filename = filenames[i];
-                if (!filename.empty()) {
-                    if (!report) {
-                        new_cr = loadFile(filename);    // normal laden, wenn vorher keine Datei geladen ist.
-                    }
-                    else {
-                        new_cr = mergeFile(filenames[i]);
-                    }
-                    if (new_cr && (new_cr != report)) {
-                        report = new_cr;
-                    }
-                }
-            }
-
-            if (old_cr != report) {
-                ++selection.fileChange;
-                // TODO: make selection to use the new report instead
-                selection.selected = selection.MAPCHANGED;
-                mapChange();
-                updateFileNames();
-            }
-            if (old_cr != report) {
-                delete old_cr;
-            }
-            getApp()->endWaitCursor();
-        }
+        loadFiles(filenames);
     }
     return 1;
 }
