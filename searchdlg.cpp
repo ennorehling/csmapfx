@@ -562,36 +562,30 @@ long FXSearchDlg::onSelectResults(FXObject*, FXSelector, void*)
 
 	datablock* select = (datablock*)item->getData();
 
-	datablock::itor end = mapFile->blocks().end();
+    datablock::itor region, block, end = mapFile->blocks().end();
+    mapFile->findSelection(select, block, region);
 
-	datablock::itor region = end;
-
-	for (datablock::itor block = mapFile->blocks().begin(); block != end; block++)
-	{
-		if (block->type() == block_type::TYPE_REGION)
-			region = block;
-
-		if (select != &*block)
-			continue;
-
-		// propagate selection
-        datafile::SelectionState state;
-
-		state.selected = 0;
-
-		if (region != end)
-			state.region = region, state.selected |= state.REGION;
-
-		if (block->type() == block_type::TYPE_UNIT)
-			state.unit = block, state.selected |= state.UNIT;
-		else if (block->type() == block_type::TYPE_BUILDING)
-			state.building = block, state.selected |= state.BUILDING;
-		else if (block->type() == block_type::TYPE_SHIP)
-			state.ship = block, state.selected |= state.SHIP;
-
-		getOwner()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
-		return 1;
-	}
-
+    // propagate selection
+    datafile::SelectionState state;
+    state.selected = 0;
+    if (region != end) {
+        state.region = region;
+        state.selected |= state.REGION;
+    }
+    if (block != end) {
+        if (block->type() == block_type::TYPE_UNIT) {
+            state.unit = block;
+            state.selected |= state.UNIT;
+        }
+        else if (block->type() == block_type::TYPE_BUILDING) {
+            state.building = block;
+            state.selected |= state.BUILDING;
+        }
+        else if (block->type() == block_type::TYPE_SHIP) {
+            state.ship = block;
+            state.selected |= state.SHIP;
+        }
+    }
+	getOwner()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 	return 1;
 }

@@ -56,13 +56,10 @@ void FXMessages::setMapFile(datafile *f)
         if (mapFile) {
             end = mapFile->blocks().end();
             for (block = mapFile->blocks().begin(); block != end; ++block) {
-                if (block->type() == block_type::TYPE_FACTION) {
-                    datablock::itor child;
-                    for (child = block; child != end; ++child) {
-                        if (child->type() == block_type::TYPE_MESSAGE) {
-                            addMessage(groups.messages, child);
-                        }
-                    }
+                if (block->type() == block_type::TYPE_MESSAGE && block->depth() == 3) {
+                    addMessage(groups.messages, block);
+                }
+                if (block->type() == block_type::TYPE_REGION) {
                     break;
                 }
             }
@@ -261,9 +258,18 @@ long FXMessages::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
         
         datablock::itor unit;
         if (mapFile->getUnit(unit, id)) {
-			sel_state.unit = unit;
-			sel_state.selected |= sel_state.UNIT;
-		}
+            datablock* select = &*unit;
+            datablock::itor region, end = mapFile->blocks().end();
+            mapFile->findSelection(select, unit, region);
+            if (sel_state.region != end) {
+                sel_state.region = region;
+            }
+            else {
+                sel_state.selected = 0;
+            }
+            sel_state.unit = unit;
+            sel_state.selected |= sel_state.UNIT;
+        }
         else {
             return 0;
         }

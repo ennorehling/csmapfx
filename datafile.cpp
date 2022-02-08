@@ -1785,6 +1785,24 @@ datablock::itor datafile::dummyToItor(const datablock* block)
 	return m_blocks.end();
 }
 
+void datafile::findSelection(const datablock* select, datablock::itor& out, datablock::itor& region)
+{
+    datablock::itor end = m_blocks.end();
+
+    region = end;
+    out = end;
+    for (datablock::itor itor = m_blocks.begin(); itor != m_blocks.end(); ++itor) {
+        datablock& block = *itor;
+        if (block.type() == block_type::TYPE_REGION) {
+            region = itor;
+        }
+        if (&block == select) {
+            out = itor;
+            break;
+        }
+    }
+}
+
 void datafile::createHierarchy()
 {
 	typedef std::vector<block_type> stack;

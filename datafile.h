@@ -369,6 +369,7 @@ public:
     bool deleteRegion(datablock* region);
     datablock::itor dummyToItor(const datablock* block);
 
+    void findSelection(const datablock* select, datablock::itor& out, datablock::itor& region);
 	typedef std::list<datafile>::iterator itor;
 
 	// data of selection state (what region, what unit is actually selected?)
