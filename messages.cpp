@@ -70,21 +70,35 @@ void FXMessages::setMapFile(datafile *f)
 void FXMessages::addMessage(FXTreeItem* group, datablock::itor& block)
 {
     FXTreeItem* item = appendItem(group, block->value("rendered"));
-    FXival unit = block->valueInt("target");
+    FXival uid = block->valueInt("target");
 
-    if (unit <= 0)
-        unit = block->valueInt("unit");
-    if (unit <= 0)
-        unit = block->valueInt("mage");
-    if (unit <= 0)
-        unit = block->valueInt("spy");
-    if (unit <= 0)
-        unit = block->valueInt("teacher");
-    if (unit > 0) {
-        item->setData((void*)unit);
+    if (uid <= 0)
+        uid = block->valueInt("unit");
+    if (uid <= 0)
+        uid = block->valueInt("mage");
+    if (uid <= 0)
+        uid = block->valueInt("spy");
+    if (uid <= 0)
+        uid = block->valueInt("teacher");
+
+    datablock::itor select;
+    if (uid > 0 && mapFile->getUnit(select, uid)) {
+        item->setData((void*)&*select);
     }
     else {
-        item->setData(nullptr);
+        FXString loc = block->value("region");
+        if (loc.empty()) {
+            item->setData(nullptr);
+        }
+        else {
+            int x, y, plane;
+            x = FXIntVal(loc.section(' ', 0));
+            y = FXIntVal(loc.section(' ', 1));
+            plane = FXIntVal(loc.section(' ', 2));
+            if (mapFile->getRegion(select, x, y, plane)) {
+                item->setData((void*)&*select);
+            }
+        }
     }
 }
 
@@ -249,29 +263,29 @@ long FXMessages::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 		return FXTreeList::onDoubleClicked(sender, sel, ptr);
 
 	// select MESSAGE.unit on double-click
-    if (int id = (FXival)item->getData())
+    datablock* select = (datablock*)item->getData();
+    if (select != nullptr)
 	{
         datafile::SelectionState sel_state;
+        sel_state.selected = 0;
 
-		sel_state.selected = selection.selected & selection.REGION;
-		sel_state.region = selection.region;
-        
-        datablock::itor unit;
-        if (mapFile->getUnit(unit, id)) {
-            datablock* select = &*unit;
-            datablock::itor region, end = mapFile->blocks().end();
-            mapFile->findSelection(select, unit, region);
-            if (sel_state.region != end) {
-                sel_state.region = region;
+        if (select->type() == block_type::TYPE_REGION) {
+            if (mapFile->getRegion(sel_state.region, select->x(), select->y(), select->info())) {
+                sel_state.selected = selection.selected & selection.REGION;
             }
-            else {
-                sel_state.selected = 0;
-            }
-            sel_state.unit = unit;
-            sel_state.selected |= sel_state.UNIT;
         }
         else {
-            return 0;
+            datablock::itor block;
+            datablock::itor region, end = mapFile->blocks().end();
+            mapFile->findSelection(select, block, region);
+            if (region != end) {
+                sel_state.region = region;
+                sel_state.selected = selection.selected & selection.REGION;
+            }
+            if (select->type() == block_type::TYPE_UNIT) {
+                sel_state.unit = block;
+                sel_state.selected |= sel_state.UNIT;
+            }
         }
 
 		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
