@@ -738,9 +738,6 @@ int datafile::load(const char* filename)
 		}
 	}
 
-	createHierarchy();		// set depth field of blocks
-	createHashTables();		// creates hash tables and set region flags
-
 	return m_blocks.size();
 }
 
