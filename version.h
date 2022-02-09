@@ -11,7 +11,7 @@
 #define CSMAP_APP_VERSION    1, 0, 0
 
     // application version string
-#define CSMAP_APP_VERSIONSTR "v1.0 RC3"
+#define CSMAP_APP_VERSIONSTR "v1.0 RC5"
 
 	// application title with full version string
 #define CSMAP_APP_TITLE_VERSION CSMAP_APP_TITLE " " CSMAP_APP_VERSIONSTR
