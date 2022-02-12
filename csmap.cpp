@@ -1651,8 +1651,6 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
     getApp()->beginWaitCursor();
-    // reset state
-    selection.selected = 0;
 
     if (report) {
         updateFileNames();
@@ -1850,16 +1848,12 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         }
     }
 
-    // save new selection state
-    selection.selected = pstate->selected;
-    selection.region = pstate->region;
-    selection.faction = pstate->faction;
-    selection.building = pstate->building;
-    selection.ship = pstate->ship;
-    selection.unit = pstate->unit;
-
-    selection.regionsSelected = pstate->regionsSelected;
-    ++selection.selChange;
+    // save new selection state, mark dirty (update selChange)
+    int selChange = selection.selChange + 1;
+    int fileChange = selection.fileChange;
+    selection = *pstate;
+    selection.selChange = selChange;
+    selection.fileChange = fileChange;
 
     // make sure that a region is always selected (when something in it is selected)
     if (!(selection.selected & selection.REGION))
