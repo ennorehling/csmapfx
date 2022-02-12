@@ -1077,6 +1077,7 @@ void datafile::merge(datafile * new_cr)
             else // append region to old cr
             {
                 copy_children = true;
+                block->attachment(nullptr);
                 m_blocks.push_back(*block);
             }
         }
