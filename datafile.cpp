@@ -1031,9 +1031,8 @@ void datafile::mergeBlock(datablock::itor& block, const datablock::itor& begin, 
 void datafile::merge(datafile * new_cr)
 {
     // dann: Datei an den aktuellen CR anfuegen (nur Karteninformationen)
-    datablock regionblock;
-    regionblock.string("REGION");
     datablock::itor new_end = new_cr->m_blocks.end();
+    bool copy_children = false;
     for (datablock::itor block = new_cr->m_blocks.begin(); block != new_end;)
     {
         // handle only regions
@@ -1045,8 +1044,10 @@ void datafile::merge(datafile * new_cr)
             FXint plane = block->info();
             datablock::itor oldr = region(x, y, plane);
 
+
             if (oldr != m_blocks.end())            // add some info to old cr (island names)
             {
+                copy_children = false;
                 if (const datakey* islandkey = block->valueKey(TYPE_ISLAND)) {
                     if (!oldr->valueKey(TYPE_ISLAND))
                     {
@@ -1073,45 +1074,21 @@ void datafile::merge(datafile * new_cr)
                 }
                 continue;
             }
-            else // add region to old cr
+            else // append region to old cr
             {
-                m_blocks.push_back(regionblock);
-                datablock& newblock = m_blocks.back();
-
-                newblock.infostr(FXString().format("%d %d %d", x, y, plane));
-                newblock.terrain(block->terrain());
-
-                FXString name = block->value(TYPE_NAME);
-                FXString terrain = block->value(TYPE_TERRAIN);
-                FXString island = block->value(TYPE_ISLAND);
-                FXString turn = block->value(TYPE_TURN);
-                FXString id = block->value(TYPE_ID);
-
-                datakey key;
-
-                if (!name.empty())
-                {
-                    key.key("Name"); key.value(name); newblock.data().push_back(key);
-                }
-                if (!terrain.empty())
-                {
-                    key.key("Terrain"); key.value(terrain); newblock.data().push_back(key);
-                }
-                if (!island.empty())
-                {
-                    key.key("Insel"); key.value(island); newblock.data().push_back(key);
-                }
-                if (!id.empty())
-                {
-                    key.key("id"); key.value(id); newblock.data().push_back(key);
-                }
-
-                key.key("Runde");
-                if (turn.empty())
-                    key.value(FXStringVal(m_turn));
-                else
-                    key.value(turn);
-                newblock.data().push_back(key);
+                copy_children = true;
+                m_blocks.push_back(*block);
+            }
+        }
+        else if (copy_children) {
+            /* part of a new region that is appended to the report, copy detail blocks */
+            switch (block->type()) {
+            case block_type::TYPE_BUILDING:
+            case block_type::TYPE_PRICES:
+            case block_type::TYPE_BORDER:
+            case block_type::TYPE_RESOURCE:
+                m_blocks.push_back(*block);
+                break;
             }
         }
         ++block;
