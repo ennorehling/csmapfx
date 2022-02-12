@@ -417,6 +417,7 @@ public:
             sel_plane = state.sel_plane;
             selChange = state.selChange;
             fileChange = state.fileChange;
+            selChange = state.selChange;
             selected = state.selected;
             region = state.region;
             faction = state.faction;
