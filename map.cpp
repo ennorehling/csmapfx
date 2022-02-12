@@ -171,11 +171,11 @@ void FXCSMap::calculateContentSize()
 	}
 
 	// auf 'unmoegliche' Werte initialisieren
-	FXint min_x =  0x0FFFFFFF;
-	FXint max_x = -0x0FFFFFFF;
+	FXint min_x = INT_MAX;
+	FXint max_x = INT_MIN;
 
-	FXint min_y =  0x0FFFFFFF;
-	FXint max_y = -0x0FFFFFFF;
+	FXint min_y = INT_MAX;
+	FXint max_y = INT_MIN;
 
 	FXint regionSize = FXint(64*scale);
 
@@ -2058,99 +2058,6 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
 			scroll = true;
 		}
-
-		if (mapFile && (selection.selected & selection.REGION) && (selection.selected & selection.UNIT))
-		{
-            getApp()->beginWaitCursor();
-            // parse commands of selected unit and show traveller arrows
-			datablock::itor unit = selection.unit;
-
-			datablock::itor end = mapFile->blocks().end();
-			datablock::itor block = unit;
-			for (block++; block != end && block->depth() > unit->depth(); block++)
-				if (block->type() == block_type::TYPE_COMMANDS)
-					break;				// found
-
-            // found commands block
-			if (block != end && block->type() == block_type::TYPE_COMMANDS)
-			{
-								// NW, NO, O, SO, SW, W
-				/*
-				int offset_x[6] = { -1,  0, +1, +1,  0, -1 };
-				int offset_y[6] = { +1, +1,  0, -1, -1,  0 };
-
-				datakey::list_type &cmds = block->data();
-
-				for (datakey::itor itor = cmds.begin(); itor != cmds.end(); itor++)
-				{
-					FXString line = itor->value();
-					FXString cmd = line.before(' ');
-					cmd.upper();
-
-					if (cmd != "NACH" && cmd != "ROUTE")
-						continue;
-
-					FXCSMap::arrow arrow;
-					int x = selection.region->x();
-					int y = selection.region->y();
-					int paused = 0;
-
-					while (!(line = line.after(' ').trimBegin()).empty())
-					{
-						cmd = line.before(' ');
-						if (cmd.empty())
-							cmd = line;
-						cmd.upper();
-
-						int dir = -1;
-
-						if (cmd == "NW")
-							dir = 0;
-						else if (cmd == "NO")
-							dir = 1;
-						else if (cmd == "O")
-							dir = 2;
-						else if (cmd == "SO")
-							dir = 3;
-						else if (cmd == "SW")
-							dir = 4;
-						else if (cmd == "W")
-							dir = 5;
-						//else if (!strncmp(cmd.text(), "NORDWESTEN", cmd.length()))
-						//	dir = 0;
-						//else if (!strncmp(cmd.text(), "NORDOSTEN", cmd.length()))
-						//	dir = 1;
-						else if (!strncmp(cmd.text(), "OSTEN", cmd.length()))
-							dir = 2;
-						//else if (!strncmp(cmd.text(), "S\u00dcDOSTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDOSTEN", cmd.length()))
-						//	dir = 3;
-						//else if (!strncmp(cmd.text(), "S\u00dcDWESTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDWESTEN", cmd.length()))
-						//	dir = 4;
-						else if (!strncmp(cmd.text(), "WESTEN", cmd.length()))
-							dir = 5;
-						else if (!strncmp(cmd.text(), "PAUSE", cmd.length()))
-						{
-							paused++;
-							continue;
-						}
-						else
-							break;
-
-						arrow.x = x; arrow.y = y;
-						arrow.dir = dir;
-						arrow.color = paused ? arrow::ARROW_GREY : arrow::ARROW_RED;
-						unitArrows.push_back(arrow);
-
-						x += offset_x[dir]; y += offset_y[dir];
-					}
-				}
-				*/
-
-				//arrows.insert(arrows.end(), unitArrows.begin(), unitArrows.end());
-			}
-            getApp()->endWaitCursor();
-        }
-
 		map->update();
 	}
 
