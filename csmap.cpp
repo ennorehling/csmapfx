@@ -2163,8 +2163,8 @@ void CSMap::loadFiles(const FXString filenames[])
                 report = new_cr;
             }
         }
+        ++selection.fileChange;
         if (old_cr != report) {
-            ++selection.fileChange;
             if (rebuild) {
                 // rebuild the resulting report
                 report->createHierarchy();		// set depth field of blocks
