@@ -1648,13 +1648,17 @@ void CSMap::updateFileNames() {
 
 long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 {
-    datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
+    datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
 
     getApp()->beginWaitCursor();
 
     if (report) {
         updateFileNames();
     }
+
+    // save new selection state, mark dirty (update selChange)
+    selection.selected = pstate->selected;
+    ++selection.selChange;
 
     // file change notification
     if (pstate->map & selection.MAPCHANGED)
@@ -1671,14 +1675,14 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
         // store flags
         selection.fileChange++;
-        selection.map = pstate->map & ~(selection.ACTIVEFACTION|selection.MAPCHANGED|selection.NEWFILE);
+        selection.map = pstate->map & ~(selection.ACTIVEFACTION | selection.MAPCHANGED | selection.NEWFILE);
 
         // delete all planes except default
         planes->clearItems();        // clear planes
         planes->appendItem("Standardebene (0)", NULL, (void*)0);
         planes->setNumVisible(planes->getNumItems());
 
-        FXWindow *nextw, *item = planemenu->getFirst();
+        FXWindow* nextw, * item = planemenu->getFirst();
         if (item)
             item = item->getNext();
         while (item)
@@ -1728,7 +1732,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
                 }
                 planes->appendItem(label, NULL, (void*)p);
 
-                FXMenuRadio *radio = new FXMenuRadio(planemenu,label, this,ID_MAP_VISIBLEPLANE,0);
+                FXMenuRadio* radio = new FXMenuRadio(planemenu, label, this, ID_MAP_VISIBLEPLANE, 0);
                 radio->setUserData((void*)p);
                 radio->create();
             }
@@ -1789,7 +1793,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
                     float f_points = (float)points;
                     float f_average = (float)average;
 
-                    FXString percent = FXStringVal(FXint(f_points*100/f_average));
+                    FXString percent = FXStringVal(FXint(f_points * 100 / f_average));
 
                     menu.points->setText("Punkte: " + FXStringVal(points) + " (" + percent + "% von " + FXStringVal(average) + ")");
                     menu.points->show();
@@ -1860,6 +1864,11 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
             // pstate may be pointing to blocks in an older report, point to the current report instead.
             datablock::itor end = report->blocks().end();
             datablock::itor block, region = end;
+
+            // HACK: multi-select is difficult to update, clear it:
+            selection.selected &= ~selection.MULTIPLE_REGIONS;
+            selection.regionsSelected.clear();
+
             for (block = report->blocks().begin(); block != report->blocks().end(); ++block) {
                 if (block->type() == block_type::TYPE_REGION)
                 {
@@ -1888,7 +1897,11 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
             }
         }
     }
-    else {
+    else
+    {
+        if (pstate->selected & selection.MULTIPLE_REGIONS) {
+            selection.regionsSelected = pstate->regionsSelected;
+        }
         if (pstate->selected & selection.REGION) {
             selection.region = pstate->region;
         }
@@ -1904,9 +1917,6 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
             selection.sel_plane = pstate->sel_plane;
         }
     }
-    // save new selection state, mark dirty (update selChange)
-    selection.selected = pstate->selected;
-    ++selection.selChange;
 
     // make sure that a region is always selected (when something in it is selected)
     if (!(selection.selected & selection.REGION))
