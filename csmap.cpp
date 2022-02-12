@@ -1846,14 +1846,67 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
             if (menu.faction->isEnabled())
                 menu.faction->disable();
         }
+        if (pstate->selected & selection.REGION) {
+            selection.sel_x = pstate->region->x();
+            selection.sel_y = pstate->region->y();
+            selection.sel_plane = pstate->region->info();
+        }
+        else {
+            selection.sel_x = pstate->sel_x;
+            selection.sel_y = pstate->sel_y;
+            selection.sel_plane = pstate->sel_plane;
+        }
+        if (report && pstate->selected) {
+            // pstate may be pointing to blocks in an older report, point to the current report instead.
+            datablock::itor end = report->blocks().end();
+            datablock::itor block, region = end;
+            for (block = report->blocks().begin(); block != report->blocks().end(); ++block) {
+                if (block->type() == block_type::TYPE_REGION)
+                {
+                    region = block;
+                    if ((pstate->selected & (selection.REGION | selection.UNKNOWN_REGION)) &&
+                        (block->x() == selection.sel_x) &&
+                        (block->y() == selection.sel_y) &&
+                        (block->info() == selection.sel_plane))
+                    {
+                        selection.region = block;
+                        selection.selected |= selection.REGION;
+                    }
+                }
+                else if (block->type() == block_type::TYPE_UNIT)
+                {
+                    if (pstate->selected & selection.UNIT &&
+                        block->info() == pstate->unit->info())
+                    {
+                        selection.region = region;
+                        selection.selected |= selection.REGION;
+                        selection.unit = block;
+                        selection.selected |= selection.UNIT;
+                        break;
+                    }
+                }
+            }
+        }
     }
-
+    else {
+        if (pstate->selected & selection.REGION) {
+            selection.region = pstate->region;
+        }
+        if (pstate->selected & selection.UNIT) {
+            selection.unit = pstate->unit;
+        }
+        if (pstate->selected & selection.FACTION) {
+            selection.faction = pstate->faction;
+        }
+        if (pstate->selected & selection.UNKNOWN_REGION) {
+            selection.sel_x = pstate->sel_x;
+            selection.sel_y = pstate->sel_y;
+            selection.sel_plane = pstate->sel_plane;
+        }
+    }
     // save new selection state, mark dirty (update selChange)
-    int selChange = selection.selChange + 1;
-    int fileChange = selection.fileChange;
-    selection = *pstate;
-    selection.selChange = selChange;
-    selection.fileChange = fileChange;
+    selection.selected = pstate->selected;
+    ++selection.selChange;
 
     // make sure that a region is always selected (when something in it is selected)
     if (!(selection.selected & selection.REGION))

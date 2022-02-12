@@ -427,7 +427,6 @@ public:
             map = state.map;
             regionsSelected = state.regionsSelected;
             selected = state.selected;
-
         }
 	};
 
