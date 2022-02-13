@@ -1014,10 +1014,11 @@ int datafile::save(const char* filename, map_type map_filter)
 void datafile::mergeBlock(datablock::itor& block, const datablock::itor& begin, const datablock::itor& end, block_type parent_type)
 {
     block_type type = block->type();
+    int info = block->info();
     datablock::itor child = begin;
     datablock::itor insert = begin;
     for (child++; child != end && child->type() != parent_type; ++child) {
-        if (child->type() == type) {
+        if (child->type() == type && child->info() == info) {
             // we already have a block of this type
             break;
         }
