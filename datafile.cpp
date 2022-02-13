@@ -578,6 +578,17 @@ void datablock::attachment(::attachment* attach)
 	m_attachment = attach;
 }
 
+bool datablock::hasKey(const datakey& key) const
+{
+    for (datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
+    {
+        if (srch->type() == key.type() && srch->key() == key.key()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 const FXString datablock::value(const char* key) const
 {
 	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
@@ -791,10 +802,7 @@ int datafile::save(const char* filename, map_type map_filter)
 
         if (map_filter == map_type::MAP_MINIMAL) {
             /* skip over anything except version or region  */
-            if (type == block_type::TYPE_REGION) {
-                hideKeys = true;
-            }
-            else if (type != block_type::TYPE_VERSION) {
+            if (type != block_type::TYPE_REGION && type != block_type::TYPE_VERSION) {
                 continue;
             }
         }
@@ -841,34 +849,6 @@ int datafile::save(const char* filename, map_type map_filter)
 		if (type == block_type::TYPE_REGION)
 		{
             file << '\"' << block->terrainString().text() << "\";Terrain" << std::endl;
-            if (map_filter != map_type::MAP_FULL) {
-                // Nur Name-Tag und Terrain-Tag ausgeben
-                FXString name = block->value(TYPE_NAME);
-                if (!name.empty())
-                {
-                    file << '\"';
-
-                    for (int i = 0; i < name.length(); i++)
-                    {
-                        char c = name[i];
-
-                        if (c == '\\' || c == '\"')
-                            file << '\\';
-
-                        if (c == '\n')
-                            file << "\\n";
-                        else
-                            file << c;
-                    }
-
-                    file << "\";Name" << std::endl;
-                }
-
-                if (const datakey* islandkey = block->valueKey(TYPE_ISLAND))
-                {
-                    file << '\"' << islandkey->value().text() << "\";" << islandkey->key().text() << std::endl;
-                }
-            }
         }
 		// Konfiguration-Block anpassen und Charset auf ISO-8859-1 setzen
 		else if (type == block_type::TYPE_VERSION)
@@ -956,8 +936,18 @@ int datafile::save(const char* filename, map_type map_filter)
             }
 			else if (type == block_type::TYPE_REGION)
 			{
-                if (map_filter != map_type::MAP_FULL && tags->type() == TYPE_VISIBILITY)
-                    continue;
+                if (map_filter != map_type::MAP_FULL)
+                {
+                    if (tags->type() == TYPE_VISIBILITY) {
+                        continue;
+                    }
+                    if (map_filter == map_type::MAP_MINIMAL)
+                    {
+                        int ttype = tags->type();
+                        if (ttype != TYPE_NAME && ttype != TYPE_ISLAND && ttype != TYPE_ID)
+                            continue;
+                    }
+                }
 			}
 			else if (type == block_type::TYPE_UNIT)
 			{
@@ -1049,6 +1039,14 @@ void datafile::merge(datafile * new_cr)
             if (oldr != m_blocks.end())            // add some info to old cr (island names)
             {
                 copy_children = false;
+                if (!is_seen) {
+                    for (const datakey& key : block->data())
+                    {
+                        if (!oldr->hasKey(key)) {
+                            oldr->data().push_back(key);
+                        }
+                    }
+                }
                 if (const datakey* islandkey = block->valueKey(TYPE_ISLAND)) {
                     if (!oldr->valueKey(TYPE_ISLAND))
                     {

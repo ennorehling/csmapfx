@@ -52,7 +52,7 @@ public:
 	~datakey() {}
 
 	const FXString& value() const { return m_value; }
-	int type() const { return (m_type & TYPE_MASK); }
+	key_type type() const { return (key_type)(m_type & TYPE_MASK); }
 	const FXString key() const;
 
 	void key(const FXString& s);
@@ -235,6 +235,7 @@ public:
 	
 	const FXString terrainString() const;
 
+	bool hasKey(const datakey& key) const;
 	const FXString value(const char* key) const;
 	const FXString value(key_type key) const;
 	int valueInt(const char* key, int def = 0) const;
