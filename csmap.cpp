@@ -3019,8 +3019,9 @@ long CSMap::onHelpAbout(FXObject*, FXSelector, void*)
 
     return 1;
 }
+
 void CSMap::beginLoading(const FXString& filename)
 {
-    FXString app_title = CSMAP_APP_TITLE " - lade " + filename;
-    handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &app_title);
+    FXString app_title = "Lade " + filename + "...";
+    status->getStatusLine()->setText(app_title);
 }
