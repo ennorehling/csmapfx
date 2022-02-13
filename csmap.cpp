@@ -3010,7 +3010,7 @@ long CSMap::onHelpAbout(FXObject*, FXSelector, void*)
     abouttext.append("\n\n" CSMAP_APP_COPYRIGHT "\nWeb: " CSMAP_APP_URL);
     abouttext.append("\n\nSpecial thanks to Xolgrim for assembling Eressea rules information.\nThanks to all users for suggesting features and finding bugs.");
     abouttext.append("\n\nThis software uses the FOX Toolkit Library (http://www.fox-toolkit.org).");
-    abouttext.append("\nThis software uses the TinyExpr library (https://github.com/codeplea/tinyexpr).");
+    abouttext.append("\nThis software uses the mJS library (https://github.com/cesanta/mjs).");
     abouttext.append("\nThis software is based in part on the work of the Independent JPEG Group.");
 
     FXMessageBox about(this, "Wer mich schuf...", abouttext, getIcon(), MBOX_OK);
