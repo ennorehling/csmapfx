@@ -1586,35 +1586,32 @@ long CSMap::onUpdMapSetModus(FXObject* sender, FXSelector, void* ptr)
 
 void CSMap::updateFileNames() {
     // change window title and status bar
-    FXString titlestr;
+    FXString titlestr = CSMAP_APP_TITLE_VERSION;
 
-    // get report file name
-    FXString filenames = FXPath::name(report->filename());
+    if (report) {
+        // get report file name
+        FXString filenames = FXPath::name(report->filename());
 
-    // append command file name, if any
-    if (!report->cmdfilename().empty())
-    {
-        filenames += ", ";
-        filenames += FXPath::name(report->cmdfilename());
+        // append command file name, if any
+        if (!report->cmdfilename().empty())
+        {
+            filenames += ", ";
+            filenames += FXPath::name(report->cmdfilename());
 
-        // mark modified command file with an asterisk
-        if (report->modifiedCmds())
-            filenames += "*";
+            // mark modified command file with an asterisk
+            if (report->modifiedCmds())
+                filenames += "*";
+        }
+        else if (report->modifiedCmds())
+            filenames += ", *";
+
+        // put the filenames in the title
+        titlestr = CSMAP_APP_TITLE;
+        titlestr += " - [" + filenames + "]";
+        // update filename in statusbar
+        status_file->setText(filenames);
+        status_file->show(), status_lfile->show();
     }
-    else if (report->modifiedCmds())
-        filenames += ", *";
-
-    // put the filenames in the title
-    titlestr += " - [" + filenames + "]";
-
-    // update filename in statusbar
-    status_file->setText(filenames);
-    status_file->show(), status_lfile->show();
-
-    if (titlestr.empty())
-        titlestr = CSMAP_APP_TITLE_VERSION;
-    else
-        titlestr = CSMAP_APP_TITLE + titlestr;
 
     handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &titlestr);
 }
@@ -1930,6 +1927,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         status_turn->show(), status_lturn->show();
     }
     else {
+        status_turn->hide(); status_lturn->hide();
         status_file->hide(), status_lfile->hide();
         status->recalc();
     }
@@ -2381,6 +2379,7 @@ long CSMap::onFileClose(FXObject*, FXSelector, void*)
 {
     bool res = closeFile();
     mapChange();
+    updateFileNames();
     return res ? 1 : 0;
 }
 
