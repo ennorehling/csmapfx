@@ -975,9 +975,7 @@ datafile* CSMap::mergeFile(const FXString& filename)
 {
     // zuerst: Datei normal laden
     datafile* new_cr = new datafile;
-    FXString app_title = CSMAP_APP_TITLE " - lade " + filename;
-
-    handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &app_title);
+    beginLoading(filename);
 
     try
     {
@@ -1612,32 +1610,6 @@ void CSMap::updateFileNames() {
     // update filename in statusbar
     status_file->setText(filenames);
     status_file->show(), status_lfile->show();
-
-    if (selection.selected & selection.MULTIPLE_REGIONS)
-    {
-        titlestr.append(FXString().format(" - [%zu Regionen markiert]", selection.regionsSelected.size()));
-    }
-
-
-    if (selection.selected & (selection.REGION | selection.UNKNOWN_REGION))
-    {
-        FXString label, name, terrain = "Unbekannt";
-
-        if (selection.selected & selection.REGION)
-        {
-            const datablock &region = *selection.region;
-
-            name = region.value(TYPE_NAME);
-            terrain = region.terrainString();
-        }
-
-        if (name.empty())
-            label.format(" - %s (%d,%d)", terrain.text(), selection.sel_x, selection.sel_y);
-        else
-            label.format(" - %s von %s (%d,%d)", terrain.text(), name.text(), selection.sel_x, selection.sel_y);
-
-        titlestr.append(label);
-    }
 
     if (titlestr.empty())
         titlestr = CSMAP_APP_TITLE_VERSION;
