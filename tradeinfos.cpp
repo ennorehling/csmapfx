@@ -53,6 +53,7 @@ void FXTradeInfos::create()
 
 FXTradeInfos::~FXTradeInfos()
 {
+    clearLabels();
 }
 
 void FXTradeInfos::setMapFile(datafile *f)

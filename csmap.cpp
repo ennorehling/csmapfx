@@ -1014,6 +1014,7 @@ datafile* CSMap::mergeFile(const FXString& filename)
     datafile* result = report;
     if (new_turn <= turn) {
         report->merge(new_cr);
+        delete new_cr;
     }
     else {
         new_cr->merge(report);
@@ -1952,7 +1953,11 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         selection.sel_plane = selection.region->info();
     }
 
-    if (!report) {
+    if (report) {
+        status_turn->setText(FXStringVal(report->turn()));
+        status_turn->show(), status_lturn->show();
+    }
+    else {
         status_file->hide(), status_lfile->hide();
         status->recalc();
     }
@@ -1966,14 +1971,10 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
         status_faction->setText(faction);
         status_faction->show(), status_lfaction->show();
-
-        status_turn->setText(FXStringVal(report->turn()));
-        status_turn->show(), status_lturn->show();
     }
     else
     {
         status_faction->hide(), status_lfaction->hide();
-        status_turn->hide(), status_lturn->hide();
         status->recalc();
     }
 
@@ -2160,6 +2161,9 @@ void CSMap::loadFiles(const FXString filenames[])
                 rebuild = true;
             }
             if (new_cr && (new_cr != report)) {
+                if (old_cr != report) {
+                    delete report;
+                }
                 report = new_cr;
             }
         }

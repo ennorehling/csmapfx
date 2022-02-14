@@ -38,8 +38,8 @@ protected:
 	// Tradeinfos
 	struct
 	{
-		FXLabel *luxury, *luxuryVolume, *luxuryDummy;
-		FXLabel *selled, *selledPrice, *selledDummy;
+		FXLabel *luxury, *luxuryVolume;
+		FXLabel *selled, *selledPrice;
         
 		FXFrame *matrixsep;
 		FXHorizontalFrame *matrixframe;

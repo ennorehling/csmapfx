@@ -115,9 +115,10 @@ FXFileDialogEx::~FXFileDialogEx() {
     }
   delete [] m_pszFoxPats;
   delete [] m_pszFoxCustomPat;
+  delete[] m_filenames;
 
   delete m_ofn;
-  }
+}
 
 /*-----------------------------------------------------------------*\
  * 
