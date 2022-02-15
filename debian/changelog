@@ -1,3 +1,17 @@
+csmapfx (1.0.0-1) stable; urgency=low
+
+  * always keep more recent information during merge
+  * improved placement of cursor when clicking on messages
+  * add list of battles to message list
+  * bugfix: closing files resets the GUI state.
+  * cursor can now select unknown regions.
+  * eliminate memory leak when merging multiple files at once
+  * bugfix: save complete region data
+  * bugfix: open reports from program arguments
+  * bugfix: population graph had disappeared
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 15 Feb 2022 14:00:00 +0200
+
 csmapfx (0.9.20-1) stable; urgency=low
 
   * show an icon for battles
