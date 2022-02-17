@@ -2143,11 +2143,11 @@ void CSMap::loadFiles(const FXString filenames[])
         report->createHashTables();		// creates hash tables and set region flags
         if (old_cr != report) {
             // TODO: make selection to use the new report instead
-            selection.selected |= selection.MAPCHANGED;
-            mapChange();
-            updateFileNames();
             delete old_cr;
         }
+        selection.selected |= selection.MAPCHANGED;
+        mapChange();
+        updateFileNames();
         getApp()->endWaitCursor();
     }
 }
