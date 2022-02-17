@@ -422,7 +422,7 @@ FXint FXCSMap::GetHexFromScreenY(FXint scrx, FXint scry)
 
 FXint FXCSMap::GetHexFromScreenX(FXint scrx, FXint scry)
 {
-	return (FXint)floorf((scrx) / 64.0f/scale - GetHexFromScreenY(scrx, scry)/2.0f);
+	return (FXint)floorf(scrx / 64.0f/scale - GetHexFromScreenY(scrx, scry)/2.0f);
 }
 
 FXint FXCSMap::GetScreenFromHexY(FXint /*x*/, FXint y)

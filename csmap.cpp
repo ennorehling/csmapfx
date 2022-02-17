@@ -2104,6 +2104,8 @@ long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
             beginLoading(filename);
             if (nullptr != (report = loadFile(filename))) {
                 updateFileNames();
+                report->createHierarchy();		// set depth field of blocks
+                report->createHashTables();		// creates hash tables and set region flags
                 mapChange();
                 recentFiles.appendFile(filename);
             }
@@ -2119,7 +2121,6 @@ void CSMap::loadFiles(const FXString filenames[])
     if (filenames) {
         datafile* new_cr = nullptr;
         getApp()->beginWaitCursor();
-        bool rebuild = false;
 
         for (int i = 0; !filenames[i].empty(); i++) {
             FXString const& filename = filenames[i];
@@ -2128,7 +2129,6 @@ void CSMap::loadFiles(const FXString filenames[])
             }
             else {
                 new_cr = mergeFile(filenames[i]);
-                rebuild = true;
             }
             if (new_cr && (new_cr != report)) {
                 if (old_cr != report) {
@@ -2138,12 +2138,10 @@ void CSMap::loadFiles(const FXString filenames[])
             }
         }
         ++selection.fileChange;
+        // rebuild the resulting report
+        report->createHierarchy();		// set depth field of blocks
+        report->createHashTables();		// creates hash tables and set region flags
         if (old_cr != report) {
-            if (rebuild) {
-                // rebuild the resulting report
-                report->createHierarchy();		// set depth field of blocks
-                report->createHashTables();		// creates hash tables and set region flags
-            }
             // TODO: make selection to use the new report instead
             selection.selected |= selection.MAPCHANGED;
             mapChange();

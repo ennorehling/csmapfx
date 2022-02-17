@@ -54,7 +54,11 @@ Section "CsMapFX (required)"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CsMapFX" "NoModify" 1
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CsMapFX" "NoRepair" 1
   WriteUninstaller "$INSTDIR\uninstall.exe"
-  
+
+  # register file extension
+  WriteRegStr HKCR ".cr" "" "CsMapFX"
+  WriteRegStr HKCR "CsMapFX\Shell\open\command" "" '"$INSTDIR\CsMapFX.exe" %1'
+
 SectionEnd
 
 Section "Additional Game Information"
@@ -97,5 +101,10 @@ Section "Uninstall"
   ; Remove directories
   RMDir "$SMPROGRAMS\CsMapFX"
   RMDir "$INSTDIR"
+
+  ; Remove extension association
+  DeleteRegKey HKCR ".cr"
+  ReadRegStr $0 ".cr" ""
+  DeleteRegKey HKCR "$0"
 
 SectionEnd
