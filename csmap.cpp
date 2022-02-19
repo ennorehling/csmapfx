@@ -2141,13 +2141,13 @@ void CSMap::loadFiles(const FXString filenames[])
         // rebuild the resulting report
         report->createHierarchy();		// set depth field of blocks
         report->createHashTables();		// creates hash tables and set region flags
+        selection.selected |= selection.MAPCHANGED;
+        mapChange();
+        updateFileNames();
         if (old_cr != report) {
             // TODO: make selection to use the new report instead
             delete old_cr;
         }
-        selection.selected |= selection.MAPCHANGED;
-        mapChange();
-        updateFileNames();
         getApp()->endWaitCursor();
     }
 }
