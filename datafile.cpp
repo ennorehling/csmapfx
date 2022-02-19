@@ -1043,7 +1043,7 @@ void datafile::merge(datafile * new_cr)
         // handle only regions
         if (block->type() == block_type::TYPE_REGION)
         {
-            bool is_seen = !!(block->flags() & datablock::FLAG_REGION_SEEN);
+            bool is_seen = 0 != (block->flags() & datablock::FLAG_REGION_SEEN);
             FXint x = block->x();
             FXint y = block->y();
             FXint plane = block->info();
@@ -1052,9 +1052,9 @@ void datafile::merge(datafile * new_cr)
 
             if (oldr != m_blocks.end())            // add some info to old cr (island names)
             {
+                bool overwrite = is_seen || (0 == (oldr->flags() & datablock::FLAG_REGION_SEEN));
                 copy_children = false;
-                if (!is_seen)
-                {
+                if (overwrite) {
                     for (const datakey& key : block->data())
                     {
                         if (key.type() == TYPE_NAME || key.type() == TYPE_TERRAIN) {
@@ -1080,7 +1080,7 @@ void datafile::merge(datafile * new_cr)
                     block_type type = block->type();
                     if (type == block_type::TYPE_BORDER || type == block_type::TYPE_RESOURCE)
                     {
-                        if (!is_seen) {
+                        if (overwrite) {
                             // we cannot see this region, should we replace what we know?
                             mergeBlock(block, oldr, old_end, block_type::TYPE_REGION);
                         }
