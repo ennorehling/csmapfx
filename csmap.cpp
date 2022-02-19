@@ -2686,6 +2686,8 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
         beginLoading(filename);
         if (nullptr != (report = loadFile(filename))) {
             recentFiles.appendFile(filename);
+            report->createHierarchy();		// set depth field of blocks
+            report->createHashTables();		// creates hash tables and set region flags
             updateFileNames();
             mapChange();
         }
