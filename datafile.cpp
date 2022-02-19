@@ -638,7 +638,7 @@ const datakey* datablock::valueKey(int key) const
 // ===========================
 // === datafile implementation
 
-datafile::datafile() : m_factionId(0), m_recruitment(0), m_turn(0), m_activefaction(m_blocks.end())
+datafile::datafile() : m_factionId(0), m_recruitment(0), m_turn(-1), m_activefaction(m_blocks.end())
 {
 	m_cmds.modified = false;
 }
@@ -662,6 +662,22 @@ static inline char* getNextLine(char* str)
 }
 
 const char* UTF8BOM = "\xEF\xBB\xBF";
+
+int datafile::turn() const
+{
+    if (m_turn < 0) {
+        datablock::citor block;
+        for (block = m_blocks.begin(); block != m_blocks.end(); block++)
+        {
+            // set turn number to that found in version block
+            if (block->type() == block_type::TYPE_VERSION) {
+                m_turn = block->valueInt(TYPE_TURN, m_turn);
+                break;
+            }
+        }
+    }
+    return m_turn;
+}
 
 // loads file, parses it and returns number of block
 int datafile::load(const char* filename)
