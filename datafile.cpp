@@ -1053,15 +1053,20 @@ void datafile::merge(datafile * new_cr)
             if (oldr != m_blocks.end())            // add some info to old cr (island names)
             {
                 copy_children = false;
-                if (!is_seen) {
+                if (!is_seen)
+                {
                     for (const datakey& key : block->data())
                     {
+                        if (key.type() == TYPE_NAME || key.type() == TYPE_TERRAIN) {
+                            continue;
+                        }
                         if (!oldr->hasKey(key)) {
                             oldr->data().push_back(key);
                         }
                     }
                 }
-                if (const datakey* islandkey = block->valueKey(TYPE_ISLAND)) {
+                if (const datakey* islandkey = block->valueKey(TYPE_ISLAND))
+                {
                     if (!oldr->valueKey(TYPE_ISLAND))
                     {
                         if (islandkey && !islandkey->isInt())        // add only Vorlage-style islands (easier)
@@ -1069,10 +1074,12 @@ void datafile::merge(datafile * new_cr)
                     }
                 }
                 // copy child blocks if we don't have them
-                for (block++; block != new_end && block->type() != block_type::TYPE_REGION; ++block) {
+                for (block++; block != new_end && block->type() != block_type::TYPE_REGION; ++block)
+                {
                     datablock::itor old_end = m_blocks.end();
                     block_type type = block->type();
-                    if (type == block_type::TYPE_BORDER || type == block_type::TYPE_RESOURCE) {
+                    if (type == block_type::TYPE_BORDER || type == block_type::TYPE_RESOURCE)
+                    {
                         if (!is_seen) {
                             // we cannot see this region, should we replace what we know?
                             mergeBlock(block, oldr, old_end, block_type::TYPE_REGION);
