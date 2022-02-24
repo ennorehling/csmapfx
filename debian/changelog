@@ -1,6 +1,6 @@
-csmapfx (1.1.3-1) stable; urgency=low
+csmapfx (1.2.0-1) stable; urgency=high
 
-  * update hash tables to avoid duplicates during merge
+  * avoid creating duplicate regions during merge
 
  -- Enno Rehling <enno@eressea.de>  Thu, 24 Feb 2022 16:00:00 +0200
 
