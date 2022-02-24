@@ -1009,14 +1009,25 @@ datafile* CSMap::mergeFile(const FXString& filename)
     int turn = report->turn();
     int new_turn = new_cr->turn();
 
+    int x_offset = 0, y_offset = 0;
     datafile* result = report;
     if (new_turn <= turn) {
-        report->merge(new_cr);
+        report->findOffset(new_cr, &x_offset, &y_offset);
+        report->merge(new_cr, x_offset, y_offset);
         delete new_cr;
     }
     else {
-        new_cr->merge(report);
+        new_cr->findOffset(report, &x_offset, &y_offset);
+        new_cr->merge(report, x_offset, y_offset);
         result = new_cr;
+    }
+    if (x_offset || y_offset) {
+        if (selection.sel_plane == 0) {
+            selection.selected = 0;
+            selection.sel_x += x_offset;
+            selection.sel_y += y_offset;
+            selection.selChange++;
+        }
     }
     return result;
 }
@@ -1412,7 +1423,7 @@ long CSMap::onSetOrigin(FXObject*, FXSelector, void*)
         if (block->type() != block_type::TYPE_REGION)
             continue;
 
-        // handle only the actually selected plain
+        // handle only the actually selected plane
         if (block->info() != orig_plane)
             continue;
 

@@ -533,6 +533,12 @@ FXString datablock::id() const
 	return (nn > 0) ? FXStringValEx(nn, 36) : "0";
 }
 
+void datablock::move(int x_offset, int y_offset)
+{
+    m_x += x_offset;
+    m_y += y_offset;
+}
+
 void datablock::infostr(const FXString& s)
 {  
 	flags(flags() & ~(FLAG_BLOCKID_BIT0|FLAG_BLOCKID_BIT1));
@@ -1041,7 +1047,46 @@ void datafile::mergeBlock(datablock::itor& block, const datablock::itor& begin, 
     }
 }
 
-void datafile::merge(datafile * new_cr)
+void datafile::findOffset(datafile* new_cr, int* x_offset, int* y_offset) const
+{
+    // first, create an index of all regions with an Id in new_cr:
+    std::map<int, datablock::itor> regionIndex;
+    for (regions_map::const_iterator it = new_cr->m_regions.begin(); it != new_cr->m_regions.end(); ++it)
+    {
+        const datablock::itor& block = (*it).second;
+        int plane = block->info();
+        // only comparing plane 0
+        if (plane == 0) {
+            int id = block->valueInt(TYPE_ID, -1);
+            if (id > 0) {
+                regionIndex[id] = block;
+            }
+        }
+    }
+
+    // second, try finding a region from this report in the index:
+    for (regions_map::const_iterator it = m_regions.begin(); it != m_regions.end(); ++it)
+    {
+        const datablock::itor& block = (*it).second;
+        int id = block->valueInt(TYPE_ID, -1);
+        int plane = block->info();
+        if (plane == 0) {
+            std::map<int, datablock::itor>::const_iterator match = regionIndex.find(id);
+            if (match != regionIndex.end()) {
+                const datablock::itor& other = (*match).second;
+                int xo = block->x() - other->x();
+                int yo = block->y() - other->y();
+                if (xo != 0 || yo != 0) {
+                    if (x_offset) *x_offset = xo;
+                    if (y_offset) *y_offset = yo;
+                }
+                return;
+            }
+        }
+    }
+}
+
+void datafile::merge(datafile * new_cr, int x_offset, int y_offset)
 {
     // dann: Datei an den aktuellen CR anfuegen (nur Karteninformationen)
     datablock::itor new_end = new_cr->m_blocks.end();
@@ -1052,11 +1097,14 @@ void datafile::merge(datafile * new_cr)
         if (block->type() == block_type::TYPE_REGION)
         {
             bool is_seen = 0 != (block->flags() & datablock::FLAG_REGION_SEEN);
-            FXint x = block->x();
-            FXint y = block->y();
-            FXint plane = block->info();
+            int x = block->x();
+            int y = block->y();
+            int plane = block->info();
+            if (plane == 0) {
+                x += x_offset;
+                y += y_offset;
+            }
             datablock::itor oldr = region(x, y, plane);
-
 
             if (oldr != m_blocks.end())            // add some info to old cr (island names)
             {
@@ -1104,6 +1152,11 @@ void datafile::merge(datafile * new_cr)
             }
             else // append region to old cr
             {
+                if (x_offset || y_offset) {
+                    if (block->info() == 0) {
+                        block->move(x_offset, y_offset);
+                    }
+                }
                 copy_children = true;
                 block->attachment(nullptr);
                 m_blocks.push_back(*block);

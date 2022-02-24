@@ -217,6 +217,8 @@ public:
 	FXString id() const;					// identifier as base36
 	int x() const { return m_x; }
 	int y() const { return m_y; }
+    void move(int x_offset, int y_offset);
+
 	int terrain() const { return m_terrain; }
 	int flags() const { return m_flags; }
 	const FXString string() const;
@@ -350,7 +352,9 @@ public:
 
 	int load(const char* filename);
 	int save(const char* filename, map_type map_filter);
-    void merge(datafile * new_cr);
+
+    void findOffset(datafile* new_cr, int* x_offset, int* y_offset) const;
+    void merge(datafile * new_cr, int x_offset = 0, int y_offset = 0);
 
 	int loadCmds(const FXString &filename);
 	int saveCmds(const FXString &filename, const FXString &passwd, bool stripped);
@@ -507,7 +511,8 @@ protected:
 
 	// hash tables
 	std::map<int, datablock::itor> m_units, m_factions, m_buildings, m_ships, m_islands;
-	std::map<koordinates, datablock::itor> m_regions;
+    typedef std::map<koordinates, datablock::itor> regions_map;
+    regions_map m_regions;
 	std::map<koordinates, datablock::itor> m_battles;
 
 	// temporaries (like FACTION block that don't exist in CR)
