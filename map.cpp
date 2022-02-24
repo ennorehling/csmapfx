@@ -885,7 +885,7 @@ long FXCSMap::onLeftButtonRelease(FXObject* /*sender*/, FXSelector /*sel*/, void
 		// when in painting mode, relayout should not be done when button is pressed, so do it on buttonrelease
 		if (modus >= MODUS_SETTERRAIN && modus < MODUS_SETTERRAIN+ data::TERRAIN_LAST)
 		{
-            mapFile->createHashTables();	// deferred
+            mapFile->rebuildRegions();
 
 			datafile::SelectionState state = selection;
 			state.selected &= ~(state.REGION|state.UNKNOWN_REGION);
@@ -1229,10 +1229,10 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 							}
 					}
 
-					// map changed
-                    mapFile->createHashTables();
+                    // islands changed, rebuild:
+                    mapFile->rebuildIslands();
 
-					datafile::SelectionState state = selection;
+                    datafile::SelectionState state = selection;
 					state.map |= state.MAPCHANGED;
 					getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 				}
@@ -1271,8 +1271,8 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 							region->data().push_back(namekey);
 						}
 
-						// map changed
-                        mapFile->createHashTables();
+						// islands changed, rebuild:
+                        mapFile->rebuildIslands();
 
 						datafile::SelectionState state = selection;
 						state.map |= state.MAPCHANGED;
@@ -1409,7 +1409,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 				}
 				// sofort loeschen
                 mapFile->blocks().erase(block, srch);
-                mapFile->createHashTables();
+                mapFile->rebuildRegions();
 				deleted = true;
 				break;
 			}
@@ -1453,7 +1453,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 	// map changed
 	if (!(flags&FLAG_PRESSED) || modus < MODUS_SETTERRAIN || modus >= MODUS_SETTERRAIN+ data::TERRAIN_LAST)
 	{
-        mapFile->createHashTables();			// don't do this in painting mode
+        mapFile->rebuildRegions();			// don't do this in painting mode
 
 		datafile::SelectionState state = selection;
 		state.selected &= ~(state.REGION|state.UNKNOWN_REGION);

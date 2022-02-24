@@ -1419,8 +1419,6 @@ long CSMap::onSetOrigin(FXObject*, FXSelector, void*)
         block->infostr(txt.format("%d %d %d", block->x()-orig_x, block->y()-orig_y, orig_plane));
     }
 
-    report->createHashTables();
-
     selection.sel_x = 0, selection.sel_y = 0;    // its the origin now
 
     mapChange();
@@ -2104,8 +2102,6 @@ long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
             beginLoading(filename);
             if (nullptr != (report = loadFile(filename))) {
                 updateFileNames();
-                report->createHierarchy();		// set depth field of blocks
-                report->createHashTables();		// creates hash tables and set region flags
                 mapChange();
                 recentFiles.appendFile(filename);
             }
@@ -2139,8 +2135,6 @@ void CSMap::loadFiles(const FXString filenames[])
         }
         ++selection.fileChange;
         // rebuild the resulting report
-        report->createHierarchy();		// set depth field of blocks
-        report->createHashTables();		// creates hash tables and set region flags
         selection.selected |= selection.MAPCHANGED;
         mapChange();
         updateFileNames();
@@ -2686,8 +2680,6 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
         beginLoading(filename);
         if (nullptr != (report = loadFile(filename))) {
             recentFiles.appendFile(filename);
-            report->createHierarchy();		// set depth field of blocks
-            report->createHashTables();		// creates hash tables and set region flags
             updateFileNames();
             mapChange();
         }
@@ -2951,8 +2943,6 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
         // delete this region
         report->deleteRegion(region);
     }
-
-    report->createHashTables();
 
     // Markierung auch loeschen
     selection.selected &= ~selection.MULTIPLE_REGIONS;

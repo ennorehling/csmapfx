@@ -219,7 +219,6 @@ public:
 	int y() const { return m_y; }
 	int terrain() const { return m_terrain; }
 	int flags() const { return m_flags; }
-	int depth() const { return m_depth; }
 	const FXString string() const;
 	datakey::list_type& data(){ return m_data; }
 
@@ -228,7 +227,13 @@ public:
 	void terrain(int terrain);
 	void flags(int flags);				// set <flags> and unset all other flags
 	void setFlags(int flags);				// set <flags> and don't modify the other flags
-	void depth(int depth);				// set depth of the block
+
+#ifndef NDEBUG
+    int depth() const;
+#else
+    int depth() const { return m_depth; }
+#endif
+    void depth(int depth);				// set depth of the block
 
 	::attachment* attachment() const { return m_attachment; }
 	void attachment(::attachment* attach);
@@ -347,9 +352,6 @@ public:
 	int save(const char* filename, map_type map_filter);
     void merge(datafile * new_cr);
 
-    void createHierarchy();
-	void createHashTables();
-
 	int loadCmds(const FXString &filename);
 	int saveCmds(const FXString &filename, const FXString &passwd, bool stripped);
 
@@ -431,7 +433,13 @@ public:
         }
 	};
 
+    void rebuildIslands() { createHashTables(); }
+    void rebuildRegions() { createHashTables(); }
+
 protected:
+    void createHashTables();
+    void createHierarchy();
+
     void mergeBlock(datablock::itor& block, const datablock::itor& begin, const datablock::itor& end, block_type parent_type);
     const char* getConfigurationName(map_type type);
 

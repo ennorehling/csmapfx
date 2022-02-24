@@ -1,5 +1,5 @@
-#include <time.h>
-#include <time.h>
+#include <ctime>
+#include <cassert>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -297,6 +297,13 @@ bool datakey::parse(char* str, bool isUtf8)
 	{ block_type::TYPE_UNKNOWN, NULL }
 };
 
+#ifndef NDEBUG
+int datablock::depth() {
+    assert(m_depth >= 0);
+    return m_depth;
+}
+#endif
+
 /*static*/ block_type datablock::parseType(const FXString& type)
 {
 	// region moved to top (performance)
@@ -483,12 +490,12 @@ bool datablock::parse(char* str)
 
 	// unset all other states
 	terrain(data::TERRAIN_UNKNOWN);
-	depth(0);
+	// depth(0);
 	attachment(NULL);
 	return true;
 }
 
-datablock::datablock() : m_type(block_type::TYPE_UNKNOWN), m_info(0), m_x(0),m_y(0), m_terrain(0), m_flags(0), m_depth(0), m_attachment(0)
+datablock::datablock() : m_type(block_type::TYPE_UNKNOWN), m_info(0), m_x(0),m_y(0), m_terrain(0), m_flags(0), m_depth(-1), m_attachment(0)
 {
 }
 
@@ -765,6 +772,7 @@ int datafile::load(const char* filename)
 			block = &m_blocks.back();
 		}
 	}
+    createHashTables();
 	return m_blocks.size();
 }
 
@@ -1114,7 +1122,7 @@ void datafile::merge(datafile * new_cr)
         }
         ++block;
     }
-
+    createHashTables();
 }
 
 const char* datafile::getConfigurationName(map_type type)
@@ -1899,12 +1907,8 @@ void datafile::createHashTables()
 
 	std::map<int, int> allied_status;	// what factions do we have HELP stati set to?
 	std::set<int> unit_got_taxes;		// units that got taxes (MSG id 1264208711); the regions will get a coins icon
-	/*
-	MESSAGE <id>
-	1264208711;type
-	"$unit (zzz) treibt in $region (x,y) Steuern in H\u00f6he von $amount Silber ein.";rendered
-	*/
 
+    createHierarchy();
 	datablock::itor block;
 	for (block = m_blocks.begin(); block != m_blocks.end(); block++)
 	{
