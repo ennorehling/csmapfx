@@ -2999,5 +2999,8 @@ long CSMap::onHelpAbout(FXObject*, FXSelector, void*)
 void CSMap::beginLoading(const FXString& filename)
 {
     FXString app_title = "Lade " + filename + "...";
+#if WIN32
+    app_title.substitute('/', '\\', true);
+#endif
     status->getStatusLine()->setText(app_title);
 }
