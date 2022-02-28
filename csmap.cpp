@@ -1019,6 +1019,8 @@ datafile* CSMap::mergeFile(const FXString& filename)
     else {
         new_cr->findOffset(report, &x_offset, &y_offset);
         new_cr->merge(report, x_offset, y_offset);
+        new_cr->filename(report->filename());
+        new_cr->cmdfilename(report->cmdfilename());
         result = new_cr;
     }
     if (x_offset || y_offset) {
