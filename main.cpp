@@ -74,8 +74,6 @@ void showVersion()
 	showError(help.str());
 }
 
-#define MAX_FILES 8
-
 int main(int argc, char *argv[])
 {
     PHYSFS_init(argv[0]);
@@ -171,7 +169,11 @@ int main(int argc, char *argv[])
 	else
 		shell = csmap = new CSMap(&CSApp); 
 
-	// Create it 
+    // Programm ohne GUI beenden?
+    if (!startgui && !calculator)
+        return 0;
+    
+    // Create it 
 	try
 	{
 		// create all windows
@@ -189,72 +191,17 @@ int main(int argc, char *argv[])
 		FXMessageBox::error(&CSApp, MBOX_OK, "CSMap - Fehler", "CSMap konnte nicht gestartet werden:\n%s", FXString(e.what()).text());
 		return -1;
 	}
+    if (shell)
+        shell->show(PLACEMENT_DEFAULT);
 
-	if (shell)
-		shell->show(PLACEMENT_DEFAULT);
-	
-	int numfiles = 0;
-    FXString filenames[MAX_FILES + 1];
-
-	// load command argument files
-	for (; arg < argc; arg++)
-	{
-		if (argv[arg][0] == '-')	// check option
-		{
-			for (int i = 1; argv[arg][i]; i++)
-			{
-				char c = argv[arg][i];
-
-				if (c == 'h')			// help
-					showHelpText();
-				else if (c == 'c')		// calculator
-				{
-					showError((std::string)"csmapfx: -c kann nicht zusammen mit einem CR benutzt werden.");
-				}
-				else if (c == 'o')
-				{
-					if (arg+1 < argc)
-					{
-						arg++;
-						if (csmap)
-							csmap->saveReport(FXString(argv[arg]), map_type::MAP_FULL);
-						startgui = false;
-						break;
-					}
-					else
-						showError((std::string)"csmapfx: -o muss zusammen mit einem Dateinamen benutzt werden.");
-				}
-				else if (c == '-')		// -- bla
-				{
-                    if (argv[arg][i+1] == 'h' && argv[arg][i+2] == 'e' && argv[arg][i+3] == 'l' &&
-							argv[arg][i+4] == 'p' && argv[arg][i+5] == '\0')
-						showHelpText();
-					else
-						showError((std::string)"csmapfx: Ung\u00fcltige Option: --" + (argv[arg]+i+1) + "\nProbier 'csmapfx --help\' f\u00fcr m\u00f6gliche Optionen");
-
-					break;
-				}
-				else
-					showError((std::string)"csmapfx: Ung\u00fcltige Option: -" + c + "\nProbier 'csmapfx --help\' f\u00fcr m\u00f6gliche Optionen");
-			}
-		}
-		else if (argv[arg][0] && csmap)		// stop here if a filename was found
-		{
-            if (numfiles < MAX_FILES) {
-                filenames[numfiles++].assign(argv[arg]);
-            }
-			startgui = true;
-		}
-	}
-
-    if (numfiles > 0) {
-        csmap->loadFiles(filenames);
+    if (csmap) {
+#ifdef WIN32
+        csmap->ParseCommandLine();
+#else
+        csmap->ParseCommandLine(argc, argv);
+#endif
     }
-	// Programm ohne GUI beenden?
-	if (!startgui && !calculator)
-		return 0;
-
-	// Run 
+    // Run 
 	int exitcode = CSApp.run(); 
     curl_global_cleanup();
     PHYSFS_deinit();

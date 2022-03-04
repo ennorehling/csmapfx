@@ -16,3 +16,4 @@ Release
 *.log
 *.vcxproj.user
 /enc_temp_folder/
+/version.aps

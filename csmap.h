@@ -33,6 +33,12 @@ public:
 	virtual void create();
 	virtual FXbool close(FXbool notify=FALSE);
 
+#ifdef WIN32
+    void ParseCommandLine();
+#else
+    coid ParseCommandLine(int argc, char** argv);
+#endif
+
     static CSMap* getInstance();
 
     bool saveReport(const FXString& filename, map_type mode, bool merge_commands = false);

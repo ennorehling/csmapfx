@@ -3006,3 +3006,47 @@ void CSMap::beginLoading(const FXString& filename)
 #endif
     status->getStatusLine()->setText(app_title);
 }
+
+#define MAX_FILES 8
+
+#ifdef WIN32
+void CSMap::ParseCommandLine()
+{
+    LPWSTR* argv;
+    int argc;
+    int numfiles = 0;
+    FXString filenames[MAX_FILES + 1];
+
+    argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+    for (int arg = 1; arg != argc; ++arg)
+    {
+        if (argv[arg][0] != '-') {
+            if (numfiles < MAX_FILES) {
+                filenames[numfiles++].assign(argv[arg]);
+            }
+        }
+    }
+    if (numfiles > 0) {
+        loadFiles(filenames);
+    }
+    LocalFree(argv);
+}
+#else
+void CSMap::ParseCommandLine(int argc, char** argv)
+{
+    int numfiles = 0;
+    FXString filenames[MAX_FILES + 1];
+    // load command argument files
+    for (int arg = 0; arg != argc; ++arg)
+    {
+        if (argv[arg][0] != '-') {
+            if (numfiles < MAX_FILES) {
+                filenames[numfiles++].assign(argv[arg]);
+            }
+        }
+    }
+    if (numfiles > 0) {
+        loadFiles(filenames);
+    }
+}
+#endif
