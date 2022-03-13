@@ -2271,7 +2271,9 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
                                 error->unit_id = FXIntVal(line.section("|", 2), 36);
                                 output.push_back(error);
                                 display = line.section("|", 4);
-                                display += ": ";
+                                if (!display.empty()) {
+                                    display += ": ";
+                                }
                                 display += line.section("|", 3);
                                 errorList->appendItem(display, NULL, error);
                             }
