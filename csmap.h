@@ -36,7 +36,7 @@ public:
 #ifdef WIN32
     void ParseCommandLine();
 #else
-    coid ParseCommandLine(int argc, char** argv);
+    void ParseCommandLine(int argc, char** argv);
 #endif
 
     static CSMap* getInstance();
