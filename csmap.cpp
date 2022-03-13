@@ -39,6 +39,10 @@
 #include <cstring>
 #include <curl/curl.h>
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 FXDEFMAP(CSMap) MessageMap[]=
 {
     //________Message_Type_____________________ID_______________Message_Handler_______
@@ -2232,7 +2236,8 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
                 ZeroMemory(&si, sizeof(si));
                 si.cb = sizeof(si);
                 ZeroMemory(&pi, sizeof(pi));
-                if (!CreateProcess(NULL, (LPSTR)cmdline.text(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+                // hack: set ECheck locale to German, since we don't support English CsMap yet:
+                if (!CreateProcess(NULL, (LPSTR)cmdline.text(), NULL, NULL, FALSE, 0, (LPVOID)"LC_MESSAGES=de\0", NULL, &si, &pi)) {
                     errorList->appendItem("CreateProcess failed: " + cmdline);
                 }
 
