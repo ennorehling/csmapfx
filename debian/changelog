@@ -2,6 +2,7 @@ csmapfx (1.2.1-1) stable; urgency=low
 
   * keep filename in titlebar intact after merge
   * fix encoding of command line in windows
+  * force ECheck to print German messages
 
  -- Enno Rehling <enno@eressea.de>  Fri, 04 Mar 2022 21:00:00 +0200
 
