@@ -2237,7 +2237,8 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
                 si.cb = sizeof(si);
                 ZeroMemory(&pi, sizeof(pi));
                 // hack: set ECheck locale to German, since we don't support English CsMap yet:
-                if (!CreateProcess(NULL, (LPSTR)cmdline.text(), NULL, NULL, FALSE, 0, (LPVOID)"LC_MESSAGES=de\0", NULL, &si, &pi)) {
+                if (!CreateProcess(NULL, (LPSTR)cmdline.text(), NULL, NULL, FALSE, 0, (LPVOID)"LC_MESSAGES=de\0", 
+                    settings.echeck_dir.text(), &si, &pi)) {
                     errorList->appendItem("CreateProcess failed: " + cmdline);
                 }
 
