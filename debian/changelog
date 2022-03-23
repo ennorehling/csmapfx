@@ -1,4 +1,4 @@
-csmapfx (1.2.2-1) stable; urgency=low
+csmapfx (1.2.3-1) stable; urgency=low
 
   * use new ECheck output format to navigate to regions in messages
 
