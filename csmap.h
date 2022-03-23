@@ -331,6 +331,8 @@ private:
 
     struct MessageInfo {
         FXint unit_id;
+        FXint region_x;
+        FXint region_y;
         FXint level;
     };
 

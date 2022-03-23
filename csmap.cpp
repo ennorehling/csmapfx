@@ -1475,12 +1475,21 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
         FXint item = list->getCurrentItem();
         MessageInfo *info = static_cast<MessageInfo *>(list->getItemData(item));
 
-        if (info && info->unit_id) {
+        if (info) {
             datafile::SelectionState state;
-            if (report->getUnit(state.unit, info->unit_id)) {
-                state.selected = selection.UNIT;
-                handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
-                return 1;
+            if (info->unit_id) {
+                if (report->getUnit(state.unit, info->unit_id)) {
+                    state.selected = selection.UNIT;
+                    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+                    return 1;
+                }
+            }
+            else {
+                if (report->getRegion(state.region, info->region_x, info->region_y, 0)) {
+                    state.selected = selection.REGION;
+                    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+                    return 1;
+                }
             }
         }
     }
@@ -2225,7 +2234,7 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
             }
             else {
                 // Echeck it:
-                cmdline.append(" -w3 -c -Lde -Re2 -O");
+                cmdline.append(" -w3 -c1 -Lde -Re2 -O");
                 cmdline.append(outfile);
                 cmdline.append(" ");
                 cmdline.append(infile);
@@ -2267,15 +2276,24 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
                             MessageInfo *error = new MessageInfo();
                             if (error) {
                                 FXString line, display;
+                                FXString tok;
                                 line.assign(str.c_str());
                                 error->level = FXIntVal(line.section("|", 1));
-                                error->unit_id = FXIntVal(line.section("|", 2), 36);
+                                tok = line.section("|", 2);
+                                if (tok == "U") {
+                                    error->unit_id = FXIntVal(line.section("|", 3), 36);
+                                }
+                                else if (tok == "R") {
+                                    tok = line.section("|", 3);
+                                    error->region_x = FXIntVal(tok.section(",", 0));
+                                    error->region_y = FXIntVal(tok.section(",", 1));
+                                }
                                 output.push_back(error);
-                                display = line.section("|", 4);
+                                display = line.section("|", 5);
                                 if (!display.empty()) {
                                     display += ": ";
                                 }
-                                display += line.section("|", 3);
+                                display += line.section("|", 4);
                                 errorList->appendItem(display, NULL, error);
                             }
                         }

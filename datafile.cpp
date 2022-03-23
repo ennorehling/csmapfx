@@ -1477,7 +1477,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 	else
 	{
 		out << "\n";
-		out << "; ECHECK -l -w3 -r" << recruitment() << "\n";
+		out << "; ECHECK -v4.7 -l -w3 -r" << recruitment() << "\n";
 		out << "\n";
 		out << "; " << CSMAP_APP_TITLE_VERSION << "\n";
 		out << "\n";
