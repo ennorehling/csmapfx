@@ -226,6 +226,9 @@ private:
     void setAutoReload(reload_type mode);
     bool allowReplaceFile(const FXString& filename);
 
+    // Fonts
+    FXFont* fontFixed;
+
 	// Menubar
 	FXMenuBar		*menubar;
 	FXMenuPane		*filemenu, *recentmenu, *viewmenu, *regionmenu, *factionmenu;
