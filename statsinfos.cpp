@@ -222,14 +222,19 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
 
                 for (datakey::itor itor = list.begin(); itor != list.end(); itor++)
                 {
-                    if (itor->key() == "region")
+                    key_type key = itor->type();
+                    if (key == key_type::TYPE_MSG_REGION) {
                         reg = itor;
-                    else if (itor->key() == "amount")
+                    }
+                    else if (key == key_type::TYPE_MSG_AMOUNT) {
                         amount = itor->getInt();
-                    else if (itor->key() == "cost")
+                    }
+                    else if (key == key_type::TYPE_MSG_COST) {
                         amount = itor->getInt();
-                    else if (itor->key() == "mode")
+                    }
+                    else if (key == key_type::TYPE_MSG_MODE) {
                         mode = itor->getInt();
+                    }
                 }
 
                 if (reg == list.end())

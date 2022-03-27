@@ -38,6 +38,10 @@ typedef enum key_type
     TYPE_LOCALE,
     TYPE_OWNER,
     TYPE_ORDERS_CONFIRMED,		// ejcOrdersConfirmed, special tag
+    TYPE_MSG_COST,
+    TYPE_MSG_AMOUNT,
+    TYPE_MSG_MODE,
+    TYPE_MSG_REGION,
     TYPE_LAST,
 
     TYPE_MASK = (1 << 7) - 1,

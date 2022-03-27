@@ -89,7 +89,17 @@ void datakey::value(const FXString& s)
 		return TYPE_OWNER;
 	if (type == "ejcOrdersConfirmed")
 		return TYPE_ORDERS_CONFIRMED;
-	
+
+    // MESSAGE tags
+    if (type == "mode")
+        return TYPE_MSG_MODE|TYPE_INTEGER;
+    if (type == "cost")
+        return TYPE_MSG_COST|TYPE_INTEGER;
+    if (type == "amount")
+        return TYPE_MSG_AMOUNT|TYPE_INTEGER;
+    if (type == "region")
+        return TYPE_MSG_REGION;
+
 	return TYPE_UNKNOWN;
 }
 
@@ -147,6 +157,14 @@ const FXString datakey::key() const
         return "Besitzer";
     else if (type() == TYPE_ORDERS_CONFIRMED)
 		return "ejcOrdersConfirmed";
+    else if (type() == TYPE_MSG_REGION)
+        return "region";
+    else if (type() == TYPE_MSG_AMOUNT)
+        return "amount";
+    else if (type() == TYPE_MSG_COST)
+        return "cost";
+    else if (type() == TYPE_MSG_MODE)
+        return "mode";
 
 	return "";
 }
