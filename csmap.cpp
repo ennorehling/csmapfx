@@ -2991,6 +2991,8 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
         report->deleteRegion(region);
     }
 
+    report->rebuildRegions();
+
     // Markierung auch loeschen
     selection.selected &= ~selection.MULTIPLE_REGIONS;
     selection.regionsSelected.clear();

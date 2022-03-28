@@ -1388,35 +1388,11 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 		}
 		else
 		{
-			// delete old region and all subblocks
-			bool deleted = false;
-
 			// delete region
-			for (datablock::itor block = mapFile->blocks().begin(); block != mapFile->blocks().end(); block++)
-			{
-				// handle only regions
-				if (block->type() != block_type::TYPE_REGION)
-					continue;
-
-				if (iregion != block)
-					continue;
-
-				// gefunden. nun loeschen
-				datablock::itor srch = block;
-				for (srch++; srch != mapFile->blocks().end() && srch->depth() > block->depth(); srch++)
-				{
-					// block is part of the region
-				}
-				// sofort loeschen
-                mapFile->blocks().erase(block, srch);
+            if (mapFile->deleteRegion(&*iregion)) {
                 mapFile->rebuildRegions();
-				deleted = true;
-				break;
-			}
 
-			if (deleted)
-			{
-				if (selection.selected & selection.REGION)
+                if (selection.selected & selection.REGION)
 				{
 					// deleted region should not be selected
 					if (selection.region == iregion)

@@ -1738,6 +1738,9 @@ bool datafile::deleteRegion(datablock* block)
 {
     datablock::itor first = region(block->x(), block->y(), block->info());
     // found the region. delete all blocks until next region.
+    if (first == m_blocks.end()) {
+        return false;
+    }
     datablock::itor last = first;
     for (++last; last != m_blocks.end(); ++last) {
         // block is in region?
@@ -1746,7 +1749,8 @@ bool datafile::deleteRegion(datablock* block)
             return true;
         }
     }
-    return false;
+    m_blocks.erase(first, m_blocks.end());
+    return true;
 }
 
 datablock::itor datafile::unit(int id)

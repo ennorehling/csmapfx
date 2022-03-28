@@ -357,7 +357,7 @@ long FXStatsInfos::onMapChange(FXObject*, FXSelector, void* ptr)
 
         selection = *pstate;
 
-		if (needUpdate) // expensive operation
+		if (needUpdate && selection.selected & selection.MULTIPLE_REGIONS) // expensive operation
 			selection.regionsSelected = pstate->regionsSelected;
 	}
 
