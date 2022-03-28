@@ -20,9 +20,21 @@ typedef enum key_type
     TYPE_ISLAND,
     TYPE_ID,
     TYPE_FACTION,
+    TYPE_OTHER_FACTION,
     TYPE_FACTIONNAME,
     TYPE_NUMBER,
+    TYPE_BUILDING,
+    TYPE_SHIP,
+    TYPE_WEIGHT,
+    TYPE_GROUP,
+    TYPE_PREFIX,
+    TYPE_STATUS,
+    TYPE_GUARDING,
+    TYPE_HUNGER,
+    TYPE_HERO,
+    TYPE_HITPOINTS,
     TYPE_TYPE,
+    TYPE_SIZE,
     TYPE_SKILL,
     TYPE_KONFIGURATION,
     TYPE_CHARSET,
@@ -38,6 +50,14 @@ typedef enum key_type
     TYPE_LOCALE,
     TYPE_OWNER,
     TYPE_ORDERS_CONFIRMED,		// ejcOrdersConfirmed, special tag
+    TYPE_DAMAGE,
+    TYPE_CAPTAIN,
+    TYPE_COAST,
+    TYPE_CAPACITY,
+    TYPE_CARGO,
+    TYPE_LOAD,
+    TYPE_MAXLOAD,
+    TYPE_MSG_TYPE,
     TYPE_MSG_COST,
     TYPE_MSG_AMOUNT,
     TYPE_MSG_MODE,
@@ -56,8 +76,10 @@ public:
 	~datakey() {}
 
 	const FXString& value() const { return m_value; }
-	key_type type() const { return (key_type)(m_type & TYPE_MASK); }
-	const FXString key() const;
+	key_type type() const {
+        return (key_type)(m_type & TYPE_MASK);
+    }
+    FXString key() const;
 
 	void key(const FXString& s);
 	void value(const FXString& s);
@@ -247,10 +269,10 @@ public:
 	const FXString terrainString() const;
 
 	bool hasKey(const datakey& key) const;
-	const FXString value(const char* key) const;
+	const FXString value(const FXString& key) const;
 	const FXString value(key_type key) const;
-	int valueInt(const char* key, int def = 0) const;
-	int valueInt(int key, int def = 0) const;
+	int valueInt(const FXString& key, int def = 0) const;
+	int valueInt(key_type key, int def = 0) const;
 	const datakey* valueKey(int key) const;
 
     // Flags for map icons

@@ -210,7 +210,7 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
         {
             if (block->type() == block_type::TYPE_MESSAGE)
             {
-                int type = block->valueInt("type");
+                int type = block->valueInt(TYPE_TYPE);
 
                 if (type != 771334452 && type != 443066738)
                     continue;
@@ -241,11 +241,11 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
                     continue;
 
                 FXString location = reg->value();
-                int x = atoi(location.before(' ').text());
+                int x = FXIntVal(location.before(' '));
                 location = location.after(' ');
-                int y = atoi(location.before(' ').text());
+                int y = FXIntVal(location.before(' '));
                 location = location.after(' ');
-                int z = atoi(location.before(' ').text());
+                int z = FXIntVal(location.before(' '));
 
                 if (region->x() != x || region->y() != y || region->info() != z)
                     continue;
@@ -275,9 +275,6 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
 
 void FXStatsInfos::updateData()
 {
-	//if (files->empty())
-		//return;
-
 	if (selection.selected & selection.MULTIPLE_REGIONS)
 	{
 		std::list<Info> info;

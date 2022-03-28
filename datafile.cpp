@@ -53,17 +53,41 @@ void datakey::value(const FXString& s)
 		return TYPE_ID|TYPE_INTEGER;
 	if (type == "Partei")
 		return TYPE_FACTION;
+	if (type == "Anderepartei")
+		return TYPE_OTHER_FACTION;
 	if (type == "Parteiname")
 		return TYPE_FACTIONNAME;
 	if (type == "Anzahl")
 		return TYPE_NUMBER;
+	if (type == "Burg")
+		return TYPE_BUILDING;
+	if (type == "Schiff")
+		return TYPE_SHIP;
 	if (type == "Typ")
 		return TYPE_TYPE;
+	if (type == "Groesse")
+		return TYPE_SIZE;
 	if (type == "skill")
 		return TYPE_SKILL;
 	if (type == "Konfiguration")
 		return TYPE_KONFIGURATION;
-	if (type == "charset")
+    if (type == "weight")
+        return TYPE_WEIGHT;
+    if (type == "group")
+        return TYPE_GROUP;
+    if (type == "typprefix")
+        return TYPE_PREFIX;
+    if (type == "Kampfstatus")
+        return TYPE_STATUS;
+    if (type == "hp")
+        return TYPE_HITPOINTS;
+    if (type == "bewacht")
+        return TYPE_GUARDING;
+    if (type == "hunger")
+        return TYPE_HUNGER;
+    if (type == "hero")
+        return TYPE_HERO;
+    if (type == "charset")
 		return TYPE_CHARSET;
 	if (type == "visibility")
 		return TYPE_VISIBILITY;
@@ -89,8 +113,24 @@ void datakey::value(const FXString& s)
 		return TYPE_OWNER;
 	if (type == "ejcOrdersConfirmed")
 		return TYPE_ORDERS_CONFIRMED;
+    if (type == "Schaden")
+        return TYPE_DAMAGE;
+    if (type == "Kapitaen")
+        return TYPE_CAPTAIN;
+    if (type == "Kueste")
+        return TYPE_COAST;
+    if (type == "capacity")
+        return TYPE_CAPACITY;
+    if (type == "cargo")
+        return TYPE_CARGO;
+    if (type == "Ladung")
+        return TYPE_LOAD;
+    if (type == "MaxLadung")
+        return TYPE_MAXLOAD;
 
     // MESSAGE tags
+    if (type == "type")
+        return TYPE_MSG_TYPE | TYPE_INTEGER;
     if (type == "mode")
         return TYPE_MSG_MODE|TYPE_INTEGER;
     if (type == "cost")
@@ -103,70 +143,112 @@ void datakey::value(const FXString& s)
 	return TYPE_UNKNOWN;
 }
 
-const FXString datakey::key() const
+FXString datakey::key() const
 {
-	if (type() == TYPE_UNKNOWN)
-		return m_key;
-	else if (type() == TYPE_EMPTY)
-		return "";
-	else if (type() == TYPE_NAME)
-		return "Name";
-	else if (type() == TYPE_DESCRIPTION)
-		return "Beschr";
-	else if (type() == TYPE_TERRAIN)
-		return "Terrain";
-	else if (type() == TYPE_ISLAND)
-		return "Insel";
-	else if (type() == TYPE_ID)
-		return "id";
-	else if (type() == TYPE_FACTION)
-		return "Partei";
-	else if (type() == TYPE_FACTIONNAME)
-		return "Parteiname";
-	else if (type() == TYPE_NUMBER)
-		return "Anzahl";
-	else if (type() == TYPE_TYPE)
-		return "Typ";
-	else if (type() == TYPE_SKILL)
-		return "skill";
-	else if (type() == TYPE_KONFIGURATION)
-		return "Konfiguration";
-	else if (type() == TYPE_CHARSET)
-		return "charset";
-	else if (type() == TYPE_VISIBILITY)
-		return "visibility";
-	else if (type() == TYPE_TURN)
-		return "Runde";
-	else if (type() == TYPE_SILVER)
-		return "Silber";
-	else if (type() == TYPE_RECRUITMENTCOST)
-		return "Rekrutierungskosten";
-	else if (type() == TYPE_AURA)
-		return "Aura";
-	else if (type() == TYPE_AURAMAX)
-		return "Auramax";
-	else if (type() == TYPE_OPTIONS)
-		return "Optionen";
-	else if (type() == TYPE_EMAIL)
-		return "email";
-	else if (type() == TYPE_BANNER)
-		return "banner";
-    else if (type() == TYPE_LOCALE)
+    switch (type()) {
+    case TYPE_UNKNOWN:
+        return m_key;
+    case TYPE_EMPTY:
+        return "";
+    case TYPE_NAME:
+        return "Name";
+    case TYPE_DESCRIPTION:
+        return "Beschr";
+    case TYPE_TERRAIN:
+        return "Terrain";
+    case TYPE_ISLAND:
+        return "Insel";
+    case TYPE_ID:
+        return "id";
+    case TYPE_FACTION:
+        return "Partei";
+    case TYPE_OTHER_FACTION:
+        return "Anderepartei";
+    case TYPE_FACTIONNAME:
+        return "Parteiname";
+    case TYPE_NUMBER:
+        return "Anzahl";
+    case TYPE_BUILDING:
+        return "Burg";
+    case TYPE_SHIP:
+        return "Schiff";
+    case TYPE_TYPE:
+        return "Typ";
+    case TYPE_SIZE:
+        return "Groesse";
+    case TYPE_SKILL:
+        return "skill";
+    case TYPE_KONFIGURATION:
+        return "Konfiguration";
+    case TYPE_WEIGHT:
+        return "weight";
+    case TYPE_GROUP:
+        return "group";
+    case TYPE_PREFIX:
+        return "typprefix";
+    case TYPE_HITPOINTS:
+        return "hp";
+    case TYPE_STATUS:
+        return "Kampfstatus";
+    case TYPE_GUARDING:
+        return "bewacht";
+    case TYPE_HUNGER:
+        return "hunger";
+    case TYPE_HERO:
+        return "hero";
+    case TYPE_CHARSET:
+        return "charset";
+    case TYPE_VISIBILITY:
+        return "visibility";
+    case TYPE_TURN:
+        return "Runde";
+    case TYPE_SILVER:
+        return "Silber";
+    case TYPE_RECRUITMENTCOST:
+        return "Rekrutierungskosten";
+    case TYPE_AURA:
+        return "Aura";
+    case TYPE_AURAMAX:
+        return "Auramax";
+    case TYPE_OPTIONS:
+        return "Optionen";
+    case TYPE_EMAIL:
+        return "email";
+    case TYPE_BANNER:
+        return "banner";
+    case TYPE_LOCALE:
         return "locale";
-    else if (type() == TYPE_OWNER)
+    case TYPE_OWNER:
         return "Besitzer";
-    else if (type() == TYPE_ORDERS_CONFIRMED)
-		return "ejcOrdersConfirmed";
-    else if (type() == TYPE_MSG_REGION)
-        return "region";
-    else if (type() == TYPE_MSG_AMOUNT)
-        return "amount";
-    else if (type() == TYPE_MSG_COST)
-        return "cost";
-    else if (type() == TYPE_MSG_MODE)
-        return "mode";
+    case TYPE_ORDERS_CONFIRMED:
+        return "ejcOrdersConfirmed";
+    case TYPE_DAMAGE:
+        return "Schaden";
+    case TYPE_CAPTAIN:
+        return "Kapitaen";
+    case TYPE_COAST:
+        return "Kueste";
+    case TYPE_CAPACITY:
+        return "capacity";
+    case TYPE_CARGO:
+        return "cargo";
+    case TYPE_LOAD:
+        return "Ladung";
+    case TYPE_MAXLOAD:
+        return "MaxLadung";
 
-	return "";
+    case TYPE_MSG_TYPE:
+        return "type";
+    case TYPE_MSG_REGION:
+        return "region";
+    case TYPE_MSG_AMOUNT:
+        return "amount";
+    case TYPE_MSG_COST:
+        return "cost";
+    case TYPE_MSG_MODE:
+        return "mode";
+    }
+	return FXString();
 }
 
 int datakey::getInt() const
@@ -621,10 +703,10 @@ bool datablock::hasKey(const datakey& key) const
     return false;
 }
 
-const FXString datablock::value(const char* key) const
+const FXString datablock::value(const FXString& key) const
 {
 	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
-		if (srch->key() == key)
+		if (key == srch->key())
 			return srch->value();
 
 	return "";
@@ -639,16 +721,18 @@ const FXString datablock::value(key_type key) const
 	return "";
 }
 
-int datablock::valueInt(const char* key, int def /* = 0 */) const
+int datablock::valueInt(const FXString& key, int def /* = 0 */) const
 {
-	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
-		if (srch->key() == key)
-			return srch->getInt();
+    for (datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++) {
+        if (key == srch->key()) {
+            return srch->getInt();
+        }
+    }
 
 	return def;
 }
 
-int datablock::valueInt(int key, int def /* = 0 */) const
+int datablock::valueInt(key_type key, int def /* = 0 */) const
 {
 	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
 		if (srch->type() == key)
@@ -1030,9 +1114,10 @@ int datafile::save(const char* filename, map_type map_filter)
 			}
 				
 			// key
-			if (!tags->key().empty())
+            FXString key = tags->key();
+            if (!key.empty())
 			{
-				file << ';' << tags->key().text();	// als utf8 ausgeben
+				file << ';' << key.text();
 			}
 
 			file << std::endl;

@@ -121,7 +121,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					descr = key->value();
 				else if (key->type() == TYPE_FACTION)
 					factionId = atoi(key->value().text());
-				else if (key->key() == "Anderepartei")
+				else if (key->type() == TYPE_OTHER_FACTION)
 					AnotherfactionId = atoi(key->value().text());
 				else if (key->type() == TYPE_NUMBER)
 					number = key->value();
@@ -131,27 +131,27 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					aura = key->value();
 				else if (key->type() == TYPE_AURAMAX)
 					auramax = key->value();
-                else if (key->key() == "Burg") {
+                else if (key->type() == TYPE_BUILDING) {
                     mapFile->getBuilding(building, atoi(key->value().text()));
                 }
-                else if (key->key() == "Schiff") {
+                else if (key->type() == TYPE_SHIP) {
                     mapFile->getShip(ship, atoi(key->value().text()));
                 }
-				else if (key->key() == "weight")
+				else if (key->type() == TYPE_WEIGHT)
 					weight = key->value();
-				else if (key->key() == "gruppe")
+                else if (key->type() == TYPE_GROUP)
 					group = key->value();
-				else if (key->key() == "typprefix")
+                else if (key->type() == TYPE_PREFIX)
 					prefix = key->value();
-				else if (key->key() == "Kampfstatus")
+                else if (key->type() == TYPE_STATUS)
 					combatstatus = key->value();
-				else if (key->key() == "hp")
+                else if (key->type() == TYPE_HITPOINTS)
 					hp = key->value();
-				else if (key->key() == "bewacht")
+                else if (key->type() == TYPE_GUARDING)
 					guards = key->value();
-				else if (key->key() == "hunger")
+                else if (key->type() == TYPE_HUNGER)
 					hungry = key->value();
-				else if (key->key() == "hero")
+                else if (key->type() == TYPE_HERO)
 					hero = key->value();
 				else
 					unhandled.push_back(key);
@@ -357,7 +357,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 				for (datakey::itor key = talents->data().begin(); key != talents->data().end(); key++)
 				{
-					item = list->appendItem(node, key->key()+" "+key->value().section(' ',1));
+					item = list->appendItem(node, key->key() + " " + key->value().section(' ', 1));
 					item->setData((void*)1);	// show "info" popup cmd
 				}
 
@@ -393,7 +393,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 						factionId = atoi(key->value().text());
 					else if (key->type() == TYPE_TYPE)
 						type = key->value();
-					else if (key->key() == "Groesse")
+					else if (key->type() == TYPE_SIZE)
 						size = key->value();
 					else
 						unhandled.push_back(key);
@@ -483,21 +483,19 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 						factionId = atoi(key->value().text());
 					else if (key->type() == TYPE_TYPE)
 						type = key->value();
-					else if (key->key() == "Groesse")
+                    else if (key->type() == TYPE_SIZE)
 						size = key->value();
-					else if (key->key() == "Schaden")
+                    else if (key->type() == TYPE_DAMAGE)
 						damage = key->value();
-					else if (key->key() == "Kapitaen")
+                    else if (key->type() == TYPE_CAPTAIN)
 						captain = key->value();
-					else if (key->key() == "Kueste")
+                    else if (key->type() == TYPE_COAST)
 						coast = key->value();
-					else if (key->key() == "cargo")
+                    else if (key->type() == TYPE_CARGO)
 						cargo = key->value();
-					else if (key->key() == "capacity")
+                    else if (key->type() == TYPE_CAPACITY)
 						capacity = key->value();
-					else if (key->key() == "Ladung" || key->key() == "MaxLadung")
-					{} // ignore
-					else
+					else if (key->type() != TYPE_LOAD && key->type() != TYPE_MAXLOAD)
 						unhandled.push_back(key);
 				}
 

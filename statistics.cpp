@@ -191,9 +191,10 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 		if (block->type() == block_type::TYPE_ITEMS)
 		{
 			// <Item>: #
-			for (datakey::itor itor = block->data().begin(); itor != block->data().end(); itor++)
-				if (itor->key().length() && itor->value().length())
-					items[itor->key()].list.push_back(std::make_pair(unitId, atoi(itor->value().text())));
+            for (datakey::itor itor = block->data().begin(); itor != block->data().end(); itor++) {
+                if (itor->value().length())
+                    items[itor->key()].list.push_back(std::make_pair(unitId, atoi(itor->value().text())));
+            }
 		}
 
 		// collect statistics from this block
@@ -203,7 +204,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 
 			// <Talent> <Level>: #
 			for (datakey::itor itor = block->data().begin(); itor != block->data().end(); itor++)
-				if (itor->key().length() && itor->value().length())
+				if (!itor->value().empty())
 				{
 					FXString talent = itor->value().after(' ');
 					int level = atoi(talent.text());

@@ -754,10 +754,10 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                             uname = key->value();
                         else if (key->type() == TYPE_NUMBER)
                             number = key->value();
-                        else if (key->key() == "Burg") {
+                        else if (key->type() == TYPE_BUILDING) {
                             color = FXRGB(0, 127, 0);
                         }
-                        else if (key->key() == "Schiff") {
+                        else if (key->type() == TYPE_SHIP) {
                             color = FXRGB(0, 0, 255);
                         }
                     }
