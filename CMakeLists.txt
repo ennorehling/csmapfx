@@ -32,6 +32,7 @@ set (SOURCES
   prefsdlg.cpp
 	regioninfos.cpp
 	regionlist.cpp
+	reportinfo.cpp
 	scout.cpp
 	searchdlg.cpp
 	statistics.cpp

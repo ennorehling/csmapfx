@@ -195,6 +195,7 @@
     </ClCompile>
     <ClCompile Include="regioninfos.cpp" />
     <ClCompile Include="regionlist.cpp" />
+    <ClCompile Include="reportinfo.cpp" />
     <ClCompile Include="scout.cpp" />
     <ClCompile Include="searchdlg.cpp" />
     <ClCompile Include="prefsdlg.cpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="mjs\mjs.h" />
     <ClInclude Include="regioninfos.h" />
     <ClInclude Include="regionlist.h" />
+    <ClInclude Include="reportinfo.h" />
     <ClInclude Include="scout.h" />
     <ClInclude Include="searchdlg.h" />
     <ClInclude Include="prefsdlg.h" />

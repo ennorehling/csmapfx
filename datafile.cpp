@@ -1968,6 +1968,29 @@ void datafile::findSelection(const datablock* select, datablock::itor& out, data
     }
 }
 
+FXString datafile::regionName(const datablock& block)
+{
+    FXString rname;
+    if (block.type() == block_type::TYPE_REGION) {
+        rname = block.value(TYPE_NAME);
+        if (rname.empty()) {
+            rname = block.terrainString();
+        }
+    } else {
+        datablock::itor select;
+        if (getRegion(select, block.x(), block.y(), block.info())) {
+            rname = select->value(TYPE_NAME);
+            if (rname.empty()) {
+                rname = select->terrainString();
+            }
+        }
+        else {
+            return "Unbekannt";
+        }
+    }
+    return rname;
+}
+
 void datafile::createHierarchy()
 {
 	typedef std::vector<block_type> stack;

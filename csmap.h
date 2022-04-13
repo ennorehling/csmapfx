@@ -1,19 +1,8 @@
 #ifndef _CSMAP
 #define _CSMAP
 
-#include "regionlist.h"
-#include "regioninfos.h"
-#include "statsinfos.h"
-#include "tradeinfos.h"
-#include "unitlist.h"
-#include "statistics.h"
-#include "commands.h"
-#include "messages.h"
-#include "calc.h"
-#include "map.h"
 #include "terrain.h"
-
-#include "FXSplitterEx.h"
+#include "datafile.h"
 
 #include <fx.h>
 
@@ -227,18 +216,18 @@ private:
     bool allowReplaceFile(const FXString& filename);
 
     // Fonts
-    FXFont* fontFixed;
+    class FXFont* fontFixed;
 
 	// Menubar
-	FXMenuBar		*menubar;
-	FXMenuPane		*filemenu, *recentmenu, *viewmenu, *regionmenu, *factionmenu;
-	FXMenuPane		*mapmenu, *selectionmenu, *planemenu, *zoommenu, *helpmenu;
+    class FXMenuBar		*menubar;
+    class FXMenuPane		*filemenu, *recentmenu, *viewmenu, *regionmenu, *factionmenu;
+    class FXMenuPane		*mapmenu, *selectionmenu, *planemenu, *zoommenu, *helpmenu;
 
 	// Toolbar
-	FXToolBar		*toolbar;
-	FXListBox		*planes;
-	FXPopup			*terrainPopup;
-	FXButton		*terrainSelect;
+    class FXToolBar		*toolbar;
+    class FXListBox		*planes;
+    class FXPopup			*terrainPopup;
+    class FXButton		*terrainSelect;
 	
 	// Menu: Speichert zuletzt verwendete Dateien
 	FXRecentFiles	recentFiles;
@@ -247,86 +236,88 @@ private:
 	FXString		dialogDirectory;
 
 	// Statusbar
-	FXStatusBar		*status;
-	FXLabel			*status_lfaction, *status_faction;
-	FXLabel			*status_lturn, *status_turn;
-	FXLabel			*status_lfile, *status_file;
+    class FXStatusBar		*status;
+    class FXLabel			*status_lfaction, *status_faction;
+    class FXLabel			*status_lturn, *status_turn;
+    class FXLabel			*status_lfile, *status_file;
 
 	// ToolBarTabs
-	FXToolBarTab	*riTab, *siTab, *tiTab;
+    class FXToolBarTab	*riTab, *siTab, *tiTab;
 
 	// Generelles Layout
-	FXSplitterEx	*content;
+    class FXSplitterEx	*content;
 
 	// Links
-	FXVerticalFrame *leftframe;
-	FXRegionList	*regions;
+    class FXRegionList* regions;
+    class FXVerticalFrame *leftframe;
 
 	// Mitte
-	FXVerticalFrame	*middle;
-	FXCSMap			*map;
-	FXVerticalFrame *msgBorder;
-	FXMessages		*messages;
-	FXCalculator	*mathbar;
+    class FXCSMap* map;
+    class FXReportInfo* reportInfo;
+    class FXMessages* messages;
+    class FXCommands* commands;
+    class FXCalculator* mathbar;
+    class FXVerticalFrame	*middle;
+    class FXVerticalFrame *msgBorder;
 
 	// Rechts
-	FXVerticalFrame *rightframe;
-	FXRegionInfos	*regioninfos;
-	FXStatsInfos	*statsinfos;
-	FXTradeInfos	*tradeinfos;
-	FXSplitterEx	*commandsplitter;
-	FXTabBook		*tabbook;
-	FXTabBook		*outputTabs;
-	FXCommands		*commands;
-    FXList          *errorList;
+    class FXRegionInfos* regioninfos;
+    class FXStatsInfos* statsinfos;
+    class FXTradeInfos* tradeinfos;
+    class FXVerticalFrame *rightframe;
+    class FXSplitterEx	*commandsplitter;
+    class FXTabBook		*tabbook;
+    class FXTabBook		*outputTabs;
+    class FXList          *errorList;
 
-	FXVerticalFrame *commandframe;
+    class FXVerticalFrame *commandframe;
 
 	// Im TabBook
-	FXUnitList		*unitlist;
-	FXStatistics	*statistics;
+	class FXUnitList *unitlist;
+	class FXStatistics *statistics;
 
 	// Floating
-	FXDialogBox		*minimap_frame;
-	FXCSMap			*minimap;
-	class FXInfoDlg	*infodlg;
-	class FXSearchDlg *searchdlg;
+    class FXCSMap* minimap;
+    class FXInfoDlg* infodlg;
+    class FXSearchDlg* searchdlg;
+    class FXDialogBox* minimap_frame;
+    
     time_t last_save_time;
 
 	struct
 	{
-		FXMenuCheck	*modifycheck;	// check if orders are externally modified
-		FXMenuCheck	*toolbar;		// show toolbar
-		FXMenuCheck	*maponly;		// show only map
-		FXMenuCheck	*minimap;		// show minimap
-		FXMenuCheck	*infodlg;		// show info dialog
-		FXMenuCheck	*messages;		// show messages window
-		FXMenuCheck	*show_left;		// show left frame (regions)
-		FXMenuCheck	*show_right;	// show right frame (properties)
-		FXMenuCheck	*calc;			// show calculator
-		FXMenuCheck	*streets;		// show streets on the map
-		FXMenuCheck *visibility;	// show symbols for visibility of a region
-		FXMenuCheck *shiptravel;	// show a symbol for travelled ships
-		FXMenuCheck *shadowRegions;	// paint unseen regions darker
-		FXMenuCheck *colorizeUnits;	// colorize units in building/ship
-		FXMenuCheck *islands;		// show island names
-		FXMenuCheck *minimap_islands;	// show island names on mini map
+        class FXMenuCheck	*modifycheck;	// check if orders are externally modified
+        class FXMenuCheck	*toolbar;		// show toolbar
+        class FXMenuCheck	*maponly;		// show only map
+        class FXMenuCheck	*minimap;		// show minimap
+        class FXMenuCheck	*infodlg;		// show info dialog
+        class FXMenuCheck	*messages;		// show messages window
+        class FXMenuCheck	*show_left;		// show left frame (regions)
+        class FXMenuCheck	*show_right;	// show right frame (properties)
+        class FXMenuCheck	*calc;			// show calculator
+        class FXMenuCheck	*streets;		// show streets on the map
+        class FXMenuCheck *visibility;	// show symbols for visibility of a region
+        class FXMenuCheck *shiptravel;	// show a symbol for travelled ships
+        class FXMenuCheck *shadowRegions;	// paint unseen regions darker
+        class FXMenuCheck *colorizeUnits;	// colorize units in building/ship
+        class FXMenuCheck *islands;		// show island names
+        class FXMenuCheck *minimap_islands;	// show island names on mini map
 
-		FXMenuCheck *regdescription;	// show description of the region
+        class FXMenuCheck *regdescription;	// show description of the region
 
-		FXMenuCheck *ownFactionGroup;	// no own faction group in regionlist
+        class FXMenuCheck *ownFactionGroup;	// no own faction group in regionlist
 
 		// faction menu items
-		FXMenuTitle	*faction;
+        class FXMenuTitle	*faction;
 
-		FXMenuCommand *name, *email; // +banner?
-		FXMenuCommand *points;
-		FXMenuCommand *age;
-		FXMenuCommand *type, *number;
-		FXMenuCommand *magic;
+        class FXMenuCommand *name, *email; // +banner?
+        class FXMenuCommand *points;
+        class FXMenuCommand *age;
+        class FXMenuCommand *type, *number;
+        class FXMenuCommand *magic;
 
-		FXMenuPane	  *factionpool;
-		FXMenuCommand *poolnoitems;
+        class FXMenuPane	  *factionpool;
+        class FXMenuCommand *poolnoitems;
 	} menu;
 
 	// clipboard data
@@ -349,16 +340,16 @@ private:
 	// icons for toolbar
 	struct
 	{
-		FXIcon *open, *merge, *save, *close;
-		FXIcon *info;
+        class FXIcon *open, *merge, *save, *close;
+        class FXIcon *info;
 
-		FXIcon *pointer, *select;
-		FXIcon *terrain[data::TERRAIN_LAST];
+        class FXIcon *pointer, *select;
+        class FXIcon *terrain[data::TERRAIN_LAST];
 
 	} icons;
 
     // some data
-	datafile *report;
+	class datafile *report;
     std::list<MessageInfo *> output;
     datafile::SelectionState selection;			// selected region,faction,unit...
 

@@ -271,12 +271,15 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 
 long FXMessages::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 {
+    if (this != sender) {
+        return 0;
+    }
 	if (!mapFile)
 		return 0;
 
 	FXTreeItem* item = (FXTreeItem*)ptr;
 	if (!item)
-		return FXTreeList::onDoubleClicked(sender, sel, ptr);
+		return FXTreeList::onDoubleClicked(this, sel, ptr);
 
 	// select MESSAGE.unit on double-click
     datablock* select = (datablock*)item->getData();
@@ -308,7 +311,7 @@ long FXMessages::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 		return 1;
 	}
 
-	return FXTreeList::onDoubleClicked(sender, sel, ptr);
+	return FXTreeList::onDoubleClicked(this, sel, ptr);
 }
 
 void FXMessages::clearSiblings(FXTreeItem* parent_item)

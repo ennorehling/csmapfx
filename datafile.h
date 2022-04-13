@@ -401,6 +401,7 @@ public:
 	bool getRegion(datablock::itor &out, int x, int y, int plane);
     bool hasRegion(int x, int y, int plane) const;
     bool deleteRegion(datablock* region);
+    FXString regionName(const datablock& block);
     datablock::itor dummyToItor(const datablock* block);
 
     void findSelection(const datablock* select, datablock::itor& out, datablock::itor& region);

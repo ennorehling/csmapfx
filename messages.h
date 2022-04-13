@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _CSMAP_MESSAGES
 #define _CSMAP_MESSAGES
 

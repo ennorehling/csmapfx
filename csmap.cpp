@@ -16,9 +16,20 @@
 #include "main.h"
 #include "fxhelper.h"
 #include "csmap.h"
+#include "messages.h"
+#include "reportinfo.h"
 #include "commands.h"
 #include "datafile.h"
 #include "symbols.h"
+#include "regionlist.h"
+#include "regioninfos.h"
+#include "statsinfos.h"
+#include "tradeinfos.h"
+#include "unitlist.h"
+#include "statistics.h"
+#include "commands.h"
+#include "calc.h"
+#include "map.h"
 
 #include "exportdlg.h"
 #include "infodlg.h"
@@ -27,6 +38,7 @@
 
 #include "fxkeys.h"
 #include "FXMenuSeparatorEx.h"
+#include "FXSplitterEx.h"
 #include "FXFileDialogEx.h"
 #include <FXFont.h>
 #include <FXRex.h>
@@ -518,8 +530,10 @@ CSMap::CSMap(FXApp *app) :
     msgBorder->setBorderColor(getApp()->getShadowColor());
 
     outputTabs = new FXTabBook(msgBorder, nullptr, 0, TABBOOK_NORMAL | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
-    new FXTabItem(outputTabs, "Meldungen");
-    messages = new FXMessages(outputTabs, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    new FXTabItem(outputTabs, "Report");
+    reportInfo = new FXReportInfo(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
+    new FXTabItem(outputTabs, "Region");
+    messages = new FXMessages(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
     new FXTabItem(outputTabs, "Fehler");
     errorList = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
 
@@ -909,6 +923,7 @@ void CSMap::mapChange()
     statsinfos->setMapFile(report);
     regioninfos->setMapFile(report);
     mathbar->setMapFile(report);
+    reportInfo->setMapFile(report);
     messages->setMapFile(report);
     map->setMapFile(report);
     regions->setMapFile(report);
@@ -1411,18 +1426,14 @@ long CSMap::onSetOrigin(FXObject*, FXSelector, void*)
     FXString name;
     if (selection.selected & selection.REGION)
     {
-        datablock &region = *selection.region;
-
-        FXString rname = region.value(TYPE_NAME);
-        if (rname.empty())
-            rname = region.terrainString();
+        name = report->regionName(*selection.region);
+    }
+    else {
+        name = "Unbekannt";
     }
 
-    if (name.empty())
-        name = "Unbekannt";
-
     FXString txt;
-    txt.format("Koordinaten-Ursprung auf die Region %s (%d,%d) setzen?", name.text(), orig_x,orig_y);
+    txt.format("Koordinaten-Ursprung auf die Region %s (%d,%d) setzen?", name.text(), orig_x, orig_y);
 
     FXMessageBox dlg(this, CSMAP_APP_TITLE, txt, 0, MBOX_YES_NO);
     FXuint res = dlg.execute(PLACEMENT_SCREEN);
