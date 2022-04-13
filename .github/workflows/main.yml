@@ -10,7 +10,7 @@ jobs:
       - name: Update APT
         run: sudo apt update
       - name: Install Dependencies
-        run: sudo apt install --assume-yes libfox-1.6 libphysfs-dev
+        run: sudo apt install --assume-yes libfox-1.6-dev libphysfs-dev
       - name: Git Checkout
         uses: actions/checkout@v2
         with:
