@@ -17,3 +17,6 @@ Release
 *.vcxproj.user
 /enc_temp_folder/
 /version.aps
+.gdb_history
+gdb-entitlement.xml
+macos-setup-codesign.sh

@@ -1,0 +1,25 @@
+name: continuous-integration
+on: [push, pull_request]
+
+jobs:
+  linux-os:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get latest CMake and ninja
+        uses: lukka/get-cmake@latest
+      - name: Update APT
+        run: sudo apt update
+      - name: Install Dependencies
+        run: sudo apt install --assume-yes libfox-1.6 libphysfs-dev
+      - name: Git Checkout
+        uses: actions/checkout@v2
+        with:
+          repository: eressea/echeck
+      - name: Build and Test
+        uses: ashutoshvarma/action-cmake-build@master
+        with:
+          build-dir: ${{ runner.workspace }}/build
+          build-type: Release
+          run-test: false
+          ctest-options: --output-on-failure
+
