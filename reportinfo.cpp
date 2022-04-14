@@ -69,10 +69,38 @@ void FXReportInfo::setMapFile(datafile *f)
     }
 }
 
+FXString FXReportInfo::messageSection(const FXString& section)
+{
+    if (section == "errors") return "Fehler";
+    if (section == "magic") return "Magie";
+    if (section == "production") return "Produktion";
+    if (section == "movement") return "Bewegungen";
+    if (section == "economy") return "Wirtschaft";
+    if (section == "events") return "Ereignisse";
+    if (section == "study") return "Ausbildung";
+    return section;
+}
+
 void FXReportInfo::addMessage(FXTreeItem *group, datablock::itor& block)
 {
-    FXTreeItem* item = appendItem(group, block->value("rendered"));
+    FXTreeItem* item;
     FXival uid = block->valueInt("target");
+    FXString section = block->value("section");
+
+    if (!section.empty()) {
+        FXString label = messageSection(section);
+        FXTreeItem* child;
+        for (child = group->getFirst(); child != nullptr; child = child->getNext()) {
+            if (child->getText() == label) {
+                group = child;
+                break;
+            }
+        }
+        if (child == nullptr) {
+            group = prependItem(group, label);
+        }
+    }
+    item = appendItem(group, block->value("rendered"));
 
     if (uid <= 0)
         uid = block->valueInt("unit");

@@ -396,7 +396,7 @@ public:
 	bool getShip(datablock::itor& out, int id);
 	bool getFaction(datablock::itor& out, int id);
     bool getIsland(datablock::itor& out, int id);
-    datablock::itor getBattle(int x, int y, int plane);
+    bool getBattle(datablock::itor& out, int x, int y, int plane);
     bool hasBattle(int x, int y, int plane) const;
 	bool getRegion(datablock::itor &out, int x, int y, int plane);
     bool hasRegion(int x, int y, int plane) const;

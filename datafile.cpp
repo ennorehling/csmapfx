@@ -1800,9 +1800,10 @@ bool datafile::getRegion(datablock::itor &out, int x, int y, int plane)
     return false;
 }
 
-datablock::itor datafile::getBattle(int x, int y, int plane)
+bool datafile::getBattle(datablock::itor &out, int x, int y, int plane)
 {
-    return battle(x, y, plane);
+    out = battle(x, y, plane);
+    return (out != m_blocks.end());
 }
 
 bool datafile::hasBattle(int x, int y, int plane) const

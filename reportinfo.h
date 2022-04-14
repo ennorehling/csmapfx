@@ -47,6 +47,8 @@ protected:
 	FXReportInfo() : mapFile(0) {}
 	FXReportInfo(const FXReportInfo&) : mapFile(0) {}
 
+private:
+    static FXString messageSection(const FXString& section);
 };
 
 #endif //_CSMAP_MESSAGES

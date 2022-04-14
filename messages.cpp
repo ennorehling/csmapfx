@@ -52,22 +52,6 @@ void FXMessages::setMapFile(datafile *f)
     if (f != mapFile) {
         datablock::itor block, end;
         mapFile = f;
-        clearSiblings(groups.messages);
-        if (mapFile) {
-            end = mapFile->blocks().end();
-            for (block = mapFile->blocks().begin(); block != end; ++block) {
-                if (block->type() == block_type::TYPE_MESSAGE && block->depth() == 3) {
-                    addMessage(groups.messages, block);
-                }
-                else if (block->type() == block_type::TYPE_BATTLE) {
-                    addMessage(groups.messages, block);
-                    break;
-                }
-                else if (block->type() == block_type::TYPE_REGION) {
-                    break;
-                }
-            }
-        }
     }
 }
 
@@ -156,12 +140,10 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
                 datablock::itor end = mapFile->blocks().end();
                 datablock::itor block;
                 std::set<FXint> guard_ids;
-                datablock::itor battle = mapFile->getBattle(selection.sel_x, selection.sel_y, selection.sel_plane);
-                if (battle != end) {
+                if (mapFile->getBattle(block, selection.sel_x, selection.sel_y, selection.sel_plane)) {
+                    int depth = block->depth();
                     groups.battle = appendItem(nullptr, "Kampf");
-                    block = battle;
-                    ++block;
-                    for (; block != end && block->depth() > battle->depth(); block++)
+                    for (++block; block != end && block->depth() > depth; block++)
                     {
                         if (block->type() == block_type::TYPE_MESSAGE) {
                             addMessage(groups.battle, block);
