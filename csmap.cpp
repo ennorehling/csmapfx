@@ -1191,8 +1191,6 @@ bool CSMap::checkCommands()
 #endif
                 for (auto error : output) delete error;
                 output.clear();
-                /* select the errors tab */
-                outputTabs->setCurrent(outputTabs->indexOfChild(errorList) / 2);
 
                 std::ifstream results;
                 results.open(outfile, std::ios::in);
@@ -2327,7 +2325,12 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
 
 long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
 {
-    return checkCommands() ? 1 : 0;
+    if (checkCommands()) {
+        /* select the errors tab */
+        outputTabs->setCurrent(outputTabs->indexOfChild(errorList) / 2);
+        return 1;
+    }
+    return 0;
 }
 
 int CSMap::unlink(const char *pathname) {
