@@ -38,7 +38,6 @@ protected:
         FXTreeItem* effects;
         FXTreeItem* streets;
         FXTreeItem* travel;
-        FXTreeItem* other;
         FXTreeItem* guards;
         FXTreeItem* battle;
     } groups;
