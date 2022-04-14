@@ -640,11 +640,6 @@ CSMap::CSMap(FXApp *app) :
     searchdlg->getAccelTable()->addAccel(MKUINT(KEY_F,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_SEARCHDLG));
 }
 
-/*static*/ CSMap* CSMap::getInstance()
-{
-    return CSMap_instance;
-}
-
 CSMap::~CSMap()
 {
     errorList->clearItems();
@@ -1097,6 +1092,7 @@ bool CSMap::loadCommands(const FXString& filename)
 
     reload_mode = CSMap::reload_type::RELOAD_ASK;
     updateFileNames();
+    checkCommands();
     mapChange();
     return true;
 }
@@ -1117,6 +1113,125 @@ bool CSMap::saveCommands(const FXString &filename, bool stripped)
     last_save_time = 0;
     report->modifiedCmds(false);
     updateFileNames();
+    return true;
+}
+
+static char* u_mkstemp(char* buffer) {
+#ifdef HAVE_MKSTEMP
+    int fd;
+    strncpy(buffer, "/tmp/csmapXXXXXX", PATH_MAX);
+    if (0 <= (fd = mkstemp(buffer))) {
+        close(fd);
+        return buffer;
+    }
+    return nullptr;
+#else
+    return tmpnam(buffer);
+#endif
+}
+
+bool CSMap::checkCommands()
+{
+    // save to a temporary file:
+    char infile[PATH_MAX];
+    char outfile[PATH_MAX];
+    FXString cmdline("echeck");
+#ifdef WIN32
+    cmdline += "w.exe";
+    if (!settings.echeck_dir.empty()) {
+        cmdline = "\"" + settings.echeck_dir + "\\" + cmdline + "\"";
+    }
+#else
+    if (!settings.echeck_dir.empty()) {
+        cmdline = settings.echeck_dir + "/echeck";
+    }
+#endif
+    errorList->clearItems();
+    if (cmdline.empty()) {
+        errorList->appendItem("Could not find the echeck executable.");
+    }
+    else {
+        if (!u_mkstemp(infile) || report->saveCmds(infile, "", true) != 0) {
+            errorList->appendItem("Could not save commands for analysis.");
+        }
+        else {
+            if (!u_mkstemp(outfile)) {
+                errorList->appendItem("Could not create output file for analysis.");
+            }
+            else {
+                // Echeck it:
+                cmdline.append(" -w3 -c1 -Lde -Re2 -O");
+                cmdline.append(outfile);
+                cmdline.append(" ");
+                cmdline.append(infile);
+#ifdef WIN32
+                STARTUPINFO si;
+                PROCESS_INFORMATION pi;
+
+                ZeroMemory(&si, sizeof(si));
+                si.cb = sizeof(si);
+                ZeroMemory(&pi, sizeof(pi));
+                // hack: set ECheck locale to German, since we don't support English CsMap yet:
+                if (!CreateProcess(nullptr, (LPSTR)cmdline.text(), nullptr, nullptr, FALSE, 0, (LPVOID)"LC_MESSAGES=de\0",
+                    settings.echeck_dir.text(), &si, &pi)) {
+                    errorList->appendItem("CreateProcess failed: " + cmdline);
+                }
+
+                // Wait until child process exits.
+                WaitForSingleObject(pi.hProcess, INFINITE);
+
+                // Close process and thread handles. 
+                CloseHandle(pi.hProcess);
+                CloseHandle(pi.hThread);
+#else
+                if (system(cmdline.text()) < 0) {
+                    errorList->appendItem("echeck system call failed: " + cmdline);
+                    return false;
+                }
+#endif
+                for (auto error : output) delete error;
+                output.clear();
+                /* select the errors tab */
+                outputTabs->setCurrent(outputTabs->indexOfChild(errorList) / 2);
+
+                std::ifstream results;
+                results.open(outfile, std::ios::in);
+                if (results.is_open()) {
+                    std::string str;
+                    while (!results.eof()) {
+                        std::getline(results, str);
+                        if (!str.empty()) {
+                            MessageInfo* error = new MessageInfo();
+                            if (error) {
+                                FXString line, display;
+                                FXString tok;
+                                line.assign(str.c_str());
+                                error->level = FXIntVal(line.section("|", 1));
+                                tok = line.section("|", 2);
+                                if (tok == "U") {
+                                    error->unit_id = FXIntVal(line.section("|", 3), 36);
+                                }
+                                else if (tok == "R") {
+                                    tok = line.section("|", 3);
+                                    error->region_x = FXIntVal(tok.section(",", 0));
+                                    error->region_y = FXIntVal(tok.section(",", 1));
+                                }
+                                output.push_back(error);
+                                display = line.section("|", 5);
+                                if (!display.empty()) {
+                                    display += ": ";
+                                }
+                                display += line.section("|", 4);
+                                errorList->appendItem(display, nullptr, error);
+                            }
+                        }
+                    }
+                }
+                unlink(outfile);
+            }
+            unlink(infile);
+        }
+    }
     return true;
 }
 
@@ -2146,6 +2261,7 @@ long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
             FXString filename = dlg.getFilename();
             beginLoading(filename);
             if (nullptr != (report = loadFile(filename))) {
+                checkCommands();
                 updateFileNames();
                 mapChange();
                 recentFiles.appendFile(filename);
@@ -2182,6 +2298,7 @@ void CSMap::loadFiles(const FXString filenames[])
         // rebuild the resulting report
         selection.selected |= selection.MAPCHANGED;
         mapChange();
+        checkCommands();
         updateFileNames();
         if (old_cr != report) {
             // TODO: make selection to use the new report instead
@@ -2208,122 +2325,9 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
     return 1;
 }
 
-char *u_mkstemp(char *buffer) {
-#ifdef HAVE_MKSTEMP
-    int fd;
-    strncpy(buffer, "/tmp/csmapXXXXXX", PATH_MAX);
-    if (0 <= (fd = mkstemp(buffer))) {
-        close(fd);
-        return buffer;
-    }
-    return nullptr;
-#else
-    return tmpnam(buffer);
-#endif
-}
-
-
 long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
 {
-    // save to a temporary file:
-    char infile[PATH_MAX];
-    char outfile[PATH_MAX];
-    FXString cmdline("echeck");
-#ifdef WIN32
-    cmdline += "w.exe";
-    if (!settings.echeck_dir.empty()) {
-        cmdline = "\"" + settings.echeck_dir + "\\" + cmdline + "\"";
-    }
-#else
-    if (!settings.echeck_dir.empty()) {
-        cmdline = settings.echeck_dir + "/echeck";
-    }
-#endif
-    errorList->clearItems();
-    if (cmdline.empty()) {
-        errorList->appendItem("Could not find the echeck executable.");
-    }
-    else {
-        if (!u_mkstemp(infile) || report->saveCmds(infile, "", true) != 0) {
-            errorList->appendItem("Could not save commands for analysis.");
-        }
-        else {
-            if (!u_mkstemp(outfile)) {
-                errorList->appendItem("Could not create output file for analysis.");
-            }
-            else {
-                // Echeck it:
-                cmdline.append(" -w3 -c1 -Lde -Re2 -O");
-                cmdline.append(outfile);
-                cmdline.append(" ");
-                cmdline.append(infile);
-#ifdef WIN32
-                STARTUPINFO si;
-                PROCESS_INFORMATION pi;
-
-                ZeroMemory(&si, sizeof(si));
-                si.cb = sizeof(si);
-                ZeroMemory(&pi, sizeof(pi));
-                // hack: set ECheck locale to German, since we don't support English CsMap yet:
-                if (!CreateProcess(nullptr, (LPSTR)cmdline.text(), nullptr, nullptr, FALSE, 0, (LPVOID)"LC_MESSAGES=de\0", 
-                    settings.echeck_dir.text(), &si, &pi)) {
-                    errorList->appendItem("CreateProcess failed: " + cmdline);
-                }
-
-                // Wait until child process exits.
-                WaitForSingleObject(pi.hProcess, INFINITE);
-
-                // Close process and thread handles. 
-                CloseHandle(pi.hProcess);
-                CloseHandle(pi.hThread);
-#else
-                if (system(cmdline.text()) < 0) {
-                    errorList->appendItem("echeck system call failed: " + cmdline);
-                }
-#endif
-                for (auto error : output) delete error;
-                output.clear();
-                outputTabs->setCurrent(1);
-                
-                std::ifstream results;
-                results.open(outfile, std::ios::in);
-                if (results.is_open()) {
-                    std::string str;
-                    while (!results.eof()) {
-                        std::getline(results, str);
-                        if (!str.empty()) {
-                            MessageInfo *error = new MessageInfo();
-                            if (error) {
-                                FXString line, display;
-                                FXString tok;
-                                line.assign(str.c_str());
-                                error->level = FXIntVal(line.section("|", 1));
-                                tok = line.section("|", 2);
-                                if (tok == "U") {
-                                    error->unit_id = FXIntVal(line.section("|", 3), 36);
-                                }
-                                else if (tok == "R") {
-                                    tok = line.section("|", 3);
-                                    error->region_x = FXIntVal(tok.section(",", 0));
-                                    error->region_y = FXIntVal(tok.section(",", 1));
-                                }
-                                output.push_back(error);
-                                display = line.section("|", 5);
-                                if (!display.empty()) {
-                                    display += ": ";
-                                }
-                                display += line.section("|", 4);
-                                errorList->appendItem(display, nullptr, error);
-                            }
-                        }
-                    }
-                }
-                unlink(outfile);
-            }
-            unlink(infile);
-        }
-    }
-    return 1;
+    return checkCommands() ? 1 : 0;
 }
 
 int CSMap::unlink(const char *pathname) {
@@ -2739,6 +2743,7 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
         if (nullptr != (report = loadFile(filename))) {
             recentFiles.appendFile(filename);
             updateFileNames();
+            checkCommands();
             mapChange();
         }
     }

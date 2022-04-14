@@ -28,8 +28,7 @@ public:
     void ParseCommandLine(int argc, char** argv);
 #endif
 
-    static CSMap* getInstance();
-
+private:
     bool saveReport(const FXString& filename, map_type mode, bool merge_commands = false);
     void mapChange();
 	bool haveActiveFaction() const;
@@ -43,7 +42,8 @@ public:
 	bool loadCommands(const FXString& filename);
     bool updateCommands(const FXString &filename);
     bool saveCommands(const FXString &filename, bool stripped);
-	bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
+    bool checkCommands();
+    bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
     void updateFileNames();
 
 public:		// this functions are slots for menu commands
