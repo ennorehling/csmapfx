@@ -1,3 +1,9 @@
+csmapfx (1.2.7-1) stable; urgency=low
+
+  * reset battles and factions when loading a new report.
+
+ -- Enno Rehling <enno@eressea.de>  Wed, 20 Apr 2022 18:00:00 +0200
+
 csmapfx (1.2.6-1) stable; urgency=low
 
   * remove unknown section from battle reports

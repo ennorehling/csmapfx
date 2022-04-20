@@ -49,6 +49,8 @@ void FXReportInfo::setMapFile(datafile *f)
         datablock::itor block, end;
         mapFile = f;
         clearSiblings(groups.messages);
+        clearSiblings(groups.factions);
+        clearSiblings(groups.battles);
         if (mapFile) {
             end = mapFile->blocks().end();
             for (block = mapFile->blocks().begin(); block != end; ++block) {
