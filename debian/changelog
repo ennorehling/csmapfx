@@ -1,8 +1,9 @@
 csmapfx (1.2.7-1) stable; urgency=low
 
   * reset battles and factions when loading a new report.
+  * remove outdated region visibility status during merge.
 
- -- Enno Rehling <enno@eressea.de>  Wed, 20 Apr 2022 18:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Thu, 21 Apr 2022 06:00:00 +0200
 
 csmapfx (1.2.6-1) stable; urgency=low
 

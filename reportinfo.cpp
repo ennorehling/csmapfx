@@ -53,12 +53,14 @@ void FXReportInfo::setMapFile(datafile *f)
         clearSiblings(groups.battles);
         if (mapFile) {
             end = mapFile->blocks().end();
-            for (block = mapFile->blocks().begin(); block != end; ++block) {
+            for (block = mapFile->blocks().begin(); block != end;) {
                 if (block->type() == block_type::TYPE_MESSAGE && block->depth() == 3) {
                     addMessage(groups.messages, block);
                 }
                 else if (block->type() == block_type::TYPE_BATTLE) {
                     addBattle(block);
+                    /* block is already on the next object */
+                    continue;
                 }
                 else if (block->type() == block_type::TYPE_FACTION) {
                     addFaction(block);
@@ -66,6 +68,7 @@ void FXReportInfo::setMapFile(datafile *f)
                 else if (block->type() == block_type::TYPE_REGION) {
                     break;
                 }
+                ++block;
             }
         }
     }

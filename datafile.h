@@ -274,6 +274,7 @@ public:
 	int valueInt(const FXString& key, int def = 0) const;
 	int valueInt(key_type key, int def = 0) const;
 	const datakey* valueKey(int key) const;
+    bool removeKey(int key);
 
     // Flags for map icons
 	enum

@@ -750,6 +750,18 @@ const datakey* datablock::valueKey(int key) const
 	return NULL;
 }
 
+bool datablock::removeKey(int key)
+{
+    for (datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
+    {
+        if (srch->type() == key) {
+            m_data.erase(srch);
+            return true;
+        }
+    }
+    return false;
+}
+
 // ===========================
 // === datafile implementation
 
@@ -1194,6 +1206,13 @@ void datafile::merge(datafile * new_cr, int x_offset, int y_offset)
     // dann: Datei an den aktuellen CR anfuegen (nur Karteninformationen)
     datablock::itor new_end = new_cr->m_blocks.end();
     bool copy_children = false;
+    for (datablock::itor block = m_blocks.begin(); block != m_blocks.end(); ++block) {
+        /* remove visibility status from older of the two reports */
+        if (block->type() == block_type::TYPE_REGION)
+        {
+            block->removeKey(TYPE_VISIBILITY);
+        }
+    }
     for (datablock::itor block = new_cr->m_blocks.begin(); block != new_end;)
     {
         // handle only regions
