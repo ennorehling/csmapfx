@@ -13,7 +13,7 @@ class FXSearchDlg : public FXDialogBox
 	FXDECLARE(FXSearchDlg)
 
 public:
-	FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint opts=DECOR_TITLE|DECOR_BORDER, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
+	FXSearchDlg(FXWindow* owner, FXFoldingList* resultList, const FXString& name, FXIcon* icon, FXuint opts=DECOR_TITLE|DECOR_BORDER, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
 	void create();
 	virtual ~FXSearchDlg();

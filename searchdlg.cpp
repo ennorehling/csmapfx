@@ -22,8 +22,6 @@ FXDEFMAP(FXSearchDlg) MessageMap[]=
 	FXMAPFUNC(SEL_COMMAND,				FXSearchDlg::ID_SEARCH,					FXSearchDlg::onSearch),
 	FXMAPFUNC(SEL_CHANGED,				FXSearchDlg::ID_SEARCH,					FXSearchDlg::onChangedSearch),
 	FXMAPFUNC(SEL_UPDATE,				FXSearchDlg::ID_SEARCH,					FXSearchDlg::onUpdateSearch),
-
-	FXMAPFUNC(SEL_COMMAND,				FXSearchDlg::ID_RESULTS,				FXSearchDlg::onSelectResults),
 };
 
 FXIMPLEMENT(FXSearchDlg, FXDialogBox, MessageMap, ARRAYNUMBER(MessageMap))
@@ -40,8 +38,8 @@ protected:
     FXFont* m_font;
 };
 
-FXSearchDlg::FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint opts, FXint x, FXint y, FXint w, FXint h)
-		: FXDialogBox(owner, name, opts, x, y, w, h, 10, 10, 10, 10, 10, 10), modifiedText(false), boldFont(nullptr), mapFile(nullptr)
+FXSearchDlg::FXSearchDlg(FXWindow* owner, FXFoldingList* resultList, const FXString& name, FXIcon* icon, FXuint opts, FXint x, FXint y, FXint w, FXint h)
+		: FXDialogBox(owner, name, opts, x, y, w, h, 10, 10, 10, 10, 10, 10), modifiedText(false), boldFont(nullptr), results(resultList), mapFile(nullptr)
 {
 	setIcon(icon);
 
@@ -596,45 +594,6 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 	else
 		info_text->setText(FXStringVal(results->getNumItems()) + " Treffer");
 
-	return 1;
-}
-
-long FXSearchDlg::onSelectResults(FXObject*, FXSelector, void*)
-{
-	if (!mapFile)
-		return 0;
-
-	FXFoldingItem *item = results->getCurrentItem();
-	if (!item)
-		return 0;
-
-	datablock* select = (datablock*)item->getData();
-
-    datablock::itor region, block, end = mapFile->blocks().end();
-    mapFile->findSelection(select, block, region);
-
-    // propagate selection
-    datafile::SelectionState state;
-    state.selected = 0;
-    if (region != end) {
-        state.region = region;
-        state.selected |= state.REGION;
-    }
-    if (block != end) {
-        if (block->type() == block_type::TYPE_UNIT) {
-            state.unit = block;
-            state.selected |= state.UNIT;
-        }
-        else if (block->type() == block_type::TYPE_BUILDING) {
-            state.building = block;
-            state.selected |= state.BUILDING;
-        }
-        else if (block->type() == block_type::TYPE_SHIP) {
-            state.ship = block;
-            state.selected |= state.SHIP;
-        }
-    }
-	getOwner()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 	return 1;
 }
 
