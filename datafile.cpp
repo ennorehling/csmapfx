@@ -22,7 +22,7 @@ void att_commands::addCommand(const FXString &line) {
 // ===========================
 // === datakey implementation
 
-void datakey::key(const FXString& type, enum class block_type btype)
+void datakey::key(const FXString& type, enum block_type btype)
 {
 	m_type = parseType(type, btype);
 
@@ -258,7 +258,7 @@ int datakey::getInt() const
 }
 
 // parses str and returns created datakey object or NULL pointer
-bool datakey::parse(char* str, enum class block_type btype, bool isUtf8)
+bool datakey::parse(char* str, enum block_type btype, bool isUtf8)
 {
 	if (!str)
 		return false;
