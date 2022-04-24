@@ -7,9 +7,46 @@
 #include <set>
 #include <fx.h>
 
-// ==================
-// === datakey class
 
+// types of datablocks
+typedef enum class block_type
+{
+    TYPE_UNKNOWN,
+    TYPE_VERSION,
+    TYPE_OPTIONS,
+    TYPE_FACTION,
+    TYPE_GROUP,
+    TYPE_ALLIANCE,
+    TYPE_REGION,
+    TYPE_ISLAND,
+    TYPE_SCHEMEN,
+    TYPE_RESOURCE,
+    TYPE_PRICES,
+    TYPE_DURCHREISE,
+    TYPE_DURCHSCHIFFUNG,
+    TYPE_BORDER,
+    TYPE_SHIP,
+    TYPE_BUILDING,
+    TYPE_UNIT,
+    TYPE_UNITMESSAGES,
+    TYPE_TALENTS,
+    TYPE_SPELLS,
+    TYPE_COMBATSPELL,
+    TYPE_ZAUBER,
+    TYPE_KOMPONENTEN,
+    TYPE_TRANK,
+    TYPE_ZUTATEN,
+    TYPE_ITEMS,
+    TYPE_COMMANDS,
+    TYPE_EFFECTS,
+    TYPE_MESSAGE,
+    TYPE_BATTLE,
+    TYPE_MESSAGETYPE,
+    TYPE_TRANSLATION,
+    TYPE_LAST
+} block_type;
+
+// types of datakeys
 typedef enum key_type
 {
     TYPE_UNKNOWN,
@@ -68,6 +105,9 @@ typedef enum key_type
     TYPE_INTEGER = 1 << 7
 } key_type;
 
+// ==================
+// === datakey class
+
 class datakey
 {
 public:
@@ -81,15 +121,15 @@ public:
     }
     FXString key() const;
 
-	void key(const FXString& s);
+	void key(const FXString& s, enum class block_type btype);
 	void value(const FXString& s);
 
 	bool isInt() const { return (m_type & TYPE_INTEGER) != 0; }
 	int getInt() const;
 
 	// parses str and create datakey object
-	static int parseType(const FXString& type);
-	bool parse(char* str, bool isUtf8 = true);
+	static int parseType(const FXString& type, enum class block_type btype);
+	bool parse(char* str, enum class block_type btype, bool isUtf8 = true);
 
 	typedef std::vector<datakey/*, boost::pool_allocator<datakey>*/ > list_type;
 	typedef list_type::iterator itor;
@@ -185,44 +225,6 @@ public:
 
 // ====================
 // === datablock class
-
-// types of datablocks
-typedef enum class block_type
-{
-    TYPE_UNKNOWN,
-    TYPE_VERSION,
-    TYPE_OPTIONS,
-    TYPE_FACTION,
-    TYPE_GROUP,
-    TYPE_ALLIANCE,
-    TYPE_REGION,
-    TYPE_ISLAND,
-    TYPE_SCHEMEN,
-    TYPE_RESOURCE,
-    TYPE_PRICES,
-    TYPE_DURCHREISE,
-    TYPE_DURCHSCHIFFUNG,
-    TYPE_BORDER,
-    TYPE_SHIP,
-    TYPE_BUILDING,
-    TYPE_UNIT,
-    TYPE_UNITMESSAGES,
-    TYPE_TALENTS,
-    TYPE_SPELLS,
-    TYPE_COMBATSPELL,
-    TYPE_ZAUBER,
-    TYPE_KOMPONENTEN,
-    TYPE_TRANK,
-    TYPE_ZUTATEN,
-    TYPE_ITEMS,
-    TYPE_COMMANDS,
-    TYPE_EFFECTS,
-    TYPE_MESSAGE,
-    TYPE_BATTLE,
-    TYPE_MESSAGETYPE,
-    TYPE_TRANSLATION,
-    TYPE_LAST
-} block_type;
 
 
 // contains information for "NAME Info"

@@ -1,3 +1,10 @@
+csmapfx (1.2.8-1) stable; urgency=low
+
+  * fix type tags missing quotes in RESOURCE block
+  * add workaround to read files written by broken version
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 24 Apr 2022 20:30:00 +0200
+
 csmapfx (1.2.7-1) stable; urgency=low
 
   * reset battles and factions when loading a new report.

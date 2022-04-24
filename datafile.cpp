@@ -22,9 +22,9 @@ void att_commands::addCommand(const FXString &line) {
 // ===========================
 // === datakey implementation
 
-void datakey::key(const FXString& type)
+void datakey::key(const FXString& type, enum class block_type btype)
 {
-	m_type = parseType(type);
+	m_type = parseType(type, btype);
 
 	if (m_type == TYPE_UNKNOWN)
 		m_key = type;
@@ -37,7 +37,7 @@ void datakey::value(const FXString& s)
 	m_value = s;
 }
 
-/*static*/ int datakey::parseType(const FXString& type)
+/*static*/ int datakey::parseType(const FXString& type, const block_type btype)
 {
 	if (type.empty())
 		return TYPE_EMPTY;
@@ -128,18 +128,19 @@ void datakey::value(const FXString& s)
     if (type == "MaxLadung")
         return TYPE_MAXLOAD;
 
-    // MESSAGE tags
-    if (type == "type")
-        return TYPE_MSG_TYPE | TYPE_INTEGER;
-    if (type == "mode")
-        return TYPE_MSG_MODE|TYPE_INTEGER;
-    if (type == "cost")
-        return TYPE_MSG_COST|TYPE_INTEGER;
-    if (type == "amount")
-        return TYPE_MSG_AMOUNT|TYPE_INTEGER;
-    if (type == "region")
-        return TYPE_MSG_REGION;
-
+    if (btype == block_type::TYPE_MESSAGE) {
+        // MESSAGE tags
+        if (type == "type")
+            return TYPE_MSG_TYPE | TYPE_INTEGER;
+        if (type == "mode")
+            return TYPE_MSG_MODE | TYPE_INTEGER;
+        if (type == "cost")
+            return TYPE_MSG_COST | TYPE_INTEGER;
+        if (type == "amount")
+            return TYPE_MSG_AMOUNT | TYPE_INTEGER;
+        if (type == "region")
+            return TYPE_MSG_REGION;
+    }
 	return TYPE_UNKNOWN;
 }
 
@@ -257,7 +258,7 @@ int datakey::getInt() const
 }
 
 // parses str and returns created datakey object or NULL pointer
-bool datakey::parse(char* str, bool isUtf8)
+bool datakey::parse(char* str, enum class block_type btype, bool isUtf8)
 {
 	if (!str)
 		return false;
@@ -283,9 +284,9 @@ bool datakey::parse(char* str, bool isUtf8)
 	// ok, so assign new values
 
 	if (semikolon)
-		key(semikolon+1);			// ... and the FXString::operator=() copies the string itself.
+		key(semikolon+1, btype);			// ... and the FXString::operator=() copies the string itself.
 	else
-		key("");					// no semikolon found.
+		key("", btype);					// no semikolon found.
 
 	if (*str == '\"')				// cuts the " at start and end of the string
 	{
@@ -566,13 +567,8 @@ bool datablock::parse(char* str)
 		if (*srch == ' ' && !space)
 			space = srch;
 		
-		if (*srch == '\"')	// can't be a '\"'
+		if (*srch == '\"' || *srch == ';')	// can't be a '\"' or ';'
 			return false;
-		if (*srch == ';')	// ';' is a comment, stop here
-		{
-			*srch = '\0';
-			break;
-		}
 	}
 
 	// unset flags
@@ -855,7 +851,7 @@ int datafile::load(const char* filename)
 		next = getNextLine(ptr);
 
 		// erster versuch: enth\u00e4lt die Zeile einen datakey?
-		if (key.parse(ptr, utf8))
+		if (key.parse(ptr, block ? block->type() : block_type::TYPE_UNKNOWN, utf8))
 		{
 			if (block)
 			{
@@ -891,6 +887,15 @@ int datafile::load(const char* filename)
 			m_blocks.push_back(newblock);		// appends BLOCK Info - tags
 			block = &m_blocks.back();
 		}
+        else if (block) {
+            /* fix for a bug introduced by version 1.2.7 */
+            const char* semi = strchr(ptr, ';');
+            if (semi) {
+                key.key(FXString(semi + 1), block->type());
+                key.value(FXString(ptr, semi - ptr));
+                block->data().push_back(key);
+            }
+        }
 	}
     createHashTables();
 	return m_blocks.size();
@@ -2263,7 +2268,7 @@ void datafile::createHashTables()
 				if (factionId == 0 || factionId == 666)	// Monster (0) and the new Monster (ii)
 				{
 					datakey key;
-					key.key("Parteiname");
+					key.key("Parteiname", block->type());
 					key.value("Monster");
 					faction.data().push_back(key);
 				}

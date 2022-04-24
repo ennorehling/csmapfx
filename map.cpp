@@ -1211,7 +1211,7 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 					if (key == region->data().end() && input.getText().length())
 					{
 						datakey namekey;
-						namekey.key("Insel");
+						namekey.key("Insel", region->type());
 						namekey.value(input.getText());
 						region->data().push_back(namekey);
 					}
@@ -1303,7 +1303,7 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 						if (key == region->data().end() && input.getText().length())
 						{
 							datakey namekey;
-							namekey.key("Name");
+							namekey.key("Name", region->type());
 							namekey.value(input.getText());
 							region->data().push_back(namekey);
 						}
