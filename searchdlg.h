@@ -13,7 +13,7 @@ class FXSearchDlg : public FXDialogBox
 	FXDECLARE(FXSearchDlg)
 
 public:
-	FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint opts=DECOR_TITLE|DECOR_BORDER, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
+	FXSearchDlg(FXWindow* owner, FXFoldingList* resultList, const FXString& name, FXIcon* icon, FXuint opts=DECOR_TITLE|DECOR_BORDER, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
 	void create();
 	virtual ~FXSearchDlg();
@@ -29,7 +29,6 @@ public:
 	long onSearch(FXObject*, FXSelector, void*);		// hit enter in search textbox
 	long onChangedSearch(FXObject*, FXSelector, void*);	// change text in textbox
 	long onUpdateSearch(FXObject*, FXSelector, void*);	// update event on textbox
-	long onSelectResults(FXObject*, FXSelector, void*);
 
 public:
 	enum
@@ -40,12 +39,8 @@ public:
 	};
 
 protected:
-	datafile::SelectionState selection;
-    datafile *mapFile;
-
 	FXTextField		*search;				// textfield for search
 	FXButton		*search_button;			// "do the search!"
-	bool			modifiedText;
 
 	FXFoldingList	*results;				// list of results
 	FXLabel			*info_text;				// info about search
@@ -61,9 +56,14 @@ protected:
 		FXListBox		*domain;				// where to search
 
 		FXCheckButton	*searchdirectly;
+		FXCheckButton	*appendResults;
 		FXCheckButton	*limitresults;
 
 	} options;
+
+    datafile* mapFile;
+    datafile::SelectionState selection;
+    bool modifiedText;
 
 protected:
 	FXSearchDlg(){}

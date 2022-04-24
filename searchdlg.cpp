@@ -20,14 +20,12 @@ FXDEFMAP(FXSearchDlg) MessageMap[]=
 	FXMAPFUNC(SEL_COMMAND,				FXSearchDlg::ID_SEARCH,					FXSearchDlg::onSearch),
 	FXMAPFUNC(SEL_CHANGED,				FXSearchDlg::ID_SEARCH,					FXSearchDlg::onChangedSearch),
 	FXMAPFUNC(SEL_UPDATE,				FXSearchDlg::ID_SEARCH,					FXSearchDlg::onUpdateSearch),
-
-	FXMAPFUNC(SEL_COMMAND,				FXSearchDlg::ID_RESULTS,				FXSearchDlg::onSelectResults),
 };
 
 FXIMPLEMENT(FXSearchDlg,FXDialogBox,MessageMap, ARRAYNUMBER(MessageMap))
 
-FXSearchDlg::FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint opts, FXint x,FXint y,FXint w,FXint h)
-		: FXDialogBox(owner, name, opts, x,y,w,h, 10,10,10,10, 10,10), modifiedText(false)
+FXSearchDlg::FXSearchDlg(FXWindow* owner, FXFoldingList* resultList, const FXString& name, FXIcon* icon, FXuint opts, FXint x,FXint y,FXint w,FXint h)
+		: FXDialogBox(owner, name, opts, x,y,w,h, 10,10,10,10, 10,10), results(resultList), mapFile(nullptr), modifiedText(false)
 {
 	setIcon(icon);
 
@@ -78,19 +76,8 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	FXVerticalFrame *details_frame = new FXVerticalFrame(details, LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0);
 	details_frame->setBorderColor(getApp()->getShadowColor());
 	options.searchdirectly = new FXCheckButton(details_frame, "Bei Texteingabe suchen", NULL,0, CHECKBUTTON_NORMAL);
+	options.appendResults = new FXCheckButton(details_frame, L"Zu Ergebnisse hinzuf\u00fcgen", NULL,0, CHECKBUTTON_NORMAL);
 	options.limitresults = new FXCheckButton(details_frame, FXString(L"Auf 1000 Treffer beschr\u00e4nken"), this,ID_SEARCH, CHECKBUTTON_NORMAL);
-
-	// results list
-	new FXHorizontalSeparator(content, SEPARATOR_GROOVE|LAYOUT_FILL_X, 0,0,0,0, 0,0,DEFAULT_SPACING,DEFAULT_SPACING);
-
-	FXHorizontalFrame *list_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0,0,0,0, 0,0,0,0);
-	list_frame->setBorderColor(getApp()->getShadowColor());
-
-	results = new FXFoldingList(list_frame, this,ID_RESULTS, FOLDINGLIST_SINGLESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	results->getHeader()->setHeaderStyle(HEADER_RESIZE|HEADER_TRACKING);
-	
-    results->appendHeader("Region");
-	results->appendHeader(FXString(L"Einheit/Geb\u00e4ude/Schiff"));
 }
 
 void FXSearchDlg::create()
@@ -548,44 +535,5 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 	else
 		info_text->setText(FXStringVal(results->getNumItems()) + " Treffer");
 
-	return 1;
-}
-
-long FXSearchDlg::onSelectResults(FXObject*, FXSelector, void*)
-{
-	if (!mapFile)
-		return 0;
-
-	FXFoldingItem *item = results->getCurrentItem();
-	if (!item)
-		return 0;
-
-	datablock* select = (datablock*)item->getData();
-
-    datablock::itor region, block, end = mapFile->blocks().end();
-    mapFile->findSelection(select, block, region);
-
-    // propagate selection
-    datafile::SelectionState state;
-    state.selected = 0;
-    if (region != end) {
-        state.region = region;
-        state.selected |= state.REGION;
-    }
-    if (block != end) {
-        if (block->type() == block_type::TYPE_UNIT) {
-            state.unit = block;
-            state.selected |= state.UNIT;
-        }
-        else if (block->type() == block_type::TYPE_BUILDING) {
-            state.building = block;
-            state.selected |= state.BUILDING;
-        }
-        else if (block->type() == block_type::TYPE_SHIP) {
-            state.ship = block;
-            state.selected |= state.SHIP;
-        }
-    }
-	getOwner()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 	return 1;
 }

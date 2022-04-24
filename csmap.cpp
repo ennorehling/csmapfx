@@ -93,6 +93,7 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_CHECK_ORDERS,        CSMap::updActiveFaction),
 
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_ERRROR_SELECTED,          CSMap::onErrorSelected),
+    FXMAPFUNC(SEL_COMMAND,	CSMap::ID_RESULT_SELECTED,		    CSMap::onResultSelected),
 
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_MODIFY_CHECK,        CSMap::onModifyCheck),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_MODIFY_CHECK,        CSMap::updModifyCheck),
@@ -536,6 +537,11 @@ CSMap::CSMap(FXApp *app) :
     messages = new FXMessages(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
     new FXTabItem(outputTabs, "Fehler");
     errorList = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
+    new FXTabItem(outputTabs, "Suchergebnisse");
+    searchResults = new FXFoldingList(outputTabs, this, ID_RESULT_SELECTED, FOLDINGLIST_SINGLESELECT | LAYOUT_FILL_X | LAYOUT_FILL_Y);
+    searchResults->getHeader()->setHeaderStyle(HEADER_RESIZE | HEADER_TRACKING);
+    searchResults->appendHeader("Region");
+    searchResults->appendHeader(FXString(L"Einheit/Geb\u00e4ude/Schiff"));
 
     // Calculator bar
     mathbar = new FXCalculator(middle, this,ID_SELECTION, LAYOUT_FILL_X);
@@ -636,7 +642,7 @@ CSMap::CSMap(FXApp *app) :
     infodlg->setGame("default");
 
     // search dialog
-    searchdlg = new FXSearchDlg(this, "Suchen...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));
+    searchdlg = new FXSearchDlg(this, searchResults, "Suchen...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));
     searchdlg->getAccelTable()->addAccel(MKUINT(KEY_F,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_SEARCHDLG));
 }
 
@@ -2250,6 +2256,46 @@ long CSMap::onCalculator(FXObject *, FXSelector, void *)
 
     return 1;
 }
+
+long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)
+{
+    if (!report)
+        return 0;
+
+    FXFoldingItem* item = searchResults->getCurrentItem();
+    if (!item)
+        return 0;
+
+    datablock* select = (datablock*)item->getData();
+
+    datablock::itor region, block, end = report->blocks().end();
+    report->findSelection(select, block, region);
+
+    // propagate selection
+    datafile::SelectionState state;
+    state.selected = 0;
+    if (region != end) {
+        state.region = region;
+        state.selected |= state.REGION;
+    }
+    if (block != end) {
+        if (block->type() == block_type::TYPE_UNIT) {
+            state.unit = block;
+            state.selected |= state.UNIT;
+        }
+        else if (block->type() == block_type::TYPE_BUILDING) {
+            state.building = block;
+            state.selected |= state.BUILDING;
+        }
+        else if (block->type() == block_type::TYPE_SHIP) {
+            state.ship = block;
+            state.selected |= state.SHIP;
+        }
+    }
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    return 1;
+}
+
 long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
 {
     FXFileDialog dlg(this, FXString(L"\u00d6ffnen..."));

@@ -109,7 +109,8 @@ public:		// this functions are slots for menu commands
     long updModifyCheck(FXObject*, FXSelector, void* ptr);
 
     long onErrorSelected(FXObject*, FXSelector, void* ptr);
-	
+    long onResultSelected(FXObject*, FXSelector, void* ptr);
+
 	long onSetVisiblePlane(FXObject*, FXSelector, void* ptr);
 	long onUpdVisiblePlane(FXObject*, FXSelector, void* ptr);
 
@@ -159,6 +160,7 @@ public:
 
         // ECheck error list
         ID_ERRROR_SELECTED,
+        ID_RESULT_SELECTED,
 
 		// View menu
 		ID_VIEW_MAPONLY,
@@ -281,6 +283,7 @@ private:
     class FXInfoDlg* infodlg;
     class FXSearchDlg* searchdlg;
     class FXDialogBox* minimap_frame;
+    class FXFoldingList* searchResults;
     
     time_t last_save_time;
 
