@@ -1033,6 +1033,12 @@ datafile* CSMap::mergeFile(const FXString& filename)
 
     int x_offset = 0, y_offset = 0;
     datafile* result = report;
+    if (new_turn < turn) {
+        new_cr->removeTemporary();
+    }
+    else if (turn < new_turn) {
+        report->removeTemporary();
+    }
     if (new_turn < turn || (new_turn == turn && report->hasUnits())) {
         report->findOffset(new_cr, &x_offset, &y_offset);
         report->merge(new_cr, x_offset, y_offset);

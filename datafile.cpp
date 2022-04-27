@@ -1206,11 +1206,8 @@ void datafile::findOffset(datafile* new_cr, int* x_offset, int* y_offset) const
     }
 }
 
-void datafile::merge(datafile * new_cr, int x_offset, int y_offset)
+void datafile::removeTemporary()
 {
-    // dann: Datei an den aktuellen CR anfuegen (nur Karteninformationen)
-    datablock::itor new_end = new_cr->m_blocks.end();
-    bool copy_children = false;
     for (datablock::itor block = m_blocks.begin(); block != m_blocks.end(); ++block) {
         /* remove visibility status from older of the two reports */
         if (block->type() == block_type::TYPE_REGION)
@@ -1218,6 +1215,13 @@ void datafile::merge(datafile * new_cr, int x_offset, int y_offset)
             block->removeKey(TYPE_VISIBILITY);
         }
     }
+}
+
+void datafile::merge(datafile * new_cr, int x_offset, int y_offset)
+{
+    // dann: Datei an den aktuellen CR anfuegen (nur Karteninformationen)
+    datablock::itor new_end = new_cr->m_blocks.end();
+    bool copy_children = false;
     for (datablock::itor block = new_cr->m_blocks.begin(); block != new_end;)
     {
         // handle only regions
