@@ -721,6 +721,7 @@ int datablock::valueInt(const FXString& key, int def /* = 0 */) const
 {
     for (datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++) {
         if (key == srch->key()) {
+            assert(srch->isInt());
             return srch->getInt();
         }
     }
@@ -730,10 +731,14 @@ int datablock::valueInt(const FXString& key, int def /* = 0 */) const
 
 int datablock::valueInt(key_type key, int def /* = 0 */) const
 {
-	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
-		if (srch->type() == key)
-			return srch->getInt();
-
+    for (datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
+    {
+        if (srch->type() == key)
+        {
+            assert(srch->isInt());
+            return srch->getInt();
+        }
+    }
 	return def;
 }
 

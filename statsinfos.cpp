@@ -210,7 +210,7 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
         {
             if (block->type() == block_type::TYPE_MESSAGE)
             {
-                int type = block->valueInt(TYPE_TYPE);
+                int type = block->valueInt(TYPE_MSG_TYPE);
 
                 if (type != 771334452 && type != 443066738)
                     continue;
