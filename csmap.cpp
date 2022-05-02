@@ -536,11 +536,12 @@ CSMap::CSMap(FXApp *app) :
     messages = new FXMessages(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
     new FXTabItem(outputTabs, "&Fehler");
     errorList = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
-    new FXTabItem(outputTabs, "Suchergebnisse");
+    new FXTabItem(outputTabs, "&Suchergebnisse");
     searchResults = new FXFoldingList(outputTabs, this, ID_RESULT_SELECTED, FOLDINGLIST_SINGLESELECT | LAYOUT_FILL_X | LAYOUT_FILL_Y);
     searchResults->getHeader()->setHeaderStyle(HEADER_RESIZE | HEADER_TRACKING);
     searchResults->appendHeader("Region");
     searchResults->appendHeader(FXString(L"Einheit/Geb\u00e4ude/Schiff"));
+    searchResults->appendHeader("Partei");
 
     // Calculator bar
     mathbar = new FXCalculator(middle, this,ID_SELECTION, LAYOUT_FILL_X);
@@ -819,6 +820,11 @@ void CSMap::create()
 
     if (maximized)
         maximize();
+
+    // resize table headers
+    int wid = (outputTabs->getWidth() - outputTabs->getPadLeft() - outputTabs->getPadRight() - 20) / searchResults->getNumHeaders();
+    for (int i = 0; i < searchResults->getNumHeaders(); i++)
+        searchResults->setHeaderSize(i, wid);
 }
 
 FXbool CSMap::close(FXbool notify)

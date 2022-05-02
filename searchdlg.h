@@ -30,7 +30,7 @@ public:
 	long onChangedSearch(FXObject*, FXSelector, void*);	// change text in textbox
 	long onUpdateSearch(FXObject*, FXSelector, void*);	// update event on textbox
     long onSelectResults(FXObject*, FXSelector, void*);
-
+    long onCopyResults(FXObject* sender, FXSelector sel, void* ptr);
 public:
 	enum
 	{
@@ -43,10 +43,12 @@ protected:
 	datafile::SelectionState selection;
     datafile *mapFile = nullptr;
 
-	FXTextField		*search = nullptr;				// textfield for search
-	FXButton		*search_button = nullptr;		// "do the search!"
+	FXTextField		*txtSearch = nullptr;				// textfield for search
+	FXButton		*btnSearch = nullptr;		// "do the search!"
+	FXButton		*btnTransfer = nullptr;		// "do the search!"
 	bool			modifiedText = false;
 
+	FXFoldingList	*matches = nullptr;				// list of results
 	FXFoldingList	*results = nullptr;				// list of results
 	FXLabel			*info_text = nullptr;			// info about search
 

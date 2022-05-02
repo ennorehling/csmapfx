@@ -22,6 +22,8 @@ FXDEFMAP(FXSearchDlg) MessageMap[]=
 	FXMAPFUNC(SEL_COMMAND,				FXSearchDlg::ID_SEARCH,					FXSearchDlg::onSearch),
 	FXMAPFUNC(SEL_CHANGED,				FXSearchDlg::ID_SEARCH,					FXSearchDlg::onChangedSearch),
 	FXMAPFUNC(SEL_UPDATE,				FXSearchDlg::ID_SEARCH,					FXSearchDlg::onUpdateSearch),
+
+    FXMAPFUNC(SEL_COMMAND,				FXSearchDlg::ID_RESULTS,				FXSearchDlg::onCopyResults),
 };
 
 FXIMPLEMENT(FXSearchDlg, FXDialogBox, MessageMap, ARRAYNUMBER(MessageMap))
@@ -39,7 +41,7 @@ protected:
 };
 
 FXSearchDlg::FXSearchDlg(FXWindow* owner, FXFoldingList* resultList, const FXString& name, FXIcon* icon, FXuint opts, FXint x, FXint y, FXint w, FXint h)
-		: FXDialogBox(owner, name, opts, x, y, w, h, 10, 10, 10, 10, 10, 10), modifiedText(false), boldFont(nullptr), results(resultList), mapFile(nullptr)
+		: FXDialogBox(owner, name, opts, x, y, w, h, 10, 10, 10, 10, 10, 10), results(resultList), matches(nullptr), modifiedText(false), boldFont(nullptr), mapFile(nullptr)
 {
 	setIcon(icon);
 
@@ -57,10 +59,10 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, FXFoldingList* resultList, const FXStr
 	new FXLabel(content, "&Suche nach:", NULL, LABEL_NORMAL);
 
 	FXHorizontalFrame* search_line = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
-	search = new FXTextField(search_line, 12, this, ID_SEARCH, FRAME_LINE|TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X);
-	search->setBorderColor(getApp()->getShadowColor());
-	search_button = new FXButton(search_line, "Suchen", NULL, this, ID_SEARCH, BUTTON_DEFAULT|FRAME_RAISED);
-	
+	txtSearch = new FXTextField(search_line, 12, this,ID_SEARCH, FRAME_LINE|TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X);
+	txtSearch->setBorderColor(getApp()->getShadowColor());
+	btnSearch = new FXButton(search_line, "&Suchen", NULL, this, ID_SEARCH, BUTTON_DEFAULT|FRAME_RAISED);
+    btnTransfer = new FXButton(search_line, "Zum &Ergebnis", NULL, this, ID_RESULTS, BUTTON_DEFAULT | FRAME_RAISED);
 	// search mode: Ignore case, regular expression matching
 	FXHorizontalFrame* mode_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
 	options.regardcase = new FXCheckButton(mode_frame, FXString(L"&Gro\u00df-/Kleinschreibung beachten"), this, ID_SEARCH, CHECKBUTTON_NORMAL);
@@ -89,12 +91,12 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, FXFoldingList* resultList, const FXStr
 	FXHorizontalFrame *list_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
 	list_frame->setBorderColor(getApp()->getShadowColor());
 
-	results = new FXFoldingList(list_frame, this, ID_RESULTS, FOLDINGLIST_SINGLESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	results->getHeader()->setHeaderStyle(HEADER_RESIZE|HEADER_TRACKING);
+    matches = new FXFoldingList(list_frame, this, ID_RESULTS, FOLDINGLIST_SINGLESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    matches->getHeader()->setHeaderStyle(HEADER_RESIZE|HEADER_TRACKING);
 	
-    results->appendHeader("Region");
-	results->appendHeader(FXString(L"Einheit/Geb\u00e4ude/Schiff"));
-	results->appendHeader("Partei");
+    matches->appendHeader("Region");
+    matches->appendHeader(FXString(L"Einheit/Geb\u00e4ude/Schiff"));
+    matches->appendHeader("Partei");
 }
 
 void FXSearchDlg::create()
@@ -108,9 +110,9 @@ void FXSearchDlg::create()
     boldFont->create();
 
 	// resize table headers
-	int w = (getWidth() - getPadLeft() - getPadRight() - 20) / results->getNumHeaders();
-	for (int i = 0; i < results->getNumHeaders(); i++)
-		results->setHeaderSize(i, w);
+	int w = (getWidth() - getPadLeft() - getPadRight() - 20) / matches->getNumHeaders();
+	for (int i = 0; i < matches->getNumHeaders(); i++)
+        matches->setHeaderSize(i, w);
 }
 
 FXSearchDlg::~FXSearchDlg()
@@ -169,10 +171,10 @@ void FXSearchDlg::saveState(FXRegistry& reg)
 
 long FXSearchDlg::onFocusIn(FXObject* sender, FXSelector sel, void* ptr)
 {
-	if (!search->hasFocus())
+	if (!txtSearch->hasFocus())
 	{
-		search->setFocus();
-		search->selectAll();
+		txtSearch->setFocus();
+		txtSearch->selectAll();
 	}
 
 	return FXDialogBox::onFocusIn(sender, sel, ptr);;
@@ -416,11 +418,11 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 		return 0;
 
 	// clear old results
-	results->clearItems();
+    matches->clearItems();
 	info_text->setText("");
 
 	// get search string
-	FXString str = search->getText().trim();
+	FXString str = txtSearch->getText().trim();
 	if (str.empty())
 		return 1;
 
@@ -583,18 +585,31 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 
             FXSearchItem* item = new FXSearchItem(region_str + "\t" + object_str + "\t" + faction_str, nullptr, nullptr, (void*)&*link);
             if (bold) item->setFont(boldFont);
-            results->appendItem(nullptr, item);
-			if (results->getNumItems() >= MAX_RESULTS)
+			matches->appendItem(nullptr, item);
+			if (matches->getNumItems() >= MAX_RESULTS)
 				break;				// list only 1000 results
 		}
 	}
 
-	if (results->getNumItems() >= MAX_RESULTS)
-		info_text->setText("Nur die ersten " + FXStringVal(results->getNumItems()) + " Treffer werden angezeigt.");
+	if (matches->getNumItems() >= MAX_RESULTS)
+		info_text->setText("Nur die ersten " + FXStringVal(matches->getNumItems()) + " Treffer werden angezeigt.");
 	else
-		info_text->setText(FXStringVal(results->getNumItems()) + " Treffer");
+		info_text->setText(FXStringVal(matches->getNumItems()) + " Treffer");
 
 	return 1;
+}
+
+long FXSearchDlg::onCopyResults(FXObject* sender, FXSelector sel, void* ptr)
+{
+    FXFoldingItem* item;
+    for (item = matches->getFirstItem(); item; item = item->getNext()) {
+        FXFoldingItem* copy = new FXFoldingItem(item->getText(), item->getOpenIcon(), item->getClosedIcon(), item->getData());
+        results->appendItem(NULL, copy);
+    }
+    FXTabBook* outputTabs = (FXTabBook*)results->getParent();
+    outputTabs->setCurrent(outputTabs->indexOfChild(results) / 2);
+
+    return 1;
 }
 
 static const int ICON_SPACING = 4;	// Spacing between parent and child in x direction
