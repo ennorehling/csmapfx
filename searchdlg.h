@@ -29,7 +29,7 @@ public:
 	long onSearch(FXObject*, FXSelector, void*);		// hit enter in search textbox
 	long onChangedSearch(FXObject*, FXSelector, void*);	// change text in textbox
 	long onUpdateSearch(FXObject*, FXSelector, void*);	// update event on textbox
-
+    long onCopyResults(FXObject* sender, FXSelector sel, void* ptr);
 public:
 	enum
 	{
@@ -39,9 +39,11 @@ public:
 	};
 
 protected:
-	FXTextField		*search;				// textfield for search
-	FXButton		*search_button;			// "do the search!"
+	FXTextField		*txtSearch;				// textfield for search
+	FXButton		*btnSearch;	 	    	// "do the search!"
+	FXButton		*btnTransfer;			// "transfer to results"
 
+	FXFoldingList	*matches;				// list of results
 	FXFoldingList	*results;				// list of results
 	FXLabel			*info_text;				// info about search
 
@@ -56,7 +58,6 @@ protected:
 		FXListBox		*domain;				// where to search
 
 		FXCheckButton	*searchdirectly;
-		FXCheckButton	*appendResults;
 		FXCheckButton	*limitresults;
 
 	} options;
