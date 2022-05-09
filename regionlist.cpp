@@ -4,6 +4,7 @@
 #include "regionlist.h"
 #include "symbols.h"
 
+#include "fxhelper.h"
 #include "FXMenuSeparatorEx.h"
 
 // *********************************************************************************************************
@@ -66,7 +67,7 @@ static const int SIDE_SPACING = 4;	// Spacing between side and item
 FXIMPLEMENT(FXRegionItem,FXTreeItem,NULL,0)
 
 // Draw item
-void FXRegionItem::draw(const FXTreeList* list,FXDC& dc,FXint xx,FXint yy,FXint,FXint hh) const
+void FXRegionItem::draw(const FXTreeList* list, FXDC& dc, FXint xx, FXint yy, FXint ww, FXint hh) const
 {
     FXIcon *icon = (state & OPENED) ? openIcon : closedIcon;
     FXFont *font = list->getFont();

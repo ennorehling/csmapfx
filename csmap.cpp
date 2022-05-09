@@ -387,22 +387,22 @@ CSMap::CSMap(FXApp *app) :
     viewmenu = new FXMenuPane(this);
     new FXMenuTitle(menubar,"&Ansicht",nullptr,viewmenu);
     menu.toolbar = new FXMenuCheck(viewmenu,"Tool&bar\tCtrl-T\tToolbar ein- bzw. ausblenden.", toolbar,ID_TOGGLESHOWN);
-    menu.maponly = new FXMenuCheck(viewmenu,"&Nur Karte anzeigen\tCtrl-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this,ID_VIEW_MAPONLY,0);
+    menu.maponly = new FXMenuCheck(viewmenu,"&Nur Karte anzeigen\tCtrl-Shift-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this,ID_VIEW_MAPONLY,0);
     menu.messages = new FXMenuCheck(viewmenu,"&Meldungen\tCtrl-Shift-V\tRegionsmeldungen ein- bzw. ausblenden.", this, ID_VIEW_MESSAGES);
-    menu.show_left = new FXMenuCheck(viewmenu,"&Regionsliste\t\tRegionsliste ein- bzw. ausblenden.", this, ID_VIEW_REGIONLIST);
-    menu.show_right = new FXMenuCheck(viewmenu,"&Eigenschaften\t\tEinheiten- und Regionsdetails ein- bzw. ausblenden.", this, ID_VIEW_PROPERTIES);
+    menu.show_left = new FXMenuCheck(viewmenu,"&Regionsliste\tCtrl-Shift-R\tRegionsliste ein- bzw. ausblenden.", this, ID_VIEW_REGIONLIST);
+    menu.show_right = new FXMenuCheck(viewmenu,"&Eigenschaften\tCtrl-Shift-E\tEinheiten- und Regionsdetails ein- bzw. ausblenden.", this, ID_VIEW_PROPERTIES);
     menu.calc = new FXMenuCheck(viewmenu,"&Taschenrechner\tCtrl-Shift-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
-    menu.minimap = new FXMenuCheck(viewmenu,FXString(L"\u00dcbersichts&karte\tCtrl-Shift-N\t\u00dcbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
-    menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tCtrl-Shift-B\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
+    menu.minimap = new FXMenuCheck(viewmenu,FXString(L"\u00dcbersichts&karte\tCtrl-N\t\u00dcbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
+    menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tCtrl-B\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
     new FXMenuSeparatorEx(viewmenu, "Liste");
-    menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tAlt-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
+    menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tStrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
     menu.colorizeUnits = new FXMenuCheck(viewmenu, "Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
     new FXMenuSeparatorEx(viewmenu, "Karte");
-    menu.streets = new FXMenuCheck(viewmenu,"&Strassen zeigen\tAlt-S\tStrassen auf der Karte anzeigen.");
-    menu.visibility = new FXMenuCheck(viewmenu,FXString(L"&Sichtbarkeit zeigen\tAlt-V\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise)."));
-    menu.shiptravel = new FXMenuCheck(viewmenu,"&Durchschiffung\tAlt-T\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
-    menu.shadowRegions = new FXMenuCheck(viewmenu,"Regionen ab&dunkeln\tAlt-F\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.");
-    menu.islands = new FXMenuCheck(viewmenu,"&Inselnamen zeigen\tAlt-I\tInselnamen auf der Karte zeigen.");
+    menu.streets = new FXMenuCheck(viewmenu,"&Strassen zeigen\tCtrl-F1\tStrassen auf der Karte anzeigen.");
+    menu.visibility = new FXMenuCheck(viewmenu,FXString(L"&Sichtbarkeit zeigen\tCtrl-F2\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise)."));
+    menu.shiptravel = new FXMenuCheck(viewmenu,"&Durchschiffung\tCtrl-F3\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
+    menu.shadowRegions = new FXMenuCheck(viewmenu,"Regionen ab&dunkeln\tCtrl-F4\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.");
+    menu.islands = new FXMenuCheck(viewmenu,"&Inselnamen zeigen\tCtrl-F5\tInselnamen auf der Karte zeigen.");
     menu.minimap_islands = new FXMenuCheck(viewmenu,"&Inseln auf Minikarte\t\tInselnamen auf der Minikarte zeigen.");
     planemenu = new FXMenuPane(this);
     FXMenuRadio* radio = new FXMenuRadio(planemenu, "Standardebene (0)", this, ID_MAP_VISIBLEPLANE, 0);
@@ -530,11 +530,11 @@ CSMap::CSMap(FXApp *app) :
     msgBorder->setBorderColor(getApp()->getShadowColor());
 
     outputTabs = new FXTabBook(msgBorder, nullptr, 0, TABBOOK_NORMAL | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
-    new FXTabItem(outputTabs, "Report");
+    new FXTabItem(outputTabs, "Rep&ort");
     reportInfo = new FXReportInfo(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
-    new FXTabItem(outputTabs, "Region");
+    new FXTabItem(outputTabs, "Re&gion");
     messages = new FXMessages(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
-    new FXTabItem(outputTabs, "Fehler");
+    new FXTabItem(outputTabs, "&Fehler");
     errorList = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
 
     // Calculator bar

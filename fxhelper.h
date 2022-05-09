@@ -45,4 +45,5 @@ inline std::ostream& operator<<(std::ostream& out, const FX::FXString& str)
 
 FXString FXStringValEx(FXulong num, unsigned int base = 10);
 
+
 #endif //_CSMAP_FXHELPER_H

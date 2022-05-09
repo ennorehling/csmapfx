@@ -26,8 +26,20 @@ FXDEFMAP(FXSearchDlg) MessageMap[]=
 
 FXIMPLEMENT(FXSearchDlg,FXDialogBox,MessageMap, ARRAYNUMBER(MessageMap))
 
+class FXSearchItem : public FXFoldingItem {
+public:
+    FXSearchItem(const FXString& text, FXIcon* oi = NULL, FXIcon* ci = nullptr, void* ptr = nullptr)
+        : FXFoldingItem(text, oi, ci, ptr), m_font(nullptr) {}
+
+    void setFont(FXFont* font) { m_font = font; }
+    virtual void draw(const FXFoldingList* list, FXDC& dc, FXint x, FXint y, FXint w, FXint h) const override;
+
+protected:
+    FXFont* m_font;
+};
+
 FXSearchDlg::FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint opts, FXint x,FXint y,FXint w,FXint h)
-		: FXDialogBox(owner, name, opts, x,y,w,h, 10,10,10,10, 10,10), modifiedText(false)
+		: FXDialogBox(owner, name, opts, x,y,w,h, 10,10,10,10, 10,10), modifiedText(false), boldFont(nullptr), mapFile(nullptr)
 {
 	setIcon(icon);
 
@@ -96,6 +108,12 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 void FXSearchDlg::create()
 {
 	FXDialogBox::create();
+
+    FXFontDesc fontdesc;
+    results->getFont()->getFontDesc(fontdesc);
+    fontdesc.weight = FXFont::Bold;
+    boldFont = new FXFont(getApp(), fontdesc);
+    boldFont->create();
 
 	// resize table headers
 	int w = (getWidth() - getPadLeft() - getPadRight() - 20) / results->getNumHeaders();
@@ -476,7 +494,7 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 		if (search_func(block, context))
 		{
 			FXString region_str, object_str;
-
+            bool bold = false;
 			// add region to results-list in first column
 			if (region != end)
 			{
@@ -519,14 +537,28 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 			{
 				FXString name = unit->value(TYPE_NAME);
 				FXString id = unit->id();
-				//FXString number = block->value(TYPE_NUMBER);
-				//FXString type = block->value(TYPE_TYPE);
 
 				if (name.empty())
 					name = "Einheit " + id;
 
 				object_str = name + " (" + id + ")";
-			}
+
+                block = unit;
+                for (block++; block != end && block->depth() > unit->depth(); block++)
+                {
+                    if (block->type() != block_type::TYPE_COMMANDS)
+                        continue;
+
+                    if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment())) {
+                        bold = !cmds->confirmed;
+                        break;
+                    }
+                }
+
+                if (att_commands* cmds = dynamic_cast<att_commands*>(unit->attachment())) {
+                    bold = !cmds->confirmed;
+                }
+            }
 
 			// add to list
 			datablock::itor link = region;
@@ -537,7 +569,9 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 			else if (ship != end)
 				link = ship;
 
-            results->appendItem(NULL, region_str + "\t" + object_str, NULL,NULL, (void*)&*link);
+            FXSearchItem* item = new FXSearchItem(region_str + "\t" + object_str, nullptr, nullptr, (void*)&*link);
+            if (bold) item->setFont(boldFont);
+            results->appendItem(nullptr, item);
 			if (limitresults && results->getNumItems() >= 1000)
 				break;				// list only 1000 results
 		}
@@ -588,4 +622,19 @@ long FXSearchDlg::onSelectResults(FXObject*, FXSelector, void*)
     }
 	getOwner()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 	return 1;
+}
+
+static const int ICON_SPACING = 4;	// Spacing between parent and child in x direction
+static const int TEXT_SPACING = 4;	// Spacing between icon and text
+static const int SIDE_SPACING = 4;	// Spacing between side and item
+
+void FXSearchItem::draw(const FXFoldingList* list, FXDC& dc, FXint xx, FXint yy, FXint ww, FXint hh) const
+{
+    FXFont* dcfont = dc.getFont();
+    FXFont* font = dcfont;
+    if (m_font) {
+        dc.setFont(font = m_font);
+    }
+    FXFoldingItem::draw(list, dc, xx, yy, ww, hh);
+    if (m_font) dc.setFont(dcfont);
 }

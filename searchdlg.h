@@ -68,6 +68,9 @@ protected:
 protected:
 	FXSearchDlg(){}
 	FXSearchDlg(const FXSearchDlg&) {}
+
+private:
+    class FXFont* boldFont;
 };
 
 #endif //_CSMAP_SEARCHDLG
