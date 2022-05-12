@@ -115,46 +115,68 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 			for (datakey::itor key = unit->data().begin(); key != unit->data().end(); key++)
 			{
-				if (key->type() == TYPE_NAME)
-					name = key->value();
-				else if (key->type() == TYPE_DESCRIPTION)
-					descr = key->value();
-				else if (key->type() == TYPE_FACTION)
-					factionId = atoi(key->value().text());
-				else if (key->type() == TYPE_OTHER_FACTION)
-					AnotherfactionId = atoi(key->value().text());
-				else if (key->type() == TYPE_NUMBER)
-					number = key->value();
-				else if (key->type() == TYPE_TYPE)
-					race = key->value();
-				else if (key->type() == TYPE_AURA)
-					aura = key->value();
-				else if (key->type() == TYPE_AURAMAX)
-					auramax = key->value();
-                else if (key->type() == TYPE_BUILDING) {
+                switch (key->type()) {
+                case TYPE_NAME:
+                    name = key->value();
+                    break;
+                case TYPE_DESCRIPTION:
+                    descr = key->value();
+                    break;
+                case TYPE_FACTION:
+                    factionId = atoi(key->value().text());
+                    break;
+                case TYPE_OTHER_FACTION:
+                    AnotherfactionId = atoi(key->value().text());
+                    break;
+                case TYPE_NUMBER:
+                    number = key->value();
+                    break;
+                case TYPE_TYPE:
+                    race = key->value();
+                    break;
+                case TYPE_AURA:
+                    aura = key->value();
+                    break;
+                case TYPE_AURAMAX:
+                    auramax = key->value();
+                    break;
+                case TYPE_BUILDING:
                     mapFile->getBuilding(building, atoi(key->value().text()));
-                }
-                else if (key->type() == TYPE_SHIP) {
+                    break;
+                case TYPE_SHIP:
                     mapFile->getShip(ship, atoi(key->value().text()));
+                    break;
+                case TYPE_WEIGHT:
+                    weight = key->value();
+                    break;
+                case TYPE_GROUP:
+                    group = key->value();
+                    break;
+                case TYPE_PREFIX:
+                    prefix = key->value();
+                    break;
+                case TYPE_STATUS:
+                    combatstatus = key->value();
+                    break;
+                case TYPE_HITPOINTS:
+                    hp = key->value();
+                    break;
+                case TYPE_GUARDING:
+                    guards = key->value();
+                    break;
+                case TYPE_HUNGER:
+                    hungry = key->value();
+                    break;
+                case TYPE_HERO:
+                    hero = key->value();
+                    break;
+                case TYPE_ORDERS_CONFIRMED:
+                    // do not show
+                    break;
+                default:
+                    unhandled.push_back(key);
+                    break;
                 }
-				else if (key->type() == TYPE_WEIGHT)
-					weight = key->value();
-                else if (key->type() == TYPE_GROUP)
-					group = key->value();
-                else if (key->type() == TYPE_PREFIX)
-					prefix = key->value();
-                else if (key->type() == TYPE_STATUS)
-					combatstatus = key->value();
-                else if (key->type() == TYPE_HITPOINTS)
-					hp = key->value();
-                else if (key->type() == TYPE_GUARDING)
-					guards = key->value();
-                else if (key->type() == TYPE_HUNGER)
-					hungry = key->value();
-                else if (key->type() == TYPE_HERO)
-					hero = key->value();
-				else
-					unhandled.push_back(key);
 			}
 
 			/*
