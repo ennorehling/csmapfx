@@ -1,3 +1,10 @@
+csmapfx (1.2.12-1) stable; urgency=low
+
+  * reorganize menus
+  * fix crashes when no report is loaded
+
+ -- Enno Rehling <enno@eressea.de>  Sat, 21 May 2022 12:00:00 +0200
+
 csmapfx (1.2.11-1) stable; urgency=low
 
   * change default hotkeys
