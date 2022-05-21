@@ -332,36 +332,17 @@ CSMap::CSMap(FXApp *app) :
         L"Sch&liessen\t\tDie aktuelle Datei schliessen.",
         icons.close, this, ID_FILE_CLOSE);
 
-    new FXMenuSeparatorEx(filemenu);
-    new FXMenuCommand(
-        filemenu,
-        L"Befehle pr\u00fcfen\t\tPr\u00fct die Befehle.",
-        nullptr, this, ID_FILE_CHECK_ORDERS);
-    new FXMenuCommand(
-        filemenu,
-        L"Befehle einsenden...\t\tDie Befehle an den Server versenden.",
-        nullptr, this, ID_FILE_UPLOAD_ORDERS);
-    new FXMenuCommand(
-        filemenu,
-        L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",
-        nullptr, this, ID_FILE_EXPORT_ORDERS);
-    menu.modifycheck = new FXMenuCheck(filemenu, 
-        L"\u00c4nderungserkennung\t\tAutomatische \u00c4nderungserkennung.", this, ID_FILE_MODIFY_CHECK);
-    new FXMenuSeparatorEx(filemenu);
-
+    FXString noText;
     recentmenu = new FXMenuPane(this);
-    for (int i = 0; i < 6; i++)
-        new FXMenuCommand(recentmenu, "", nullptr, &recentFiles,FXRecentFiles::ID_FILE_1+i);
+    for (int i = 0; i != 6; ++i)
+        new FXMenuCommand(recentmenu, noText, nullptr, &recentFiles, FXRecentFiles::ID_FILE_1 + i);
 
     new FXMenuCascade(filemenu, L"&Zuletzt ge\u00f6ffnet", nullptr, recentmenu, 0);
-    new FXMenuSeparatorEx(filemenu);
-    new FXMenuCommand(filemenu,
-        L"B&eenden\tCtrl-Q\tDas Programm beenden.", nullptr,
-        this, ID_FILE_QUIT);
 
+    new FXMenuSeparatorEx(filemenu);
     // Map menu
     mapmenu = new FXMenuPane(this);
-    new FXMenuTitle(menubar, "&Karte", nullptr, mapmenu);
+    new FXMenuCascade(filemenu, "&Karte", nullptr, mapmenu, 0);
     new FXMenuCommand(
         mapmenu,
         L"H&inzuf\u00fcgen...\tCtrl-I\tL\u00e4dt einen Karten-Report in den aktuellen Report.",
@@ -379,9 +360,24 @@ CSMap::CSMap(FXApp *app) :
         L"Als &PNG exportieren...\t\tDie Karte als PNG speichern.",
         nullptr, this, ID_FILE_EXPORT_IMAGE);
 
-    new FXMenuSeparatorEx(mapmenu, "Regionsmarker");
-    new FXMenuCommand(mapmenu, "&Ursprung setzen\t\tDen Kartenursprung (0/0) auf die markierte Region setzen.", nullptr, this, ID_MAP_SETORIGIN, 0);
-    new FXMenuCommand(mapmenu, L"Markierte &ausw\u00e4hlen\tCtrl-Space\tMarkierte Region ausw\u00e4hlen.", nullptr, this, ID_MAP_SELECTMARKED, 0);
+    new FXMenuCommand(
+        filemenu,
+        L"Befehle pr\u00fcfen\t\tPr\u00fct die Befehle.",
+        nullptr, this, ID_FILE_CHECK_ORDERS);
+    new FXMenuCommand(
+        filemenu,
+        L"Befehle einsenden...\t\tDie Befehle an den Server versenden.",
+        nullptr, this, ID_FILE_UPLOAD_ORDERS);
+    new FXMenuCommand(
+        filemenu,
+        L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",
+        nullptr, this, ID_FILE_EXPORT_ORDERS);
+    menu.modifycheck = new FXMenuCheck(filemenu, 
+        L"\u00c4nderungserkennung\t\tAutomatische \u00c4nderungserkennung.", this, ID_FILE_MODIFY_CHECK);
+    new FXMenuSeparatorEx(filemenu);
+    new FXMenuCommand(filemenu,
+        L"B&eenden\tCtrl-Q\tDas Programm beenden.", nullptr,
+        this, ID_FILE_QUIT);
 
     // View menu
     viewmenu = new FXMenuPane(this);
@@ -424,20 +420,23 @@ CSMap::CSMap(FXApp *app) :
 
     // Region menu
     regionmenu = new FXMenuPane(this);
-    new FXMenuTitle(menubar,"&Region",nullptr,regionmenu);
-    new FXMenuCommand(regionmenu,"&Suchen...\tCtrl-F\tEine Region, Einheit, Schiff, etc. suchen.",nullptr, this,ID_VIEW_SEARCHDLG);
+    new FXMenuTitle(menubar,"&Bearbeiten",nullptr,regionmenu);
+    new FXMenuCommand(regionmenu, "&Suchen...\tCtrl-F\tEine Region, Einheit, Schiff, etc. suchen.", nullptr, this, ID_VIEW_SEARCHDLG);
+    new FXMenuCommand(regionmenu, "&Ursprung setzen\t\tDen Kartenursprung (0/0) auf die markierte Region setzen.", nullptr, this, ID_MAP_SETORIGIN, 0);
+    new FXMenuSeparatorEx(regionmenu, "Regionen");
     menu.regdescription = new FXMenuCheck(regionmenu,"&Beschreibung zeigen\t\tRegionsbeschreibung anzeigen.");
-    new FXMenuSeparatorEx(regionmenu, "Markieren");
     new FXMenuCommand(regionmenu,FXString(L"&Alle markieren\tCtrl-Shift-A\tAlle Regionen ausw\u00e4hlen."),nullptr,this,ID_REGION_SELALL);
     new FXMenuCommand(regionmenu,FXString(L"Alle &Inseln ausw\u00e4hlen\t\tAlle Landregionen ausw\u00e4hlen (Ozean, Feuerwand und Eisberg z\u00e4hlen nicht als Land)."),nullptr,this,ID_REGION_SELALLISLANDS);
     new FXMenuCommand(regionmenu,FXString(L"&Keine markieren\t\tKeine Region ausw\u00e4hlen."),nullptr,this,ID_REGION_UNSEL);
     new FXMenuCommand(regionmenu,FXString(L"Auswahl &invertieren\t\tAusgew\u00e4hlte Regionen abw\u00e4hlen und umgekehrt."),nullptr,this,ID_REGION_INVERTSEL);
-        selectionmenu = new FXMenuPane(this);
-        new FXMenuCommand(selectionmenu,"Auswahl &erweitern\tCtrl-Shift-F7\tAuswahl mit dem Radius von einer Region erweitern.",nullptr,this,ID_REGION_EXTENDSEL);
-        new FXMenuCommand(selectionmenu,FXString(L"&Inseln ausw\u00e4hlen\tCtrl-Shift-F9\tAuswahl auf komplette Inseln erweitern."),nullptr,this,ID_REGION_SELISLANDS);
+
+    selectionmenu = new FXMenuPane(this);
     new FXMenuCascade(regionmenu, "&Erweitern", nullptr, selectionmenu);
-    new FXMenuSeparatorEx(regionmenu, "Bearbeiten");
-    new FXMenuCommand(regionmenu,FXString(L"Markierte &l\u00f6schen\t\t"),nullptr,this,ID_REGION_REMOVESEL);
+    new FXMenuCommand(selectionmenu,"Auswahl &erweitern\tCtrl-Shift-F7\tAuswahl mit dem Radius von einer Region erweitern.",nullptr,this,ID_REGION_EXTENDSEL);
+    new FXMenuCommand(selectionmenu,FXString(L"&Inseln ausw\u00e4hlen\tCtrl-Shift-F9\tAuswahl auf komplette Inseln erweitern."),nullptr,this,ID_REGION_SELISLANDS);
+
+    new FXMenuCommand(regionmenu, L"Markierte &ausw\u00e4hlen\tCtrl-Space\tMarkierte Region ausw\u00e4hlen.", nullptr, this, ID_MAP_SELECTMARKED, 0);
+    new FXMenuCommand(regionmenu, FXString(L"Markierte &l\u00f6schen\t\t"), nullptr, this, ID_REGION_REMOVESEL);
 
     // Faction menu
     factionmenu = new FXMenuPane(this);
@@ -2768,6 +2767,7 @@ long CSMap::onQuit(FXObject*, FXSelector, void* ptr)
 
 long CSMap::onRegionSelAll(FXObject*, FXSelector, void*)
 {
+    if (!report) return 1;
     // alle Regionen markieren
     datafile::SelectionState state = selection;
     state.selected |= state.MULTIPLE_REGIONS;
@@ -2796,6 +2796,7 @@ long CSMap::onRegionSelAll(FXObject*, FXSelector, void*)
 
 long CSMap::onRegionUnSel(FXObject*, FXSelector, void*)
 {
+    if (!report) return 1;
     // alle Regionen demarkieren
     datafile::SelectionState state = selection;
     state.selected &= ~state.MULTIPLE_REGIONS;
@@ -2806,6 +2807,7 @@ long CSMap::onRegionUnSel(FXObject*, FXSelector, void*)
 
 long CSMap::onRegionInvertSel(FXObject*, FXSelector, void*)
 {
+    if (!report) return 1;
     // Auswahl invertieren
     datafile::SelectionState state = selection;
 
@@ -2855,6 +2857,7 @@ static const int hex_offset[6][2] = {
 
 long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
 {
+    if (!report) return 1;
     if (!(selection.selected & selection.MULTIPLE_REGIONS))
         return 1;        // nothing to do
 
@@ -2894,6 +2897,7 @@ long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
 
 long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
 {
+    if (!report) return 1;
     if (!(selection.selected & selection.MULTIPLE_REGIONS))
         return 1;        // nothing to do
 
@@ -2947,6 +2951,7 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
 
 long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
 {
+    if (!report) return 1;
     // alle Landregionen markieren (also au\u00dfer Ozean & Feuerwand & Eisberg)
     datafile::SelectionState state = selection;
     state.selected |= state.MULTIPLE_REGIONS;
@@ -2980,6 +2985,7 @@ long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
 
 long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 {
+    if (!report) return 1;
     // markierte Regionen l\u00f6schen
     if (!(selection.selected & selection.MULTIPLE_REGIONS) || selection.regionsSelected.empty())
     {
