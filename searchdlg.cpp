@@ -103,6 +103,7 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	
     results->appendHeader("Region");
 	results->appendHeader(FXString(L"Einheit/Geb\u00e4ude/Schiff"));
+	results->appendHeader("Partei");
 }
 
 void FXSearchDlg::create()
@@ -493,7 +494,7 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 
 		if (search_func(block, context))
 		{
-			FXString region_str, object_str;
+			FXString region_str, object_str, faction_str;
             bool bold = false;
 			// add region to results-list in first column
 			if (region != end)
@@ -537,6 +538,13 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 			{
 				FXString name = unit->value(TYPE_NAME);
 				FXString id = unit->id();
+                int fac_id = unit->valueInt(TYPE_FACTION);
+                if (fac_id > 0) {
+                    datablock::itor faction;
+                    if (mapFile->getFaction(faction, fac_id)) {
+                        faction_str = faction->value(TYPE_FACTIONNAME)  + " (" + faction->id() + ")";
+                    }
+                }
 
 				if (name.empty())
 					name = "Einheit " + id;
@@ -569,7 +577,7 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 			else if (ship != end)
 				link = ship;
 
-            FXSearchItem* item = new FXSearchItem(region_str + "\t" + object_str, nullptr, nullptr, (void*)&*link);
+            FXSearchItem* item = new FXSearchItem(region_str + "\t" + object_str + "\t" + faction_str, nullptr, nullptr, (void*)&*link);
             if (bold) item->setFont(boldFont);
             results->appendItem(nullptr, item);
 			if (limitresults && results->getNumItems() >= 1000)
