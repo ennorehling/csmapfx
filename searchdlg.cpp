@@ -69,8 +69,9 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	options.regexp = new FXCheckButton(mode_frame, FXString(L"&Regul\u00e4rer Ausdruck"), this, ID_SEARCH, CHECKBUTTON_NORMAL);
 
 	// search domain: Search for what type, search in descriptions
-	FXHorizontalFrame* domain_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
+	FXHorizontalFrame* domain_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X | PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
 	options.descriptions = new FXCheckButton(domain_frame, "&Beschreibungen", this, ID_SEARCH, CHECKBUTTON_NORMAL);
+	options.factions = new FXCheckButton(domain_frame, "&Parteien", this,ID_SEARCH, CHECKBUTTON_NORMAL);
 	new FXVerticalSeparator(domain_frame, SEPARATOR_GROOVE|LAYOUT_FILL_Y);
 	new FXLabel(domain_frame, "&Durchsuche", NULL, LABEL_NORMAL);
 	FXListBox *box = options.domain = new FXListBox(domain_frame, this, ID_SEARCH, LISTBOX_NORMAL|LAYOUT_FILL_X|FRAME_LINE);
@@ -139,9 +140,11 @@ void FXSearchDlg::loadState(FXRegistry& reg)
 	FXint regardcase = reg.readUnsignedEntry("SEARCHDLG", "REGARDCASE", 0);
 	FXint regexp = reg.readUnsignedEntry("SEARCHDLG", "REGEXP", 0);
 	FXint descriptions = reg.readUnsignedEntry("SEARCHDLG", "DESCRIPTIONS", 0);
+	FXint factions = reg.readUnsignedEntry("SEARCHDLG", "FACTIONS", 0);
 	options.regardcase->setCheck(regardcase!=0);
 	options.regexp->setCheck(regexp != 0);
 	options.descriptions->setCheck(descriptions != 0);
+	options.factions->setCheck(factions != 0);
 	
 	FXint domain = reg.readUnsignedEntry("SEARCHDLG", "DOMAIN", 0);
 	if (domain >= 0 && domain < options.domain->getNumItems())
@@ -161,6 +164,7 @@ void FXSearchDlg::saveState(FXRegistry& reg)
 	reg.writeUnsignedEntry("SEARCHDLG", "REGARDCASE", options.regardcase->getCheck());
 	reg.writeUnsignedEntry("SEARCHDLG", "REGEXP", options.regexp->getCheck());
 	reg.writeUnsignedEntry("SEARCHDLG", "DESCRIPTIONS", options.descriptions->getCheck());
+	reg.writeUnsignedEntry("SEARCHDLG", "FACTIONS", options.factions->getCheck());
 	
 	reg.writeUnsignedEntry("SEARCHDLG", "DOMAIN", options.domain->getCurrentItem());
 }
@@ -244,8 +248,24 @@ namespace
 
 	// search functions
 	typedef const datablock::itor& itor_ref;
-	typedef std::tuple<itor_ref, itor_ref, itor_ref, itor_ref, itor_ref, const compare_func_t&, const compare_func_t&, bool> block_context;
-	// context(search_string, region, building, ship, unit, end, compare_func, compare_func_icase, descriptions);
+    struct block_context {
+        datafile* report;
+        itor_ref region;
+        itor_ref building;
+        itor_ref ship;
+        itor_ref unit;
+        const compare_func_t& compare;
+        const compare_func_t& compare_icase;
+        bool searchDescriptions;
+        bool searchFactions;
+
+        block_context(datafile* report, itor_ref region, itor_ref building, itor_ref ship, itor_ref unit,
+            const compare_func_t& compare, const compare_func_t& compare_icase, bool searchDescriptions, bool searchFactions)
+            : report(report), region(region), building(building), ship(ship), unit(unit), compare(compare), compare_icase(compare_icase),
+            searchDescriptions(searchDescriptions), searchFactions(searchFactions) {}
+    };
+//	typedef std::tuple<itor_ref, itor_ref, itor_ref, itor_ref, itor_ref, const compare_func_t&, const compare_func_t&, bool, bool> block_context;
+	// context(mapfile, region, building, ship, unit, end, compare_func, compare_func_icase, descriptions, faction);
 
 	typedef std::function<bool(const datablock::itor&, const block_context&)> search_func_t;
 
@@ -254,7 +274,7 @@ namespace
 		if (block->type() != block_type::TYPE_REGION)
 			return false;
 
-		const compare_func_t& compare = std::get<5>(context);
+		const compare_func_t& compare = context.compare;
 
 		FXString name = block->value(TYPE_NAME);
 		if (name.empty())
@@ -270,7 +290,7 @@ namespace
 		if (compare(name))
 			return true;
 
-		if (std::get<7>(context))		// compare descriptions?
+		if (context.searchDescriptions)		// compare descriptions?
 			return compare(block->value(TYPE_DESCRIPTION));
 
 		return false;
@@ -281,15 +301,24 @@ namespace
 		if (block->type() != block_type::TYPE_UNIT)
 			return false;
 
-		const compare_func_t& compare = std::get<5>(context);
-		const compare_func_t& compare_icase = std::get<6>(context);
+		const compare_func_t& compare = context.compare;
+		const compare_func_t& compare_icase = context.compare_icase;
 
 		if (compare(block->value(TYPE_NAME)) || compare_icase(block->id()))
 			return true;
 
-		if (std::get<7>(context))		// compare descriptions?
-			return compare(block->value(TYPE_DESCRIPTION));
+        // compare descriptions?
+		if (context.searchDescriptions && compare(block->value(TYPE_DESCRIPTION)))
+			return true;
 
+        // compare faction names?
+        if (context.searchFactions) {
+            datablock::itor faction;
+            int fac_id = block->valueInt(TYPE_FACTION);
+            if (context.report->getFaction(faction, fac_id)) {
+                return compare(faction->value(TYPE_FACTIONNAME));
+            }
+        }
 		return false;
 	}
 
@@ -298,13 +327,13 @@ namespace
 		if (block->type() != block_type::TYPE_BUILDING)
 			return false;
 
-		const compare_func_t& compare = std::get<5>(context);
-		const compare_func_t& compare_icase = std::get<6>(context);
+		const compare_func_t& compare = context.compare;
+		const compare_func_t& compare_icase = context.compare_icase;
 
 		if (compare(block->value(TYPE_NAME)) || compare_icase(block->id()))
 			return true;
 
-		if (std::get<7>(context))		// compare descriptions?
+		if (context.searchDescriptions)		// compare descriptions?
 			return compare(block->value(TYPE_DESCRIPTION));
 
 		return false;
@@ -315,14 +344,14 @@ namespace
 		if (block->type() != block_type::TYPE_SHIP)
 			return false;
 
-		const compare_func_t& compare = std::get<5>(context);
-		const compare_func_t& compare_icase = std::get<6>(context);
+        const compare_func_t& compare = context.compare;
+        const compare_func_t& compare_icase = context.compare_icase;
 
 		if (compare(block->value(TYPE_NAME)) || compare_icase(block->id()))
 			return true;
 
-		if (std::get<7>(context))		// compare descriptions?
-			return compare(block->value(TYPE_DESCRIPTION));
+        if (context.searchDescriptions)		// compare descriptions?
+            return compare(block->value(TYPE_DESCRIPTION));
 
 		return false;
 	}
@@ -332,7 +361,7 @@ namespace
 		if (block->type() != block_type::TYPE_COMMANDS)
 			return false;
 
-		const compare_func_t& compare = std::get<5>(context);
+        const compare_func_t& compare = context.compare;
 
 		// search if a command matchs
 		if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
@@ -401,6 +430,7 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 	bool regardcase = options.regardcase->getCheck() == TRUE;		// ignore case or don't ignore case
 	bool regexp = options.regexp->getCheck() == TRUE;				// use regular expressions
 	bool descriptions = options.descriptions->getCheck() == TRUE;	// search also in description texts
+	bool factions = options.factions->getCheck() == TRUE;	// search also in faction names
 
 	compare_func_t compare_func_icase = compare_normal(str);		// ignores case (for base36 numbers)
 	compare_func_t compare_func = compare_normal(str);				// does ignores case if not other specified
@@ -437,12 +467,12 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 	// do the search
 	datablock::itor end = mapFile->blocks().end();
 
-	datablock::itor region = end,			// initialize last-block-of-typ holder
+	datablock::itor region = end,			// initialize last-block-of-type holder
 					building = end,
 					ship = end,
 					unit = end;
 
-	block_context context(region, building, ship, unit, end, compare_func, compare_func_icase, descriptions);
+	block_context context(mapFile, region, building, ship, unit, compare_func, compare_func_icase, descriptions, factions);
 
 	for (datablock::itor block = mapFile->blocks().begin(); block != end; block++)
 	{

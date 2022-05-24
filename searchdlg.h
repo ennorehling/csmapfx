@@ -55,6 +55,7 @@ protected:
 		FXCheckButton	*regardcase;			// ignore case or don't
 		FXCheckButton	*regexp;				// regular expression match
 		FXCheckButton	*descriptions;			// search also in descriptions
+		FXCheckButton	*factions;			// search also in descriptions
 
 		FXListBox		*domain;				// where to search
 	} options;
