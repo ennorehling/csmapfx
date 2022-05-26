@@ -55,8 +55,8 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, FXFoldingList* resultList, const FXStr
     // buttons on bottom
     FXHorizontalFrame* buttons = new FXHorizontalFrame(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
     info_text = new FXLabel(buttons, "", NULL, LABEL_NORMAL);
+    new FXButton(buttons, "S&chliessen", NULL, this, ID_CLOSE, BUTTON_DEFAULT | FRAME_RAISED | LAYOUT_FILL_Y | LAYOUT_RIGHT);
     btnTransfer = new FXButton(buttons, L"In Such&ergebnissen \u00f6ffnen", NULL, this, ID_TRANSFER, BUTTON_DEFAULT | FRAME_RAISED | LAYOUT_FILL_Y | LAYOUT_RIGHT);
-    new FXButton(buttons, "S&chliessen", NULL, this, ID_CLOSE, BUTTON_DEFAULT|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_RIGHT);
 	
 	new FXHorizontalSeparator(this, SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
 
@@ -321,8 +321,8 @@ namespace
         if (context.searchFactions) {
             datablock::itor faction;
             int fac_id = block->valueInt(TYPE_FACTION);
-            if (context.report->getFaction(faction, fac_id)) {
-                return compare(faction->value(TYPE_FACTIONNAME));
+            if (fac_id > 0 && context.report->getFaction(faction, fac_id)) {
+                return compare(faction->value(TYPE_FACTIONNAME)) || context.compare_icase(FXStringValEx(fac_id, 36));
             }
         }
 		return false;
@@ -350,9 +350,8 @@ namespace
 			return false;
 
         const compare_func_t& compare = context.compare;
-        const compare_func_t& compare_icase = context.compare_icase;
 
-		if (compare(block->value(TYPE_NAME)) || compare_icase(block->id()))
+		if (compare(block->value(TYPE_NAME)))
 			return true;
 
         if (context.searchDescriptions)		// compare descriptions?
@@ -520,7 +519,8 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 
 	for (datablock::itor block = mapFile->blocks().begin(); block != end; block++)
 	{
-		// pass blocks to search functors
+        FXString id;
+        // pass blocks to search functors
 		if (block->type() == block_type::TYPE_REGION)
 		{
 			region = block;
@@ -530,21 +530,45 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 		{
             building = block;
 			ship = unit = end;
+            id = block->id().lower();
 		}
 		else if (block->type() == block_type::TYPE_SHIP)
 		{
             ship = block;
 			building = unit = end;
+            id = block->id().lower();
 		}
 		else if (block->type() == block_type::TYPE_UNIT)
 		{
             unit = block;
 			building = ship = end;
+            id = block->id().lower();
 		}
 
-        if (region != end && (compare_func_icase(block->id()) || search_func(block, context)))
-        {
-            addMatch(region, building, ship, unit);
+        if (!id.empty() && region != end) {
+            if (compare_func_icase(id)) {
+                FXFoldingItem* item = addMatch(region, building, ship, unit);
+                FXRex compare(str, REX_NORMAL);
+                FXint m_beg, m_end;
+                if (compare.match(id, &m_beg, &m_end)) {
+                    if (m_beg == 0 && m_end == id.length()) {
+                        // exact match: add to top of results.
+                        matches->prependItem(nullptr, item);
+                    }
+                    else {
+                        matches->appendItem(nullptr, item);
+                    }
+                }
+                else {
+                    matches->appendItem(nullptr, item);
+                }
+            }
+            else if (search_func(block, context))
+            {
+                FXFoldingItem* item = addMatch(region, building, ship, unit);
+                matches->appendItem(nullptr, item);
+            }
+            else continue;
             if (matches->getNumItems() >= MAX_RESULTS)
                 break;				// list only 1000 results
         }
@@ -572,7 +596,8 @@ long FXSearchDlg::onCopyResults(FXObject* sender, FXSelector sel, void* ptr)
     return onCmdHide(sender, sel, ptr);
 }
 
-void FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor& building, const datablock::itor& ship, const datablock::itor& unit)
+FXFoldingItem *
+FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor& building, const datablock::itor& ship, const datablock::itor& unit)
 {
     const datablock::itor end = mapFile->blocks().end();
     FXString region_str, object_str, faction_str;
@@ -660,7 +685,7 @@ void FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor&
 
     FXSearchItem* item = new FXSearchItem(region_str + "\t" + object_str + "\t" + faction_str, nullptr, nullptr, (void*)&*link);
     if (bold) item->setFont(boldFont);
-    matches->appendItem(nullptr, item);
+    return item;
 }
 
 static const int ICON_SPACING = 4;	// Spacing between parent and child in x direction

@@ -67,7 +67,7 @@ protected:
 	FXSearchDlg(){}
 	FXSearchDlg(const FXSearchDlg&) {}
 
-    void addMatch(const datablock::itor &region, const datablock::itor& building, const datablock::itor& ship, const datablock::itor& unit);
+    class FXFoldingItem *addMatch(const datablock::itor &region, const datablock::itor& building, const datablock::itor& ship, const datablock::itor& unit);
 
 private:
     class FXFont* boldFont = nullptr;
