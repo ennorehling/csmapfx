@@ -1,3 +1,10 @@
+csmapfx (1.3.0-1) stable; urgency=low
+
+  * add a tab with search results
+  * load orders from recent files
+
+ -- Enno Rehling <enno@eressea.de>  Thu, 26 May 2022 16:00:00 +0200
+
 csmapfx (1.2.12-2) stable; urgency=low
 
   * remove advanced search options

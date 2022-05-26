@@ -328,19 +328,7 @@ CSMap::CSMap(FXApp *app) :
         filemenu,
         L"Befehle &speichern\tCtrl-S\tBefehlsdatei speichern.",
         icons.save, this, ID_FILE_SAVE_ORDERS);
-    new FXMenuCommand(
-        filemenu,
-        L"Sch&liessen\t\tDie aktuelle Datei schliessen.",
-        icons.close, this, ID_FILE_CLOSE);
 
-    FXString noText;
-    recentmenu = new FXMenuPane(this);
-    for (int i = 0; i != 6; ++i)
-        new FXMenuCommand(recentmenu, noText, nullptr, &recentFiles, FXRecentFiles::ID_FILE_1 + i);
-
-    new FXMenuCascade(filemenu, L"&Zuletzt ge\u00f6ffnet", nullptr, recentmenu, 0);
-
-    new FXMenuSeparatorEx(filemenu);
     // Map menu
     mapmenu = new FXMenuPane(this);
     new FXMenuCascade(filemenu, "&Karte", nullptr, mapmenu, 0);
@@ -361,6 +349,13 @@ CSMap::CSMap(FXApp *app) :
         L"Als &PNG exportieren...\t\tDie Karte als PNG speichern.",
         nullptr, this, ID_FILE_EXPORT_IMAGE);
 
+
+    new FXMenuCommand(
+        filemenu,
+        L"Sch&liessen\t\tDie aktuelle Datei schliessen.",
+        icons.close, this, ID_FILE_CLOSE);
+
+    new FXMenuSeparatorEx(filemenu);
     new FXMenuCommand(
         filemenu,
         L"Befehle pr\u00fcfen\t\tPr\u00fct die Befehle.",
@@ -375,6 +370,15 @@ CSMap::CSMap(FXApp *app) :
         nullptr, this, ID_FILE_EXPORT_ORDERS);
     menu.modifycheck = new FXMenuCheck(filemenu, 
         L"\u00c4nderungserkennung\t\tAutomatische \u00c4nderungserkennung.", this, ID_FILE_MODIFY_CHECK);
+
+    FXString noText;
+    new FXMenuSeparatorEx(filemenu);
+    recentmenu = new FXMenuPane(this);
+    for (int i = 0; i != 6; ++i)
+        new FXMenuCommand(recentmenu, noText, nullptr, &recentFiles, FXRecentFiles::ID_FILE_1 + i);
+
+    new FXMenuCascade(filemenu, L"&Zuletzt ge\u00f6ffnet", nullptr, recentmenu, 0);
+
     new FXMenuSeparatorEx(filemenu);
     new FXMenuCommand(filemenu,
         L"B&eenden\tCtrl-Q\tDas Programm beenden.", nullptr,
@@ -2532,7 +2536,12 @@ long CSMap::onFileOpenCommands(FXObject *, FXSelector, void *)
     dialogDirectory = dlg.getDirectory();
     if (res) {
         getApp()->beginWaitCursor();
-        loadCommands(dlg.getFilename());
+        FXString filename = dlg.getFilename();
+        if (loadCommands(filename)) {
+            recentFiles.appendFile(filename);
+            updateFileNames();
+            checkCommands();
+        }
         getApp()->endWaitCursor();
         return 1;
     }
@@ -2795,16 +2804,31 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
 long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
 {
     FXString filename((const char *)ptr);
-
+    FXint dotPos = filename.rfind('.');
+    bool loadReport = true;
+    if (dotPos > 0) {
+        if ("cr" != filename.mid(dotPos + 1, 2)) {
+            loadReport = false;
+        }
+    }
     recentFiles.removeFile(filename);
     getApp()->beginWaitCursor();
-    if (closeFile()) {
-        beginLoading(filename);
-        if (nullptr != (report = loadFile(filename))) {
+    beginLoading(filename);
+    if (loadReport) {
+        if (closeFile()) {
+            if (nullptr != (report = loadFile(filename))) {
+                recentFiles.appendFile(filename);
+                updateFileNames();
+                checkCommands();
+                mapChange();
+            }
+        }
+    }
+    else {
+        if (loadCommands(filename)) {
             recentFiles.appendFile(filename);
             updateFileNames();
             checkCommands();
-            mapChange();
         }
     }
     getApp()->endWaitCursor();
