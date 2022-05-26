@@ -41,24 +41,24 @@ public:
 
 protected:
 	datafile::SelectionState selection;
-    datafile *mapFile;
+    datafile *mapFile = nullptr;
 
-	FXTextField		*search;				// textfield for search
-	FXButton		*search_button;			// "do the search!"
-	bool			modifiedText;
+	FXTextField		*search = nullptr;				// textfield for search
+	FXButton		*search_button = nullptr;		// "do the search!"
+	bool			modifiedText = false;
 
-	FXFoldingList	*results;				// list of results
-	FXLabel			*info_text = nullptr;				// info about search
+	FXFoldingList	*results = nullptr;				// list of results
+	FXLabel			*info_text = nullptr;			// info about search
 
 	struct
 	{
-		FXCheckButton	*regardcase;			// ignore case or don't
-		FXCheckButton	*regexp;				// regular expression match
-		FXCheckButton	*descriptions;			// search also in descriptions
-		FXCheckButton	*factions;			// search also in descriptions
+		FXCheckButton	*regardcase = nullptr;      // ignore case or don't
+		FXCheckButton	*regexp = nullptr;			// regular expression match
+		FXCheckButton	*descriptions = nullptr;	// search also in descriptions
+		FXCheckButton	*factions = nullptr;		// search also in descriptions
 
-		FXListBox		*domain;				// where to search
-	} options;
+		FXListBox		*domain = nullptr;			// where to search
+    } options;
 
 protected:
 	FXSearchDlg(){}
