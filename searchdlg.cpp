@@ -7,6 +7,8 @@
 #include <functional>
 #include <tuple>
 
+#define MAX_RESULTS 1000
+
 // *********************************************************************************************************
 // *** FXMessages implementation
 
@@ -24,7 +26,7 @@ FXDEFMAP(FXSearchDlg) MessageMap[]=
 	FXMAPFUNC(SEL_COMMAND,				FXSearchDlg::ID_RESULTS,				FXSearchDlg::onSelectResults),
 };
 
-FXIMPLEMENT(FXSearchDlg,FXDialogBox,MessageMap, ARRAYNUMBER(MessageMap))
+FXIMPLEMENT(FXSearchDlg, FXDialogBox, MessageMap, ARRAYNUMBER(MessageMap))
 
 class FXSearchItem : public FXFoldingItem {
 public:
@@ -38,40 +40,40 @@ protected:
     FXFont* m_font;
 };
 
-FXSearchDlg::FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint opts, FXint x,FXint y,FXint w,FXint h)
-		: FXDialogBox(owner, name, opts, x,y,w,h, 10,10,10,10, 10,10), modifiedText(false), boldFont(nullptr), mapFile(nullptr)
+FXSearchDlg::FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint opts, FXint x, FXint y, FXint w, FXint h)
+		: FXDialogBox(owner, name, opts, x, y, w, h, 10, 10, 10, 10, 10, 10), modifiedText(false), boldFont(nullptr), mapFile(nullptr)
 {
 	setIcon(icon);
 
     // buttons on bottom
-	FXHorizontalFrame* buttons = new FXHorizontalFrame(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0,0,0,0, 0,0,0,0);
-	new FXButton(buttons, "S&chliessen", NULL, this,ID_CLOSE, BUTTON_DEFAULT|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_RIGHT);
+	FXHorizontalFrame* buttons = new FXHorizontalFrame(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
+	new FXButton(buttons, "S&chliessen", NULL, this, ID_CLOSE, BUTTON_DEFAULT|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_RIGHT);
 	info_text = new FXLabel(buttons, "", NULL, LABEL_NORMAL);
 	
 	new FXHorizontalSeparator(this, SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
 
     // create layout
-	FXVerticalFrame* content = new FXVerticalFrame(this, LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
+	FXVerticalFrame* content = new FXVerticalFrame(this, LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 
 	// search field
 	new FXLabel(content, "&Suche nach:", NULL, LABEL_NORMAL);
 
-	FXHorizontalFrame* search_line = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0,0,0,0, 0,0,0,0);
-	search = new FXTextField(search_line, 12, this,ID_SEARCH, FRAME_LINE|TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X);
+	FXHorizontalFrame* search_line = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
+	search = new FXTextField(search_line, 12, this, ID_SEARCH, FRAME_LINE|TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X);
 	search->setBorderColor(getApp()->getShadowColor());
-	search_button = new FXButton(search_line, "Suchen", NULL, this,ID_SEARCH, BUTTON_DEFAULT|FRAME_RAISED);
+	search_button = new FXButton(search_line, "Suchen", NULL, this, ID_SEARCH, BUTTON_DEFAULT|FRAME_RAISED);
 	
 	// search mode: Ignore case, regular expression matching
-	FXHorizontalFrame* mode_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0,0,0,0, 0,0,0,0);
-	options.regardcase = new FXCheckButton(mode_frame, FXString(L"&Gro\u00df-/Kleinschreibung beachten"), this,ID_SEARCH, CHECKBUTTON_NORMAL);
-	options.regexp = new FXCheckButton(mode_frame, FXString(L"&Regul\u00e4rer Ausdruck"), this,ID_SEARCH, CHECKBUTTON_NORMAL);
+	FXHorizontalFrame* mode_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
+	options.regardcase = new FXCheckButton(mode_frame, FXString(L"&Gro\u00df-/Kleinschreibung beachten"), this, ID_SEARCH, CHECKBUTTON_NORMAL);
+	options.regexp = new FXCheckButton(mode_frame, FXString(L"&Regul\u00e4rer Ausdruck"), this, ID_SEARCH, CHECKBUTTON_NORMAL);
 
 	// search domain: Search for what type, search in descriptions
-	FXHorizontalFrame* domain_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0,0,0,0, 0,0,0,0);
-	options.descriptions = new FXCheckButton(domain_frame, "&Beschreibungen", this,ID_SEARCH, CHECKBUTTON_NORMAL);
+	FXHorizontalFrame* domain_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
+	options.descriptions = new FXCheckButton(domain_frame, "&Beschreibungen", this, ID_SEARCH, CHECKBUTTON_NORMAL);
 	new FXVerticalSeparator(domain_frame, SEPARATOR_GROOVE|LAYOUT_FILL_Y);
 	new FXLabel(domain_frame, "&Durchsuche", NULL, LABEL_NORMAL);
-	FXListBox *box = options.domain = new FXListBox(domain_frame, this,ID_SEARCH, LISTBOX_NORMAL|LAYOUT_FILL_X|FRAME_LINE);
+	FXListBox *box = options.domain = new FXListBox(domain_frame, this, ID_SEARCH, LISTBOX_NORMAL|LAYOUT_FILL_X|FRAME_LINE);
 	box->setBorderColor(getApp()->getShadowColor());
 	
 	box->appendItem("Alles");
@@ -82,23 +84,13 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	box->appendItem("Befehle");
 	box->setNumVisible(box->getNumItems());
 
-	// detail options
-	FXHorizontalFrame *details = new FXHorizontalFrame(content, LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
-	detailsTab = new FXToolBarTab(details, NULL,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
-	detailsTab->setTipText("Weitere Optionen ein- und ausblenden");
-
-	FXVerticalFrame *details_frame = new FXVerticalFrame(details, LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0);
-	details_frame->setBorderColor(getApp()->getShadowColor());
-	options.searchdirectly = new FXCheckButton(details_frame, "Bei Texteingabe suchen", NULL,0, CHECKBUTTON_NORMAL);
-	options.limitresults = new FXCheckButton(details_frame, FXString(L"Auf 1000 Treffer beschr\u00e4nken"), this,ID_SEARCH, CHECKBUTTON_NORMAL);
-
 	// results list
-	new FXHorizontalSeparator(content, SEPARATOR_GROOVE|LAYOUT_FILL_X, 0,0,0,0, 0,0,DEFAULT_SPACING,DEFAULT_SPACING);
+	new FXHorizontalSeparator(content, SEPARATOR_GROOVE|LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, DEFAULT_SPACING, DEFAULT_SPACING);
 
-	FXHorizontalFrame *list_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0,0,0,0, 0,0,0,0);
+	FXHorizontalFrame *list_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
 	list_frame->setBorderColor(getApp()->getShadowColor());
 
-	results = new FXFoldingList(list_frame, this,ID_RESULTS, FOLDINGLIST_SINGLESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+	results = new FXFoldingList(list_frame, this, ID_RESULTS, FOLDINGLIST_SINGLESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 	results->getHeader()->setHeaderStyle(HEADER_RESIZE|HEADER_TRACKING);
 	
     results->appendHeader("Region");
@@ -154,14 +146,6 @@ void FXSearchDlg::loadState(FXRegistry& reg)
 	FXint domain = reg.readUnsignedEntry("SEARCHDLG", "DOMAIN", 0);
 	if (domain >= 0 && domain < options.domain->getNumItems())
 		options.domain->setCurrentItem(domain);
-
-	FXint hideoptions = reg.readUnsignedEntry("SEARCHDLG", "HIDEOPTIONS", 1);
-	detailsTab->collapse(hideoptions != 0);
-
-	FXint searchdirectly = reg.readUnsignedEntry("SEARCHDLG", "SEARCHDIRECTLY", 1);
-	FXint limitresults = reg.readUnsignedEntry("SEARCHDLG", "LIMITRESULTS", 1);
-	options.searchdirectly->setCheck(searchdirectly != 0);
-	options.limitresults->setCheck(limitresults != 0);
 }
 
 void FXSearchDlg::saveState(FXRegistry& reg)
@@ -179,11 +163,6 @@ void FXSearchDlg::saveState(FXRegistry& reg)
 	reg.writeUnsignedEntry("SEARCHDLG", "DESCRIPTIONS", options.descriptions->getCheck());
 	
 	reg.writeUnsignedEntry("SEARCHDLG", "DOMAIN", options.domain->getCurrentItem());
-
-	reg.writeUnsignedEntry("SEARCHDLG", "HIDEOPTIONS", detailsTab->isCollapsed());
-
-	reg.writeUnsignedEntry("SEARCHDLG", "SEARCHDIRECTLY", options.searchdirectly->getCheck());
-	reg.writeUnsignedEntry("SEARCHDLG", "LIMITRESULTS", options.limitresults->getCheck());
 }
 
 long FXSearchDlg::onFocusIn(FXObject* sender, FXSelector sel, void* ptr)
@@ -283,9 +262,9 @@ namespace
 		if (name.empty())
 			name = "Unbekannt";
 
-		name += " (" + FXStringVal(block->x()) + "," + FXStringVal(block->y());
+		name += " (" + FXStringVal(block->x()) + ", " + FXStringVal(block->y());
 		if (block->info())
-			name += "," + datablock::planeName(block->info());
+			name += ", " + datablock::planeName(block->info());
 		name += ")";
 
 		if (compare(name))
@@ -389,8 +368,7 @@ namespace
 
 long FXSearchDlg::onChangedSearch(FXObject* sender, FXSelector sel, void* ptr)
 {
-	if (options.searchdirectly->getCheck())
-		modifiedText = true;
+	modifiedText = true;
 	return 0;
 }
 
@@ -423,8 +401,6 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 	bool regardcase = options.regardcase->getCheck() == TRUE;		// ignore case or don't ignore case
 	bool regexp = options.regexp->getCheck() == TRUE;				// use regular expressions
 	bool descriptions = options.descriptions->getCheck() == TRUE;	// search also in description texts
-
-	bool limitresults = options.limitresults->getCheck() == TRUE;	// stop after 1000 results
 
 	compare_func_t compare_func_icase = compare_normal(str);		// ignores case (for base36 numbers)
 	compare_func_t compare_func = compare_normal(str);				// does ignores case if not other specified
@@ -508,9 +484,9 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 					name = "Unbekannt";
 
 				if (region->info())
-					region_str.format("%s (%d,%d,%s)", name.text(), region->x(), region->y(), datablock::planeName(region->info()).text());
+					region_str.format("%s (%d, %d, %s)", name.text(), region->x(), region->y(), datablock::planeName(region->info()).text());
 				else
-					region_str.format("%s (%d,%d)", name.text(), region->x(), region->y());
+					region_str.format("%s (%d, %d)", name.text(), region->x(), region->y());
 			}
 
 			// add block to results-list in second column
@@ -580,12 +556,12 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
             FXSearchItem* item = new FXSearchItem(region_str + "\t" + object_str + "\t" + faction_str, nullptr, nullptr, (void*)&*link);
             if (bold) item->setFont(boldFont);
             results->appendItem(nullptr, item);
-			if (limitresults && results->getNumItems() >= 1000)
+			if (results->getNumItems() >= MAX_RESULTS)
 				break;				// list only 1000 results
 		}
 	}
 
-	if (limitresults && results->getNumItems() >= 1000)
+	if (results->getNumItems() >= MAX_RESULTS)
 		info_text->setText("Nur die ersten " + FXStringVal(results->getNumItems()) + " Treffer werden angezeigt.");
 	else
 		info_text->setText(FXStringVal(results->getNumItems()) + " Treffer");

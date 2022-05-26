@@ -116,8 +116,8 @@ public:
 	~datakey() {}
 
 	const FXString& value() const { return m_value; }
-	key_type type() const {
-        return (key_type)(m_type & TYPE_MASK);
+    enum key_type type() const {
+        return (enum key_type)(m_type & TYPE_MASK);
     }
     FXString key() const;
 

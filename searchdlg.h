@@ -29,7 +29,7 @@ public:
 	long onSearch(FXObject*, FXSelector, void*);		// hit enter in search textbox
 	long onChangedSearch(FXObject*, FXSelector, void*);	// change text in textbox
 	long onUpdateSearch(FXObject*, FXSelector, void*);	// update event on textbox
-	long onSelectResults(FXObject*, FXSelector, void*);
+    long onSelectResults(FXObject*, FXSelector, void*);
 
 public:
 	enum
@@ -48,9 +48,7 @@ protected:
 	bool			modifiedText;
 
 	FXFoldingList	*results;				// list of results
-	FXLabel			*info_text;				// info about search
-
-	FXToolBarTab	*detailsTab;			// tab of detailed options
+	FXLabel			*info_text = nullptr;				// info about search
 
 	struct
 	{
@@ -59,10 +57,6 @@ protected:
 		FXCheckButton	*descriptions;			// search also in descriptions
 
 		FXListBox		*domain;				// where to search
-
-		FXCheckButton	*searchdirectly;
-		FXCheckButton	*limitresults;
-
 	} options;
 
 protected:
@@ -70,7 +64,7 @@ protected:
 	FXSearchDlg(const FXSearchDlg&) {}
 
 private:
-    class FXFont* boldFont;
+    class FXFont* boldFont = nullptr;
 };
 
 #endif //_CSMAP_SEARCHDLG
