@@ -35,6 +35,7 @@ public:
 	enum
 	{
 		ID_SEARCH = FXDialogBox::ID_LAST,
+		ID_TRANSFER,
 		ID_RESULTS,
 		ID_LAST
 	};
@@ -43,9 +44,9 @@ protected:
 	datafile::SelectionState selection;
     datafile *mapFile = nullptr;
 
-	FXTextField		*txtSearch = nullptr;				// textfield for search
-	FXButton		*btnSearch = nullptr;		// "do the search!"
-	FXButton		*btnTransfer = nullptr;		// "do the search!"
+	FXTextField		*txtSearch = nullptr;			// textfield for search
+	FXButton		*btnSearch = nullptr;		    // do the search
+	FXButton		*btnTransfer = nullptr;		    // transfer to global search list
 	bool			modifiedText = false;
 
 	FXFoldingList	*matches = nullptr;				// list of results
@@ -65,6 +66,8 @@ protected:
 protected:
 	FXSearchDlg(){}
 	FXSearchDlg(const FXSearchDlg&) {}
+
+    void addMatch(const datablock::itor &region, const datablock::itor& building, const datablock::itor& ship, const datablock::itor& unit);
 
 private:
     class FXFont* boldFont = nullptr;

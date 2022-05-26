@@ -8,6 +8,12 @@
 #include <tuple>
 
 #define MAX_RESULTS 1000
+#define DOMAIN_ALL 0
+#define DOMAIN_REGION 1
+#define DOMAIN_UNIT 2
+#define DOMAIN_BLDG 3
+#define DOMAIN_SHIP 4
+#define DOMAIN_CMDS 5
 
 // *********************************************************************************************************
 // *** FXMessages implementation
@@ -23,7 +29,8 @@ FXDEFMAP(FXSearchDlg) MessageMap[]=
 	FXMAPFUNC(SEL_CHANGED,				FXSearchDlg::ID_SEARCH,					FXSearchDlg::onChangedSearch),
 	FXMAPFUNC(SEL_UPDATE,				FXSearchDlg::ID_SEARCH,					FXSearchDlg::onUpdateSearch),
 
-    FXMAPFUNC(SEL_COMMAND,				FXSearchDlg::ID_RESULTS,				FXSearchDlg::onCopyResults),
+    FXMAPFUNC(SEL_COMMAND,				FXSearchDlg::ID_TRANSFER,				FXSearchDlg::onCopyResults),
+    FXMAPFUNC(SEL_COMMAND,				FXSearchDlg::ID_RESULTS,				FXSearchDlg::onSelectResults),
 };
 
 FXIMPLEMENT(FXSearchDlg, FXDialogBox, MessageMap, ARRAYNUMBER(MessageMap))
@@ -46,9 +53,10 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, FXFoldingList* resultList, const FXStr
 	setIcon(icon);
 
     // buttons on bottom
-	FXHorizontalFrame* buttons = new FXHorizontalFrame(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
-	new FXButton(buttons, "S&chliessen", NULL, this, ID_CLOSE, BUTTON_DEFAULT|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_RIGHT);
-	info_text = new FXLabel(buttons, "", NULL, LABEL_NORMAL);
+    FXHorizontalFrame* buttons = new FXHorizontalFrame(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
+    info_text = new FXLabel(buttons, "", NULL, LABEL_NORMAL);
+    btnTransfer = new FXButton(buttons, L"In Such&ergebnissen \u00f6ffnen", NULL, this, ID_TRANSFER, BUTTON_DEFAULT | FRAME_RAISED | LAYOUT_FILL_Y | LAYOUT_RIGHT);
+    new FXButton(buttons, "S&chliessen", NULL, this, ID_CLOSE, BUTTON_DEFAULT|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_RIGHT);
 	
 	new FXHorizontalSeparator(this, SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
 
@@ -62,7 +70,6 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, FXFoldingList* resultList, const FXStr
 	txtSearch = new FXTextField(search_line, 12, this,ID_SEARCH, FRAME_LINE|TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X);
 	txtSearch->setBorderColor(getApp()->getShadowColor());
 	btnSearch = new FXButton(search_line, "&Suchen", NULL, this, ID_SEARCH, BUTTON_DEFAULT|FRAME_RAISED);
-    btnTransfer = new FXButton(search_line, "Zum &Ergebnis", NULL, this, ID_RESULTS, BUTTON_DEFAULT | FRAME_RAISED);
 	// search mode: Ignore case, regular expression matching
 	FXHorizontalFrame* mode_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
 	options.regardcase = new FXCheckButton(mode_frame, FXString(L"&Gro\u00df-/Kleinschreibung beachten"), this, ID_SEARCH, CHECKBUTTON_NORMAL);
@@ -104,7 +111,7 @@ void FXSearchDlg::create()
 	FXDialogBox::create();
 
     FXFontDesc fontdesc;
-    results->getFont()->getFontDesc(fontdesc);
+    matches->getFont()->getFontDesc(fontdesc);
     fontdesc.weight = FXFont::Bold;
     boldFont = new FXFont(getApp(), fontdesc);
     boldFont->create();
@@ -302,9 +309,8 @@ namespace
 			return false;
 
 		const compare_func_t& compare = context.compare;
-		const compare_func_t& compare_icase = context.compare_icase;
 
-		if (compare(block->value(TYPE_NAME)) || compare_icase(block->id()))
+		if (compare(block->value(TYPE_NAME)))
 			return true;
 
         // compare descriptions?
@@ -328,9 +334,8 @@ namespace
 			return false;
 
 		const compare_func_t& compare = context.compare;
-		const compare_func_t& compare_icase = context.compare_icase;
 
-		if (compare(block->value(TYPE_NAME)) || compare_icase(block->id()))
+		if (compare(block->value(TYPE_NAME)))
 			return true;
 
 		if (context.searchDescriptions)		// compare descriptions?
@@ -412,6 +417,45 @@ long FXSearchDlg::onUpdateSearch(FXObject* sender, FXSelector sel, void* ptr)
 	return 0;
 }
 
+long FXSearchDlg::onSelectResults(FXObject*, FXSelector, void*)
+{
+    if (!mapFile)
+        return 0;
+
+    FXFoldingItem* item = matches->getCurrentItem();
+    if (!item)
+        return 0;
+
+    datablock* select = (datablock*)item->getData();
+
+    datablock::itor region, block, end = mapFile->blocks().end();
+    mapFile->findSelection(select, block, region);
+
+    // propagate selection
+    datafile::SelectionState state;
+    state.selected = 0;
+    if (region != end) {
+        state.region = region;
+        state.selected |= state.REGION;
+    }
+    if (block != end) {
+        if (block->type() == block_type::TYPE_UNIT) {
+            state.unit = block;
+            state.selected |= state.UNIT;
+        }
+        else if (block->type() == block_type::TYPE_BUILDING) {
+            state.building = block;
+            state.selected |= state.BUILDING;
+        }
+        else if (block->type() == block_type::TYPE_SHIP) {
+            state.ship = block;
+            state.selected |= state.SHIP;
+        }
+    }
+    getOwner()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    return 1;
+}
+
 long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 {
 	if (!mapFile)
@@ -446,17 +490,17 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 
 	search_func_t search_func;
 
-	if (domain == 0)
+    if (domain == DOMAIN_ALL)
 		search_func = search_all;
-	else if (domain == 1)
+	else if (domain == DOMAIN_REGION)
 		search_func = search_region;
-	else if (domain == 2)
+	else if (domain == DOMAIN_UNIT)
 		search_func = search_unit;
-	else if (domain == 3)
+	else if (domain == DOMAIN_BLDG)
 		search_func = search_building;
-	else if (domain == 4)
+	else if (domain == DOMAIN_SHIP)
 		search_func = search_ship;
-	else if (domain == 5)
+	else if (domain == DOMAIN_CMDS)
 		search_func = search_commands;
 	else
 	{
@@ -484,112 +528,27 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 		}
 		else if (block->type() == block_type::TYPE_BUILDING)
 		{
-			building = block;
+            building = block;
 			ship = unit = end;
 		}
 		else if (block->type() == block_type::TYPE_SHIP)
 		{
-			ship = block;
+            ship = block;
 			building = unit = end;
 		}
 		else if (block->type() == block_type::TYPE_UNIT)
 		{
-			unit = block;
+            unit = block;
 			building = ship = end;
 		}
 
-		if (search_func(block, context))
-		{
-			FXString region_str, object_str, faction_str;
-            bool bold = false;
-			// add region to results-list in first column
-			if (region != end)
-			{
-				FXString terrain = region->terrainString();
-				FXString name = region->value(TYPE_NAME);
-
-				if (name.empty())
-					name = terrain;
-				if (name.empty())
-					name = "Unbekannt";
-
-				if (region->info())
-					region_str.format("%s (%d, %d, %s)", name.text(), region->x(), region->y(), datablock::planeName(region->info()).text());
-				else
-					region_str.format("%s (%d, %d)", name.text(), region->x(), region->y());
-			}
-
-			// add block to results-list in second column
-			if (building != end)
-			{
-				FXString name = building->value(TYPE_NAME);
-				FXString id = building->id();
-
-				if (name.empty())
-					name = FXString(L"Geb\u00e4ude ") + id;
-
-				object_str = name + " (" + id + ")";
-			}
-			else if (ship != end)
-			{
-				FXString name = ship->value(TYPE_NAME);
-				FXString id = ship->id();
-
-				if (name.empty())
-					name = "Schiff " + id;
-
-				object_str = name + " (" + id + ")";
-			}
-			else if (unit != end)
-			{
-				FXString name = unit->value(TYPE_NAME);
-				FXString id = unit->id();
-                int fac_id = unit->valueInt(TYPE_FACTION);
-                if (fac_id > 0) {
-                    datablock::itor faction;
-                    if (mapFile->getFaction(faction, fac_id)) {
-                        faction_str = faction->value(TYPE_FACTIONNAME)  + " (" + faction->id() + ")";
-                    }
-                }
-
-				if (name.empty())
-					name = "Einheit " + id;
-
-				object_str = name + " (" + id + ")";
-
-                block = unit;
-                for (block++; block != end && block->depth() > unit->depth(); block++)
-                {
-                    if (block->type() != block_type::TYPE_COMMANDS)
-                        continue;
-
-                    if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment())) {
-                        bold = !cmds->confirmed;
-                        break;
-                    }
-                }
-
-                if (att_commands* cmds = dynamic_cast<att_commands*>(unit->attachment())) {
-                    bold = !cmds->confirmed;
-                }
-            }
-
-			// add to list
-			datablock::itor link = region;
-			if (unit != end)
-				link = unit;
-			else if (building != end)
-				link = building;
-			else if (ship != end)
-				link = ship;
-
-            FXSearchItem* item = new FXSearchItem(region_str + "\t" + object_str + "\t" + faction_str, nullptr, nullptr, (void*)&*link);
-            if (bold) item->setFont(boldFont);
-			matches->appendItem(nullptr, item);
-			if (matches->getNumItems() >= MAX_RESULTS)
-				break;				// list only 1000 results
-		}
-	}
+        if (region != end && (compare_func_icase(block->id()) || search_func(block, context)))
+        {
+            addMatch(region, building, ship, unit);
+            if (matches->getNumItems() >= MAX_RESULTS)
+                break;				// list only 1000 results
+        }
+    }
 
 	if (matches->getNumItems() >= MAX_RESULTS)
 		info_text->setText("Nur die ersten " + FXStringVal(matches->getNumItems()) + " Treffer werden angezeigt.");
@@ -602,6 +561,7 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 long FXSearchDlg::onCopyResults(FXObject* sender, FXSelector sel, void* ptr)
 {
     FXFoldingItem* item;
+    results->clearItems();
     for (item = matches->getFirstItem(); item; item = item->getNext()) {
         FXFoldingItem* copy = new FXFoldingItem(item->getText(), item->getOpenIcon(), item->getClosedIcon(), item->getData());
         results->appendItem(NULL, copy);
@@ -609,7 +569,98 @@ long FXSearchDlg::onCopyResults(FXObject* sender, FXSelector sel, void* ptr)
     FXTabBook* outputTabs = (FXTabBook*)results->getParent();
     outputTabs->setCurrent(outputTabs->indexOfChild(results) / 2);
 
-    return 1;
+    return onCmdHide(sender, sel, ptr);
+}
+
+void FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor& building, const datablock::itor& ship, const datablock::itor& unit)
+{
+    const datablock::itor end = mapFile->blocks().end();
+    FXString region_str, object_str, faction_str;
+    bool bold = false;
+    // add region to results-list in first column
+    if (region != end)
+    {
+        FXString terrain = region->terrainString();
+        FXString name = region->value(TYPE_NAME);
+
+        if (name.empty())
+            name = terrain;
+        if (name.empty())
+            name = "Unbekannt";
+
+        if (region->info())
+            region_str.format("%s (%d, %d, %s)", name.text(), region->x(), region->y(), datablock::planeName(region->info()).text());
+        else
+            region_str.format("%s (%d, %d)", name.text(), region->x(), region->y());
+    }
+
+    // add block to results-list in second column
+    if (building != end)
+    {
+        FXString name = building->value(TYPE_NAME);
+        FXString id = building->id();
+
+        if (name.empty())
+            name = FXString(L"Geb\u00e4ude ") + id;
+
+        object_str = name + " (" + id + ")";
+    }
+    else if (ship != end)
+    {
+        FXString name = ship->value(TYPE_NAME);
+        FXString id = ship->id();
+
+        if (name.empty())
+            name = "Schiff " + id;
+
+        object_str = name + " (" + id + ")";
+    }
+    else if (unit != end)
+    {
+        FXString name = unit->value(TYPE_NAME);
+        FXString id = unit->id();
+        int fac_id = unit->valueInt(TYPE_FACTION);
+        if (fac_id > 0) {
+            datablock::itor faction;
+            if (mapFile->getFaction(faction, fac_id)) {
+                faction_str = faction->value(TYPE_FACTIONNAME) + " (" + faction->id() + ")";
+            }
+        }
+
+        if (name.empty())
+            name = "Einheit " + id;
+
+        object_str = name + " (" + id + ")";
+
+        datablock::itor block = unit;
+        for (block++; block != end && block->depth() > unit->depth(); block++)
+        {
+            if (block->type() != block_type::TYPE_COMMANDS)
+                continue;
+
+            if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment())) {
+                bold = !cmds->confirmed;
+                break;
+            }
+        }
+
+        if (att_commands* cmds = dynamic_cast<att_commands*>(unit->attachment())) {
+            bold = !cmds->confirmed;
+        }
+    }
+
+    // add to list
+    datablock::itor link = region;
+    if (unit != end)
+        link = unit;
+    else if (building != end)
+        link = building;
+    else if (ship != end)
+        link = ship;
+
+    FXSearchItem* item = new FXSearchItem(region_str + "\t" + object_str + "\t" + faction_str, nullptr, nullptr, (void*)&*link);
+    if (bold) item->setFont(boldFont);
+    matches->appendItem(nullptr, item);
 }
 
 static const int ICON_SPACING = 4;	// Spacing between parent and child in x direction
