@@ -238,10 +238,11 @@ private:
 	FXString		dialogDirectory;
 
 	// Statusbar
-    class FXStatusBar		*status;
-    class FXLabel			*status_lfaction, *status_faction;
-    class FXLabel			*status_lturn, *status_turn;
-    class FXLabel			*status_lfile, *status_file;
+    class FXStatusBar	*status;
+    class FXLabel		*status_lfaction, *status_faction;
+    class FXLabel		*status_lturn, *status_turn;
+    class FXLabel		*status_ldate, *status_date;
+    class FXLabel		*status_lfile, *status_file;
 
 	// ToolBarTabs
     class FXToolBarTab	*riTab, *siTab, *tiTab;

@@ -206,6 +206,11 @@ CSMap::CSMap(FXApp *app) :
     status_faction->setBorderColor(getApp()->getShadowColor());
     status_faction->hide(); status_lfaction->hide();
 
+    status_date = new FXLabel(status, "-", 0, FRAME_LINE | LAYOUT_RIGHT | LAYOUT_CENTER_Y);
+    status_ldate = new FXLabel(status, " Datum:", nullptr, LAYOUT_RIGHT | LAYOUT_CENTER_Y);
+    status_date->setBorderColor(getApp()->getShadowColor());
+    status_date->hide(); status_ldate->hide();
+
     // Menubar, Toolbar
     FXDockSite* topdock = new FXDockSite(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X);
     /*FXDockSite* bottomdock =*/ new FXDockSite(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
@@ -2100,12 +2105,28 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     }
 
     if (report) {
-        status_turn->setText(FXStringVal(report->turn()));
-        status_turn->show(), status_lturn->show();
+        const wchar_t* season_names[] = { L"Fr\u00fchling", L"Sommer", L"Herbst", L"Winter", L"Winter" };
+        int turn = report->turn();
+        status_turn->setText(FXStringVal(turn));
+        status_turn->show();
+        status_lturn->show();
+        int since_epoch = turn >= 194 ? (turn - 184) : turn;
+        int year = 1 + since_epoch / 27;
+        int month = 1 + since_epoch % 9;
+        int week = 1 + since_epoch % 3;
+        int season = ((month + 8) % 9) / 2;
+        FXString label = FXStringVal(week) + ". Woche im " + season_names[season] + " des Jahres " + FXStringVal(year);
+        status_date->setText(label);
+        status_date->show();
+        status_ldate->show();
     }
     else {
-        status_turn->hide(); status_lturn->hide();
-        status_file->hide(), status_lfile->hide();
+        status_turn->hide();
+        status_lturn->hide();
+        status_file->hide();
+        status_lfile->hide();
+        status_date->hide();
+        status_ldate->hide();
         status->recalc();
     }
 
@@ -2117,11 +2138,13 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
             selection.activefaction->id().text());
 
         status_faction->setText(faction);
-        status_faction->show(), status_lfaction->show();
+        status_faction->show();
+        status_lfaction->show();
     }
     else
     {
-        status_faction->hide(), status_lfaction->hide();
+        status_faction->hide();
+        status_lfaction->hide();
         status->recalc();
     }
 
