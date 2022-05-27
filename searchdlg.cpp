@@ -548,7 +548,7 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
         if (!id.empty() && region != end) {
             if (compare_func_icase(id)) {
                 FXFoldingItem* item = addMatch(region, building, ship, unit);
-                FXRex compare(str, REX_NORMAL);
+                FXRex compare(str, REX_ICASE);
                 FXint m_beg, m_end;
                 if (compare.match(id, &m_beg, &m_end)) {
                     if (m_beg == 0 && m_end == id.length()) {
