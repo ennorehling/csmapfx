@@ -361,6 +361,7 @@ protected:
 	CSMap() {}
 
     void beginLoading(const FXString& filename);
+    FXString gameDate(int turn) const;
 };
 
 #endif //_CSMAP

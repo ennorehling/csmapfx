@@ -2105,18 +2105,12 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     }
 
     if (report) {
-        const wchar_t* season_names[] = { L"Fr\u00fchling", L"Sommer", L"Herbst", L"Winter", L"Winter" };
         int turn = report->turn();
         status_turn->setText(FXStringVal(turn));
         status_turn->show();
         status_lturn->show();
-        int since_epoch = turn >= 194 ? (turn - 184) : turn;
-        int year = 1 + since_epoch / 27;
-        int month = 1 + since_epoch % 9;
-        int week = 1 + since_epoch % 3;
-        int season = ((month + 8) % 9) / 2;
-        FXString label = FXStringVal(week) + ". Woche im " + season_names[season] + " des Jahres " + FXStringVal(year);
-        status_date->setText(label);
+        FXString date = gameDate(turn);
+        status_date->setText(date);
         status_date->show();
         status_ldate->show();
     }
@@ -3162,6 +3156,22 @@ long CSMap::onHelpAbout(FXObject*, FXSelector, void*)
     about.execute(PLACEMENT_SCREEN);
 
     return 1;
+}
+
+FXString CSMap::gameDate(int turn) const
+{
+    struct season {
+        int index;
+        int offset;
+    } seasons[] = { {1, 3}, {2, 0}, {2, 3}, {3, 0}, {3, 3}, {3, 6}, {0, 0}, {0, 3}, {1, 0} };
+    const wchar_t* season_names[] = { L"Fr\u00fchling", L"Sommer", L"Herbst", L"Winter", L"Winter" };
+    int since_epoch = (turn < 184) ? turn : (turn - 184);
+    int year = 1 + since_epoch / 27;
+    int week = since_epoch % 27;
+    int month = week / 3;
+    int season = seasons[month].index;
+    int week_of_month = 1 + seasons[month].offset + week % 3;
+    return FXStringVal(week_of_month) + ". Woche im " + season_names[season] + " des Jahres " + FXStringVal(year);
 }
 
 void CSMap::beginLoading(const FXString& filename)
