@@ -543,8 +543,8 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
             id = block->id().lower();
 		}
 
-        if (!id.empty() && region != end) {
-            if (compare_func_icase(id)) {
+        if (region != end) {
+            if (!id.empty() && compare_func_icase(id)) {
                 FXFoldingItem* item = addMatch(region, building, ship, unit);
                 FXRex compare(str, REX_ICASE);
                 FXint m_beg, m_end;

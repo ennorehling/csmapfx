@@ -816,23 +816,25 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
         if (top) {
             if (selection.selected & selection.REGION)
             {
-                FXTreeItem* item = findTreeItem(top, &*selection.region);
-                if (item) top = item;
+                FXTreeItem* region = findTreeItem(top, &*selection.region);
+                FXTreeItem* item = nullptr;
                 if (selection.selected & selection.FACTION)
-                    item = findTreeItem(top, &*selection.faction);
+                    region = findTreeItem(top, &*selection.faction);
 
                 if (selection.selected & selection.BUILDING)
-                    item = findTreeItem(top, &*selection.building);
+                    item = findTreeItem(region ? region : top, &*selection.building);
 
                 if (selection.selected & selection.SHIP)
-                    item = findTreeItem(top, &*selection.ship);
+                    item = findTreeItem(region ? region : top, &*selection.ship);
 
                 if (selection.selected & selection.UNIT)
-                    item = findTreeItem(top, &*selection.unit);
+                    item = findTreeItem(region ? region : top, &*selection.unit);
 
-                if (!item) item = top;
-                selectItem(item);
-                makeItemVisible(item);
+                if (!item) item = region;
+                if (item) {
+                    selectItem(item);
+                    makeItemVisible(item);
+                }
             }
             if (selection.selected & selection.UNIT)
             {
