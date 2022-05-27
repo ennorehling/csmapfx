@@ -286,8 +286,6 @@ namespace
 		FXString name = block->value(TYPE_NAME);
 		if (name.empty())
 			name = block->terrainString();
-		if (name.empty())
-			name = "Unbekannt";
 
 		name += " (" + FXStringVal(block->x()) + ", " + FXStringVal(block->y());
 		if (block->info())
