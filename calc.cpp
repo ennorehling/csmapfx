@@ -53,7 +53,7 @@ FXCalculator::FXCalculator(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
         }
     }
 
-    new FXLabel(this, "Rechner ", 0, LAYOUT_CENTER_Y);
+    new FXLabel(this, "&Rechner ", 0, LAYOUT_CENTER_Y);
 
     FXVerticalFrame *frame = new FXVerticalFrame(this, LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0);
     firstline = new FXHorizontalFrame(frame, LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0);

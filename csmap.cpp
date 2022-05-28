@@ -437,7 +437,7 @@ CSMap::CSMap(FXApp *app) :
     menu.regdescription = new FXMenuCheck(regionmenu,"&Beschreibung zeigen\t\tRegionsbeschreibung anzeigen.");
     new FXMenuCommand(regionmenu,FXString(L"&Alle markieren\tCtrl-Shift-A\tAlle Regionen ausw\u00e4hlen."),nullptr,this,ID_REGION_SELALL);
     new FXMenuCommand(regionmenu,FXString(L"Alle &Inseln ausw\u00e4hlen\t\tAlle Landregionen ausw\u00e4hlen (Ozean, Feuerwand und Eisberg z\u00e4hlen nicht als Land)."),nullptr,this,ID_REGION_SELALLISLANDS);
-    new FXMenuCommand(regionmenu,FXString(L"&Keine markieren\t\tKeine Region ausw\u00e4hlen."),nullptr,this,ID_REGION_UNSEL);
+    new FXMenuCommand(regionmenu,FXString(L"&Keine markieren\tEscape\tKeine Region ausw\u00e4hlen."),nullptr,this,ID_REGION_UNSEL);
     new FXMenuCommand(regionmenu,FXString(L"Auswahl &invertieren\t\tAusgew\u00e4hlte Regionen abw\u00e4hlen und umgekehrt."),nullptr,this,ID_REGION_INVERTSEL);
 
     selectionmenu = new FXMenuPane(this);
@@ -484,7 +484,7 @@ CSMap::CSMap(FXApp *app) :
     getAccelTable()->addAccel(MKUINT(KEY_K,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_MARKERNORTHEAST));
 
     // jump to calculator on ESCAPE
-    getAccelTable()->addAccel(MKUINT(KEY_Escape,0), this,FXSEL(SEL_COMMAND,ID_CALCULATOR));
+    // getAccelTable()->addAccel(MKUINT(KEY_R, CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_CALCULATOR));
 
     // Help menu
     helpmenu = new FXMenuPane(this);

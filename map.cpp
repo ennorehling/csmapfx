@@ -809,12 +809,8 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 		{
 			state.selected = 0;
 
-			// Strg gedrueckt? -> multiple selected regions!
-			if (event->state&CONTROLMASK || modus == MODUS_SELECT)
-			{
-				if (selection.selected & selection.MULTIPLE_REGIONS)
-					state.regionsSelected = selection.regionsSelected;
-			}
+			if (selection.selected & selection.MULTIPLE_REGIONS)
+				state.regionsSelected = selection.regionsSelected;
 
             if (mapFile->getRegion(state.region, x, y, visiblePlane)) {
                 state.selected |= state.REGION;
