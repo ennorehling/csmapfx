@@ -331,10 +331,12 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
 	if (!getCurrentItem())	// kein Item markiert.
 		return 0;
 
-	datablock* datablk = (datablock*)getCurrentItem()->getData();
-	datablock* parentdata = NULL;
-	if (getCurrentItem()->getParent())
-		parentdata = (datablock*)getCurrentItem()->getParent()->getData();
+    FXTreeItem* current = getCurrentItem();
+	datablock* datablk = (datablock*)current->getData();
+	datablock* parentdata = nullptr;
+    FXTreeItem* folder = current->getParent();
+	if (folder)
+		parentdata = (datablock*)folder->getData();
 
 	datablock::itor main = mapFile->blocks().end();
 	datablock::itor iparent = mapFile->blocks().end();
@@ -387,7 +389,7 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
 			sel_state.selected = sel_state.REGION;
 			sel_state.region = main;
 		}
-		if (main->type() == block_type::TYPE_FACTION)
+        if (main->type() == block_type::TYPE_FACTION)
 		{
 			sel_state.selected = sel_state.FACTION;
 			sel_state.faction = main;
@@ -420,7 +422,7 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
 				sel_state.faction = iparent;
 			}
 		}
-		if (main->type() == block_type::TYPE_UNIT)
+        if (main->type() == block_type::TYPE_UNIT)
 		{
 			sel_state.selected = sel_state.UNIT;
 			sel_state.unit = main;
@@ -431,10 +433,9 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
 				sel_state.faction = iparent;
 			}			
 		}
-
 		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
 		return 1;
-	}
+    }
 
 	return 0;
 }
@@ -812,64 +813,21 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 	if (selection.selChange != pstate->selChange)
 	{
         selection = *pstate;
-        FXTreeItem* top = getFirstItem();
-        if (top) {
-            if (selection.selected & selection.REGION)
-            {
+        if (selection.selected & selection.REGION)
+        {
+            FXTreeItem* top = getFirstItem();
+            if (top) {
                 FXTreeItem* region = findTreeItem(top, &*selection.region);
                 FXTreeItem* item = nullptr;
-                if (selection.selected & selection.FACTION)
-                    region = findTreeItem(top, &*selection.faction);
-
-                if (selection.selected & selection.BUILDING)
-                    item = findTreeItem(region ? region : top, &*selection.building);
-
-                if (selection.selected & selection.SHIP)
-                    item = findTreeItem(region ? region : top, &*selection.ship);
-
                 if (selection.selected & selection.UNIT)
                     item = findTreeItem(region ? region : top, &*selection.unit);
+                else if (selection.selected & selection.FACTION)
+                    item = findTreeItem(region, &*selection.faction);
 
                 if (!item) item = region;
                 if (item) {
                     selectItem(item);
                     makeItemVisible(item);
-                }
-            }
-            if (selection.selected & selection.UNIT)
-            {
-                bool cmd_confirmed = true;
-
-                datablock::itor block = selection.unit;
-                datablock::itor end = mapFile->blocks().end();
-                for (block++; block != end && block->depth() > selection.unit->depth(); block++)
-                {
-                    if (block->type() != block_type::TYPE_COMMANDS)
-                        continue;
-
-                    cmd_confirmed = false;
-
-                    if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
-                        cmd_confirmed = cmds->confirmed;
-                }
-
-                // all item should be FXRegionItem
-                FXRegionItem* item = dynamic_cast<FXRegionItem*>(findTreeItem(top, &*selection.unit));
-                if (item)
-                {
-                    item->setBold(!cmd_confirmed);
-                    update();
-                    // propagate boldness to parents
-                    while (FXRegionItem* father = dynamic_cast<FXRegionItem*>(item->getParent()))
-                    {
-                        bool boldness = false;
-                        for (item = dynamic_cast<FXRegionItem*>(father->getFirst()); item; item = dynamic_cast<FXRegionItem*>(item->getNext()))
-                            if (item->isBold())
-                                boldness = true;
-
-                        father->setBold(boldness);
-                        item = father;
-                    }
                 }
             }
         }
