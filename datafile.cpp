@@ -398,13 +398,6 @@ bool datakey::parse(char* str, enum block_type btype, bool isUtf8)
 	{ block_type::TYPE_UNKNOWN, NULL }
 };
 
-#ifndef NDEBUG
-int datablock::depth() {
-    assert(m_depth >= 0);
-    return m_depth;
-}
-#endif
-
 /*static*/ block_type datablock::parseType(const FXString& type)
 {
 	// region moved to top (performance)

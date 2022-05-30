@@ -258,11 +258,7 @@ public:
 	void flags(int flags);				// set <flags> and unset all other flags
 	void setFlags(int flags);				// set <flags> and don't modify the other flags
 
-#ifndef NDEBUG
-    int depth() const;
-#else
     int depth() const { return m_depth; }
-#endif
     void depth(int depth);				// set depth of the block
 
 	::attachment* attachment() const { return m_attachment; }
