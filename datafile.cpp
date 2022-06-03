@@ -1,14 +1,16 @@
-#include <ctime>
-#include <cassert>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
+#include "datafile.h"
+
 #include "version.h"
 #include "main.h"
 #include "fxhelper.h"
-#include "datafile.h"
 #include "terrain.h"
+
+#include <ctime>
+#include <cassert>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
 
 #define HELP_GUARD 16
 
@@ -1215,94 +1217,95 @@ void datafile::removeTemporary()
     }
 }
 
-void datafile::merge(datafile * new_cr, int x_offset, int y_offset)
+void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
 {
     // dann: Datei an den aktuellen CR anfuegen (nur Karteninformationen)
-    datablock::itor new_end = new_cr->m_blocks.end();
+    datablock::itor old_end = old_cr->m_blocks.end();
     bool copy_children = false;
-    for (datablock::itor block = new_cr->m_blocks.begin(); block != new_end;)
+    for (datablock::itor old_r = old_cr->m_blocks.begin(); old_r != old_end;++old_r)
     {
         // handle only regions
-        if (block->type() == block_type::TYPE_REGION)
+        if (old_r->type() == block_type::TYPE_REGION)
         {
-            bool is_seen = 0 != (block->flags() & datablock::FLAG_REGION_SEEN);
-            int x = block->x();
-            int y = block->y();
-            int plane = block->info();
+            bool was_seen = 0 != (old_r->flags() & datablock::FLAG_REGION_SEEN);
+            int x = old_r->x();
+            int y = old_r->y();
+            int plane = old_r->info();
             if (plane == 0) {
                 x += x_offset;
                 y += y_offset;
             }
-            datablock::itor oldr = region(x, y, plane);
+            datablock::itor new_r = region(x, y, plane);
 
-            if (oldr != m_blocks.end())            // add some info to old cr (island names)
+            if (new_r != m_blocks.end())            // add some info to old cr (island names)
             {
-                bool overwrite = is_seen || (0 == (oldr->flags() & datablock::FLAG_REGION_SEEN));
+                bool is_seen = (0 != (new_r->flags() & datablock::FLAG_REGION_SEEN));
                 copy_children = false;
-                if (overwrite) {
-                    for (const datakey& key : block->data())
-                    {
-                        if (key.type() == TYPE_NAME || key.type() == TYPE_TERRAIN) {
-                            continue;
-                        }
-                        if (!oldr->hasKey(key)) {
-                            oldr->data().push_back(key);
-                        }
-                    }
-                }
-                if (const datakey* islandkey = block->valueKey(TYPE_ISLAND))
+                if (const datakey* islandkey = old_r->valueKey(TYPE_ISLAND))
                 {
-                    if (!oldr->valueKey(TYPE_ISLAND))
+                    if (!new_r->valueKey(TYPE_ISLAND))
                     {
                         if (islandkey && !islandkey->isInt())        // add only Vorlage-style islands (easier)
-                            oldr->data().push_back(*islandkey);
+                            new_r->data().push_back(*islandkey);
                     }
                 }
-                // copy child blocks if we don't have them
-                for (block++; block != new_end && block->type() != block_type::TYPE_REGION; ++block)
-                {
-                    datablock::itor old_end = m_blocks.end();
-                    block_type type = block->type();
-                    if (type == block_type::TYPE_BORDER || type == block_type::TYPE_RESOURCE)
-                    {
-                        if (overwrite) {
-                            // we cannot see this region, should we replace what we know?
-                            mergeBlock(block, oldr, old_end, block_type::TYPE_REGION);
+                if (was_seen) {
+                    // old return contained good data that we may want to keep
+                    if (!is_seen) {
+                        for (const datakey& key : old_r->data())
+                        {
+                            if (key.type() == TYPE_NAME || key.type() == TYPE_TERRAIN) {
+                                continue;
+                            }
+                            if (!new_r->hasKey(key)) {
+                                new_r->data().push_back(key);
+                            }
                         }
                     }
-                    else if (type == block_type::TYPE_PRICES) {
-                        mergeBlock(block, oldr, old_end, block_type::TYPE_REGION);
+                    // copy child blocks if we don't have them
+                    for (old_r++; old_r != old_end && old_r->type() != block_type::TYPE_REGION; ++old_r)
+                    {
+                        datablock::itor new_end = m_blocks.end();
+                        block_type type = old_r->type();
+                        if (type == block_type::TYPE_PRICES) {
+                            mergeBlock(old_r, new_r, new_end, block_type::TYPE_REGION);
+                        }
+                        else if (!is_seen)
+                        {
+                            if (type == block_type::TYPE_BORDER || type == block_type::TYPE_RESOURCE) {
+                                mergeBlock(old_r, new_r, new_end, block_type::TYPE_REGION);
+                            }
+                        }
                     }
                 }
-                if (block == new_end) {
+                if (old_r == old_end) {
                     break;
                 }
                 continue;
             }
-            else // append region to old cr
+            else // append region to this cr
             {
                 if (x_offset || y_offset) {
-                    if (block->info() == 0) {
-                        block->move(x_offset, y_offset);
+                    if (old_r->info() == 0) {
+                        old_r->move(x_offset, y_offset);
                     }
                 }
                 copy_children = true;
-                block->attachment(nullptr);
-                m_blocks.push_back(*block);
+                old_r->attachment(nullptr);
+                m_blocks.push_back(*old_r);
             }
         }
         else if (copy_children) {
             /* part of a new region that is appended to the report, copy detail blocks */
-            switch (block->type()) {
+            switch (old_r->type()) {
             case block_type::TYPE_BUILDING:
             case block_type::TYPE_PRICES:
             case block_type::TYPE_BORDER:
             case block_type::TYPE_RESOURCE:
-                m_blocks.push_back(*block);
+                m_blocks.push_back(*old_r);
                 break;
             }
         }
-        ++block;
     }
     createHashTables();
 }

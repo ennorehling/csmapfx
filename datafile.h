@@ -380,9 +380,9 @@ public:
 
     void removeTemporary();
     void findOffset(datafile* new_cr, int* x_offset, int* y_offset) const;
-    void merge(datafile* new_cr, int x_offset = 0, int y_offset = 0);
+    void merge(datafile* old_cr, int x_offset = 0, int y_offset = 0);
 
-	int loadCmds(const FXString &filename);
+    int loadCmds(const FXString &filename);
 	int saveCmds(const FXString &filename, const FXString &passwd, bool stripped);
 
     FXString getPassword() const { return m_password; }
