@@ -819,8 +819,14 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
             if (top) {
                 FXTreeItem* region = findTreeItem(top, &*selection.region);
                 FXTreeItem* item = nullptr;
-                if (selection.selected & selection.UNIT)
+                if (selection.selected & selection.UNIT) {
                     item = findTreeItem(region ? region : top, &*selection.unit);
+                    FXRegionItem* ri = static_cast<FXRegionItem *>(item);
+                    if (ri->isBold() != !(selection.selected & selection.CONFIRMED)) {
+                        ri->setBold(!(selection.selected & selection.CONFIRMED));
+                        update();
+                    }
+                }
                 else if (selection.selected & selection.FACTION)
                     item = findTreeItem(region, &*selection.faction);
 

@@ -362,6 +362,7 @@ protected:
 
     void beginLoading(const FXString& filename);
     FXString gameDate(int turn) const;
+    bool isConfirmed(const datablock::itor& unit);
 };
 
 #endif //_CSMAP

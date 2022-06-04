@@ -2065,6 +2065,12 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         }
         if (pstate->selected & selection.UNIT) {
             selection.unit = pstate->unit;
+            if (isConfirmed(selection.unit)) {
+                selection.selected |= selection.CONFIRMED;
+            }
+            else {
+                selection.selected &= ~selection.CONFIRMED;
+            }
         }
         if (pstate->selected & selection.FACTION) {
             selection.faction = pstate->faction;
@@ -3178,6 +3184,23 @@ FXString CSMap::gameDate(int turn) const
     int season = seasons[month].index;
     int week_of_month = 1 + seasons[month].offset + week % 3;
     return FXStringVal(week_of_month) + ". Woche im " + season_names[season] + " des Jahres " + FXStringVal(year);
+}
+
+bool CSMap::isConfirmed(const datablock::itor& unit)
+{
+    if (unit->type() == block_type::TYPE_UNIT) {
+        datablock::itor block = unit;
+        for (++block; block != report->blocks().end() && block->depth() > unit->depth(); ++block) {
+            if (block->type() == block_type::TYPE_COMMANDS) {
+                att_commands* att = static_cast<att_commands*>(block->attachment());
+                if (att) {
+                    return att->confirmed;
+                }
+                break;
+            }
+        }
+    }
+    return false;
 }
 
 void CSMap::beginLoading(const FXString& filename)
