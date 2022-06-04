@@ -3200,7 +3200,7 @@ bool CSMap::isConfirmed(const datablock::itor& unit)
             }
         }
     }
-    return false;
+    return true;
 }
 
 void CSMap::beginLoading(const FXString& filename)
