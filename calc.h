@@ -43,18 +43,18 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-	datafile *mapFile;
+	datafile *mapFile = nullptr;
 
-	FXHorizontalFrame	*firstline;
-	FXHorizontalFrame	*secondline;
+	FXHorizontalFrame	*firstline = nullptr;
+	FXHorizontalFrame	*secondline = nullptr;
 
-	FXTextField			*formula;
-	FXTextField			*result;
-	FXTextField			*longresult;
+	FXTextField			*formula = nullptr;
+	FXTextField			*result = nullptr;
+	FXTextField			*longresult = nullptr;
 
-	FXIcon				*closeIcon;
+	FXIcon				*closeIcon = nullptr;
 
-	FXCSMap				*map;				// map to send ROUTE commands to
+	FXCSMap				*map = nullptr;				// map to send ROUTE commands to
 
 protected:
 	FXCalculator(){}

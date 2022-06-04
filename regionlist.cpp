@@ -18,10 +18,10 @@ class FXAPI FXRegionItem : public FXTreeItem
 protected:
 	static FXFont *boldfont;
 
-	bool bold;
-    FXColor m_textColor;
+	int unconfirmed = 0;
+    FXColor m_textColor = 0;
 
-	FXRegionItem() : FXTreeItem(), m_textColor(0), bold(false) {}
+	FXRegionItem() : FXTreeItem(), m_textColor(0) {}
 
 	virtual void draw(const FXTreeList* list,FXDC& dc,FXint x,FXint y,FXint w,FXint h) const;
 	virtual FXint hitItem(const FXTreeList* list,FXint xx,FXint yy) const;
@@ -30,16 +30,17 @@ protected:
 
 public:
 	/// Constructor
-	FXRegionItem(const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL) : FXTreeItem(text, oi, ci, ptr), m_textColor(0), bold(false) {}
+	FXRegionItem(const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL) : FXTreeItem(text, oi, ci, ptr), m_textColor(0) {}
 
 	bool isBold() const
 	{
-		return bold;
+		return unconfirmed != 0;
 	}
 
-	void setBold(bool b = true)
+    int getUnconfirmed() const { return unconfirmed;  }
+	void setUnconfirmed(int u)
 	{
-		bold = b;
+        unconfirmed = u;
 	}
 
 	// ----------------------------------
@@ -792,11 +793,14 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
                         if (!cmd_confirmed)
                         {
-                            item->setBold(!cmd_confirmed);
+                            item->setUnconfirmed(1);
 
-                            for (FXRegionItem *father = dynamic_cast<FXRegionItem *>(item->getParent());
-                                father; father = dynamic_cast<FXRegionItem *>(father->getParent()))
-                                father->setBold(!cmd_confirmed);
+                            for (FXRegionItem* father = dynamic_cast<FXRegionItem*>(item->getParent());
+                                father; father = dynamic_cast<FXRegionItem*>(father->getParent()))
+                            {
+                                int unconfirmed = father->getUnconfirmed() + 1;
+                                father->setUnconfirmed(unconfirmed);
+                            }
                         }
 
                     }
@@ -823,7 +827,19 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                     item = findTreeItem(region ? region : top, &*selection.unit);
                     FXRegionItem* ri = static_cast<FXRegionItem *>(item);
                     if (ri->isBold() != !(selection.selected & selection.CONFIRMED)) {
-                        ri->setBold(!(selection.selected & selection.CONFIRMED));
+                        int unconfirmed = ri->isBold() ? 0 : 1;
+                        ri->setUnconfirmed(unconfirmed);
+                        FXRegionItem* pi = static_cast<FXRegionItem*>(ri->getParent());
+                        while (pi) {
+                            int value = pi->getUnconfirmed();
+                            if (unconfirmed) {
+                                pi->setUnconfirmed(value + 1);
+                            }
+                            else {
+                                pi->setUnconfirmed(value - 1);
+                            }
+                            pi = static_cast<FXRegionItem*>(pi->getParent());
+                        }
                         update();
                     }
                 }

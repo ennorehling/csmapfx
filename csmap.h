@@ -210,7 +210,7 @@ public:
 
 private: 
     typedef enum class reload_type { RELOAD_NEVER, RELOAD_AUTO, RELOAD_ASK } reload_type;
-    reload_type reload_mode;
+    reload_type reload_mode = reload_type::RELOAD_NEVER;
 
     int unlink(const char *pathname);
     FXString askSaveFileName(const FXString& dlgTitle);
@@ -218,18 +218,18 @@ private:
     bool allowReplaceFile(const FXString& filename);
 
     // Fonts
-    class FXFont* fontFixed;
+    class FXFont* fontFixed = nullptr;
 
 	// Menubar
-    class FXMenuBar		*menubar;
-    class FXMenuPane		*filemenu, *recentmenu, *viewmenu, *regionmenu, *factionmenu;
-    class FXMenuPane		*mapmenu, *selectionmenu, *planemenu, *zoommenu, *helpmenu;
+    class FXMenuBar		*menubar = nullptr;
+    class FXMenuPane	*filemenu = nullptr, *recentmenu = nullptr, *viewmenu = nullptr, *regionmenu = nullptr, *factionmenu = nullptr;
+    class FXMenuPane	*mapmenu, *selectionmenu = nullptr, *planemenu = nullptr, *zoommenu = nullptr, *helpmenu = nullptr;
 
 	// Toolbar
-    class FXToolBar		*toolbar;
-    class FXListBox		*planes;
-    class FXPopup			*terrainPopup;
-    class FXButton		*terrainSelect;
+    class FXToolBar		*toolbar = nullptr;
+    class FXListBox		*planes = nullptr;
+    class FXPopup		*terrainPopup = nullptr;
+    class FXButton		*terrainSelect = nullptr;
 	
 	// Menu: Speichert zuletzt verwendete Dateien
 	FXRecentFiles	recentFiles;
@@ -238,42 +238,42 @@ private:
 	FXString		dialogDirectory;
 
 	// Statusbar
-    class FXStatusBar	*status;
-    class FXLabel		*status_lfaction, *status_faction;
-    class FXLabel		*status_lturn, *status_turn;
-    class FXLabel		*status_ldate, *status_date;
-    class FXLabel		*status_lfile, *status_file;
+    class FXStatusBar	*status = nullptr;
+    class FXLabel		*status_lfaction = nullptr, *status_faction = nullptr;
+    class FXLabel		*status_lturn = nullptr, *status_turn = nullptr;
+    class FXLabel		*status_ldate = nullptr, *status_date = nullptr;
+    class FXLabel		*status_lfile = nullptr, *status_file = nullptr;
 
 	// ToolBarTabs
-    class FXToolBarTab	*riTab, *siTab, *tiTab;
+    class FXToolBarTab	*riTab = nullptr, *siTab = nullptr, *tiTab = nullptr;
 
 	// Generelles Layout
-    class FXSplitterEx	*content;
+    class FXSplitterEx	*content = nullptr;
 
 	// Links
-    class FXRegionList* regions;
-    class FXVerticalFrame *leftframe;
+    class FXRegionList* regions = nullptr;
+    class FXVerticalFrame *leftframe = nullptr;
 
 	// Mitte
-    class FXCSMap* map;
-    class FXReportInfo* reportInfo;
-    class FXMessages* messages;
-    class FXCommands* commands;
-    class FXCalculator* mathbar;
-    class FXVerticalFrame	*middle;
-    class FXVerticalFrame *msgBorder;
+    class FXCSMap* map = nullptr;
+    class FXReportInfo* reportInfo = nullptr;
+    class FXMessages* messages = nullptr;
+    class FXCommands* commands = nullptr;
+    class FXCalculator* mathbar = nullptr;
+    class FXVerticalFrame	*middle = nullptr;
+    class FXVerticalFrame *msgBorder = nullptr;
 
 	// Rechts
-    class FXRegionInfos* regioninfos;
-    class FXStatsInfos* statsinfos;
-    class FXTradeInfos* tradeinfos;
-    class FXVerticalFrame *rightframe;
-    class FXSplitterEx	*commandsplitter;
-    class FXTabBook		*tabbook;
-    class FXTabBook		*outputTabs;
-    class FXList          *errorList;
+    class FXRegionInfos* regioninfos = nullptr;
+    class FXStatsInfos* statsinfos = nullptr;
+    class FXTradeInfos* tradeinfos = nullptr;
+    class FXVerticalFrame *rightframe = nullptr;
+    class FXSplitterEx	*commandsplitter = nullptr;
+    class FXTabBook		*tabbook = nullptr;
+    class FXTabBook		*outputTabs = nullptr;
+    class FXList          *errorList = nullptr;
 
-    class FXVerticalFrame *commandframe;
+    class FXVerticalFrame *commandframe = nullptr;
 
 	// Im TabBook
 	class FXUnitList *unitlist;
@@ -344,16 +344,16 @@ private:
 	// icons for toolbar
 	struct
 	{
-        class FXIcon *open, *merge, *save, *close;
-        class FXIcon *info;
+        class FXIcon *open = nullptr, *merge = nullptr, *save = nullptr, *close = nullptr;
+        class FXIcon *info = nullptr;
 
-        class FXIcon *pointer, *select;
+        class FXIcon *pointer = nullptr, *select = nullptr;
         class FXIcon *terrain[data::TERRAIN_LAST];
 
 	} icons;
 
     // some data
-	class datafile *report;
+	class datafile *report = nullptr;
     std::list<MessageInfo *> output;
     datafile::SelectionState selection;			// selected region,faction,unit...
 

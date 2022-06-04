@@ -1,3 +1,9 @@
+csmapfx (1.4.1-1) stable; urgency=low
+
+  * live tracking of confirmation status in region list
+
+ -- Enno Rehling <enno@eressea.de>  Sat, 4 Jun 2022 18:45:00 +0200
+
 csmapfx (1.4.0-1) stable; urgency=low
 
   * fix merging of RESOURCE blocks

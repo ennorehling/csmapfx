@@ -55,10 +55,10 @@ public:
    
 protected:
 	datafile::SelectionState selection;
-    datafile *mapFile;
+    datafile *mapFile = nullptr;
 
-	FXCSMap				*map;				// map to send ROUTE commands to
-	int					routeLength;		// length of ROUTE
+	FXCSMap				*map = nullptr;				// map to send ROUTE commands to
+	int					routeLength = 0;		// length of ROUTE
 
 	std::vector<FXHiliteStyle>	textStyles;
 
