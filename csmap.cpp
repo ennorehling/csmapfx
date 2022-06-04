@@ -658,6 +658,7 @@ CSMap::CSMap(FXApp *app) :
 CSMap::~CSMap()
 {
     errorList->clearItems();
+    searchResults->clearItems();
     for (auto error : output) delete error;
     output.clear();
     
@@ -1173,6 +1174,7 @@ bool CSMap::checkCommands()
     }
 #endif
     errorList->clearItems();
+    searchResults->clearItems();
     if (cmdline.empty()) {
         errorList->appendItem("Could not find the echeck executable.");
     }
@@ -1832,6 +1834,10 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         // delete all planes except default
         planes->clearItems();        // clear planes
         planes->appendItem("Standardebene (0)", nullptr, (void*)0);
+        
+        searchResults->clearItems(); 
+        errorList->clearItems(); 
+        
         planes->setNumVisible(planes->getNumItems());
 
         FXWindow* nextw, * item = planemenu->getFirst();

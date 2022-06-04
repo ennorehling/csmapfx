@@ -129,6 +129,8 @@ FXSearchDlg::~FXSearchDlg()
 void FXSearchDlg::setMapFile(datafile *f)
 {
     mapFile = f;
+    matches->clearItems();
+    info_text->setText("");
 }
 
 void FXSearchDlg::loadState(FXRegistry& reg)
