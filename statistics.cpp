@@ -612,6 +612,10 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 					state.faction = iparent;
 				}			
 			}
+            if (selection.selected & selection.MULTIPLE_REGIONS) {
+                state.selected |= selection.MULTIPLE_REGIONS;
+                state.regionsSelected = selection.regionsSelected;
+            }
 
 			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 			return 1;

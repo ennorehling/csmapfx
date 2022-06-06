@@ -1,3 +1,9 @@
+csmapfx (1.4.3-1) stable; urgency=low
+
+  * fix multiple situations where selection was cleared.
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 6 Jun 2022 12:45:00 +0200
+
 csmapfx (1.4.2-1) stable; urgency=low
 
   * display other factions' units as confirmed.

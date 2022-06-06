@@ -651,7 +651,7 @@ CSMap::CSMap(FXApp *app) :
     infodlg->setGame("default");
 
     // search dialog
-    searchdlg = new FXSearchDlg(this, searchResults, "Suchen...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));
+    searchdlg = new FXSearchDlg(this, this, ID_SELECTION, searchResults, "Suchen...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));
     searchdlg->getAccelTable()->addAccel(MKUINT(KEY_F,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_SEARCHDLG));
 }
 
@@ -2023,10 +2023,6 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
             datablock::itor end = report->blocks().end();
             datablock::itor block, region = end;
 
-            // HACK: multi-select is difficult to update, clear it:
-            selection.selected &= ~selection.MULTIPLE_REGIONS;
-            selection.regionsSelected.clear();
-
             for (block = report->blocks().begin(); block != report->blocks().end(); ++block) {
                 if (block->type() == block_type::TYPE_REGION)
                 {
@@ -2312,6 +2308,11 @@ long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)
     // propagate selection
     datafile::SelectionState state;
     state.selected = 0;
+    if (selection.selected & selection.MULTIPLE_REGIONS)
+    {
+        state.selected = state.MULTIPLE_REGIONS;
+        state.regionsSelected = selection.regionsSelected;
+    }
     if (region != end) {
         state.region = region;
         state.selected |= state.REGION;
@@ -2902,6 +2903,7 @@ long CSMap::onRegionSelAll(FXObject*, FXSelector, void*)
 long CSMap::onRegionUnSel(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
+
     // alle Regionen demarkieren
     datafile::SelectionState state = selection;
     state.selected &= ~state.MULTIPLE_REGIONS;

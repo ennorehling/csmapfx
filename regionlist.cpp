@@ -278,14 +278,16 @@ long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* p
 	active_faction_group = !active_faction_group;
 
 	// map change notify rebuilds treelist
-	datafile::SelectionState sel_state = selection;
-    if (!mapFile) {
-        sel_state.selected = 0;
-        sel_state.map = 0;
+    if (mapFile) {
+        datafile::SelectionState sel_state = selection;
+        if (!active_faction_group) {
+            if (selection.faction == mapFile->activefaction()) {
+                sel_state.selected &= ~sel_state.FACTION;
+            }
+        }
+        sel_state.map = sel_state.MAPCHANGED;
+        getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
     }
-
-	sel_state.map |= sel_state.MAPCHANGED;
-	getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
 	return 1;  
 }
 
@@ -299,20 +301,18 @@ long FXRegionList::onToggleUnitColors(FXObject *sender, FXSelector, void *ptr)
 {
     colorized_units = !colorized_units;
 
-    // map change notify rebuilds treelist
-    datafile::SelectionState sel_state = selection;
     if (mapFile) {
-        sel_state.selected = 0;
-        sel_state.map = 0;
+        update();
     }
 
-    getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
     return 1;
 }
 
 long FXRegionList::onUpdateUnitColors(FXObject* sender, FXSelector, void* ptr)
 {
-	sender->handle(this, FXSEL(SEL_COMMAND, colorized_units?ID_CHECK:ID_UNCHECK), NULL);
+    if (mapFile) {
+        sender->handle(this, FXSEL(SEL_COMMAND, colorized_units ? ID_CHECK : ID_UNCHECK), NULL);
+    }
 	return 1;
 }
 
@@ -434,7 +434,11 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
 				sel_state.faction = iparent;
 			}			
 		}
-		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
+        if (selection.selected & selection.MULTIPLE_REGIONS) {
+            sel_state.selected |= selection.MULTIPLE_REGIONS;
+            sel_state.regionsSelected = selection.regionsSelected;
+        }
+        getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
 		return 1;
     }
 

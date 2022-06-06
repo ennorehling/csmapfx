@@ -29,6 +29,8 @@ FXDEFMAP(FXSearchDlg) MessageMap[]=
 	FXMAPFUNC(SEL_CHANGED,				FXSearchDlg::ID_SEARCH,					FXSearchDlg::onChangedSearch),
 	FXMAPFUNC(SEL_UPDATE,				FXSearchDlg::ID_SEARCH,					FXSearchDlg::onUpdateSearch),
 
+    FXMAPFUNC(SEL_COMMAND,			    FXSearchDlg::ID_UPDATE,			        FXSearchDlg::onMapChange),
+
     FXMAPFUNC(SEL_COMMAND,				FXSearchDlg::ID_TRANSFER,				FXSearchDlg::onCopyResults),
     FXMAPFUNC(SEL_COMMAND,				FXSearchDlg::ID_RESULTS,				FXSearchDlg::onSelectResults),
 };
@@ -47,10 +49,12 @@ protected:
     FXFont* m_font;
 };
 
-FXSearchDlg::FXSearchDlg(FXWindow* owner, FXFoldingList* resultList, const FXString& name, FXIcon* icon, FXuint opts, FXint x, FXint y, FXint w, FXint h)
+FXSearchDlg::FXSearchDlg(FXWindow* owner, FXObject* tgt, FXSelector sel, FXFoldingList* resultList, const FXString& name, FXIcon* icon, FXuint opts, FXint x, FXint y, FXint w, FXint h)
 		: FXDialogBox(owner, name, opts, x, y, w, h, 10, 10, 10, 10, 10, 10), results(resultList), matches(nullptr), modifiedText(false), boldFont(nullptr), mapFile(nullptr)
 {
 	setIcon(icon);
+    setTarget(tgt);
+    setSelector(sel);
 
     // buttons on bottom
     FXHorizontalFrame* buttons = new FXHorizontalFrame(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -433,6 +437,10 @@ long FXSearchDlg::onSelectResults(FXObject*, FXSelector, void*)
     // propagate selection
     datafile::SelectionState state;
     state.selected = 0;
+    if (selection.selected & selection.MULTIPLE_REGIONS) {
+        state.selected = selection.MULTIPLE_REGIONS;
+        state.regionsSelected = selection.regionsSelected;
+    }
     if (region != end) {
         state.region = region;
         state.selected |= state.REGION;
@@ -594,6 +602,13 @@ long FXSearchDlg::onCopyResults(FXObject* sender, FXSelector sel, void* ptr)
     outputTabs->setCurrent(outputTabs->indexOfChild(results) / 2);
 
     return onCmdHide(sender, sel, ptr);
+}
+
+long FXSearchDlg::onMapChange(FXObject* sender, FXSelector sel, void* ptr)
+{
+    datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
+    selection = *pstate;
+    return 1;
 }
 
 FXFoldingItem *

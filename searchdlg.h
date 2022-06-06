@@ -13,7 +13,7 @@ class FXSearchDlg : public FXDialogBox
 	FXDECLARE(FXSearchDlg)
 
 public:
-	FXSearchDlg(FXWindow* owner, FXFoldingList* resultList, const FXString& name, FXIcon* icon, FXuint opts=DECOR_TITLE|DECOR_BORDER, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
+	FXSearchDlg(FXWindow* owner, FXObject* tgt, FXSelector sel, FXFoldingList* resultList, const FXString& name, FXIcon* icon, FXuint opts=DECOR_TITLE|DECOR_BORDER, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
 	void create();
 	virtual ~FXSearchDlg();
@@ -31,6 +31,9 @@ public:
 	long onUpdateSearch(FXObject*, FXSelector, void*);	// update event on textbox
     long onSelectResults(FXObject*, FXSelector, void*);
     long onCopyResults(FXObject* sender, FXSelector sel, void* ptr);
+
+    long onMapChange(FXObject* sender, FXSelector sel, void* ptr);
+
 public:
 	enum
 	{
