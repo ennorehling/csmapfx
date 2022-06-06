@@ -1,6 +1,7 @@
 csmapfx (1.4.4-1) stable; urgency=low
 
   * display ship captains in unit details.
+  * ignore alliance status for groups.
 
  -- Enno Rehling <enno@eressea.de>  Mon, 6 Jun 2022 20:00:00 +0200
 

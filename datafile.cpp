@@ -2158,6 +2158,9 @@ void datafile::createHashTables()
                 int status = block->valueInt("Status", 0);
                 allied_status[block->info()] = status;
             }
+            else if (block->type() == block_type::TYPE_GROUP) {
+                break;
+            }
 		}
 	}
 
