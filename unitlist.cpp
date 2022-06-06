@@ -490,7 +490,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 			{
 				unhandled.clear();
 
-				FXString size, captain;
+				FXString size;
 				FXString damage, coast, cargo, capacity;
 				FXString type = "Schiff";
 				factionId = -1;
@@ -509,8 +509,6 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 						size = key->value();
                     else if (key->type() == TYPE_DAMAGE)
 						damage = key->value();
-                    else if (key->type() == TYPE_CAPTAIN)
-						captain = key->value();
                     else if (key->type() == TYPE_COAST)
 						coast = key->value();
                     else if (key->type() == TYPE_CARGO)
@@ -577,9 +575,37 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				// list unhandled keys
 				for (std::vector<datakey::itor>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
 				{
-					label.format("%s: %s", (*itag)->key().text(), (*itag)->value().text());
-					item = list->appendItem(node, label.text());
-				}
+                    const datakey::itor& t = *itag;
+                    if (t->type() == TYPE_CAPTAIN) {
+                        FXint uid = FXIntVal(t->value());
+                        datablock::itor unit_owner;
+                        if (mapFile->getUnit(unit_owner, uid)) {
+                            FXint fid = FXIntVal(unit_owner->value(TYPE_FACTION));
+                            datablock::itor faction_owner;
+                            if (mapFile->getFaction(faction_owner, fid)) {
+                                label.format("%s: %s (%s), %s (%s)",
+                                    FXString(L"Kapit\u00e4n").text(),
+                                    unit_owner->value(TYPE_NAME).text(),
+                                    FXStringValEx(uid, 36).text(),
+                                    faction_owner->value(TYPE_FACTIONNAME).text(),
+                                    FXStringValEx(fid, 36).text()
+                                );
+                            }
+                            else {
+                                label.format("%s: %s (%s), Unbekannt (%s)",
+                                    t->key().text(),
+                                    unit_owner->value(TYPE_NAME).text(),
+                                    FXStringValEx(uid, 36).text(),
+                                    FXStringValEx(fid, 36).text()
+                                );
+                            }
+                        }
+                    }
+                    else {
+                        label.format("%s: %s", t->key().text(), t->value().text());
+                    }
+                    item = list->appendItem(node, label.text());
+                }
 
 				effects = end;
 				block = ship;

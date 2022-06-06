@@ -1,3 +1,9 @@
+csmapfx (1.4.4-1) stable; urgency=low
+
+  * display ship captains in unit details.
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 6 Jun 2022 20:00:00 +0200
+
 csmapfx (1.4.3-1) stable; urgency=low
 
   * fix multiple situations where selection was cleared.
