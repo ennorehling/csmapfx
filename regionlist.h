@@ -23,11 +23,11 @@ public:
 public:
 	long onSelected(FXObject*,FXSelector,void*);
 
-	long onPopup(FXObject*,FXSelector,void*);
-	long onPopupClicked(FXObject*,FXSelector,void*);
+	long onPopup(FXObject*, FXSelector, void*);
+	long onPopupClicked(FXObject*, FXSelector, void*);
 
-	long onToggleOwnFactionGroup(FXObject*,FXSelector,void*);
-	long onUpdateOwnFactionGroup(FXObject*,FXSelector,void*);
+	long onToggleOwnFactionGroup(FXObject*, FXSelector, void*);
+	long onUpdateOwnFactionGroup(FXObject*, FXSelector, void*);
 
 	long onToggleUnitColors(FXObject*,FXSelector,void*);
 	long onUpdateUnitColors(FXObject*,FXSelector,void*);

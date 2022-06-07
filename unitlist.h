@@ -5,15 +5,13 @@
 
 #include <fx.h>
 
-class FXUnitList : public FXVerticalFrame
+class FXUnitList : public FXTreeList
 {
 	FXDECLARE(FXUnitList)
 
 public:
-	FXUnitList(FXComposite* p, FXObject* tgt=NULL,FXSelector sel=0, FXuint opts=0, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
-
-	void create();
-	virtual ~FXUnitList();
+	FXUnitList(FXComposite* p, FXObject* tgt = NULL, FXSelector sel = 0, 
+        FXuint opts = 0, FXint x = 0, FXint y = 0, FXint w = 0, FXint h = 0);
 
     void setMapFile(datafile *f);
 
@@ -23,18 +21,19 @@ public:
 	FXString getSubTreeText(const FXTreeItem* item) const;
 
 public:
-	long onMapChange(FXObject*,FXSelector,void*);
-	long onQueryHelp(FXObject*,FXSelector,void*);
+	long onMapChange(FXObject*, FXSelector, void*);
+	long onQueryHelp(FXObject*, FXSelector, void*);
 
-	long onPopup(FXObject*,FXSelector,void*);
-	long onCopyTree(FXObject*,FXSelector,void*);
-	long onCopyText(FXObject*,FXSelector,void*);
-	long onShowInfo(FXObject*,FXSelector,void*);
+    long onPopup(FXObject*, FXSelector, void*);
+    long onPopupClicked(FXObject*, FXSelector, void*);
+    long onCopyTree(FXObject*, FXSelector, void*);
+	long onCopyText(FXObject*, FXSelector, void*);
+	long onShowInfo(FXObject*, FXSelector, void*);
 
 public: 
 	enum
 	{
-		ID_LIST = FXVerticalFrame::ID_LAST,		// tree list events
+        ID_POPUP_CLICKED = FXTreeList::ID_LAST,		// tree list events
         ID_POPUP_SHOW_INFO,
         ID_POPUP_COPY_TREE,
         ID_POPUP_COPY_TEXT,
@@ -42,14 +41,12 @@ public:
 	};
 
 protected:
-	datafile::SelectionState selection;
+    datafile::SelectionState selection;
 
-    datafile *mapFile;
-
-	FXTreeList *list;
+    datafile *mapFile = nullptr;
 
 protected:
-	FXUnitList(){}
+	FXUnitList() {}
 	FXUnitList(const FXUnitList&) {}
 
 };

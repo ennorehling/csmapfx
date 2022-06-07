@@ -17,36 +17,14 @@ FXDEFMAP(FXUnitList) MessageMap[]=
     
     FXMAPFUNC(SEL_QUERY_HELP,		0,									FXUnitList::onQueryHelp),
 
-	FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	FXUnitList::ID_LIST,			FXUnitList::onPopup),
-}; 
+    FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	0,								FXUnitList::onPopup),
+    FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_POPUP_CLICKED,		FXUnitList::onPopupClicked),
+};
 
-FXIMPLEMENT(FXUnitList,FXVerticalFrame,MessageMap, ARRAYNUMBER(MessageMap))
+FXIMPLEMENT(FXUnitList, FXTreeList, MessageMap, ARRAYNUMBER(MessageMap))
 
-FXUnitList::FXUnitList(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h)
-		: FXVerticalFrame(p, opts, x,y,w,h, 0,0,0,0, 0,0)
-{
-	// set target
-	setTarget(tgt);
-	setSelector(sel);
-
-	// set style
-	setBorderColor(getApp()->getShadowColor());
-	setFrameStyle(FRAME_LINE);
-
-	// init variables
-	mapFile = NULL;
-
-	// create layout
-	list = new FXTreeList(this, this,ID_LIST, LAYOUT_FILL_X|LAYOUT_FILL_Y|
-			TREELIST_SINGLESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES);
-}
-
-void FXUnitList::create()
-{
-	FXVerticalFrame::create();
-}
-
-FXUnitList::~FXUnitList()
+FXUnitList::FXUnitList(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x, FXint y, FXint w, FXint h)
+		: FXTreeList(p, tgt, sel, opts, x, y, w, h)
 {
 }
 
@@ -74,7 +52,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 	{
         selection = *pstate;
 
-		list->clearItems();		// clear list and build new
+		clearItems();		// clear list and build new
 
 		if (selection.selected & selection.UNIT)
 		{
@@ -193,7 +171,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 			FXString label;
 			label.format("%s (%s)", name.text(), unit->id().text());
-			FXTreeItem *unititem = list->appendItem(NULL, label);
+			FXTreeItem *unititem = appendItem(NULL, label);
 			unititem->setExpanded(true);
 
 			if (factionId != -1 || AnotherfactionId != -1 || !group.empty())
@@ -241,7 +219,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					label += "Gruppe " + group;
 				}
 
-				item = list->appendItem(unititem, label.text());
+				item = appendItem(unititem, label.text());
 			}
 
 			if (!weight.empty())
@@ -256,13 +234,13 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				else
 					weight = weight.left(weight.length() - 2) + "." + weight.right(2);
 
-				item = list->appendItem(unititem, "Gewicht: " + weight);
+				item = appendItem(unititem, "Gewicht: " + weight);
 			}
 
 			label.format("%s %s", number.text(), race.text());
 			if (!hero.empty())
 				label += ", Held";
-			item = list->appendItem(unititem, label.text());
+			item = appendItem(unititem, label.text());
 
 			if (!combatstatus.empty() || !hp.empty() || !hungry.empty() || !guards.empty())
 			{
@@ -308,37 +286,37 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					label += "bewacht";
 				}
 
-				item = list->appendItem(unititem, label.text());
+				item = appendItem(unititem, label.text());
 			}
 
 			if (!aura.empty() || !auramax.empty())
 			{
 				label.format("%s von %s Aura", aura.text(), auramax.text());
-				item = list->appendItem(unititem, label.text());
+				item = appendItem(unititem, label.text());
 			}
 
 			// list unhandled keys
 			for (std::vector<datakey::itor>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
 			{
 				label.format("%s: %s", (*itag)->key().text(), (*itag)->value().text());
-				item = list->appendItem(unititem, label.text());
+				item = appendItem(unititem, label.text());
 			}
 
 			if (spells != end)		// does a SPRUECHE block exist?
 			{
-				FXTreeItem *node = list->appendItem(unititem, FXString(L"Zauberspr\u00fcche"));
+				FXTreeItem *node = appendItem(unititem, FXString(L"Zauberspr\u00fcche"));
 				//node->setExpanded(true);
 
 				for (datakey::itor key = spells->data().begin(); key != spells->data().end(); ++key)
 				{
-					item = list->appendItem(node, key->value());
+					item = appendItem(node, key->value());
 					item->setData((void*)1);	// show "info" popup cmd
 				}
 			}
 
 			if (!combatspells.empty())	// do some KAMPFZAUBER blocks exist?
 			{
-				FXTreeItem *node = list->appendItem(unititem, "Kampfzauber");
+				FXTreeItem *node = appendItem(unititem, "Kampfzauber");
 				//node->setExpanded(true);
 
 				for (std::map<int,datablock::itor>::iterator itor = combatspells.begin(); itor != combatspells.end(); itor++)
@@ -359,27 +337,27 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					FXString level = block->value("level"); 
 
 					label.format("%s: %s (%s)", type.text(), spell.text(), level.text());
-					list->appendItem(node, label);
+					appendItem(node, label);
 				}
 			}
 
 			if (effects != end)		// does a EFFEKTE block exist?
 			{
-				FXTreeItem *node = list->appendItem(unititem, "Effekte");
+				FXTreeItem *node = appendItem(unititem, "Effekte");
 				node->setExpanded(true);
 
 				for (datakey::itor key = effects->data().begin(); key != effects->data().end(); key++)
-					list->appendItem(node, key->value());
+					appendItem(node, key->value());
 			}
 
 			if (talents != end)		// does a TALENTE block exist?
 			{
-				FXTreeItem *node = list->appendItem(unititem, "Talente");
+				FXTreeItem *node = appendItem(unititem, "Talente");
 				node->setExpanded(true);
 
 				for (datakey::itor key = talents->data().begin(); key != talents->data().end(); key++)
 				{
-					item = list->appendItem(node, key->key() + " " + key->value().section(' ', 1));
+					item = appendItem(node, key->key() + " " + key->value().section(' ', 1));
 					item->setData((void*)1);	// show "info" popup cmd
 				}
 
@@ -387,12 +365,12 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 			if (items != end)		// does a GEGENSTAENDE block exist?
 			{
-				FXTreeItem *node = list->appendItem(unititem, FXString(L"Gegenst\u00e4nde"));
+				FXTreeItem *node = appendItem(unititem, FXString(L"Gegenst\u00e4nde"));
 				node->setExpanded(true);
 
 				for (datakey::itor key = items->data().begin(); key != items->data().end(); key++)
 				{
-					item = list->appendItem(node, key->value()+" "+key->key());
+					item = appendItem(node, key->value()+" "+key->key());
 					item->setData((void*)1);	// show "info" popup cmd
 				}
 			}
@@ -430,7 +408,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				if (!size.empty())
 					label += FXString(L", Gr\u00f6\u00dfe ") + size;
 
-				FXTreeItem *node = list->prependItem(NULL, label);
+				FXTreeItem *node = prependItem(NULL, label);
 				node->setExpanded(true);
 
 				// list unhandled keys
@@ -465,7 +443,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                     else {
                         label.format("%s: %s", t->key().text(), t->value().text());
                     }
-                    item = list->appendItem(node, label.text());
+                    item = appendItem(node, label.text());
 				}
 
 				effects = end;
@@ -478,11 +456,11 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 				if (effects != end)		// does a EFFEKTE block exist?
 				{
-					FXTreeItem *effnode = list->appendItem(node, "Effekte");
+					FXTreeItem *effnode = appendItem(node, "Effekte");
 					effnode->setExpanded(true);
 
 					for (datakey::itor key = effects->data().begin(); key != effects->data().end(); key++)
-						list->appendItem(effnode, key->value());
+						appendItem(effnode, key->value());
 				}
 			}
 
@@ -528,13 +506,13 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				if (!size.empty())
 					label += FXString(L", Gr\u00f6\u00dfe ") + size;
 
-				FXTreeItem *node = list->prependItem(NULL, label);
+				FXTreeItem *node = prependItem(NULL, label);
 				node->setExpanded(true);
 
 				// Schaden
 				if (!damage.empty())
 
-					list->appendItem(node, damage + FXString(L"% besch\u00e4digt"));
+					appendItem(node, damage + FXString(L"% besch\u00e4digt"));
 				// Kueste
 				const wchar_t* coasts[] = { L"Nordwest", L"Nordost", L"Ost", L"S\u00fcdost", L"S\u00fcdwest", L"West", L"-unknown-" };
 
@@ -546,7 +524,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					if (dir < 0 || dir > 6)
 						dir = 6;
 
-					list->appendItem(node, FXString(coasts[dir]) + FXString(L"k\u00fcste"));
+					appendItem(node, FXString(coasts[dir]) + FXString(L"k\u00fcste"));
 				}
 
 				// Beladung (cargo/capacity)
@@ -569,7 +547,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					else
 						capacity = capacity.left(capacity.length() - 2) + "." + capacity.right(2);
 
-					list->appendItem(node, "Beladung: " + cargo + " von " + capacity + " GE");
+					appendItem(node, "Beladung: " + cargo + " von " + capacity + " GE");
 				}
 
 				// list unhandled keys
@@ -604,7 +582,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                     else {
                         label.format("%s: %s", t->key().text(), t->value().text());
                     }
-                    item = list->appendItem(node, label.text());
+                    item = appendItem(node, label.text());
                 }
 
 				effects = end;
@@ -617,11 +595,11 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 				if (effects != end)		// does a EFFEKTE block exist?
 				{
-					FXTreeItem *effnode = list->appendItem(node, "Effekte");
+					FXTreeItem *effnode = appendItem(node, "Effekte");
 					effnode->setExpanded(true);
 
 					for (datakey::itor key = effects->data().begin(); key != effects->data().end(); key++)
-						list->appendItem(effnode, key->value());
+						appendItem(effnode, key->value());
 				}
 			}
 		}
@@ -673,16 +651,20 @@ long FXUnitList::onShowInfo(FXObject* sender, FXSelector sel, void* ptr)
 
 long FXUnitList::onPopup(FXObject* sender, FXSelector sel, void* ptr)
 { 
-	FXVerticalFrame::onRightBtnRelease(sender, sel, ptr);
+    onRightBtnRelease(sender, sel, ptr);
 
-	FXEvent *event = (FXEvent*)ptr;
+    // no datafile, no popup
+    if (!mapFile)
+        return 0;
+
+    FXEvent *event = (FXEvent*)ptr;
 
 	// dont't show popup if mouse has moved
 	if (event->last_x != event->click_x || event->last_y != event->click_y)
 		return 0;
 	
 	// create popup
-	FXTreeItem *item = list->getItemAt(event->click_x, event->click_y);
+	FXTreeItem *item = getItemAt(event->click_x, event->click_y);
 	if (!item)
 		return 0;
 
@@ -711,6 +693,11 @@ long FXUnitList::onPopup(FXObject* sender, FXSelector sel, void* ptr)
 
     getApp()->runModalWhileShown(menu);
 	return 1;
+}
+
+long FXUnitList::onPopupClicked(FXObject*, FXSelector, void*)
+{
+    return 0;
 }
 
 void FXUnitList::setClipboard(const FXString& text)
@@ -751,7 +738,7 @@ FXString FXUnitList::getSubTreeText(const FXTreeItem* item) const
 
 	if (!item)
 	{
-		item = list->getFirstItem();
+		item = getFirstItem();
 		mindepth--;
 	}
 

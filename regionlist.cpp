@@ -447,13 +447,13 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
 
 long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 {
-	FXTreeList::onRightBtnRelease(sender, sel, ptr);
+	onRightBtnRelease(sender, sel, ptr);
 
-	FXEvent *event = (FXEvent*)ptr;
+    // no datafile, no popup
+    if (!mapFile)
+        return 0;
 
-	// no datafile, no popup
-	if (!mapFile)
-		return 0;
+    FXEvent *event = (FXEvent*)ptr;
 
 	// dont't show popup if mouse has moved
 	if (event->last_x != event->click_x || event->last_y != event->click_y)
@@ -464,6 +464,7 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 	if (!item)
 		return 0;
 
+    // TODO: no dynamic allocation for the menu needed
 	FXMenuPane *menu = new FXMenuPane(this);
 
 	std::vector<FXString> labels, texts;

@@ -577,16 +577,20 @@ CSMap::CSMap(FXApp *app) :
     FXHorizontalFrame *tiFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
     tiTab = new FXToolBarTab(tiFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
     tiTab->setTipText("Handelsinformationen ein- und ausblenden");
-    tradeinfos = new FXTradeInfos(tiFrame, this,ID_SELECTION, LAYOUT_FILL_X);
+    tradeinfos = new FXTradeInfos(tiFrame, this, ID_SELECTION, LAYOUT_FILL_X);
 
     commandsplitter = new FXSplitterEx(rightframe, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
     tabbook = new FXTabBook(commandsplitter, nullptr,0, TABBOOK_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
 
     new FXTabItem(tabbook, "Einheiten");
-    unitlist = new FXUnitList(tabbook, this,ID_SELECTION, LAYOUT_FILL_X);
+    FXVerticalFrame* frame = new FXVerticalFrame(tabbook, LAYOUT_FILL_X);
+    unitlist = new FXUnitList(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
+        TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
+    frame->setBorderColor(getApp()->getShadowColor());
+    frame->setFrameStyle(FRAME_LINE);
     new FXTabItem(tabbook, "Statistik");
-    statistics = new FXStatistics(tabbook, this,ID_SELECTION, LAYOUT_FILL_X);
+    statistics = new FXStatistics(tabbook, this, ID_SELECTION, LAYOUT_FILL_X);
     getAccelTable()->addAccel(MKUINT(KEY_1, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_UNIT));
     getAccelTable()->addAccel(MKUINT(KEY_2, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_STATS));
 
