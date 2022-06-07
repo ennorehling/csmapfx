@@ -1118,9 +1118,9 @@ bool CSMap::loadCommands(const FXString& filename)
     }
 
     reload_mode = CSMap::reload_type::RELOAD_ASK;
+    mapChange();
     updateFileNames();
     checkCommands();
-    mapChange();
     return true;
 }
 
@@ -2350,9 +2350,9 @@ long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
             FXString filename = dlg.getFilename();
             beginLoading(filename);
             if (nullptr != (report = loadFile(filename))) {
-                checkCommands();
-                updateFileNames();
                 mapChange();
+                updateFileNames();
+                checkCommands();
                 recentFiles.appendFile(filename);
             }
         }
@@ -2387,8 +2387,8 @@ void CSMap::loadFiles(const FXString filenames[])
         // rebuild the resulting report
         selection.selected |= selection.MAPCHANGED;
         mapChange();
-        checkCommands();
         updateFileNames();
+        checkCommands();
         if (old_cr != report) {
             // TODO: make selection to use the new report instead
             delete old_cr;
@@ -2848,9 +2848,9 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
         if (closeFile()) {
             if (nullptr != (report = loadFile(filename))) {
                 recentFiles.appendFile(filename);
+                mapChange();
                 updateFileNames();
                 checkCommands();
-                mapChange();
             }
         }
     }
