@@ -1379,7 +1379,7 @@ int datafile::loadCmds(const FXString &filename)
 			ptr++;
 
 		// when not empty, break
-		if (*ptr)
+		if (*ptr && *ptr != ';')
 			break;
 	}
 
