@@ -75,7 +75,7 @@ void datakey::value(const FXString& s)
 		return TYPE_KONFIGURATION;
     if (type == "weight")
         return TYPE_WEIGHT;
-    if (type == "group")
+    if (type == "gruppe")
         return TYPE_GROUP;
     if (type == "typprefix")
         return TYPE_PREFIX;
@@ -83,6 +83,8 @@ void datakey::value(const FXString& s)
         return TYPE_STATUS;
     if (type == "hp")
         return TYPE_HITPOINTS;
+    if (type == "familiarmage")
+        return TYPE_FAMILIARMAGE;
     if (type == "bewacht")
         return TYPE_GUARDING;
     if (type == "hunger")
@@ -186,13 +188,15 @@ FXString datakey::key() const
     case TYPE_WEIGHT:
         return "weight";
     case TYPE_GROUP:
-        return "group";
+        return "gruppe";
     case TYPE_PREFIX:
         return "typprefix";
     case TYPE_HITPOINTS:
         return "hp";
     case TYPE_STATUS:
         return "Kampfstatus";
+    case TYPE_FAMILIARMAGE:
+        return "familiarmage";
     case TYPE_GUARDING:
         return "bewacht";
     case TYPE_HUNGER:

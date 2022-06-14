@@ -66,6 +66,7 @@ typedef enum key_type
     TYPE_GROUP,
     TYPE_PREFIX,
     TYPE_STATUS,
+    TYPE_FAMILIARMAGE,
     TYPE_GUARDING,
     TYPE_HUNGER,
     TYPE_HERO,
