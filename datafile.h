@@ -393,6 +393,7 @@ public:
 
     bool hasUnits() const { return !m_units.empty(); }
     bool getUnit(datablock::itor& out, int id);
+    bool getGroup(datablock::itor& out, int id);
 	bool getBuilding(datablock::itor& out, int id);
 	bool getShip(datablock::itor& out, int id);
 	bool getFaction(datablock::itor& out, int id);
@@ -477,6 +478,7 @@ protected:
     void mergeBlock(datablock::itor& block, const datablock::itor& begin, const datablock::itor& end, block_type parent_type);
     const char* getConfigurationName(map_type type);
 
+    datablock::itor group(int id);
     datablock::itor unit(int id);
     datablock::itor building(int id);
     datablock::itor ship(int id);
@@ -540,7 +542,7 @@ protected:
 	datablock::itor m_activefaction;
 
 	// hash tables
-	std::map<int, datablock::itor> m_units, m_factions, m_buildings, m_ships, m_islands;
+	std::map<int, datablock::itor> m_units, m_factions, m_buildings, m_ships, m_islands, m_groups;
     typedef std::map<koordinates, datablock::itor> regions_map;
     regions_map m_regions;
 	std::map<koordinates, datablock::itor> m_battles;

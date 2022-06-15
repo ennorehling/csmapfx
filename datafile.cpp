@@ -43,7 +43,7 @@ void datakey::value(const FXString& s)
 {
 	if (type.empty())
 		return TYPE_EMPTY;
-	if (type == "Name")
+	if (type == "Name" || type == "name")
 		return TYPE_NAME;
 	if (type == "Beschr")
 		return TYPE_DESCRIPTION;
@@ -1872,6 +1872,27 @@ bool datafile::deleteRegion(datablock* block)
     return true;
 }
 
+datablock::itor datafile::group(int id)
+{ 
+	std::map<int, datablock::itor>::iterator unit = m_groups.find(id);
+
+	if (unit == m_groups.end()) {
+        return m_blocks.end();
+    }
+
+	return unit->second;
+}
+
+bool datafile::getGroup(datablock::itor& out, int id)
+{
+    datablock::itor block = group(id);
+    if (block != m_blocks.end()) {
+        out = block;
+        return true;
+    }
+    return false;
+}
+
 datablock::itor datafile::unit(int id)
 { 
 	std::map<int, datablock::itor>::iterator unit = m_units.find(id);
@@ -2107,6 +2128,7 @@ void datafile::createHashTables()
 	m_battles.clear();
 	m_regions.clear();
 	m_units.clear();
+    m_groups.clear();
 	m_factions.clear();
 	m_buildings.clear();
 	m_ships.clear();
@@ -2265,6 +2287,10 @@ void datafile::createHashTables()
             }
         }
         // add units to unit list
+        else if (block->type() == block_type::TYPE_GROUP)
+        {
+            m_groups[block->info()] = block;
+        }
         else if (block->type() == block_type::TYPE_UNIT)
 		{
 			m_units[block->info()] = block;

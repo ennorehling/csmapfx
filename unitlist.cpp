@@ -220,9 +220,14 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
             if (group > 0)
             {
-                label = "Gruppe ";
-                // TODO: find group name in mapFile
-                label += FXStringVal(group);
+                label = "Gruppe: ";
+                datablock::itor match;
+                if (mapFile->getGroup(match, group)) {
+                    label += match->value(key_type::TYPE_NAME);
+                } else {
+                    // TODO: find group name in mapFile
+                    label += FXStringVal(group);
+                }
                 item = appendItem(unititem, label.text());
             }
 

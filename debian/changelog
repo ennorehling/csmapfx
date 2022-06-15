@@ -3,9 +3,9 @@ csmapfx (1.4.6-1) stable; urgency=low
   * ignore comments at the top of orders.
   * display mages of famililars.
   * add navigation to unitlist popup menu.
-  * change how groups are displayed (WIP).
+  * change how groups are displayed.
 
- -- Enno Rehling <enno@eressea.de>  Tue, 14 Jun 2022 22:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Wed, 15 Jun 2022 09:00:00 +0200
 
 csmapfx (1.4.5-1) stable; urgency=low
 
