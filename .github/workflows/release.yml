@@ -1,0 +1,35 @@
+name: release
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  build-deb:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dist:
+          - buster
+          - bullseye
+        arch:
+          - i386
+          - amd64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          repository: ennorehling/csmapfx
+      - name: Build Debian Package
+        uses: dawidd6/action-debian-package@v1
+        with:
+           #artifacts_directory: dist/${{ matrix.dist }}
+           os_distribution: bullseye
+           cpu_architecture: ${{ matrix.arch }}
+      - name: Upload to Packagecloud
+        uses: danielmundi/upload-packagecloud@v1
+        with:
+          package-name: csmapfx_*.deb
+          packagecloud-username: enno
+          packagecloud-repo: eressea
+          packagecloud-distrib: debian/${{ matrix.dist }}
+          packagecloud-token: ${{ secrets.PACKAGECLOUD_TOKEN }}
