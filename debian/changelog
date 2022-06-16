@@ -1,3 +1,9 @@
+csmapfx (1.4.6-2) stable; urgency=low
+
+  * automatic package builds.
+
+ -- Enno Rehling <enno@eressea.de>  Thu, 16 Jun 2022 01:10:00 +0200
+
 csmapfx (1.4.6-1) stable; urgency=low
 
   * ignore comments at the top of orders.
