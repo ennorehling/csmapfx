@@ -21,11 +21,12 @@ jobs:
           submodules: 'true'
           repository: ennorehling/csmapfx
       - name: Build Debian Package
-        uses: ennorehling/action-debian-package@c74ec7fd4f1e9692833a9a8dcd203953ec9d8abe
+        uses: ennorehling/action-debian-package@5e444e68e2b9cf8d958dd9dcd64f92da424b2391
         with:
-           os_distribution: bullseye
+           os_distribution: ${{ matrix.dist }}
            cpu_architecture: ${{ matrix.arch }}
            artifacts_directory: artifacts
+           releases: ${{ matrix.dist }} ${{ matrix.dist }}-security ${{ matrix.dist }}-backports ${{ matrix.dist }}-updates 
       - name: Upload to Packagecloud
         uses: danielmundi/upload-packagecloud@v1
         with:
