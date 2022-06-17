@@ -28,6 +28,7 @@ jobs:
            artifacts_directory: artifacts
            releases: ${{ matrix.dist }} ${{ matrix.dist }}-security ${{ matrix.dist }}-backports ${{ matrix.dist }}-updates 
       - name: Upload to Packagecloud
+        continue-on-error: true
         uses: danielmundi/upload-packagecloud@v1
         with:
           package-name: artifacts/csmapfx_*.deb
