@@ -2,6 +2,7 @@ csmapfx (1.4.7-1) stable; urgency=low
 
   * update last modified time after loading orders.
   * ask before overwriting local changes.
+  * be more consistent in how coordinates are displayed.
 
  -- Enno Rehling <enno@eressea.de>  Sat, 15 Jul 2022 20:00:00 +0200
 

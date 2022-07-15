@@ -1058,9 +1058,9 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 
 			name = region->value(TYPE_NAME);
 			if (name.empty())
-				label.format("%s (%d,%d)", terrainString.text(), popup_x,popup_y);
+				label.format("%s (%d, %d)", terrainString.text(), popup_x,popup_y);
 			else
-				label.format("%s (%d,%d)", name.text(), popup_x,popup_y);
+				label.format("%s (%d, %d)", name.text(), popup_x,popup_y);
 
 			new FXMenuSeparatorEx(menu, label);
 
@@ -1070,7 +1070,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 			FXMenuPane *clipboard = new FXMenuPane(this);
 			new FXMenuCascade(menu, "&Zwischenablage", NULL, clipboard, 0);
 
-			label.format("%d,%d", region->x(), region->y());
+			label.format("%d, %d", region->x(), region->y());
 			cmd = new FXMenuCommand(clipboard, label + "\t\tKoordinaten", NULL, this,ID_POPUP_CLICKED);
 			cmd->setUserData((void*)POPUP_GET_TEXT);
 
