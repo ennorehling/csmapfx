@@ -39,7 +39,8 @@ private:
     void saveCommandsDlg(bool stripped, bool replace);
     FXString askFileName(const FXString &title, const FXString &patterns);
     FXString askPasswordDlg(const FXString &faction_id);
-	bool loadCommands(const FXString& filename);
+    bool confirmOverwrite();
+    bool loadCommands(const FXString& filename);
     bool updateCommands(const FXString &filename);
     bool saveCommands(const FXString &filename, bool stripped);
     bool checkCommands();
@@ -214,6 +215,7 @@ private:
 
     int unlink(const char *pathname);
     FXString askSaveFileName(const FXString& dlgTitle);
+    void updateModificationTime();
     void setAutoReload(reload_type mode);
     bool allowReplaceFile(const FXString& filename);
 

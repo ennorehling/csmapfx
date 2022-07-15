@@ -1112,6 +1112,7 @@ bool CSMap::loadCommands(const FXString& filename)
         if (factionId > 0) {
             settings.faction_id = FXStringValEx(factionId, 36);
         }
+        updateModificationTime();
     }
     catch(const std::runtime_error& err)
     {
@@ -2455,17 +2456,22 @@ FXString CSMap::askSaveFileName(const FXString &dlgTitle)
     return askFileName(dlgTitle, "Eressea Computer Report (*.cr)\nAlle Dateien (*)");
 }
 
+void CSMap::updateModificationTime()
+{
+    if (report) {
+        FXString filename = report->cmdfilename();
+        struct stat buf;
+        if (stat(filename.text(), &buf) == 0) {
+            last_save_time = buf.st_mtime;
+        }
+    }
+}
+
 void CSMap::setAutoReload(CSMap::reload_type mode)
 {
     if (reload_mode != mode) {
         if (mode != CSMap::reload_type::RELOAD_NEVER) {
-            if (report) {
-                FXString filename = report->cmdfilename();
-                struct stat buf;
-                if (stat(filename.text(), &buf) == 0) {
-                    last_save_time = buf.st_mtime;
-                }
-            }
+            updateModificationTime();
         }
         if (reload_mode == CSMap::reload_type::RELOAD_NEVER) {
             getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, nullptr);
@@ -2560,8 +2566,25 @@ bool CSMap::closeFile()
     return true;
 }
 
+bool CSMap::confirmOverwrite()
+{
+    if (report && report->modifiedCmds())
+    {
+        FXString ask =
+            L"Seit dem letzten Speichern gemachte \u00c4nderungen verlieren?";
+        FXuint res = FXMessageBox::question(this,
+            (FXuint)MBOX_YES_NO, CSMAP_APP_TITLE,
+            ask.text());
+        return (res != MBOX_CLICKED_NO);
+    }
+    return true;
+}
+
 long CSMap::onFileOpenCommands(FXObject *, FXSelector, void *)
 {
+    if (!confirmOverwrite()) {
+        return 0;
+    }
     FXFileDialog dlg(this, FXString(L"Befehle laden..."));
     dlg.setIcon(icons.open);
     dlg.setDirectory(dialogDirectory);
@@ -2837,6 +2860,9 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
 
 long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
 {
+    if (!confirmOverwrite()) {
+        return 0;
+    }
     FXString filename((const char *)ptr);
     FXint dotPos = filename.rfind('.');
     bool loadReport = true;
