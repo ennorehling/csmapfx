@@ -43,8 +43,15 @@ void datakey::value(const FXString& s)
 {
 	if (type.empty())
 		return TYPE_EMPTY;
-	if (type == "Name" || type == "name")
-		return TYPE_NAME;
+    if (type == "Name") {
+        if (btype == block_type::TYPE_COMBATSPELL)
+        {
+            return TYPE_COMBATSPELL_NAME;
+        }
+        return TYPE_NAME;
+    }
+    if (type == "name")
+		return TYPE_COMBATSPELL_NAME;
 	if (type == "Beschr")
 		return TYPE_DESCRIPTION;
 	if (type == "Terrain")
@@ -157,6 +164,8 @@ FXString datakey::key() const
         return "";
     case TYPE_NAME:
         return "Name";
+    case TYPE_COMBATSPELL_NAME:
+        return "name";
     case TYPE_DESCRIPTION:
         return "Beschr";
     case TYPE_TERRAIN:
@@ -700,10 +709,12 @@ bool datablock::hasKey(const datakey& key) const
 
 const FXString datablock::value(const FXString& key) const
 {
-	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
-		if (key == srch->key())
-			return srch->value();
-
+    for (datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
+    {
+        if (key == srch->key()) {
+            return srch->value();
+        }
+    }
 	return "";
 }
 

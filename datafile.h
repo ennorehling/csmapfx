@@ -52,6 +52,7 @@ typedef enum key_type
     TYPE_UNKNOWN,
     TYPE_EMPTY,
     TYPE_NAME,
+    TYPE_COMBATSPELL_NAME,
     TYPE_DESCRIPTION,
     TYPE_TERRAIN,
     TYPE_ISLAND,
