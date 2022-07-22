@@ -2573,7 +2573,7 @@ bool CSMap::confirmOverwrite()
         FXString ask =
             L"Seit dem letzten Speichern gemachte \u00c4nderungen verlieren?";
         FXuint res = FXMessageBox::question(this,
-            (FXuint)MBOX_YES_NO, CSMAP_APP_TITLE,
+            (FXuint)MBOX_YES_NO, CSMAP_APP_TITLE, "%s",
             ask.text());
         return (res != MBOX_CLICKED_NO);
     }
