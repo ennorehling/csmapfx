@@ -337,20 +337,31 @@ long FXStatsInfos::onMapChange(FXObject*, FXSelector, void* ptr)
 
 	if (selection.selChange != pstate->selChange)
 	{
-		if ((selection.selected & selection.REGION) != (pstate->selected & selection.REGION)
-			|| (selection.selected & selection.REGION && selection.region != pstate->region))
-			needUpdate = true;				// ignore changes that don't change selected region
-
-		if ((selection.selected & selection.UNKNOWN_REGION) != (pstate->selected & selection.UNKNOWN_REGION))
-			needUpdate = true;				// ignore changes that don't change selected region
-
-		if (selection.selected & selection.UNKNOWN_REGION && (selection.sel_x != pstate->sel_x ||
-			selection.sel_y != pstate->sel_y || selection.sel_plane != pstate->sel_plane))
-			needUpdate = true;				// ignore changes that don't change selected region
-
-		if ((selection.selected & selection.MULTIPLE_REGIONS) != (pstate->selected & selection.MULTIPLE_REGIONS)
-			|| (selection.selected & selection.MULTIPLE_REGIONS && selection.regionsSelected != pstate->regionsSelected))
-			needUpdate = true;
+        if ((selection.selected & selection.MULTIPLE_REGIONS) != (pstate->selected & selection.MULTIPLE_REGIONS)) {
+            /* we went from having a selection to not, or vice versa */
+            needUpdate = true;
+        }
+        else if ((selection.selected & selection.MULTIPLE_REGIONS) || (pstate->selected & selection.MULTIPLE_REGIONS)) {
+            if (selection.regionsSelected.size() != pstate->regionsSelected.size()) {
+                /* the selection has groen or shrunk */
+                needUpdate = true;
+            }
+        }
+        else if ((selection.selected & selection.REGION) != (pstate->selected & selection.REGION)
+            || (selection.selected & selection.REGION && selection.region != pstate->region)) {
+            /* the cursor has moved */
+            needUpdate = true;				// ignore changes that don't change selected region
+        }
+        else if ((selection.selected & selection.UNKNOWN_REGION) != (pstate->selected & selection.UNKNOWN_REGION)) {
+            /* we did not, or do now, have a cursor position off the map */
+            needUpdate = true;				// ignore changes that don't change selected region
+        }
+        else if (selection.selected & selection.UNKNOWN_REGION && (selection.sel_x != pstate->sel_x ||
+            selection.sel_y != pstate->sel_y || selection.sel_plane != pstate->sel_plane))
+        {
+            /* our off-map cursor position has changed. */
+            needUpdate = true;				// ignore changes that don't change selected region
+        }
 
         selection = *pstate;
 

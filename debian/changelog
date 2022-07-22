@@ -1,6 +1,7 @@
 csmapfx (1.4.8-1) stable; urgency=low
 
   * fix display of combat spells
+  * speed up cursor movement when many regions are selected.
 
  -- Enno Rehling <enno@eressea.de>  Sat, 22 Jul 2022 21:45:00 +0200
 
