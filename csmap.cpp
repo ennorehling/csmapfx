@@ -2995,8 +2995,14 @@ static const int hex_offset[6][2] = {
 long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
-    if (!(selection.selected & selection.MULTIPLE_REGIONS))
-        return 1;        // nothing to do
+    if (!(selection.selected & selection.MULTIPLE_REGIONS)) {
+        if (!(selection.selected & selection.REGION)) {
+            // nothing to do
+            return 1;
+        }
+        selection.regionsSelected.insert(&*selection.region);
+        selection.selected |= selection.MULTIPLE_REGIONS;
+    }
 
     // Auswahl erweitern um eine Region
     datafile::SelectionState state = selection;

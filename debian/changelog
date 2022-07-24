@@ -1,3 +1,9 @@
+csmapfx (1.4.9-1) stable; urgency=low
+
+  * extend selection from cursor when nothing is selected
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 23 Jul 2022 10:00:00 +0200
+
 csmapfx (1.4.8-1) stable; urgency=low
 
   * fix display of combat spells
