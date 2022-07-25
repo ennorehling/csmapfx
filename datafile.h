@@ -268,7 +268,7 @@ public:
 	
 	const FXString terrainString() const;
 
-	bool hasKey(const datakey& key) const;
+	bool hasKey(const key_type& type) const;
 	const FXString value(const FXString& key) const;
 	const FXString value(key_type key) const;
 	int valueInt(const FXString& key, int def = 0) const;

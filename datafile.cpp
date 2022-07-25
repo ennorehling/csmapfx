@@ -696,11 +696,11 @@ void datablock::attachment(::attachment* attach)
 	m_attachment = attach;
 }
 
-bool datablock::hasKey(const datakey& key) const
+bool datablock::hasKey(const key_type& type) const
 {
     for (datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
     {
-        if (srch->type() == key.type() && srch->key() == key.key()) {
+        if (srch->type() == type) {
             return true;
         }
     }
@@ -1272,7 +1272,7 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
                             if (key.type() == TYPE_NAME || key.type() == TYPE_TERRAIN) {
                                 continue;
                             }
-                            if (!new_r->hasKey(key)) {
+                            if (!new_r->hasKey(key.type())) {
                                 new_r->data().push_back(key);
                             }
                         }

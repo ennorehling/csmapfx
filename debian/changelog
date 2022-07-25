@@ -1,15 +1,16 @@
 csmapfx (1.4.9-1) stable; urgency=low
 
   * extend selection from cursor when nothing is selected
+  * select only visible regions
 
- -- Enno Rehling <enno@eressea.de>  Sun, 23 Jul 2022 10:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Mon, 25 Jul 2022 18:30:00 +0200
 
 csmapfx (1.4.8-1) stable; urgency=low
 
   * fix display of combat spells
   * speed up cursor movement when many regions are selected.
 
- -- Enno Rehling <enno@eressea.de>  Sat, 22 Jul 2022 21:45:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Fri, 22 Jul 2022 21:45:00 +0200
 
 csmapfx (1.4.7-1) stable; urgency=low
 

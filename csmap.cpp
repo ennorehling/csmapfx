@@ -124,6 +124,7 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_EXTENDSEL,         CSMap::onRegionExtendSel),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_SELISLANDS,        CSMap::onRegionSelIslands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_SELALLISLANDS,     CSMap::onRegionSelAllIslands),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_SELVISIBLE,        CSMap::onRegionSelVisible),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_REMOVESEL,         CSMap::onRegionRemoveSel),
 
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_HELP_ABOUT,               CSMap::onHelpAbout),
@@ -437,6 +438,7 @@ CSMap::CSMap(FXApp *app) :
     menu.regdescription = new FXMenuCheck(regionmenu,"&Beschreibung zeigen\t\tRegionsbeschreibung anzeigen.");
     new FXMenuCommand(regionmenu,FXString(L"&Alle markieren\tCtrl-Shift-A\tAlle Regionen ausw\u00e4hlen."),nullptr,this,ID_REGION_SELALL);
     new FXMenuCommand(regionmenu,FXString(L"Alle &Inseln ausw\u00e4hlen\t\tAlle Landregionen ausw\u00e4hlen (Ozean, Feuerwand und Eisberg z\u00e4hlen nicht als Land)."),nullptr,this,ID_REGION_SELALLISLANDS);
+    new FXMenuCommand(regionmenu, FXString(L"&Sichtbare markieren\t\tSichtbare Regionen ausw\u00e4hlen."), nullptr, this, ID_REGION_SELVISIBLE);
     new FXMenuCommand(regionmenu,FXString(L"&Keine markieren\tEscape\tKeine Region ausw\u00e4hlen."),nullptr,this,ID_REGION_UNSEL);
     new FXMenuCommand(regionmenu,FXString(L"Auswahl &invertieren\t\tAusgew\u00e4hlte Regionen abw\u00e4hlen und umgekehrt."),nullptr,this,ID_REGION_INVERTSEL);
 
@@ -3087,6 +3089,40 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
         }
 
     } while (changed);
+
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    return 1;
+}
+
+long CSMap::onRegionSelVisible(FXObject*, FXSelector, void* ptr)
+{
+    if (!report) return 1;
+    // alle Regionen markieren
+    datafile::SelectionState state = selection;
+    state.selected |= state.MULTIPLE_REGIONS;
+
+    state.regionsSelected.clear();
+
+    int visiblePlane = map->getVisiblePlane();
+
+    datablock::itor end = report->blocks().end();
+    for (datablock::itor block = report->blocks().begin(); block != end; block++)
+    {
+        // handle only regions
+        if (block->type() != block_type::TYPE_REGION)
+            continue;
+        // mark only visible plane
+        if (block->info() != visiblePlane)
+            continue;
+
+        if (!block->hasKey(TYPE_VISIBILITY)) {
+            att_region* att = static_cast<att_region*>(block->attachment());
+            if (!att || att->people.empty()) {
+                continue;
+            }
+        }
+        state.regionsSelected.insert(&*block);
+    }
 
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
     return 1;

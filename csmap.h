@@ -94,6 +94,7 @@ public:		// this functions are slots for menu commands
 	long onRegionInvertSel(FXObject*, FXSelector, void* ptr);
 	long onRegionExtendSel(FXObject*, FXSelector, void* ptr);
 	long onRegionSelIslands(FXObject*, FXSelector, void* ptr);
+	long onRegionSelVisible(FXObject*, FXSelector, void* ptr);
 	long onRegionSelAllIslands(FXObject*, FXSelector, void* ptr);
 	long onRegionRemoveSel(FXObject*, FXSelector, void* ptr);
 
@@ -174,6 +175,7 @@ public:
 
 		// Region menu
 		ID_REGION_SELALL,
+		ID_REGION_SELVISIBLE,
 		ID_REGION_UNSEL,
 		ID_REGION_INVERTSEL,
 		ID_REGION_EXTENDSEL,
