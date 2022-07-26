@@ -108,12 +108,6 @@ void FXStatsInfos::setInfo(const std::list<Info>& info)
 	{
 		FXString value = thousandsPoints(itor->value);
 		FXString offset = "";
-		if (itor->offset)		
-			offset = thousandsPoints(itor->offset, true);
-
-		if (itor->skill)
-			value += " (" + FXStringVal(itor->skill) + ")";
-
 		FXString infotip = "\t" + value;
 		if (offset.length())
 			infotip += " [" + offset + "]";
@@ -132,20 +126,18 @@ void FXStatsInfos::setInfo(const std::list<Info>& info)
 	}
 }
 
-void FXStatsInfos::addEntry(std::list<Info>& info, FXString name, int value, int skill, int offset, FXString tip)
+void FXStatsInfos::addEntry(std::list<Info>& info, FXString name, int value, FXString tip)
 {
 	std::list<Info>::iterator itor;
 	for (itor = info.begin(); itor != info.end(); itor++)
 		if (itor->name == name)
 		{
 			itor->value += value;
-			itor->skill += skill;
-			itor->offset += offset;
 			break;
 		}
 
 	if (itor == info.end())
-		info.push_back(Info(name, tip, value, skill, offset));
+		info.push_back(Info(name, tip, value));
 }
 
 void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
@@ -176,10 +168,10 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
 	if (workstations < 0) workstations = 0;
 
 	int Lohn = region->valueInt("Lohn");
-	if (Lohn) addEntry(info, "Lohn", Lohn, 0, 0, FXString(L"Lohn f\u00fcr Arbeit"));
+	if (Lohn) addEntry(info, "Lohn", Lohn, FXString(L"Lohn f\u00fcr Arbeit"));
 
 	int earnings = Lohn * std::min(workstations, peasants) - 10 * peasants;
-	if (earnings) addEntry(info, "Bauernertrag", earnings, 0, 0, FXString(L"\u00dcberschuss der Bauerneinnahmen pro Runde. Kann sicher eingetrieben werden."));
+	if (earnings) addEntry(info, "Bauernertrag", earnings, FXString(L"\u00dcberschuss der Bauerneinnahmen pro Runde. Kann sicher eingetrieben werden."));
 
     if (mapFile) {
         // search income messages for this region
@@ -260,16 +252,16 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
             }
         }
         // display income messages
-        if (income[0]) addEntry(info, "Einnahmen", income[0], 0, 0, FXString(L"Einnahmen durch sonstige T\u00e4tigkeiten."));
-        if (income[1]) addEntry(info, "Unterhaltung", income[1], 0, 0, "Einnahmen durch Unterhaltung");
-        if (income[2]) addEntry(info, "Steuern", income[2], 0, 0, "Einnahmen durch Steuern");
-        if (income[3]) addEntry(info, "Handel", income[3], 0, 0, "Einnahmen durch Handel");
-        if (income[4]) addEntry(info, "Handelsabgaben", income[4], 0, 0, "Einnahmen durch Handel fremder Parteien");
-        if (income[5]) addEntry(info, "Diebstahl", income[5], 0, 0, "Einnahmen durch Diebstahl");
-        if (income[6]) addEntry(info, "Zauberei", income[6], 0, 0, "Einnahmen durch Zauberei");
+        if (income[0]) addEntry(info, "Einnahmen", income[0], FXString(L"Einnahmen durch sonstige T\u00e4tigkeiten."));
+        if (income[1]) addEntry(info, "Unterhaltung", income[1], "Einnahmen durch Unterhaltung");
+        if (income[2]) addEntry(info, "Steuern", income[2], "Einnahmen durch Steuern");
+        if (income[3]) addEntry(info, "Handel", income[3], "Einnahmen durch Handel");
+        if (income[4]) addEntry(info, "Handelsabgaben", income[4], "Einnahmen durch Handel fremder Parteien");
+        if (income[5]) addEntry(info, "Diebstahl", income[5], "Einnahmen durch Diebstahl");
+        if (income[6]) addEntry(info, "Zauberei", income[6], "Einnahmen durch Zauberei");
 
         // display learncost messages
-        if (learncost) addEntry(info, "Lernkosten", -learncost, 0, 0, "Ausgaben zum Lernen von Talenten");
+        if (learncost) addEntry(info, "Lernkosten", -learncost, "Ausgaben zum Lernen von Talenten");
     }
 }
 

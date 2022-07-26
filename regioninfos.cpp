@@ -51,10 +51,10 @@ FXRegionInfos::FXRegionInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuin
 	tags.matrixframe = new FXHorizontalFrame(this, LAYOUT_SIDE_TOP|LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
 	tags.matrixframe->hide();
 
-	tags.leftmatrix = new FXMatrix(tags.matrixframe,3,MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
+	tags.leftmatrix = new FXMatrix(tags.matrixframe,2,MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
 	FXFrame *sep = new FXVerticalSeparator(tags.matrixframe,LAYOUT_FILL_Y|SEPARATOR_LINE, 0,0,0,0, 0,0,0,0);
 	sep->setBorderColor(getBorderColor());
-	tags.rightmatrix = new FXMatrix(tags.matrixframe,3,MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
+	tags.rightmatrix = new FXMatrix(tags.matrixframe,2,MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
 
 	tags.descsep = new FXHorizontalSeparator(this, LAYOUT_FILL_X|SEPARATOR_LINE, 0,0,0,0, 0,0,0,0);
 	tags.descsep->setBorderColor(getBorderColor());
@@ -109,21 +109,19 @@ void FXRegionInfos::clearLabels()
 	tags.entries.clear();
 }
 
-void FXRegionInfos::createLabels(const FXString& name, const FXString& first_label, const FXString& second_label, int column)
+void FXRegionInfos::createLabels(const FXString& name, const FXString& label, int column)
 {
 	FXMatrix *matrix = (column==0) ? tags.leftmatrix : tags.rightmatrix;
 
 	// create labels
 	FXLabel *lname = new FXLabel(matrix, name, NULL, JUSTIFY_LEFT|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
-	FXLabel *lfirst = new FXLabel(matrix, first_label, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
-	FXLabel *lsecond = new FXLabel(matrix, second_label, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
-	lsecond->disable();
-	lname->create(); lfirst->create(); lsecond->create();
+	FXLabel *lfirst = new FXLabel(matrix, label, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
+	lname->create();
+    lfirst->create();
 
 	// put into list
 	tags.entries.push_back(lname);
 	tags.entries.push_back(lfirst);
-	tags.entries.push_back(lsecond);
 }
 
 void FXRegionInfos::setInfo(const std::list<Info>& info)
@@ -136,17 +134,11 @@ void FXRegionInfos::setInfo(const std::list<Info>& info)
 	{
 		FXString value = thousandsPoints(itor->value);
 		FXString offset = "";
-		if (itor->offset)
-			offset = thousandsPoints(itor->offset, true);
-
 		if (itor->skill)
 			value += " (" + FXStringVal(itor->skill) + ")";
 
 		FXString infotip = "\t" + value;
-		if (offset.length())
-			infotip += " [" + offset + "]";
-
-		createLabels(itor->name+"\t"+itor->tip, value+infotip, offset+infotip, 2*index>=number);
+		createLabels(itor->name+"\t"+itor->tip, value+infotip, 2*index>=number);
 	}
 
 	if (number)
@@ -161,7 +153,7 @@ void FXRegionInfos::setInfo(const std::list<Info>& info)
 	}
 }
 
-void FXRegionInfos::addEntry(std::list<Info>& info, FXString name, int value, int skill, int offset, FXString tip)
+void FXRegionInfos::addEntry(std::list<Info>& info, FXString name, int value, int skill, FXString tip)
 {
 	std::list<Info>::iterator itor;
 	for (itor = info.begin(); itor != info.end(); itor++)
@@ -169,12 +161,11 @@ void FXRegionInfos::addEntry(std::list<Info>& info, FXString name, int value, in
 		{
 			itor->value += value;
 			itor->skill += skill;
-			itor->offset += offset;
 			break;
 		}
 
 	if (itor == info.end())
-		info.push_back(Info(name, tip, value, skill, offset));
+		info.push_back(Info(name, tip, value, skill));
 }
 
 void FXRegionInfos::collectData(std::list<Info>& info, datablock::itor region)
@@ -185,11 +176,11 @@ void FXRegionInfos::collectData(std::list<Info>& info, datablock::itor region)
 	FXString Rekruten = region->value("Rekruten");
 	FXString Pferde = region->value("Pferde");
 
-	if (!Bauern.empty()) addEntry(info, "Bauern", atoi(Bauern.text()), 0, 0, "Anzahl der Bauern");
-	if (!Silber.empty()) addEntry(info, "Silber", atoi(Silber.text()), 0, 0, "Silbervorrat der Bauern");
-	if (!Unterh.empty()) addEntry(info, "Unterh.max", atoi(Unterh.text()), 0, 0, "Maximale Anzahl Silber, dass per Unterhaltung eingenommen werden kann");
-	if (!Rekruten.empty()) addEntry(info, "Rekruten", atoi(Rekruten.text()), 0, 0, FXString(L"Anzahl der m\u00f6glichen Rekruten"));
-	if (!Pferde.empty()) addEntry(info, "Pferde", atoi(Pferde.text()), 0, 0, "Anzahl Pferde");
+	if (!Bauern.empty()) addEntry(info, "Bauern", atoi(Bauern.text()), 0, "Anzahl der Bauern");
+	if (!Silber.empty()) addEntry(info, "Silber", atoi(Silber.text()), 0, "Silbervorrat der Bauern");
+	if (!Unterh.empty()) addEntry(info, "Unterh.max", atoi(Unterh.text()), 0, "Maximale Anzahl Silber, dass per Unterhaltung eingenommen werden kann");
+	if (!Rekruten.empty()) addEntry(info, "Rekruten", atoi(Rekruten.text()), 0, FXString(L"Anzahl der m\u00f6glichen Rekruten"));
+	if (!Pferde.empty()) addEntry(info, "Pferde", atoi(Pferde.text()), 0, "Anzahl Pferde");
 
 	int factionId = -1;
 	bool myfaction = false;
@@ -230,7 +221,7 @@ void FXRegionInfos::collectData(std::list<Info>& info, datablock::itor region)
 				if (skillStr.length())
 					skill = atoi(skillStr.text());
 
-				addEntry(info, type, number, skill, 0, infotip);
+				addEntry(info, type, number, skill, infotip);
 			}
 		}
 		else if (block->type() == block_type::TYPE_UNIT)
@@ -263,12 +254,12 @@ void FXRegionInfos::collectData(std::list<Info>& info, datablock::itor region)
 
 	if (Personen)
 	{
-		addEntry(info, "Personen", Personen, 0, 0, "Anzahl (sichtbarer) Personen in dieser Region");
+		addEntry(info, "Personen", Personen, 0, "Anzahl (sichtbarer) Personen in dieser Region");
 	}
 	if (Parteipersonen)
 	{
-		addEntry(info, L"Anh\u00e4nger", Parteipersonen, 0, 0, "Anzahl eigener Personen");
-		addEntry(info, "Parteisilber", Parteisilber, 0, 0, "Das Silber, welches Personen der Partei in dieser Region besitzen");
+		addEntry(info, L"Anh\u00e4nger", Parteipersonen, 0, "Anzahl eigener Personen");
+		addEntry(info, "Parteisilber", Parteisilber, 0, "Das Silber, welches Personen der Partei in dieser Region besitzen");
 	}
 }
 

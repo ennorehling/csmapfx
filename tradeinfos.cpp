@@ -9,13 +9,13 @@
 FXDEFMAP(FXTradeInfos) MessageMap[]=
 { 
 	//________Message_Type_____________________ID_______________Message_Handler_______ 
-	FXMAPFUNC(SEL_COMMAND,		FXTradeInfos::ID_UPDATE,				FXTradeInfos::onMapChange), 
+	FXMAPFUNC(SEL_COMMAND, 		FXTradeInfos::ID_UPDATE, 				FXTradeInfos::onMapChange), 
 }; 
 
-FXIMPLEMENT(FXTradeInfos,FXVerticalFrame,MessageMap, ARRAYNUMBER(MessageMap))
+FXIMPLEMENT(FXTradeInfos, FXVerticalFrame, MessageMap, ARRAYNUMBER(MessageMap))
 
-FXTradeInfos::FXTradeInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h)
-		: FXVerticalFrame(p, opts, x,y,w,h, 0,0,0,0, 0,0)
+FXTradeInfos::FXTradeInfos(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x, FXint y, FXint w, FXint h)
+		: FXVerticalFrame(p, opts, x, y, w, h, 0, 0, 0, 0, 0, 0)
 {
 	// set target etc.
 	setTarget(tgt);
@@ -29,26 +29,26 @@ FXTradeInfos::FXTradeInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	mapFile = nullptr;
 
 	// create layout
-	tags.topmatrix = new FXMatrix(this,3,MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
+	tags.topmatrix = new FXMatrix(this, 2, MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0);
 
-	tags.matrixsep = new FXHorizontalSeparator(this, LAYOUT_FILL_X|SEPARATOR_LINE, 0,0,0,0, 0,0,0,0);
+	tags.matrixsep = new FXHorizontalSeparator(this, LAYOUT_FILL_X|SEPARATOR_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
 	tags.matrixsep->setBorderColor(getBorderColor());
 	tags.matrixsep->hide();
 
-	tags.matrixframe = new FXHorizontalFrame(this, LAYOUT_SIDE_TOP|LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
+	tags.matrixframe = new FXHorizontalFrame(this, LAYOUT_SIDE_TOP|LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	tags.matrixframe->hide();
 
-	tags.leftmatrix = new FXMatrix(tags.matrixframe,3,MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
-	FXFrame *sep = new FXVerticalSeparator(tags.matrixframe,LAYOUT_FILL_Y|SEPARATOR_LINE, 0,0,0,0, 0,0,0,0);
+	tags.leftmatrix = new FXMatrix(tags.matrixframe, 2, MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0);
+	FXFrame *sep = new FXVerticalSeparator(tags.matrixframe, LAYOUT_FILL_Y|SEPARATOR_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
 	sep->setBorderColor(getBorderColor());
-	tags.rightmatrix = new FXMatrix(tags.matrixframe,3,MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
+	tags.rightmatrix = new FXMatrix(tags.matrixframe, 2, MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0);
 }
 
 void FXTradeInfos::create()
 {
 	FXVerticalFrame::create();
 
-	createLabels("Kein Handel", "", "", -1);	// -1 == topmatrix
+	createLabels("Kein Handel", "", -1);	// -1 == topmatrix
 }
 
 FXTradeInfos::~FXTradeInfos()
@@ -66,7 +66,7 @@ inline FXString thousandsPoints(FXint value, bool plusSign = false)
 	FXString str = FXStringVal((value<0)?-value:value);
 
 	int n = 0;
-	for (int i = str.length(); i > 0; i--,n++)
+	for (int i = str.length(); i > 0; i--, n++)
 		if (n && !(n%3))
 			str.insert(i, '.');
 
@@ -86,7 +86,7 @@ void FXTradeInfos::clearLabels()
 	tags.entries.clear();
 }
 
-void FXTradeInfos::createLabels(const FXString& name, const FXString& one, const FXString& two, int column)
+void FXTradeInfos::createLabels(const FXString& name, const FXString& info, int column)
 {
 	FXMatrix *matrix = NULL;
 	
@@ -99,15 +99,12 @@ void FXTradeInfos::createLabels(const FXString& name, const FXString& one, const
 
 	// create labels
 	FXLabel *lname = new FXLabel(matrix, name, NULL, JUSTIFY_LEFT|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
-	FXLabel *lfirst = new FXLabel(matrix, one, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
-	FXLabel *lsecond = new FXLabel(matrix, two, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
-	lsecond->disable();
-	lname->create(); lfirst->create(); lsecond->create();
+	FXLabel *lfirst = new FXLabel(matrix, info, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
+	lname->create(); lfirst->create();
 
 	// put into list
 	tags.entries.push_back(lname);
 	tags.entries.push_back(lfirst);
-	tags.entries.push_back(lsecond);
 }
 
 void FXTradeInfos::setInfo(const std::list<Info>& info)
@@ -118,17 +115,9 @@ void FXTradeInfos::setInfo(const std::list<Info>& info)
 	{
 		FXString value = thousandsPoints(itor->value);
 		FXString offset = "";
-		if (itor->offset)		
-			offset = thousandsPoints(itor->offset, true);
-
-		if (itor->skill)
-			value += " (" + FXStringVal(itor->skill) + ")";
-
 		FXString infotip = "\t" + value;
-		if (offset.length())
-			infotip += " [" + offset + "]";
 
-		createLabels(itor->name+"\t"+itor->tip, value+infotip, offset+infotip, 2*index>=number);
+		createLabels(itor->name+"\t"+itor->tip, value+infotip, 2*index>=number);
 	}
 
 	if (number)
@@ -143,20 +132,18 @@ void FXTradeInfos::setInfo(const std::list<Info>& info)
 	}
 }
 
-void FXTradeInfos::addEntry(std::list<Info>& info, FXString name, int value, int skill, int offset, FXString tip)
+void FXTradeInfos::addEntry(std::list<Info>& info, FXString name, int value, FXString tip)
 {
 	std::list<Info>::iterator itor;
 	for (itor = info.begin(); itor != info.end(); itor++)
 		if (itor->name == name)
 		{
 			itor->value += value;
-			itor->skill += skill;
-			itor->offset += offset;
 			break;
 		}
 
 	if (itor == info.end())
-		info.push_back(Info(name, tip, value, skill, offset));
+		info.push_back(Info(name, tip, value));
 }
 
 void FXTradeInfos::collectData(std::list<Info>& info, datablock::itor region)
@@ -180,14 +167,12 @@ void FXTradeInfos::collectData(std::list<Info>& info, datablock::itor region)
 			if (goods->key().length() && goods->value().length())
 			{
 				FXint price = atoi(goods->value().text());
-				FXint offset = 0;
-
 				if (price >= 0)
-					addEntry(info, goods->key(), price, 0, offset, "Verkaufspreis " + goods->key());
+					addEntry(info, goods->key(), price, "Verkaufspreis " + goods->key());
 				else
 				{
 					price = -price;
-					createLabels("Einkaufspreis "+goods->key(), thousandsPoints(price), "", -1);	// -1 == topmatrix
+					createLabels("Einkaufspreis "+goods->key(), thousandsPoints(price), -1);	// -1 == topmatrix
 				}
 			}
 	}
@@ -204,7 +189,7 @@ void FXTradeInfos::updateData()
 		tags.matrixframe->hide();
 		clearLabels();
 
-		createLabels("Kein Handel", "", "", -1);	// -1 == topmatrix
+		createLabels("Kein Handel", "", -1);	// -1 == topmatrix
 	}
 	else if (selection.selected & selection.REGION)
 	{
@@ -220,7 +205,7 @@ void FXTradeInfos::updateData()
 			goods_at_price = atoi(peasants.text()) / 100;	// one unit of goods for every 100 peasants
 
 		// -1 == topmatrix
-		createLabels(FXString(L"Luxusg\u00fcter zum angegebenen Preis"), thousandsPoints(goods_at_price), "", -1);
+		createLabels(FXString(L"Luxusg\u00fcter zum angegebenen Preis"), thousandsPoints(goods_at_price), -1);
 
 		// collect information about luxury goods
 		std::list<Info> info;
@@ -235,7 +220,7 @@ void FXTradeInfos::updateData()
 		tags.matrixframe->hide();
 		clearLabels();
 
-		createLabels("Kein Handel", "", "", -1);	// -1 == topmatrix
+		createLabels("Kein Handel", "", -1);	// -1 == topmatrix
 	}
 }
 

@@ -49,9 +49,9 @@ protected:
 	struct Info
 	{
 		FXString name, tip;
-		FXint value, skill, offset;
+		FXint value;
 
-		Info(const FXString& n, const FXString& t, FXint v, FXint s, FXint o) : name(n), tip(t), value(v), skill(s), offset(o) {}
+		Info(const FXString& n, const FXString& t, FXint v) : name(n), tip(t), value(v) {}
 	};
 
 protected:
@@ -59,7 +59,7 @@ protected:
 	void createLabels(const FXString& name, const FXString& info, const FXString& info2, int column);
 
 	void setInfo(const std::list<Info>& info);
-	void addEntry(std::list<Info>& info, FXString name, int value, int skill, int offset, FXString tip = "");
+	void addEntry(std::list<Info>& info, FXString name, int value, FXString tip = "");
 
 	void collectData(std::list<Info>& info, datablock::itor region);
 	void updateData();
