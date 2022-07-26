@@ -124,13 +124,13 @@ void FXRegionInfos::createLabels(const FXString& name, const FXString& label, in
 	tags.entries.push_back(lfirst);
 }
 
-void FXRegionInfos::setInfo(const std::list<Info>& info)
+void FXRegionInfos::setInfo(const std::vector<Info>& info)
 {
 	clearLabels();
 
 	int number = info.size();
 	int index = 0;
-	for (std::list<Info>::const_iterator itor = info.begin(); itor != info.end(); itor++, index++)
+	for (std::vector<Info>::const_iterator itor = info.begin(); itor != info.end(); itor++, index++)
 	{
 		FXString value = thousandsPoints(itor->value);
 		FXString offset = "";
@@ -153,9 +153,9 @@ void FXRegionInfos::setInfo(const std::list<Info>& info)
 	}
 }
 
-void FXRegionInfos::addEntry(std::list<Info>& info, FXString name, int value, int skill, FXString tip)
+void FXRegionInfos::addEntry(std::vector<Info>& info, FXString name, int value, int skill, FXString tip)
 {
-	std::list<Info>::iterator itor;
+    std::vector<Info>::iterator itor;
 	for (itor = info.begin(); itor != info.end(); itor++)
 		if (itor->name == name)
 		{
@@ -168,7 +168,7 @@ void FXRegionInfos::addEntry(std::list<Info>& info, FXString name, int value, in
 		info.push_back(Info(name, tip, value, skill));
 }
 
-void FXRegionInfos::collectData(std::list<Info>& info, datablock::itor region)
+void FXRegionInfos::collectData(std::vector<Info>& info, datablock::itor region)
 {
 	FXString Bauern = region->value("Bauern");
 	FXString Silber = region->value("Silber");
@@ -279,7 +279,7 @@ void FXRegionInfos::updateData()
 		// Beschreibungsfeld kann weg
 		tags.desc->setText("");
 
-		std::list<Info> info;
+        std::vector<Info> info;
 
 		// collect infos
 		for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
@@ -344,7 +344,7 @@ void FXRegionInfos::updateData()
 		tags.name->setIcon(terrainIcons[terrain]);
 
 		// collect information (Bauern, Silber, Pferde...)
-		std::list<Info> info;
+        std::vector<Info> info;
 
 		// Bauern, Silber, Unterhaltung (Unterh), Rekruten, Parteisilber,
 		// Pferde, Laen, Eisen, Baeume, Schoesslinge

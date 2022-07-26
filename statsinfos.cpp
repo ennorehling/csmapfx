@@ -2,6 +2,8 @@
 #include "fxhelper.h"
 #include "statsinfos.h"
 
+#include <cstdio>
+
 #include <algorithm>
 #include <exception>
 
@@ -98,13 +100,13 @@ void FXStatsInfos::createLabels(const FXString& name, const FXString& one, const
 	tags.entries.push_back(lsecond);
 }
 
-void FXStatsInfos::setInfo(const std::list<Info>& info)
+void FXStatsInfos::setInfo(const std::vector<Info>& info)
 {
 	clearLabels();
 
 	int number = info.size();
 	int index = 0;
-	for (std::list<Info>::const_iterator itor = info.begin(); itor != info.end(); itor++, index++)
+	for (std::vector<Info>::const_iterator itor = info.begin(); itor != info.end(); itor++, index++)
 	{
 		FXString value = thousandsPoints(itor->value);
 		FXString offset = "";
@@ -126,9 +128,9 @@ void FXStatsInfos::setInfo(const std::list<Info>& info)
 	}
 }
 
-void FXStatsInfos::addEntry(std::list<Info>& info, FXString name, int value, FXString tip)
+void FXStatsInfos::addEntry(std::vector<Info>& info, FXString name, int value, FXString tip)
 {
-	std::list<Info>::iterator itor;
+    std::vector<Info>::iterator itor;
 	for (itor = info.begin(); itor != info.end(); itor++)
 		if (itor->name == name)
 		{
@@ -140,7 +142,7 @@ void FXStatsInfos::addEntry(std::list<Info>& info, FXString name, int value, FXS
 		info.push_back(Info(name, tip, value));
 }
 
-void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
+void FXStatsInfos::collectData(std::vector<Info>& info, datablock::itor region)
 {
 	int WorkPerRegion[] =	// Arbeitsplaetze pro Regionstyp
 	{
@@ -233,11 +235,14 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
                     continue;
 
                 FXString location = reg->value();
-                int x = FXIntVal(location.before(' '));
-                location = location.after(' ');
-                int y = FXIntVal(location.before(' '));
-                location = location.after(' ');
-                int z = FXIntVal(location.before(' '));
+                int x, y, z;
+                int num = sscanf(location.text(), "%d %d %d", &x, &y, &z);
+                if (num < 2) {
+                    continue;
+                }
+                else if (num < 3) {
+                    z = 0;
+                }
 
                 if (region->x() != x || region->y() != y || region->info() != z)
                     continue;
@@ -269,7 +274,7 @@ void FXStatsInfos::updateData()
 {
 	if (selection.selected & selection.MULTIPLE_REGIONS)
 	{
-		std::list<Info> info;
+		std::vector<Info> info;
 
 		// collect infos
 		datablock::itor notfound = mapFile->blocks().end();
@@ -282,10 +287,12 @@ void FXStatsInfos::updateData()
 		}
 
 		// "Lohn" makes no sense here. Remove.
-		for (std::list<Info>::iterator itor = info.begin(); itor != info.end(); itor++)
+		for (std::vector<Info>::iterator itor = info.begin(); itor != info.end(); itor++)
 		{
-			if (itor->name == "Lohn")
-				itor = info.erase(itor);
+            if (itor->name == "Lohn") {
+                info.erase(itor);
+                break;
+            }
 		}
 
 		// apply information entries (Bauern, Silber, Pferde...)
@@ -294,7 +301,7 @@ void FXStatsInfos::updateData()
 	else if (selection.selected & selection.REGION)
 	{
 		// collect information (Bauern, Silber, Pferde...)
-		std::list<Info> info;
+        std::vector<Info> info;
 
 		// bla
 		collectData(info, selection.region);

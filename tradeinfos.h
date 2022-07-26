@@ -5,7 +5,6 @@
 
 #include <fx.h>
 
-#include <list>
 #include <vector>
 
 class FXTradeInfos : public FXVerticalFrame
