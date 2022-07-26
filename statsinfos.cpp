@@ -168,7 +168,7 @@ void FXStatsInfos::collectData(std::list<Info>& info, datablock::itor region)
 		0	//TERRAIN_LAST
 	};
 
-	int peasants = region->valueInt("Bauern");
+    int peasants = region->valueInt("Bauern");
 
 	int workstations = WorkPerRegion[region->terrain()];
 	workstations -= 8 * region->valueInt("Baeume");

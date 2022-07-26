@@ -33,7 +33,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-    datafile *mapFile;
+    datafile *mapFile = nullptr;
 
 	// Tradeinfos
 	struct
@@ -47,7 +47,7 @@ protected:
 		
 		std::vector<FXLabel*> entries;
 
-	}tags;
+	} tags;
 
 	struct Info
 	{
@@ -63,13 +63,12 @@ protected:
 
 	void setInfo(const std::list<Info>& info);
 	void addEntry(std::list<Info>& info, FXString name, int value, int skill, int offset, FXString tip = "");
-	void clearInfo();
 
 	void collectData(std::list<Info>& info, datablock::itor region);
 	void updateData();
 
 protected:
-	FXTradeInfos(){}
+	FXTradeInfos() {}
 	FXTradeInfos(const FXTradeInfos&) {}
 };
 

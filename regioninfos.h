@@ -39,11 +39,11 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-    datafile *mapFile;
+    datafile *mapFile = nullptr;
 
-	FXIcon			*terrainIcons[data::TERRAIN_LAST];
+    FXIcon* terrainIcons[data::TERRAIN_LAST] = { 0 };
 
-	bool show_description;
+	bool show_description = false;
 
 	// Regionsinfos
 	struct
@@ -75,14 +75,13 @@ protected:
 
 	void setInfo(const std::list<Info>& info);
 	void addEntry(std::list<Info>& info, FXString name, int value, int skill, int offset, FXString tip = "");
-	void clearInfo();
 
 	void collectData(std::list<Info>& info, datablock::itor region);
 	void updateData();
 
 protected:
-	FXRegionInfos(){}
+	FXRegionInfos() {}
 	FXRegionInfos(const FXRegionInfos&) {}
 };
 
-#endif //_CSMAP_REGIONINFOS
+#endif
