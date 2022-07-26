@@ -60,10 +60,10 @@ protected:
 	void clearLabels();
 	void createLabels(const FXString& name, const FXString& info, int column);
 
-	void setInfo(const std::list<Info>& info);
-	void addEntry(std::list<Info>& info, FXString name, int value, FXString tip = "");
+	void setInfo(const std::vector<Info>& info);
+	void addEntry(std::vector<Info>& info, FXString name, int value, FXString tip = "");
 
-	void collectData(std::list<Info>& info, datablock::itor region);
+	void collectData(std::vector<Info>& info, datablock::itor region);
 	void updateData();
 
 protected:

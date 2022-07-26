@@ -84,19 +84,18 @@ void FXRegionInfos::setMapFile(datafile *f)
     mapFile = f;
 }
 
-inline FXString thousandsPoints(FXint value, bool plusSign = false)
+inline FXString thousandsPoints(FXulong value, bool plusSign = false)
 {
-	FXString str = FXStringVal((value<0)?-value:value);
+	FXString str = FXStringVal(value);
 
 	int n = 0;
 	for (int i = str.length(); i > 0; i--,n++)
 		if (n && !(n%3))
 			str.insert(i, '.');
 
-	if (value<0)
-		str = "-" + str;
-	else if (value && plusSign)
-		str = "+" + str;
+    if (plusSign) {
+        str.prepend("+");
+    }
 
 	return str;
 }
@@ -153,7 +152,7 @@ void FXRegionInfos::setInfo(const std::vector<Info>& info)
 	}
 }
 
-void FXRegionInfos::addEntry(std::vector<Info>& info, FXString name, int value, int skill, FXString tip)
+void FXRegionInfos::addEntry(std::vector<Info>& info, FXString name, FXulong value, int skill, FXString tip)
 {
     std::vector<Info>::iterator itor;
 	for (itor = info.begin(); itor != info.end(); itor++)
@@ -176,11 +175,11 @@ void FXRegionInfos::collectData(std::vector<Info>& info, datablock::itor region)
 	FXString Rekruten = region->value("Rekruten");
 	FXString Pferde = region->value("Pferde");
 
-	if (!Bauern.empty()) addEntry(info, "Bauern", atoi(Bauern.text()), 0, "Anzahl der Bauern");
-	if (!Silber.empty()) addEntry(info, "Silber", atoi(Silber.text()), 0, "Silbervorrat der Bauern");
-	if (!Unterh.empty()) addEntry(info, "Unterh.max", atoi(Unterh.text()), 0, "Maximale Anzahl Silber, dass per Unterhaltung eingenommen werden kann");
-	if (!Rekruten.empty()) addEntry(info, "Rekruten", atoi(Rekruten.text()), 0, FXString(L"Anzahl der m\u00f6glichen Rekruten"));
-	if (!Pferde.empty()) addEntry(info, "Pferde", atoi(Pferde.text()), 0, "Anzahl Pferde");
+	if (!Bauern.empty()) addEntry(info, "Bauern", FXULongVal(Bauern, 10), 0, "Anzahl der Bauern");
+	if (!Silber.empty()) addEntry(info, "Silber", FXULongVal(Silber, 10), 0, "Silbervorrat der Bauern");
+	if (!Unterh.empty()) addEntry(info, "Unterh.max", FXULongVal(Unterh, 10), 0, "Maximale Anzahl Silber, dass per Unterhaltung eingenommen werden kann");
+	if (!Rekruten.empty()) addEntry(info, "Rekruten", FXULongVal(Rekruten, 10), 0, FXString(L"Anzahl der m\u00f6glichen Rekruten"));
+	if (!Pferde.empty()) addEntry(info, "Pferde", FXULongVal(Pferde, 10), 0, "Anzahl Pferde");
 
 	int factionId = -1;
 	bool myfaction = false;

@@ -47,25 +47,26 @@ protected:
 	// Regionsinfos
 	struct
 	{
-		FXLabel *name;
+		FXLabel *name = nullptr;
         
-		FXFrame *matrixsep;
-		FXHorizontalFrame *matrixframe;
-		FXMatrix *leftmatrix, *rightmatrix;
+		FXFrame *matrixsep = nullptr;
+		FXHorizontalFrame *matrixframe = nullptr;
+		FXMatrix *leftmatrix = nullptr, *rightmatrix = nullptr;
 		
-		FXFrame *descsep;
-		FXText *desc;
+		FXFrame *descsep = nullptr;
+		FXText *desc = nullptr;
 
 		std::vector<FXLabel*> entries;
 
-	}tags;
+	} tags;
 
 	struct Info
 	{
 		FXString name, tip;
-		FXint value, skill;
+        FXulong value;
+		FXint skill;
 
-		Info(const FXString& n, const FXString& t, FXint v, FXint s) : name(n), tip(t), value(v), skill(s) {}
+		Info(const FXString& n, const FXString& t, FXulong v, FXint s) : name(n), tip(t), value(v), skill(s) {}
 	};
 
 protected:
@@ -73,7 +74,7 @@ protected:
 	void createLabels(const FXString& name, const FXString& label, int column);
 
 	void setInfo(const std::vector<Info>& info);
-	void addEntry(std::vector<Info>& info, FXString name, int value, int skill, FXString tip = "");
+	void addEntry(std::vector<Info>& info, FXString name, FXulong value, int skill, FXString tip = "");
 
 	void collectData(std::vector<Info>& info, datablock::itor region);
 	void updateData();

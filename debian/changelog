@@ -3,8 +3,9 @@ csmapfx (1.4.9-1) stable; urgency=low
   * extend selection from cursor when nothing is selected
   * select only visible regions
   * reduce memory footprint of region statistics
+  * fix display of some large numbers
 
- -- Enno Rehling <enno@eressea.de>  Tue, 26 Jul 2022 12:15:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Tue, 26 Jul 2022 12:45:00 +0200
 
 csmapfx (1.4.8-1) stable; urgency=low
 

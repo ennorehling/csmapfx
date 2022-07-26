@@ -107,11 +107,11 @@ void FXTradeInfos::createLabels(const FXString& name, const FXString& info, int 
 	tags.entries.push_back(lfirst);
 }
 
-void FXTradeInfos::setInfo(const std::list<Info>& info)
+void FXTradeInfos::setInfo(const std::vector<Info>& info)
 {
 	int number = info.size();
 	int index = 0;
-	for (std::list<Info>::const_iterator itor = info.begin(); itor != info.end(); itor++, index++)
+	for (std::vector<Info>::const_iterator itor = info.begin(); itor != info.end(); itor++, index++)
 	{
 		FXString value = thousandsPoints(itor->value);
 		FXString offset = "";
@@ -132,9 +132,9 @@ void FXTradeInfos::setInfo(const std::list<Info>& info)
 	}
 }
 
-void FXTradeInfos::addEntry(std::list<Info>& info, FXString name, int value, FXString tip)
+void FXTradeInfos::addEntry(std::vector<Info>& info, FXString name, int value, FXString tip)
 {
-	std::list<Info>::iterator itor;
+	std::vector<Info>::iterator itor;
 	for (itor = info.begin(); itor != info.end(); itor++)
 		if (itor->name == name)
 		{
@@ -146,7 +146,7 @@ void FXTradeInfos::addEntry(std::list<Info>& info, FXString name, int value, FXS
 		info.push_back(Info(name, tip, value));
 }
 
-void FXTradeInfos::collectData(std::list<Info>& info, datablock::itor region)
+void FXTradeInfos::collectData(std::vector<Info>& info, datablock::itor region)
 {
 	// search prices block of this region
 	datablock::itor end = mapFile->blocks().end();
@@ -208,7 +208,7 @@ void FXTradeInfos::updateData()
 		createLabels(FXString(L"Luxusg\u00fcter zum angegebenen Preis"), thousandsPoints(goods_at_price), -1);
 
 		// collect information about luxury goods
-		std::list<Info> info;
+		std::vector<Info> info;
 		collectData(info, selection.region);
 
 		// apply information entries (Bauern, Silber, Pferde...)
