@@ -169,17 +169,17 @@ void FXRegionInfos::addEntry(std::vector<Info>& info, FXString name, FXulong val
 
 void FXRegionInfos::collectData(std::vector<Info>& info, datablock::itor region)
 {
-	FXString Bauern = region->value("Bauern");
-	FXString Silber = region->value("Silber");
-	FXString Unterh = region->value("Unterh");
-	FXString Rekruten = region->value("Rekruten");
-	FXString Pferde = region->value("Pferde");
+	FXint Bauern = region->valueInt("Bauern", -1);
+	FXint Silber = region->valueInt("Silber", -1);
+    FXint Unterh = region->valueInt("Unterh", -1);
+    FXint Rekruten = region->valueInt("Rekruten", -1);
+    FXint Pferde = region->valueInt("Pferde", -1);
 
-	if (!Bauern.empty()) addEntry(info, "Bauern", FXULongVal(Bauern, 10), 0, "Anzahl der Bauern");
-	if (!Silber.empty()) addEntry(info, "Silber", FXULongVal(Silber, 10), 0, "Silbervorrat der Bauern");
-	if (!Unterh.empty()) addEntry(info, "Unterh.max", FXULongVal(Unterh, 10), 0, "Maximale Anzahl Silber, dass per Unterhaltung eingenommen werden kann");
-	if (!Rekruten.empty()) addEntry(info, "Rekruten", FXULongVal(Rekruten, 10), 0, FXString(L"Anzahl der m\u00f6glichen Rekruten"));
-	if (!Pferde.empty()) addEntry(info, "Pferde", FXULongVal(Pferde, 10), 0, "Anzahl Pferde");
+	if (Bauern >= 0) addEntry(info, "Bauern", Bauern, 0, "Anzahl der Bauern");
+	if (Silber >= 0) addEntry(info, "Silber", Silber, 0, "Silbervorrat der Bauern");
+	if (Unterh >= 0) addEntry(info, "Unterh.max", Unterh, 0, "Maximale Anzahl Silber, dass per Unterhaltung eingenommen werden kann");
+	if (Rekruten >= 0) addEntry(info, "Rekruten", Rekruten, 0, FXString(L"Anzahl der m\u00f6glichen Rekruten"));
+	if (Pferde >= 0) addEntry(info, "Pferde", Pferde, 0, "Anzahl Pferde");
 
 	int factionId = -1;
 	bool myfaction = false;
@@ -200,11 +200,7 @@ void FXRegionInfos::collectData(std::vector<Info>& info, datablock::itor region)
 				17;skill
 				5;number	*/
 
-			FXString type = block->value("type");
-			FXString skillStr = block->value(TYPE_SKILL);
-			FXString numberStr = block->value("number");
-			FXString infotip = "Resource ";
-				infotip += type;
+			const FXString& type = block->value(TYPE_RESOURCE_TYPE);
 
 			// don't double-count resources in REGION block
 			if (FXString("Bauern|Silber|Pferde").find(type) != -1)
@@ -212,13 +208,9 @@ void FXRegionInfos::collectData(std::vector<Info>& info, datablock::itor region)
 
             if (!type.empty())
 			{
-				FXint number = 0;
-				FXint skill = 0;
-
-				if (numberStr.length())
-					number = atoi(numberStr.text());
-				if (skillStr.length())
-					skill = atoi(skillStr.text());
+				FXint skill = block->valueInt(TYPE_RESOURCE_SKILL);
+				FXint number = block->valueInt(TYPE_RESOURCE_COUNT);
+                FXString infotip = "Resource " + type;
 
 				addEntry(info, type, number, skill, infotip);
 			}
@@ -226,17 +218,17 @@ void FXRegionInfos::collectData(std::vector<Info>& info, datablock::itor region)
 		else if (block->type() == block_type::TYPE_UNIT)
 		{
 			myfaction = false;
-			FXString id = block->value(TYPE_FACTION);
-			if (!id.empty())
-				if (factionId == atoi(id.text()))
-					myfaction = true;
+			int id = block->valueInt(TYPE_FACTION);
+            if (factionId == id) {
+                myfaction = true;
+            }
 
-			FXString number = block->value(TYPE_NUMBER);
-            if (!number.empty())
+			int number = block->valueInt(TYPE_NUMBER, -1);
+            if (number > 0)
 			{
-				Personen += atoi(number.text());
+				Personen += number;
 				if (myfaction)
-					Parteipersonen += atoi(number.text());
+					Parteipersonen += number;
 			}
 		}
 		else if (block->type() == block_type::TYPE_ITEMS)
@@ -244,9 +236,9 @@ void FXRegionInfos::collectData(std::vector<Info>& info, datablock::itor region)
 			// Silber der eigenen Partei zum Parteisilber zaehlen
 			if (myfaction)
 			{
-				FXString silber = block->value("Silber");
-				if (!silber.empty())
-	                Parteisilber += atoi(silber.text());
+				int silber = block->valueInt(TYPE_SILVER, -1);
+				if (silber > 0)
+	                Parteisilber += silber;
 			}
 		}
 	}

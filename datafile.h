@@ -74,7 +74,9 @@ typedef enum key_type
     TYPE_HITPOINTS,
     TYPE_TYPE,
     TYPE_SIZE,
-    TYPE_SKILL,
+    TYPE_RESOURCE_TYPE,
+    TYPE_RESOURCE_SKILL,
+    TYPE_RESOURCE_COUNT,
     TYPE_KONFIGURATION,
     TYPE_CHARSET,
     TYPE_VISIBILITY,
@@ -118,8 +120,8 @@ public:
 	~datakey() {}
 
 	const FXString& value() const { return m_value; }
-    enum key_type type() const {
-        return (enum key_type)(m_type & TYPE_MASK);
+    key_type type() const {
+        return (key_type)(m_type & TYPE_MASK);
     }
     FXString key() const;
 
@@ -133,7 +135,7 @@ public:
 	static int parseType(const FXString& type, enum block_type btype);
 	bool parse(char* str, enum block_type btype, bool isUtf8 = true);
 
-	typedef std::vector<datakey/*, boost::pool_allocator<datakey>*/ > list_type;
+	typedef std::vector<datakey> list_type;
 	typedef list_type::iterator itor;
 
 protected:
@@ -155,14 +157,25 @@ public:
 	virtual ~attachment() {}
 };
 
+struct region_info {
+    FXint Bauern, Silber, Unterh, Rekruten, Pferde;
+    FXint Personen, Parteipersonen, Parteisilber;
+    std::vector<std::pair<FXString, std::pair<FXint, FXint> > > resources;
+};
+
 class att_region : public attachment
 {
 public:
 	typedef std::vector<float> peoplelist_t;
 
-	peoplelist_t	people;
+	peoplelist_t people;
+    region_info* regioninfos = nullptr;
 
-	FXString		island;			// name of island
+    ~att_region() {
+        delete regioninfos;
+    }
+    
+    FXString		island;			// name of island
 
 	enum	// not yet used!!!
 	{
@@ -208,6 +221,7 @@ public:
 		FLAG_GUARDED_ENEMY= (1 << 14),		// unit guard the region
 	};
 	int				symbols;		// other symbols
+
 };
 
 class att_commands : public attachment
@@ -269,8 +283,8 @@ public:
 	const FXString terrainString() const;
 
 	bool hasKey(const key_type& type) const;
-	const FXString value(const FXString& key) const;
-	const FXString value(key_type key) const;
+	const FXString& value(const FXString& key) const;
+	const FXString& value(key_type key) const;
 	int valueInt(const FXString& key, int def = 0) const;
 	int valueInt(key_type key, int def = 0) const;
 	const datakey* valueKey(int key) const;

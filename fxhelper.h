@@ -5,6 +5,7 @@
 #include <ostream>
 #include <fx.h>
 
+extern FXString FXString_Empty;
 // array begin() / end() template
 // ------------------------------
 template <typename T, std::size_t size>

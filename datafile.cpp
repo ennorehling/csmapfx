@@ -39,16 +39,43 @@ void datakey::value(const FXString& s)
 	m_value = s;
 }
 
-/*static*/ int datakey::parseType(const FXString& type, const block_type btype)
+int datakey::parseType(const FXString& type, enum block_type btype)
 {
-	if (type.empty())
-		return TYPE_EMPTY;
-    if (type == "Name") {
-        if (btype == block_type::TYPE_COMBATSPELL)
-        {
+    if (type.empty()) {
+        return TYPE_EMPTY;
+    }
+    if (btype == block_type::TYPE_COMBATSPELL)
+    {
+        if (type == "Name") {
             return TYPE_COMBATSPELL_NAME;
         }
         return TYPE_NAME;
+    }
+    if (btype == block_type::TYPE_RESOURCE)
+    {
+        if (type == "number") {
+            return TYPE_RESOURCE_COUNT;
+        }
+        if (type == "skill") {
+            return TYPE_RESOURCE_SKILL;
+        }
+        if (type == "type") {
+            return TYPE_RESOURCE_TYPE;
+        }
+        return TYPE_NAME;
+    }
+    if (btype == block_type::TYPE_MESSAGE) {
+        // MESSAGE tags
+        if (type == "type")
+            return TYPE_MSG_TYPE | TYPE_INTEGER;
+        if (type == "mode")
+            return TYPE_MSG_MODE | TYPE_INTEGER;
+        if (type == "cost")
+            return TYPE_MSG_COST | TYPE_INTEGER;
+        if (type == "amount")
+            return TYPE_MSG_AMOUNT | TYPE_INTEGER;
+        if (type == "region")
+            return TYPE_MSG_REGION;
     }
     if (type == "name")
 		return TYPE_COMBATSPELL_NAME;
@@ -76,8 +103,6 @@ void datakey::value(const FXString& s)
 		return TYPE_TYPE;
 	if (type == "Groesse")
 		return TYPE_SIZE;
-	if (type == "skill")
-		return TYPE_SKILL;
 	if (type == "Konfiguration")
 		return TYPE_KONFIGURATION;
     if (type == "weight")
@@ -138,20 +163,6 @@ void datakey::value(const FXString& s)
         return TYPE_LOAD;
     if (type == "MaxLadung")
         return TYPE_MAXLOAD;
-
-    if (btype == block_type::TYPE_MESSAGE) {
-        // MESSAGE tags
-        if (type == "type")
-            return TYPE_MSG_TYPE | TYPE_INTEGER;
-        if (type == "mode")
-            return TYPE_MSG_MODE | TYPE_INTEGER;
-        if (type == "cost")
-            return TYPE_MSG_COST | TYPE_INTEGER;
-        if (type == "amount")
-            return TYPE_MSG_AMOUNT | TYPE_INTEGER;
-        if (type == "region")
-            return TYPE_MSG_REGION;
-    }
 	return TYPE_UNKNOWN;
 }
 
@@ -190,8 +201,12 @@ FXString datakey::key() const
         return "Typ";
     case TYPE_SIZE:
         return "Groesse";
-    case TYPE_SKILL:
+    case TYPE_RESOURCE_TYPE:
+        return "type";
+    case TYPE_RESOURCE_SKILL:
         return "skill";
+    case TYPE_RESOURCE_COUNT:
+        return "number";
     case TYPE_KONFIGURATION:
         return "Konfiguration";
     case TYPE_WEIGHT:
@@ -707,7 +722,7 @@ bool datablock::hasKey(const key_type& type) const
     return false;
 }
 
-const FXString datablock::value(const FXString& key) const
+const FXString& datablock::value(const FXString& key) const
 {
     for (datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
     {
@@ -715,16 +730,16 @@ const FXString datablock::value(const FXString& key) const
             return srch->value();
         }
     }
-	return "";
+	return FXString_Empty;
 }
 
-const FXString datablock::value(key_type key) const
+const FXString& datablock::value(key_type key) const
 {
 	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
 		if (srch->type() == key)
 			return srch->value();
 
-	return "";
+	return FXString_Empty;
 }
 
 int datablock::valueInt(const FXString& key, int def /* = 0 */) const
@@ -2236,6 +2251,7 @@ void datafile::createHashTables()
 					att_region* stats = new att_region;
 					region->attachment(stats);
 
+                    stats->people.reserve(enemy_log ? 3 : 2);
 					stats->people.push_back(own_log / 13.0f);
 					stats->people.push_back(ally_log / 13.0f);
 					if (enemy_log)
@@ -2420,7 +2436,7 @@ void datafile::createHashTables()
 				if (block->value(TYPE_FACTION) == "666")
 					region->setFlags(datablock::FLAG_MONSTER);		// Monster (ii) in region
 				if (block->valueInt(TYPE_FACTION) == 0 || block->valueInt(TYPE_FACTION) == 666
-					|| block->value(TYPE_FACTION) == "")
+					|| block->value(TYPE_FACTION).empty())
 				{
 					if (block->value(TYPE_TYPE) == "Skelette" ||
 							block->value(TYPE_TYPE) == "Skelettherren" ||

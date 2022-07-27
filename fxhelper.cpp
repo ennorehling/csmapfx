@@ -11,6 +11,8 @@
 #include "version.h"
 #include "fxhelper.h"
 
+FX::FXString FXString_Empty("");
+
 FX::FXString utf2iso(const FX::FXString& s)
 {
 	static FX::FX88591Codec codec;

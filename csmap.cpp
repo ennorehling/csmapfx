@@ -2937,10 +2937,9 @@ long CSMap::onRegionUnSel(FXObject*, FXSelector, void*)
     if (!report) return 1;
 
     // alle Regionen demarkieren
-    datafile::SelectionState state = selection;
-    state.selected &= ~state.MULTIPLE_REGIONS;
-    state.regionsSelected.clear();
-    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    selection.selected &= ~selection.MULTIPLE_REGIONS;
+    selection.regionsSelected.clear();
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
 
