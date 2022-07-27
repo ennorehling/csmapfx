@@ -159,7 +159,9 @@ void FXRegionInfos::addEntry(std::vector<Info>& info, FXString name, FXulong val
 		if (itor->name == name)
 		{
 			itor->value += value;
-			itor->skill += skill;
+            if (skill < itor->skill) {
+                itor->skill = skill;
+            }
 			break;
 		}
 
