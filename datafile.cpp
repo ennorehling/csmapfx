@@ -44,9 +44,9 @@ int datakey::parseType(const FXString& type, enum block_type btype)
     if (type.empty()) {
         return TYPE_EMPTY;
     }
-    if (btype == block_type::TYPE_COMBATSPELL)
-    {
-        if (type == "Name") {
+    if (type == "Name") {
+        if (btype == block_type::TYPE_COMBATSPELL)
+        {
             return TYPE_COMBATSPELL_NAME;
         }
         return TYPE_NAME;
