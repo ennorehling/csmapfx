@@ -84,6 +84,9 @@ target_link_libraries(${PROJECT_NAME}
   ${FOX_LIBRARIES}
   ${CMAKE_DL_LIBS} 
 )
+if (FOX_LIBDIR)
+  target_link_libraries(${PROJECT_NAME} -L${FOX_LIBDIR})
+endif(FOX_LIBDIR)
 if (FOX_LIBRARY_DIRS)
   target_link_libraries(${PROJECT_NAME} -L${FOX_LIBRARY_DIRS})
 endif(FOX_LIBRARY_DIRS)
