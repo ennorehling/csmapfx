@@ -29,7 +29,7 @@ set (SOURCES
 	mapcanvas.cpp
 	map.cpp
 	messages.cpp
-  prefsdlg.cpp
+    prefsdlg.cpp
 	regioninfos.cpp
 	regionlist.cpp
 	reportinfo.cpp
@@ -69,6 +69,7 @@ set (FOX_LIBRARIES ${FOX_LIBRARY})
 add_compile_definitions(
 FLOAT_MATH_FUNCTIONS)
 else (WIN32)
+add_compile_options(-Wno-switch)
 include (FindPkgConfig)
 if (PKG_CONFIG_EXECUTABLE)
 pkg_search_module(FOX REQUIRED fox>=1.6)
