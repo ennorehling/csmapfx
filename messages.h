@@ -30,7 +30,7 @@ protected:
 
     datafile *mapFile;
 
-    void addMessage(FXTreeItem*, datablock::itor& block);
+    void addMessage(FXTreeItem*, datablock * block);
 
     struct
     {

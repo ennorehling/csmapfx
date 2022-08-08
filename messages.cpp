@@ -54,7 +54,7 @@ void FXMessages::setMapFile(datafile *f)
     }
 }
 
-void FXMessages::addMessage(FXTreeItem* group, datablock::itor& block)
+void FXMessages::addMessage(FXTreeItem* group, datablock * block)
 {
     if (block->type() == block_type::TYPE_BATTLE) {
         datablock::itor region;
@@ -141,7 +141,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
                     for (++block; block != end && block->depth() > depth; block++)
                     {
                         if (block->type() == block_type::TYPE_MESSAGE) {
-                            addMessage(groups.battle, block);
+                            addMessage(groups.battle, &*block);
                         }
                     }
                 }
@@ -153,7 +153,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
                         MESSAGE 324149248
                         "von Figo (g351): 'KABUMM *kicher*'";rendered
                         */
-                        addMessage(groups.messages, block);
+                        addMessage(groups.messages, &*block);
                     }
                     else if (block->depth() > region->depth() + 1) {
                         continue;

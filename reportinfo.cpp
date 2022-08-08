@@ -46,29 +46,31 @@ FXReportInfo::~FXReportInfo()
 void FXReportInfo::setMapFile(datafile *f)
 {
     if (f != mapFile) {
-        datablock::itor block, end;
+        datablock::itor it, end;
         mapFile = f;
         clearSiblings(groups.messages);
         clearSiblings(groups.factions);
         clearSiblings(groups.battles);
         if (mapFile) {
             end = mapFile->blocks().end();
-            for (block = mapFile->blocks().begin(); block != end;) {
-                if (block->type() == block_type::TYPE_MESSAGE && block->depth() == 3) {
-                    addMessage(groups.messages, block);
+            for (it = mapFile->blocks().begin(); it != end;) {
+                datablock* block = &*it;
+                if (block->type() == block_type::TYPE_REGION) {
+                    break;
                 }
                 else if (block->type() == block_type::TYPE_BATTLE) {
-                    addBattle(block);
+                    addBattle(it);
                     /* block is already on the next object */
                     continue;
                 }
                 else if (block->type() == block_type::TYPE_FACTION) {
-                    addFaction(block);
+                    addFaction(it);
+                    continue;
                 }
-                else if (block->type() == block_type::TYPE_REGION) {
-                    break;
+                else if (block->type() == block_type::TYPE_MESSAGE && block->depth() == 3) {
+                    addMessage(groups.messages, block);
                 }
-                ++block;
+                ++it;
             }
         }
     }
@@ -86,11 +88,11 @@ const char *FXReportInfo::messageSection(const FXString& section)
     return nullptr;
 }
 
-void FXReportInfo::addMessage(FXTreeItem *group, datablock::itor& block)
+void FXReportInfo::addMessage(FXTreeItem *group, datablock * msg)
 {
     FXTreeItem* item;
-    FXival uid = block->valueInt("target");
-    FXString section = block->value("section");
+    FXival uid = msg->valueInt("target");
+    FXString section = msg->value("section");
 
     if (!section.empty()) {
         const char *text = messageSection(section);
@@ -108,23 +110,23 @@ void FXReportInfo::addMessage(FXTreeItem *group, datablock::itor& block)
             }
         }
     }
-    item = appendItem(group, block->value("rendered"));
+    item = appendItem(group, msg->value("rendered"));
 
     if (uid <= 0)
-        uid = block->valueInt("unit");
+        uid = msg->valueInt("unit");
     if (uid <= 0)
-        uid = block->valueInt("mage");
+        uid = msg->valueInt("mage");
     if (uid <= 0)
-        uid = block->valueInt("spy");
+        uid = msg->valueInt("spy");
     if (uid <= 0)
-        uid = block->valueInt("teacher");
+        uid = msg->valueInt("teacher");
 
     datablock::itor select;
     if (uid > 0 && mapFile->getUnit(select, uid)) {
         item->setData((void*)&*select);
     }
     else {
-        FXString loc = block->value("region");
+        FXString loc = msg->value("region");
         if (loc.empty()) {
             item->setData(nullptr);
         }
@@ -148,24 +150,22 @@ void FXReportInfo::addBattle(datablock::itor& block)
     label = name + label;
     FXTreeItem* group = appendItem(groups.battles, label);
 
-    datablock::itor region;
-    if (mapFile->getRegion(region, block->x(), block->y(), block->info())) {
-        group->setData((void*)&*region);
+    datablock::itor it;
+    if (mapFile->getRegion(it, block->x(), block->y(), block->info())) {
+        group->setData((void*)&*it);
     }
     datablock::itor end = mapFile->blocks().end();
     for (++block; block != end; ++block) {
-        if (block->type() == block_type::TYPE_MESSAGE) {
-            addMessage(group, block);
+        if (block->type() != block_type::TYPE_MESSAGE) {
+            break;
         }
-        else {
-            return;
-        }
+        addMessage(group, &*block);
     }
 }
 
 void FXReportInfo::addFaction(datablock::itor& block)
 {
-
+    ++block;
 }
 
 long FXReportInfo::onMapChange(FXObject*, FXSelector, void* ptr)

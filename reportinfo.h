@@ -28,9 +28,9 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-    datafile *mapFile;
+    datafile *mapFile = nullptr;
 
-    void addMessage(FXTreeItem* group, datablock::itor& block);
+    void addMessage(FXTreeItem* group, class datablock * msg);
     void addBattle(datablock::itor& block);
     void addFaction(datablock::itor& block);
 
@@ -39,13 +39,13 @@ protected:
         FXTreeItem* messages;
         FXTreeItem* factions;
         FXTreeItem* battles;
-    } groups;
+    } groups = { 0 };
 
 	void clearSiblings(FXTreeItem* parent);
 
 protected:
-	FXReportInfo() : mapFile(0) {}
-	FXReportInfo(const FXReportInfo&) : mapFile(0) {}
+	FXReportInfo() {}
+	FXReportInfo(const FXReportInfo&) {}
 
 private:
     static const char *messageSection(const FXString& section);

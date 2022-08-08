@@ -247,7 +247,7 @@ public:
 class datablock
 {
 public:
-    typedef std::vector<datablock/*, boost::fast_pool_allocator<datablock>*/ > list_type;
+    typedef std::list<datablock/*, boost::fast_pool_allocator<datablock>*/ > list_type;
     typedef list_type::iterator itor;
     typedef list_type::const_iterator citor;
     
