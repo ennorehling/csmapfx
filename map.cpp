@@ -1416,7 +1416,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
         // append new region of given terrain
 		datablock region;
 		region.string("REGION");
-		region.infostr(FXString().format("%d %d %d", x, y, plane));
+		region.infostr(FXStringFormat("%d %d %d", x, y, plane));
 		region.terrain(new_terrain);
 
         mapFile->blocks().push_back(region);

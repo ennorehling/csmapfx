@@ -177,6 +177,7 @@
     <ClCompile Include="calc.cpp" />
     <ClCompile Include="commands.cpp" />
     <ClCompile Include="csmap.cpp" />
+    <ClCompile Include="datablock.cpp" />
     <ClCompile Include="datafile.cpp" />
     <ClCompile Include="exportdlg.cpp" />
     <ClCompile Include="FXFileDialogEx.cpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="calc.h" />
     <ClInclude Include="commands.h" />
     <ClInclude Include="csmap.h" />
+    <ClInclude Include="datablock.h" />
     <ClInclude Include="datafile.h" />
     <ClInclude Include="exportdlg.h" />
     <ClInclude Include="FXFileDialogEx.h" />

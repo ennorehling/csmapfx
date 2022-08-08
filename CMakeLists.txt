@@ -17,6 +17,7 @@ set (SOURCES
 	calc.cpp
 	commands.cpp
 	csmap.cpp
+	datablock.cpp
 	datafile.cpp
 	exportdlg.cpp
 	FXFileDialogEx.cpp
