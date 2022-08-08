@@ -278,8 +278,10 @@ FXString datakey::key() const
         return "cost";
     case TYPE_MSG_MODE:
         return "mode";
+	default:
+		FXASSERT(!"should not happen");
     }
-	return FXString();
+	return FXString_Empty;
 }
 
 int datakey::getInt() const
@@ -1334,6 +1336,8 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
             case block_type::TYPE_RESOURCE:
                 m_blocks.push_back(*old_r);
                 break;
+			default:
+				break;
             }
         }
     }
