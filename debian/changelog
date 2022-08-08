@@ -2,8 +2,9 @@ csmapfx (1.4.10-1) stable; urgency=low
 
   * fix deselect operation not clearing selection
   * reduce string compare operations for statistics
+  * fix selecting group of anonymous units
 
- -- Enno Rehling <enno@eressea.de>  Wed, 27 Jul 2022 16:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Mon, 08 Aug 2022 16:00:00 +0200
 
 csmapfx (1.4.9-1) stable; urgency=low
 

@@ -665,10 +665,10 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                         if (factionId == 0) {
                             icon = black;
                         }
-                        else if (factionId < 0) {
-                            icon = gray;
-                        }
                         else {
+                            if (factionId < 0) {
+                                icon = gray;
+                            }
                             datablock::itor faction;
                             if (mapFile->getFaction(faction, factionId)) {
                                 facPtr = &*faction;
