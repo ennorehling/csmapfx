@@ -11,7 +11,6 @@ jobs:
     strategy:
       matrix:
         dist:
-          - buster
           - bullseye
         arch:
           - amd64
@@ -22,11 +21,12 @@ jobs:
           submodules: 'true'
           repository: ennorehling/csmapfx
       - name: Build Debian Package
-        uses: dawidd6/action-debian-package@v1
+        uses: ennorehling/action-debian-package@a7b1aab5317a5d278ada666d724b8947dd348b30
         with:
            os_distribution: ${{ matrix.dist }}
            cpu_architecture: ${{ matrix.arch }}
            artifacts_directory: artifacts
+           releases: ${{ matrix.dist }} ${{ matrix.dist }}-security ${{ matrix.dist }}-backports ${{ matrix.dist }}-updates 
       - name: Upload to Packagecloud
         continue-on-error: true
         uses: danielmundi/upload-packagecloud@v1
