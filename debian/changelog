@@ -1,3 +1,9 @@
+csmapfx (1.4.11-1) stable; urgency=low
+
+  * replace mjs with ceval for calculator
+
+ -- Enno Rehling <enno@eressea.de>  Sat, 27 Aug 2022 15:00:00 +0200
+
 csmapfx (1.4.10-1) stable; urgency=low
 
   * fix deselect operation not clearing selection

@@ -190,10 +190,6 @@
     <ClCompile Include="map.cpp" />
     <ClCompile Include="mapcanvas.cpp" />
     <ClCompile Include="messages.cpp" />
-    <ClCompile Include="mjs\mjs.c">
-      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Level2</WarningLevel>
-      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Level2</WarningLevel>
-    </ClCompile>
     <ClCompile Include="regioninfos.cpp" />
     <ClCompile Include="regionlist.cpp" />
     <ClCompile Include="reportinfo.cpp" />
@@ -208,6 +204,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="calc.h" />
+    <ClInclude Include="ceval.h" />
     <ClInclude Include="commands.h" />
     <ClInclude Include="csmap.h" />
     <ClInclude Include="datablock.h" />
@@ -224,7 +221,6 @@
     <ClInclude Include="map.h" />
     <ClInclude Include="mapcanvas.h" />
     <ClInclude Include="messages.h" />
-    <ClInclude Include="mjs\mjs.h" />
     <ClInclude Include="regioninfos.h" />
     <ClInclude Include="regionlist.h" />
     <ClInclude Include="reportinfo.h" />

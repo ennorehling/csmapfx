@@ -5,7 +5,13 @@
 #include "fxhelper.h"
 #include "calc.h"
 #include "symbols.h"
+#undef USE_MJS
+#ifdef USE_MJS
 #include "mjs/mjs.h"
+#else
+#define CEVAL_STOICAL
+#include "ceval.h"
+#endif
 
 // *********************************************************************************************************
 // *** FXCalculator implementation
@@ -160,6 +166,18 @@ long FXCalculator::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
     return 1;
 }
 
+static FXString ev_format(double v) {
+    FXString x = FXStringFormat("%lf", v);
+    FXint pos = x.length();
+    while(--pos > 0) {
+        if (x[pos] != '0') break;
+    }
+    if (x[pos] == '.') --pos;
+    x.trunc(pos+1);
+    return x;
+}
+
+#ifdef USE_MJS
 static double ev_result;
 static void ffi_ev(double v) {
     ev_result = v;
@@ -169,20 +187,11 @@ static void* my_dlsym(void* handle, const char* name) {
     if (strcmp(name, "ev") == 0) return (void*)ffi_ev;
     return NULL;
 }
+#endif
 
-static std::string ev_format(double v) {
-    FXString x = FXStringFormat("%lf", v);
-    FXint pos = x.length();
-    while(--pos > 0) {
-        if (x[pos] != '0') break;
-    }
-    if (x[pos] == '.') --pos;
-    x.trunc(pos+1);
-    return std::string(x.text());
-}
-
-static std::string evaluate(const char* expr)
+static FXString evaluate(const char* expr)
 {
+#ifdef USE_MJS
     FXString text(expr);
     if (!text.trim().empty()) {
         FXString script = FXStringFormat("let _ = ffi('void ev(double)'); _(%s)", text.text());
@@ -194,24 +203,28 @@ static std::string evaluate(const char* expr)
         case MJS_OK:
             return ev_format(ev_result);
         case MJS_SYNTAX_ERROR:
-            return std::string("Syntax Error");
+            return FXString("Syntax Error");
         case MJS_REFERENCE_ERROR:
-            return std::string("Reference Error");
+            return FXString("Reference Error");
         case MJS_TYPE_ERROR:
-            return std::string("Type Error");
+            return FXString("Type Error");
         case MJS_OUT_OF_MEMORY:
-            return std::string("Out Of Memory");
+            return FXString("Out Of Memory");
         case MJS_INTERNAL_ERROR:
-            return std::string("Internal Error");
+            return FXString("Internal Error");
         case MJS_NOT_IMPLEMENTED_ERROR:
-            return std::string("Not Implemented");
+            return FXString("Not Implemented");
         case MJS_BAD_ARGS_ERROR:
-            return std::string("Bad Arguments");
+            return FXString("Bad Arguments");
         default:
-            return std::string("Unknown Error");
+            return FXString("Unknown Error");
         }
     }
-    return std::string("");
+    return FXString_Empty;
+#else
+    double f = ceval_result(expr);
+    return ev_format(f);
+#endif
 }
 
 long FXCalculator::onChanged(FXObject*, FXSelector, void*)
@@ -257,16 +270,16 @@ long FXCalculator::onChanged(FXObject*, FXSelector, void*)
         }
     }
 
-    std::string resultstr = evaluate(exp.text());
-    if (resultstr.size() > 15)
+    FXString resultstr = evaluate(exp.text());
+    if (resultstr.length() > 15)
     {
         result->setText("");
-        longresult->setText( FXString(resultstr.c_str()) );
+        longresult->setText(resultstr);
         secondline->show();
     }
     else
     {
-        result->setText( FXString(resultstr.c_str()) );
+        result->setText(resultstr);
         secondline->hide();
     }
     recalc();

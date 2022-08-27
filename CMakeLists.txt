@@ -41,7 +41,6 @@ set (SOURCES
 	symbols.cpp
 	tradeinfos.cpp
 	unitlist.cpp
-  mjs/mjs.c
 )
 
 if (WIN32)
