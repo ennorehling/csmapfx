@@ -21,7 +21,7 @@ jobs:
           submodules: 'true'
           repository: ennorehling/csmapfx
       - name: Build Debian Package
-        uses: ennorehling/action-debian-package@a7b1aab5317a5d278ada666d724b8947dd348b30
+        uses: ennorehling/action-debian-package@v1.1
         with:
            os_distribution: ${{ matrix.dist }}
            cpu_architecture: ${{ matrix.arch }}
