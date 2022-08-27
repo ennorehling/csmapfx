@@ -259,7 +259,6 @@ FXString datakey::key() const
         return "Ladung";
     case TYPE_MAXLOAD:
         return "MaxLadung";
-
     case TYPE_MSG_TYPE:
         return "type";
     case TYPE_MSG_REGION:
@@ -270,6 +269,8 @@ FXString datakey::key() const
         return "cost";
     case TYPE_MSG_MODE:
         return "mode";
+	case TYPE_LAST:
+		break;
     }
 	return FXString_Empty;
 }

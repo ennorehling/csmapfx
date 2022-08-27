@@ -103,9 +103,10 @@ typedef enum key_type
     TYPE_MSG_REGION,
     TYPE_LAST,
 
-    TYPE_MASK = (1 << 7) - 1,
-    TYPE_INTEGER = 1 << 7
 } key_type;
+
+#define TYPE_MASK ((1 << 7) - 1)
+#define TYPE_INTEGER (1 << 7)
 
 // ==================
 // === datakey class

@@ -69,11 +69,10 @@ set (FOX_LIBRARIES ${FOX_LIBRARY})
 add_compile_definitions(
 FLOAT_MATH_FUNCTIONS)
 else (WIN32)
-add_compile_options(-Wno-switch)
-include (FindPkgConfig)
-if (PKG_CONFIG_EXECUTABLE)
-pkg_search_module(FOX REQUIRED fox>=1.6)
-endif (PKG_CONFIG_EXECUTABLE)
+ include (FindPkgConfig)
+ if (PKG_CONFIG_EXECUTABLE)
+  pkg_search_module(FOX REQUIRED fox>=1.6)
+ endif (PKG_CONFIG_EXECUTABLE)
 endif (WIN32)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
