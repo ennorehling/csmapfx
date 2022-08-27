@@ -3,6 +3,8 @@ on:
   push:
     tags:
       - 'v*'
+    branches:
+      - gh
 jobs:
   build-deb:
     runs-on: ubuntu-latest
@@ -21,7 +23,7 @@ jobs:
           submodules: 'true'
           repository: ennorehling/csmapfx
       - name: Build Debian Package
-        uses: ennorehling/action-debian-package@e4064e79f66cc4f9d6a1682dacaeed04a30a8cd8
+        uses: dawidd6/action-debian-package@v1
         with:
            os_distribution: ${{ matrix.dist }}
            cpu_architecture: ${{ matrix.arch }}
