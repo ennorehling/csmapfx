@@ -14,7 +14,6 @@ jobs:
           - buster
           - bullseye
         arch:
-          - i386
           - amd64
     steps:
       - name: Checkout
