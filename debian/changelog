@@ -1,3 +1,9 @@
+csmapfx (1.4.12-1) stable; urgency=low
+
+  * fix calculator result for empty inputs.
+
+ -- Enno Rehling <enno@eressea.de>  Sat, 27 Aug 2022 20:10:00 +0200
+
 csmapfx (1.4.11-1) stable; urgency=low
 
   * replace mjs with ceval for calculator

@@ -220,11 +220,13 @@ static FXString evaluate(const char* expr)
             return FXString("Unknown Error");
         }
     }
-    return FXString_Empty;
 #else
-    double f = ceval_result(expr);
-    return ev_format(f);
+    if (expr && expr[0]) {
+        double f = ceval_result(expr);
+        return ev_format(f);
+    }
 #endif
+    return FXString_Empty;
 }
 
 long FXCalculator::onChanged(FXObject*, FXSelector, void*)
