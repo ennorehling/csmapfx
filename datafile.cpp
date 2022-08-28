@@ -870,7 +870,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 	// loop through regions and units and complete the ordering lists
 	int factionId = activefaction()->info();
 
-	std::vector<int> *unit_order = NULL;
+	std::vector<int> *unit_order = nullptr;
 	for (datablock::itor region = m_blocks.end(), block = m_blocks.begin(); block != m_blocks.end(); block++)
 	{
 		if (block->type() == block_type::TYPE_REGION)
@@ -923,14 +923,18 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 			// add unit
 			int id = block->info();
 
-			size_t i;
-			for (i = 0; i < unit_order->size(); i++)
-				if ((*unit_order)[i] == id)
-					break;
-
-			// when not found, add it
-			if (i == unit_order->size())
-				unit_order->push_back(id);
+			if (unit_order) {
+				size_t i;
+				for (i = 0; i < unit_order->size(); i++) {
+					if ((*unit_order)[i] == id) {
+						break;
+					}
+				}
+				// when not found, add it
+				if (i == unit_order->size()) {
+					unit_order->push_back(id);
+				}
+			}
 		}
 	}
 

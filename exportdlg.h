@@ -29,12 +29,12 @@ public:
 	bool getShowIslands() const;
 
 protected:
-	FXComboBox*		scalebox;
-	FXComboBox*		colorbox;
+	FXComboBox*		scalebox = nullptr;
+	FXComboBox*		colorbox = nullptr;
 
-	FXCheckButton*	shownamesbox;
-	FXCheckButton*	showkoordsbox;
-	FXCheckButton*	showislandsbox;
+	FXCheckButton*	shownamesbox = nullptr;
+	FXCheckButton*	showkoordsbox = nullptr;
+	FXCheckButton*	showislandsbox = nullptr;
 
 protected:
 	FXExportDlg(){}

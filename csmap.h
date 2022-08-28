@@ -280,52 +280,52 @@ private:
     class FXVerticalFrame *commandframe = nullptr;
 
 	// Im TabBook
-	class FXUnitList *unitlist;
-	class FXStatistics *statistics;
+	class FXUnitList *unitlist = nullptr;
+	class FXStatistics *statistics = nullptr;
 
 	// Floating
-    class FXCSMap* minimap;
-    class FXInfoDlg* infodlg;
-    class FXSearchDlg* searchdlg;
-    class FXDialogBox* minimap_frame;
-    class FXFoldingList* searchResults;
+    class FXCSMap* minimap = nullptr;
+    class FXInfoDlg* infodlg = nullptr;
+    class FXSearchDlg* searchdlg = nullptr;
+    class FXDialogBox* minimap_frame = nullptr;
+    class FXFoldingList* searchResults = nullptr;
     
-    time_t last_save_time;
+    time_t last_save_time = 0;
 
 	struct
 	{
-        class FXMenuCheck	*modifycheck;	// check if orders are externally modified
-        class FXMenuCheck	*toolbar;		// show toolbar
-        class FXMenuCheck	*maponly;		// show only map
-        class FXMenuCheck	*minimap;		// show minimap
-        class FXMenuCheck	*infodlg;		// show info dialog
-        class FXMenuCheck	*messages;		// show messages window
-        class FXMenuCheck	*show_left;		// show left frame (regions)
-        class FXMenuCheck	*show_right;	// show right frame (properties)
-        class FXMenuCheck	*calc;			// show calculator
-        class FXMenuCheck	*streets;		// show streets on the map
-        class FXMenuCheck *visibility;	// show symbols for visibility of a region
-        class FXMenuCheck *shiptravel;	// show a symbol for travelled ships
-        class FXMenuCheck *shadowRegions;	// paint unseen regions darker
-        class FXMenuCheck *colorizeUnits;	// colorize units in building/ship
-        class FXMenuCheck *islands;		// show island names
-        class FXMenuCheck *minimap_islands;	// show island names on mini map
+        class FXMenuCheck *modifycheck = nullptr;	// check if orders are externally modified
+        class FXMenuCheck *toolbar = nullptr;		// show toolbar
+        class FXMenuCheck *maponly = nullptr;		// show only map
+        class FXMenuCheck *minimap = nullptr;		// show minimap
+        class FXMenuCheck *infodlg = nullptr;		// show info dialog
+        class FXMenuCheck *messages = nullptr;		// show messages window
+        class FXMenuCheck *show_left = nullptr;		// show left frame (regions)
+        class FXMenuCheck *show_right = nullptr;	// show right frame (properties)
+        class FXMenuCheck *calc = nullptr;			// show calculator
+        class FXMenuCheck *streets = nullptr;		// show streets on the map
+        class FXMenuCheck *visibility = nullptr;	// show symbols for visibility of a region
+        class FXMenuCheck *shiptravel = nullptr;	// show a symbol for travelled ships
+        class FXMenuCheck *shadowRegions = nullptr;	// paint unseen regions darker
+        class FXMenuCheck *colorizeUnits = nullptr;	// colorize units in building/ship
+        class FXMenuCheck *islands = nullptr;		// show island names
+        class FXMenuCheck *minimap_islands = nullptr;	// show island names on mini map
 
-        class FXMenuCheck *regdescription;	// show description of the region
+        class FXMenuCheck *regdescription = nullptr;	// show description of the region
 
-        class FXMenuCheck *ownFactionGroup;	// no own faction group in regionlist
+        class FXMenuCheck *ownFactionGroup = nullptr;	// no own faction group in regionlist
 
 		// faction menu items
-        class FXMenuTitle	*faction;
+        class FXMenuTitle	*faction = nullptr;
 
-        class FXMenuCommand *name, *email; // +banner?
-        class FXMenuCommand *points;
-        class FXMenuCommand *age;
-        class FXMenuCommand *type, *number;
-        class FXMenuCommand *magic;
+        class FXMenuCommand *name = nullptr, *email = nullptr; // +banner?
+        class FXMenuCommand *points = nullptr;
+        class FXMenuCommand *age = nullptr;
+        class FXMenuCommand *type = nullptr, *number = nullptr;
+        class FXMenuCommand *magic = nullptr;
 
-        class FXMenuPane	  *factionpool;
-        class FXMenuCommand *poolnoitems;
+        class FXMenuPane	  *factionpool = nullptr;
+        class FXMenuCommand *poolnoitems = nullptr;
 	} menu;
 
 	// clipboard data

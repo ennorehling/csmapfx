@@ -131,7 +131,7 @@ void FXInfoDlg::setGame(const FXString& game)
         if (file) {
             // parse data
             PHYSFS_sint64 filesize = PHYSFS_fileLength(file);
-            if (filesize > 0 && filesize <= SIZE_MAX) {
+            if (filesize > 0) {
                 size_t count = (size_t)filesize;
                 char* text = new char[count];
                 if (PHYSFS_readBytes(file, text, count) == count) {
