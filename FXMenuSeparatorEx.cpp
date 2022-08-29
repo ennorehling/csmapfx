@@ -30,28 +30,31 @@ FXIMPLEMENT(FXMenuSeparatorEx,FXWindow,FXMenuSeparatorExMap,ARRAYNUMBER(FXMenuSe
 
 
 // Deserialization
-FXMenuSeparatorEx::FXMenuSeparatorEx(){
-  flags|=FLAG_SHOWN;
-  font=NULL;
-  }
+FXMenuSeparatorEx::FXMenuSeparatorEx() :
+  font(nullptr)
+{
+  flags |= FLAG_SHOWN; 
+}
 
 // Separator item
-FXMenuSeparatorEx::FXMenuSeparatorEx(FXComposite* p,const FXString& text,FXuint opts,FXObject* tgt,FXSelector sel):
-  FXWindow(p,opts,0,0,0,0){
-  flags|=FLAG_SHOWN;
+FXMenuSeparatorEx::FXMenuSeparatorEx(FXComposite* p,const FXString& text,FXuint opts,FXObject* tgt,FXSelector sel) :
+  FXWindow(p,opts,0,0,0,0)
+{
+  flags |= FLAG_SHOWN;
   setTarget(tgt);
   setSelector(sel);
-  label=text.section('\t',0);
-  label=stripHotKey(label);
-  font=getApp()->getNormalFont();
-  hiliteColor=getApp()->getHiliteColor();
-  shadowColor=getApp()->getShadowColor();
-  defaultCursor=getApp()->getDefaultCursor(DEF_RARROW_CURSOR);
-  }
+  label = text.section('\t',0);
+  label = stripHotKey(label);
+  font = getApp()->getNormalFont();
+  hiliteColor = getApp()->getHiliteColor();
+  shadowColor = getApp()->getShadowColor();
+  defaultCursor = getApp()->getDefaultCursor(DEF_RARROW_CURSOR);
+}
 
 // Handle repaint
-long FXMenuSeparatorEx::onPaint(FXObject*,FXSelector,void* ptr){
-  FXEvent *ev=(FXEvent*)ptr;
+long FXMenuSeparatorEx::onPaint(FXObject*,FXSelector,void* ptr)
+{
+  FXEvent *ev = (FXEvent*)ptr;
   FXDCWindow dc(this,ev);
 
   dc.setForeground(backColor);
@@ -112,37 +115,49 @@ FXint FXMenuSeparatorEx::getDefaultWidth(){
   }
 
   // Get default height
-FXint FXMenuSeparatorEx::getDefaultHeight(){
-  FXint th=9;
-  if(!label.empty()) th=font->getFontHeight()+5;
+FXint FXMenuSeparatorEx::getDefaultHeight()
+{
+  FXint th = 9;
+  if (!label.empty()) th = font->getFontHeight() + 5;
   return th;
-  }
+}
 
 
 // Update value from a message
-long FXMenuSeparatorEx::onCmdSetStringValue(FXObject*,FXSelector,void* ptr){
-  if(ptr==NULL){ fxerror("%s::onCmdSetStringValue: NULL pointer.\n",getClassName()); }
-  setText(*((FXString*)ptr));
-  return 1;
+long FXMenuSeparatorEx::onCmdSetStringValue(FXObject*,FXSelector, void* ptr)
+{
+  FXString *text = (FXString*) ptr;
+  if (!text) {
+     fxerror("%s::onCmdSetStringValue: NULL pointer.\n", getClassName());
   }
+  else {
+    setText(*text);
+  }
+  return 1;
+}
   
   
 // Obtain value from text field
-long FXMenuSeparatorEx::onCmdGetStringValue(FXObject*,FXSelector,void* ptr){
-  if(ptr==NULL){ fxerror("%s::onCmdGetStringValue: NULL pointer.\n",getClassName()); }
-  *((FXString*)ptr)=getText();
-  return 1;
+long FXMenuSeparatorEx::onCmdGetStringValue(FXObject*, FXSelector, void* ptr) {
+  FXString *text = (FXString*) ptr;
+  if (!text) {
+    fxerror("%s::onCmdGetStringValue: NULL pointer.\n", getClassName());
   }
+  else {
+    *text = getText();
+  }
+  return 1;
+}
 
 // Change text, and scan this text to replace accelerators
-void FXMenuSeparatorEx::setText(const FXString& text){
-  FXString str=stripHotKey(text);
-  if(label!=str){
-    label=str;
+void FXMenuSeparatorEx::setText(const FXString& text) {
+  FXString str = stripHotKey(text);
+  if(label != str) {
+    label = str;
     recalc();
     update();
-    }
   }
+}
 
 
 // Set highlight color

@@ -26,9 +26,9 @@ class FXAPI FXMenuSeparatorEx : public FXWindow {
   FXDECLARE(FXMenuSeparatorEx)
 protected:
   FXString	label;
-  FXFont	*font;
-  FXColor	hiliteColor;
-  FXColor	shadowColor;
+  FXFont	*font = nullptr;
+  FXColor	hiliteColor= 0;
+  FXColor	shadowColor = 0;
 protected:
   FXMenuSeparatorEx();
 private:

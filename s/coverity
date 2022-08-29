@@ -6,6 +6,7 @@ VERSION=$(git describe --tags --match 'v*.*.*')
 echo "submitting version $BRANCH-$VERSION"
 cmake -S . -B out -DCMAKE_BUILD_TYPE=Debug
 cd out
+make clean
 cov-build --dir cov-int make
 tar czf csmapfx.tgz cov-int
 curl -k --form token=${COV_TOKEN} \
