@@ -667,9 +667,9 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
                         label.format("%s (%s)", name.text(), faction->id().text());
 
                 }
-                else {
+                else if (factionId>0) {
                     // missing PARTEI block in report? how?
-                    label.format("Unbekannt (%s)", FXStringValEx(factionId, 36).text());
+                    label.format("Unbekannt (%s)", FXStringValEx((FXulong)factionId, 36).text());
                 }
                 factionBox->appendItem(label, (void*)factionId);
                 // select previously selected faction again
