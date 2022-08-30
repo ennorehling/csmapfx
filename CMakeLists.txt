@@ -34,7 +34,6 @@ set (SOURCES
 	regioninfos.cpp
 	regionlist.cpp
 	reportinfo.cpp
-	scout.cpp
 	searchdlg.cpp
 	statistics.cpp
 	statsinfos.cpp
