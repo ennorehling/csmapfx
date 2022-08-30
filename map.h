@@ -144,14 +144,14 @@ protected:
 	FXint		mouse_select;	// select_set==1: select regions on mouse-over, select_set==2: unselect them
 
 	FXbool		minimap;		// is this map a minimap?
-	FXCSMap		*main_map;		// pointer to the normal map
+	FXCSMap		*main_map = nullptr;		// pointer to the normal map
 	
-	FXCanvas	*map;			// the bitmap where the image data will be written to
+	FXCanvas	*map = nullptr;			// the bitmap where the image data will be written to
 	
 	linked_ptr<FXImage> backbuffer, imagebuffer;
 	linked_ptr<FXFont> font, islandfont;	// font used for region names, " for island names
 
-	FXButton	*button;
+	FXButton	*button = nullptr;
 
 	FXIcon		*terrain[data::TERRAIN_LAST];
 	FXIcon		*terrainShadow[data::TERRAIN_LAST];

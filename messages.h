@@ -28,25 +28,25 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-    datafile *mapFile;
+    datafile *mapFile = nullptr;
 
     void addMessage(FXTreeItem*, datablock * block);
 
     struct
     {
-        FXTreeItem* messages;
-        FXTreeItem* effects;
-        FXTreeItem* streets;
-        FXTreeItem* travel;
-        FXTreeItem* guards;
-        FXTreeItem* battle;
+        FXTreeItem* messages = nullptr;
+        FXTreeItem* effects = nullptr;
+        FXTreeItem* streets = nullptr;
+        FXTreeItem* travel = nullptr;
+        FXTreeItem* guards = nullptr;
+        FXTreeItem* battle = nullptr;
     } groups;
 
 	void clearSiblings(FXTreeItem* parent);
 
 protected:
-	FXMessages() : mapFile(0) {}
-	FXMessages(const FXMessages&) : mapFile(0) {}
+	FXMessages() {}
+	FXMessages(const FXMessages&) {}
 
 };
 

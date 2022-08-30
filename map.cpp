@@ -1550,6 +1550,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
                     size_t size = stats->people.size();
                     if (size == 0) {
                         stats->people.push_back(0);
+                        ++size;
                     }
                     else if (size > sizeof(colors) / sizeof(colors[0])) {
                         stats->people.resize(sizeof(colors) / sizeof(colors[0]));
