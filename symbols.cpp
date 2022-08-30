@@ -117,7 +117,7 @@ namespace data
                 if (file) {
                     PHYSFS_sint64 filesize = PHYSFS_fileLength(file);
 
-                    if (filesize > 0 && filesize <= SIZE_MAX) {
+                    if (filesize > 0) {
                         size_t size = (size_t)filesize;
                         unsigned char* data = new unsigned char[size];
                         if (data) {
@@ -153,7 +153,7 @@ namespace data
                 if (file) {
                     PHYSFS_sint64 filesize = PHYSFS_fileLength(file);
 
-                    if (filesize > 0 && filesize <= SIZE_MAX) {
+                    if (filesize > 0) {
                         size_t size = (size_t)filesize;
                         unsigned char* data = new unsigned char[size];
                         if (data) {

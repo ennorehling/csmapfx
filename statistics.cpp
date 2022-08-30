@@ -370,13 +370,8 @@ void FXStatistics::updateList()
 		{
 			const entry& en = itor->second;
 
-			// calculate sum of units items
-			int sum = 0;
-			for (std::vector<std::pair<int, int> >::iterator ship = itor->second.list.begin(); ship != itor->second.list.end(); ship++)
-				sum++;
-
 			FXString label;
-			label.format("%s: %d", itor->first.text(), sum);
+			label.format("%s: %d", itor->first.text(), itor->second.list.size());
 			int idx = list->appendItem(label);
 			list->setItemData(idx, (void*)2);		// 0: unit, 1: building, 2: ship
 
@@ -467,12 +462,15 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 		{
 			datablock::itor block;
 
-            if (entryType == 0)
-                mapFile->getUnit(block, itor->first);		// get unit
-            else if (entryType == 1)
-                mapFile->getBuilding(block, itor->first);	// get building/castle
-            else if (entryType == 2)
-                mapFile->getShip(block, itor->first);		// get ship
+            if (entryType == 0) {
+                if (!mapFile->getUnit(block, itor->first)) continue;		// get unit
+            }
+            else if (entryType == 1) {
+                if (!mapFile->getBuilding(block, itor->first)) continue;	// get building/castle
+            }
+            else if (entryType == 2) {
+                if (!mapFile->getShip(block, itor->first)) continue;		// get ship
+            }
             else {
                 // something done effed up
                 continue;

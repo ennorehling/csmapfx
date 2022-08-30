@@ -191,7 +191,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                             label.format("%s (%s)", name.text(), faction->id().text());
                     }
                     else {
-                        label.format("Unbekannt (%s)", FXStringValEx(factionId, 36).text());
+                        label.format("Unbekannt (%s)", FXStringValEx((FXulong)factionId, 36).text());
                     }
                 }
 
