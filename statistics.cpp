@@ -371,7 +371,7 @@ void FXStatistics::updateList()
 			const entry& en = itor->second;
 
 			FXString label;
-			label.format("%s: %d", itor->first.text(), itor->second.list.size());
+			label.format("%s: %zd", itor->first.text(), itor->second.list.size());
 			int idx = list->appendItem(label);
 			list->setItemData(idx, (void*)2);		// 0: unit, 1: building, 2: ship
 
