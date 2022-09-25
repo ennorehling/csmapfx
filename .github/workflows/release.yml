@@ -20,7 +20,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          submodules: 'true'
           repository: ennorehling/csmapfx
       - name: Build Debian Package
         uses: ennorehling/action-debian-package@v1.2
