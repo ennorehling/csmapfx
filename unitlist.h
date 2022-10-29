@@ -45,6 +45,8 @@ protected:
 
     datafile *mapFile = nullptr;
 
+    FXTreeItem* makePopupTreeItem(const FXString& label, datablock* block, const FXString * info = nullptr);
+
 protected:
 	FXUnitList() {}
 	FXUnitList(const FXUnitList&) {}
