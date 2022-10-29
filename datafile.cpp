@@ -579,9 +579,6 @@ const char* datafile::getConfigurationName(map_type type)
 // loads command file and attaches the commands to the units
 int datafile::loadCmds(const FXString &filename)
 {
-	cmdfilename("");
-	modifiedCmds(false);
-
 	if (filename.empty())
 		return 0;
 
@@ -812,8 +809,9 @@ int datafile::loadCmds(const FXString &filename)
 
 	} while (flatten(cmd) != "naechster");
 
-	cmdfilename(filename);
-	return true;
+    cmdfilename(filename);
+    modifiedCmds(false);
+    return true;
 }
 
 // saves command file
