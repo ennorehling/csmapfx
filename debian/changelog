@@ -1,8 +1,9 @@
 csmapfx (1.4.14-1) stable; urgency=low
 
   * do not clear current filename when orders cannot be read.
+  * added an option to limit search to selected regions.
 
- -- Enno Rehling <enno@eressea.de>  Sat, 29 Oct 2022 21:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 30 Oct 2022 10:30:00 +0200
 
 csmapfx (1.4.13-1) stable; urgency=low
 

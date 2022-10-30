@@ -60,6 +60,7 @@ protected:
 	{
 		FXCheckButton	*regardcase = nullptr;      // ignore case or don't
 		FXCheckButton	*regexp = nullptr;			// regular expression match
+		FXCheckButton	*selection = nullptr;		// search only in selection
 		FXCheckButton	*descriptions = nullptr;	// search also in descriptions
 		FXCheckButton	*factions = nullptr;		// search also in descriptions
 

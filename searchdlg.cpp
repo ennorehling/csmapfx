@@ -78,6 +78,7 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, FXObject* tgt, FXSelector sel, FXFoldi
 	FXHorizontalFrame* mode_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
 	options.regardcase = new FXCheckButton(mode_frame, FXString(L"&Gro\u00df-/Kleinschreibung beachten"), this, ID_SEARCH, CHECKBUTTON_NORMAL);
 	options.regexp = new FXCheckButton(mode_frame, FXString(L"&Regul\u00e4rer Ausdruck"), this, ID_SEARCH, CHECKBUTTON_NORMAL);
+    options.selection = new FXCheckButton(mode_frame, FXString(L"&Ausgew\u00e4hlte Regionen"), this, ID_SEARCH, CHECKBUTTON_NORMAL);
 
 	// search domain: Search for what type, search in descriptions
 	FXHorizontalFrame* domain_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X | PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -154,10 +155,12 @@ void FXSearchDlg::loadState(FXRegistry& reg)
 	FXint regexp = reg.readUnsignedEntry("SEARCHDLG", "REGEXP", 0);
 	FXint descriptions = reg.readUnsignedEntry("SEARCHDLG", "DESCRIPTIONS", 0);
 	FXint factions = reg.readUnsignedEntry("SEARCHDLG", "FACTIONS", 0);
+	FXint selected = reg.readUnsignedEntry("SEARCHDLG", "SELECTION", 0);
 	options.regardcase->setCheck(regardcase!=0);
 	options.regexp->setCheck(regexp != 0);
 	options.descriptions->setCheck(descriptions != 0);
 	options.factions->setCheck(factions != 0);
+	options.selection->setCheck(selected != 0);
 	
 	FXint domain = reg.readUnsignedEntry("SEARCHDLG", "DOMAIN", 0);
 	if (domain >= 0 && domain < options.domain->getNumItems())
@@ -178,6 +181,7 @@ void FXSearchDlg::saveState(FXRegistry& reg)
 	reg.writeUnsignedEntry("SEARCHDLG", "REGEXP", options.regexp->getCheck());
 	reg.writeUnsignedEntry("SEARCHDLG", "DESCRIPTIONS", options.descriptions->getCheck());
 	reg.writeUnsignedEntry("SEARCHDLG", "FACTIONS", options.factions->getCheck());
+	reg.writeUnsignedEntry("SEARCHDLG", "SELECTION", options.selection->getCheck());
 	
 	reg.writeUnsignedEntry("SEARCHDLG", "DOMAIN", options.domain->getCurrentItem());
 }
@@ -478,10 +482,11 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
 		return 1;
 
 	// search options
-	bool regardcase = options.regardcase->getCheck() == TRUE;		// ignore case or don't ignore case
-	bool regexp = options.regexp->getCheck() == TRUE;				// use regular expressions
-	bool descriptions = options.descriptions->getCheck() == TRUE;	// search also in description texts
-	bool factions = options.factions->getCheck() == TRUE;	// search also in faction names
+	bool regardcase = options.regardcase->getCheck() != FALSE;		// ignore case or don't ignore case
+	bool regexp = options.regexp->getCheck() != FALSE;				// use regular expressions
+	bool descriptions = options.descriptions->getCheck() != FALSE;	// search also in description texts
+	bool factions = options.factions->getCheck() != FALSE;	        // search also in faction names
+    bool selected = options.selection->getCheck() != FALSE;         // search only in selected regions
 
 	compare_func_t compare_func_icase = compare_normal(str);		// ignores case (for base36 numbers)
 	compare_func_t compare_func = compare_normal(str);				// does ignores case if not other specified
@@ -531,8 +536,21 @@ long FXSearchDlg::onSearch(FXObject*, FXSelector sel, void*)
         // pass blocks to search functors
 		if (block->type() == block_type::TYPE_REGION)
 		{
-			region = block;
-			building = ship = unit = end;
+            if (selected) {
+                bool found = false;
+                for (const datablock* sregion : selection.regionsSelected) {
+                    if (sregion == &*block) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    building = ship = unit = region = end;
+                    continue;
+                }
+            }
+            region = block;
+            building = ship = unit = end;
 		}
 		else if (block->type() == block_type::TYPE_BUILDING)
 		{
