@@ -1,3 +1,9 @@
+csmapfx (1.4.15-1) stable; urgency=low
+
+  * calculate and display unit capacities.
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 30 Oct 2022 21:30:00 +0200
+
 csmapfx (1.4.14-1) stable; urgency=low
 
   * do not clear current filename when orders cannot be read.

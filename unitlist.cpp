@@ -188,10 +188,6 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				* 500 von 700 Aura
 			*/
 
-			// prefix+race
-			if (!prefix.empty() && !race.empty())
-				race = prefix + race.lower();
-
 			FXTreeItem *item;
             FXString label;
 
@@ -263,24 +259,24 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                 }
             }
 
-            if (!weight.empty())
-			{
-				// fill to 3 numbers
-				while (weight.length() < 3)
-					weight = "0" + weight;
+            FXint count = FXIntVal(number);
 
-				// cut up
-				if (weight.right(2) == "00")
-					weight = weight.left(weight.length() - 2);
-				else
-					weight = weight.left(weight.length() - 2) + "." + weight.right(2);
-
-				item = appendItem(unititem, "Gewicht: " + weight);
-			}
-
-			label.format("%s %s", number.text(), race.text());
-			if (!hero.empty())
-				label += ", Held";
+            // prefix+race
+            label = number + " ";
+            if (race.empty()) {
+                label += (count == 1) ? "Person" : "Personen";
+            }
+            else if (!prefix.empty()) {
+                label += prefix;
+                label += race.lower();
+            }
+            else {
+                label += race;
+            }
+            if (!hero.empty()) {
+                label += ", ";
+                label += (count == 1) ? "Held" : "Helden";
+            }
 			item = appendItem(unititem, label.text());
 
 			if (!combatstatus.empty() || !hp.empty() || !hungry.empty() || !guards.empty())
@@ -336,11 +332,26 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				item = appendItem(unititem, label.text());
 			}
 
-			// list unhandled keys
+            if (!weight.empty())
+            {
+                // fill to 3 numbers
+                while (weight.length() < 3)
+                    weight = "0" + weight;
+
+                // cut up
+                if (weight.right(2) == "00")
+                    weight = weight.left(weight.length() - 2);
+                else
+                    weight = weight.left(weight.length() - 2) + "." + weight.right(2);
+
+                item = appendItem(unititem, "Gewicht: " + weight);
+            }
+            
+            // list unhandled keys
 			for (std::vector<datakey::itor>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
 			{
 				label.format("%s: %s", (*itag)->key().text(), (*itag)->value().text());
-				item = appendItem(unititem, label.text());
+				appendItem(unititem, label.text());
 			}
 
 			if (spells != end)		// does a SPRUECHE block exist?
@@ -390,6 +401,9 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					appendItem(node, key->value());
 			}
 
+            FXint riding_skill = 0;
+            FXint horses = 0;
+            FXint carts = 0;
 			if (talents != end)		// does a TALENTE block exist?
 			{
 				FXTreeItem *node = appendItem(unititem, "Talente");
@@ -398,8 +412,16 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				for (datakey::itor key = talents->data().begin(); key != talents->data().end(); key++)
 				{
                     FXString info = key->key();
-                    label = key->key() + " " + key->value().section(' ', 1);
+                    FXString value = key->value().section(' ', 1);
+                    label = key->key() + " " + value;
                     appendItem(node, makePopupTreeItem(label, nullptr, &info));
+
+                    // Talent, für Transportkapazität
+                    if (riding_skill == 0) {
+                        if (info == "Reiten") {
+                            riding_skill = FXIntVal(value, 10);
+                        }
+                    }
                 }
 			}
 
@@ -411,10 +433,64 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				for (datakey::itor key = items->data().begin(); key != items->data().end(); key++)
 				{
                     const FXString& info = key->key();
-                    label = key->value() + " " + key->key();
+                    const FXString& value = key->value();
+                    label = value + " " + info;
                     appendItem(node, makePopupTreeItem(label, nullptr, &info));
-				}
+
+                    // Pferde und Wagen, für Transportkapazität
+                    if (info == "Pferd" || info == "Elfenpferd") {
+                        horses += FXIntVal(value, 10);
+                    }
+                    else if (info == "Wagen") {
+                        carts += FXIntVal(value, 10);
+                    }
+                }
 			}
+
+            // Kapazität berechnen
+            FXint carry = 540;
+            FXint self = 10;
+            if (race == "Goblin") {
+                carry = 440;
+                self = 6;
+            }
+            else if (race == "Troll") {
+                carry = 1040;
+                self = 20;
+            }
+            // walking capacity
+            FXint walk_cap = carry * count;
+            FXint max_horses = (riding_skill * 4 + 1) * count;
+            if (max_horses > horses) {
+                max_horses = horses;
+            }
+            FXint max_carts = max_horses / 2;
+            if (max_carts > carts) {
+                max_carts = carts;
+            }
+            walk_cap += max_carts * 10000 + max_horses * 2000;
+
+            FXString tail;
+            label = L"Kapazit\u00e4t: ";
+            if (horses > 0) {
+                // riding capacity
+                max_horses = riding_skill * 2 * count;
+                if (max_horses > horses) {
+                    max_horses = horses;
+                }
+                max_carts = max_horses / 2;
+                if (max_carts > carts) {
+                    max_carts = carts;
+                }
+                FXint ride_cap = max_carts * 100 + max_horses * 20 - count * self;
+                if (ride_cap > 0) {
+                    tail.format("%.2f (%d)", walk_cap / 100.0f, ride_cap);
+                }
+            }
+            if (tail.empty()) {
+                tail.format("%.2f", walk_cap / 100.0f);
+            }
+            insertItem(item, unititem, label + tail);
 
 			if (building != end)	// unit in a building?
 			{
