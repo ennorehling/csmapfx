@@ -825,20 +825,25 @@ ceval_node * ceval_insert_node(ceval_node * current, ceval_node item, int isRigh
         }
     }
     if (item.id == CEVAL_CLOSEPAR) {
-        ceval_node * parent_of_openpar = current -> parent;
-        parent_of_openpar -> right = current -> right;
-        if (current -> right) current -> right -> parent = parent_of_openpar;
-        free(current);
-        current = parent_of_openpar;
+        if (current->parent) {
+            ceval_node * parent_of_openpar = current -> parent;
+            parent_of_openpar -> right = current -> right;
+            if (current -> right) current -> right -> parent = parent_of_openpar;
+            free(current);
+            current = parent_of_openpar;
 
-        if (current -> right -> id == CEVAL_COMMA &&
-            ceval_is_binary_fun(current -> id)) {
-            ceval_node * address_of_comma = current -> right;
-            parent_of_openpar -> left = address_of_comma -> left;
-            address_of_comma -> left -> parent = parent_of_openpar;
-            parent_of_openpar -> right = address_of_comma -> right;
-            address_of_comma -> right -> parent = parent_of_openpar;
-            free(address_of_comma);
+            if (current -> right -> id == CEVAL_COMMA &&
+                ceval_is_binary_fun(current -> id)) {
+                ceval_node * address_of_comma = current -> right;
+                parent_of_openpar -> left = address_of_comma -> left;
+                address_of_comma -> left -> parent = parent_of_openpar;
+                parent_of_openpar -> right = address_of_comma -> right;
+                address_of_comma -> right -> parent = parent_of_openpar;
+                free(address_of_comma);
+            }
+        }
+        else {
+            ceval_error("Mismatched parentheses.");
         }
         return current;
     }
