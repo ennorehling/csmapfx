@@ -223,7 +223,9 @@ static FXString evaluate(const char* expr)
 #else
     if (expr && expr[0]) {
         double f = ceval_result(expr);
-        return ev_format(f);
+        if (!isnan(f)) {
+            return ev_format(f);
+        }
     }
 #endif
     return FXString_Empty;

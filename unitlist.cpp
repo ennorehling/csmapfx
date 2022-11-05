@@ -194,7 +194,6 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 			label.format("%s (%s)", name.text(), unit->id().text());
 			FXTreeItem *unititem = appendItem(nullptr, label);
 			unititem->setExpanded(true);
-            unititem->setData(&*unit);
 
 			if (factionId > 0 || otherFactionId > 0)
 			{

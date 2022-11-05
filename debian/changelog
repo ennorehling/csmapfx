@@ -1,3 +1,10 @@
+csmapfx (1.4.16-1) stable; urgency=low
+
+  * Do not show NaN values in calculator.
+  * Fix a crash in unit list.
+
+ -- Enno Rehling <enno@eressea.de>  Sat, 05 Nov 2022 19:30:00 +0200
+
 csmapfx (1.4.15-1) stable; urgency=low
 
   * calculate and display unit capacities.
