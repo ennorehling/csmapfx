@@ -5,12 +5,13 @@
 #include "fxhelper.h"
 #include "calc.h"
 #include "symbols.h"
-#undef USE_MJS
 #ifdef USE_MJS
 #include "mjs/mjs.h"
-#else
+#elif defined(USE_CEVAL)
 #define CEVAL_STOICAL
 #include "ceval.h"
+#else
+#include "tinyexpr/tinyexpr.h" 
 #endif
 
 // *********************************************************************************************************
@@ -220,11 +221,24 @@ static FXString evaluate(const char* expr)
             return FXString("Unknown Error");
         }
     }
-#else
+#elif defined(USE_CEVAL)
     if (expr && expr[0]) {
         double f = ceval_result(expr);
         if (!isnan(f)) {
             return ev_format(f);
+        }
+    }
+#else
+    if (expr && *expr) {
+        int error;
+        double f = te_interp(expr, &error);
+        if (error == 0) {
+           return ev_format(f);
+        }
+        else if (error > 0) {
+            FXString result;
+            result.format("Fehler an Position %d: %s", error, expr+error-1);
+            return result;
         }
     }
 #endif

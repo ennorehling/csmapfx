@@ -30,7 +30,7 @@ set (SOURCES
 	mapcanvas.cpp
 	map.cpp
 	messages.cpp
-    prefsdlg.cpp
+  prefsdlg.cpp
 	regioninfos.cpp
 	regionlist.cpp
 	reportinfo.cpp
@@ -40,6 +40,7 @@ set (SOURCES
 	symbols.cpp
 	tradeinfos.cpp
 	unitlist.cpp
+  tinyexpr/tinyexpr.c
 )
 
 if (WIN32)
