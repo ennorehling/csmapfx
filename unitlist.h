@@ -1,5 +1,5 @@
-#ifndef _CSMAP_UNITLIST
-#define _CSMAP_UNITLIST
+#ifndef UNITLIST_H_
+#define UNITLIST_H_
 
 #include "datafile.h"
 
@@ -30,7 +30,7 @@ public:
 	long onShowInfo(FXObject*, FXSelector, void*);
 	long onGotoItem(FXObject*, FXSelector, void*);
 
-public: 
+public:
 	enum
 	{
         ID_POPUP_SHOW_INFO = FXTreeList::ID_LAST,
@@ -50,7 +50,6 @@ protected:
 protected:
 	FXUnitList() {}
 	FXUnitList(const FXUnitList&) {}
-
 };
 
-#endif //_CSMAP_UNITLIST
+#endif // UNITLIST_H_

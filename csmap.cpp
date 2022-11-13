@@ -52,10 +52,6 @@
 #include <cstring>
 #include <curl/curl.h>
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
 FXDEFMAP(CSMap) MessageMap[]=
 {
     //________Message_Type_____________________ID_______________Message_Handler_______
