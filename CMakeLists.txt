@@ -22,6 +22,7 @@ set (CPARSE_SOURCES
 )
 
 set (SOURCES
+  ${CPARSE_SOURCES}
 	calc.cpp
 	commands.cpp
 	csmap.cpp
