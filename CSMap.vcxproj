@@ -174,8 +174,26 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="calc.cpp" />
+    <ClCompile Include="calc.cpp">
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningAsError>
+    </ClCompile>
     <ClCompile Include="commands.cpp" />
+    <ClCompile Include="cparse\builtin-features.cpp">
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="cparse\containers.cpp">
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="cparse\functions.cpp">
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="cparse\packToken.cpp">
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="cparse\shunting-yard.cpp">
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningAsError>
+    </ClCompile>
     <ClCompile Include="csmap.cpp" />
     <ClCompile Include="datablock.cpp" />
     <ClCompile Include="datafile.cpp" />
@@ -203,8 +221,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="calc.h" />
-    <ClInclude Include="ceval.h" />
     <ClInclude Include="commands.h" />
+    <ClInclude Include="cparse\containers.h" />
+    <ClInclude Include="cparse\functions.h" />
+    <ClInclude Include="cparse\packToken.h" />
+    <ClInclude Include="cparse\shunting-yard.h" />
     <ClInclude Include="csmap.h" />
     <ClInclude Include="datablock.h" />
     <ClInclude Include="datafile.h" />

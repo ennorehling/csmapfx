@@ -13,6 +13,14 @@ if (MKSTEMP_FOUND)
   add_compile_definitions(HAVE_MKSTEMP)
 endif (MKSTEMP_FOUND)
 
+set (CPARSE_SOURCES
+  cparse/shunting-yard.cpp
+  cparse/packToken.cpp
+  cparse/functions.cpp
+  cparse/containers.cpp
+  cparse/builtin-features.cpp
+)
+
 set (SOURCES
 	calc.cpp
 	commands.cpp
@@ -30,7 +38,7 @@ set (SOURCES
 	mapcanvas.cpp
 	map.cpp
 	messages.cpp
-    prefsdlg.cpp
+  prefsdlg.cpp
 	regioninfos.cpp
 	regionlist.cpp
 	reportinfo.cpp

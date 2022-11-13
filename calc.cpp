@@ -6,10 +6,13 @@
 #include "calc.h"
 #include "symbols.h"
 
-#define USE_CEVAL
+#undef USE_CEVAL
 #ifdef USE_CEVAL
 #define CEVAL_STOICAL
 #include "ceval.h"
+#else
+#include "cparse/shunting-yard.h"
+#include "cparse/shunting-yard-exceptions.h"
 #endif
 
 // *********************************************************************************************************
@@ -165,24 +168,42 @@ long FXCalculator::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
     return 1;
 }
 
+#ifdef USE_CEVAL
 static FXString ev_format(double v) {
     FXString x = FXStringFormat("%lf", v);
     FXint pos = x.length();
-    while(--pos > 0) {
+    while (--pos > 0) {
         if (x[pos] != '0') break;
     }
     if (x[pos] == '.') --pos;
-    x.trunc(pos+1);
+    x.trunc(pos + 1);
     return x;
 }
 
-#ifdef USE_CEVAL
 static FXString evaluate(const char* expr)
 {
     if (expr && expr[0]) {
         double f = ceval_result(expr);
         if (!isnan(f)) {
             return ev_format(f);
+        }
+    }
+    return FXString_Empty;
+}
+#else
+static FXString evaluate(const char* expr)
+{
+    if (expr && expr[0]) {
+        cparse::TokenMap vars;
+        cparse::calculator cl;
+        try {
+            cl.compile(expr);
+            cparse::packToken pt = cl.eval(vars);
+            std::string result = pt.str();
+            return FXString(result.c_str());
+        }
+        catch (std::exception& e) {
+            return FXString(e.what());
         }
     }
     return FXString_Empty;
