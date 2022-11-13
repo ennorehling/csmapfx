@@ -5,10 +5,9 @@
 #include "fxhelper.h"
 #include "calc.h"
 #include "symbols.h"
-#undef USE_MJS
-#ifdef USE_MJS
-#include "mjs/mjs.h"
-#else
+
+#define USE_CEVAL
+#ifdef USE_CEVAL
 #define CEVAL_STOICAL
 #include "ceval.h"
 #endif
@@ -177,59 +176,18 @@ static FXString ev_format(double v) {
     return x;
 }
 
-#ifdef USE_MJS
-static double ev_result;
-static void ffi_ev(double v) {
-    ev_result = v;
-}
-
-static void* my_dlsym(void* handle, const char* name) {
-    if (strcmp(name, "ev") == 0) return (void*)ffi_ev;
-    return NULL;
-}
-#endif
-
+#ifdef USE_CEVAL
 static FXString evaluate(const char* expr)
 {
-#ifdef USE_MJS
-    FXString text(expr);
-    if (!text.trim().empty()) {
-        FXString script = FXStringFormat("let _ = ffi('void ev(double)'); _(%s)", text.text());
-        struct mjs* mjs = mjs_create();
-        mjs_set_ffi_resolver(mjs, my_dlsym);
-        mjs_err_t err = mjs_exec(mjs, script.text(), nullptr);
-        mjs_destroy(mjs);
-        switch (err) {
-        case MJS_OK:
-            return ev_format(ev_result);
-        case MJS_SYNTAX_ERROR:
-            return FXString("Syntax Error");
-        case MJS_REFERENCE_ERROR:
-            return FXString("Reference Error");
-        case MJS_TYPE_ERROR:
-            return FXString("Type Error");
-        case MJS_OUT_OF_MEMORY:
-            return FXString("Out Of Memory");
-        case MJS_INTERNAL_ERROR:
-            return FXString("Internal Error");
-        case MJS_NOT_IMPLEMENTED_ERROR:
-            return FXString("Not Implemented");
-        case MJS_BAD_ARGS_ERROR:
-            return FXString("Bad Arguments");
-        default:
-            return FXString("Unknown Error");
-        }
-    }
-#else
     if (expr && expr[0]) {
         double f = ceval_result(expr);
         if (!isnan(f)) {
             return ev_format(f);
         }
     }
-#endif
     return FXString_Empty;
 }
+#endif
 
 long FXCalculator::onChanged(FXObject*, FXSelector, void*)
 {
