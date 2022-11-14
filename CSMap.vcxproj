@@ -49,14 +49,12 @@
     <OutDir>Release\</OutDir>
     <IntDir>Release\</IntDir>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
-    <LibraryPath>C:\homebrew\installed\x86-windows\fox-1.6.57\lib;$(LibraryPath)</LibraryPath>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>Debug\</OutDir>
     <IntDir>Debug\</IntDir>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
-    <LibraryPath>C:\homebrew\installed\x86-windows\fox-1.6.57\lib;$(LibraryPath)</LibraryPath>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -89,7 +87,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shlwapi.lib;ws2_32.lib;legacy_stdio_definitions.lib;FOX-1.6.lib;wsock32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;ws2_32.lib;legacy_stdio_definitions.lib;wsock32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)CsMapFX.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -144,7 +142,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shlwapi.lib;ws2_32.lib;legacy_stdio_definitions.lib;FOX-1.6.lib;wsock32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;ws2_32.lib;legacy_stdio_definitions.lib;wsock32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)CsMapFX.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
