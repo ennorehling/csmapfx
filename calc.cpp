@@ -203,7 +203,8 @@ static FXString evaluate(const char* expr)
             return FXString(result.c_str());
         }
         catch (std::exception& e) {
-            return FXString(e.what());
+            // return FXString(e.what());
+            return FXString("Fehler");
         }
     }
     return FXString_Empty;
