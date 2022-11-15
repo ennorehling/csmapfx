@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS // for sscanf
+
 #include "main.h"
 #include "fxhelper.h"
 #include "statsinfos.h"
