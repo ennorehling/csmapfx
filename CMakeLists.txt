@@ -65,7 +65,7 @@ else (WIN32)
 add_executable(${PROJECT_NAME} ${SOURCES})
 endif (WIN32)
 
-find_package(CURL CONFIG REQUIRED)
+find_package(CURL REQUIRED)
 find_package(PNG REQUIRED)
 find_package(PhysFS 2.1 REQUIRED)
 
