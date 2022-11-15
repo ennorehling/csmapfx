@@ -1,5 +1,13 @@
-cmake_minimum_required(VERSION 2.9)
+cmake_minimum_required(VERSION 3.0)
 project (csmapfx CXX C)
+
+if (WIN32)
+if (CMAKE_GENERATOR_PLATFORM EQUAL x86)
+set (VCPKG_TARGET_TRIPLET x86-windows)
+elseif (CMAKE_GENERATOR_PLATFORM EQUAL x64)
+set (VCPKG_TARGET_TRIPLET x64-windows)
+endif()
+endif (WIN32)
 
 include (CheckIncludeFile)
 check_include_file(unistd.h UNISTD_H_FOUND)
@@ -39,7 +47,7 @@ set (SOURCES
 	mapcanvas.cpp
 	map.cpp
 	messages.cpp
-  prefsdlg.cpp
+	prefsdlg.cpp
 	regioninfos.cpp
 	regionlist.cpp
 	reportinfo.cpp
@@ -57,9 +65,9 @@ else (WIN32)
 add_executable(${PROJECT_NAME} ${SOURCES})
 endif (WIN32)
 
-find_package(PhysFS 2.1 REQUIRED)
+find_package(CURL CONFIG REQUIRED)
 find_package(PNG REQUIRED)
-find_package(CURL REQUIRED)
+find_package(PhysFS 2.1 REQUIRED)
 
 find_library(LEGACY_STDIO_LIBRARY NAMES legacy_stdio_definitions)
 if (LEGACY_STDIO_LIBRARY)

@@ -9,7 +9,7 @@
 			],
 			"buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
 			"installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
-			"cmakeCommandArgs": "-DCMAKE_PREFIX_PATH=C:\\vcpkg\\installed\\x64-windows -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+			"cmakeCommandArgs": "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
 			"buildCommandArgs": "-v",
 			"ctestCommandArgs": ""
 		},
@@ -22,7 +22,7 @@
 			],
 			"buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
 			"installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
-			"cmakeCommandArgs": "-DCMAKE_PREFIX_PATH=C:\\vcpkg\\installed\\x64-windows -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+			"cmakeCommandArgs": "-DCMAKE_PREFIX_PATH=C:\\vcpkg\\installed\\x86-windows -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
 			"buildCommandArgs": "-v",
 			"ctestCommandArgs": ""
 		}
