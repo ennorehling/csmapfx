@@ -1548,7 +1548,7 @@ void datafile::createHashTables()
 
 			int factionId = block->valueInt(TYPE_FACTION, -1);
 
-			if (faction(factionId) == m_blocks.end())
+			if (factionId < 0 || faction(factionId) == m_blocks.end())
 			{
 				datablock faction;
 				faction.string("PARTEI");

@@ -658,7 +658,7 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 
                 FXString label;
                 datablock::itor faction;
-                if (mapFile->getFaction(faction, factionId)) {
+                if (factionId >=0 && mapFile->getFaction(faction, factionId)) {
                     FXString name = faction->value(TYPE_FACTIONNAME);
 
                     if (name.empty())

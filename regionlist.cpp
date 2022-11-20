@@ -669,8 +669,9 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                             if (factionId < 0) {
                                 icon = gray;
                             }
+
                             datablock::itor faction;
-                            if (mapFile->getFaction(faction, factionId)) {
+                            if (factionId >= 0 && mapFile->getFaction(faction, factionId)) {
                                 facPtr = &*faction;
 
                                 if (faction == selection.activefaction) {
