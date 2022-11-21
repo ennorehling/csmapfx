@@ -174,6 +174,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                     hero = key->value();
                     break;
                 case TYPE_ORDERS_CONFIRMED:
+                case TYPE_FACTIONSTEALTH:
                     // do not show
                     break;
                 default:
@@ -195,8 +196,11 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 			FXTreeItem *unititem = appendItem(nullptr, label);
 			unititem->setExpanded(true);
 
-			if (factionId > 0 || otherFactionId > 0)
-			{
+            if (factionId < 0 && otherFactionId < 0)
+            {
+                label.assign("Parteigetarnt");
+            }
+            else {
                 datablock::itor faction;
 
                 if (factionId > 0) {
@@ -231,9 +235,8 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                         label.format("Unbekannt (%s)", FXStringValEx(otherFactionId, 36).text());
                     }
                 }
-
-				item = appendItem(unititem, label.text());
-			}
+            }
+            item = appendItem(unititem, label.text());
 
             if (group > 0)
             {

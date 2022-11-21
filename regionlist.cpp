@@ -680,17 +680,17 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                                 }
                                 else
                                 {
+                                    FXString fid = faction->id();
                                     if (name.empty())
-                                        label.assign("Parteigetarnt");
+                                        label.format("Partei %s (%s)", fid.text(), fid.text());
                                     else
-                                        label.format("%s (%s)", name.text(), faction->id().text());
+                                        label.format("%s (%s)", name.text(), fid.text());
                                 }
                             }
                             else {
                                 datablock block;
                                 block.infostr(FXStringVal(factionId));
-
-                                label.format("Unbekannt (%s)", block.id().text());
+                                label.assign("Parteigetarnt");
                             }
                         }
                         if (selection.map & selection.ACTIVEFACTION)

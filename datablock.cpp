@@ -85,7 +85,9 @@ int datakey::parseType(const FXString& type, enum block_type btype)
 		return TYPE_OTHER_FACTION;
 	if (type == "Parteiname")
 		return TYPE_FACTIONNAME;
-	if (type == "Anzahl")
+    if (type == "Parteitarnung")
+        return TYPE_FACTIONSTEALTH;
+    if (type == "Anzahl")
 		return TYPE_NUMBER;
 	if (type == "Burg")
 		return TYPE_BUILDING;
@@ -183,6 +185,8 @@ FXString datakey::key() const
         return "Anderepartei";
     case TYPE_FACTIONNAME:
         return "Parteiname";
+    case TYPE_FACTIONSTEALTH:
+        return "Parteitarnung";
     case TYPE_NUMBER:
         return "Anzahl";
     case TYPE_BUILDING:
