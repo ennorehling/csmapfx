@@ -472,7 +472,7 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
     // dann: Datei an den aktuellen CR anfuegen (nur Karteninformationen)
     datablock::itor old_end = old_cr->m_blocks.end();
     bool copy_children = false;
-    for (datablock::itor old_r = old_cr->m_blocks.begin(); old_r != old_end;++old_r)
+    for (datablock::itor old_r = old_cr->m_blocks.begin(); old_r != old_end;)
     {
         // handle only regions
         if (old_r->type() == block_type::TYPE_REGION)
@@ -513,23 +513,33 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
                         }
                     }
                     // copy child blocks if we don't have them
+                    int depth = old_r->depth();
                     for (old_r++; old_r != old_end && old_r->type() != block_type::TYPE_REGION; ++old_r)
                     {
-                        datablock::itor new_end = m_blocks.end();
-                        block_type type = old_r->type();
-                        if (type == block_type::TYPE_PRICES) {
-                            mergeBlock(old_r, new_r, new_end, block_type::TYPE_REGION);
-                        }
-                        else if (!is_seen)
-                        {
-                            if (type == block_type::TYPE_BORDER || type == block_type::TYPE_RESOURCE) {
+                        if (old_r->depth() == depth + 1) {
+                            block_type type = old_r->type();
+                            datablock::itor new_end = m_blocks.end();
+                            if (type == block_type::TYPE_PRICES) {
                                 mergeBlock(old_r, new_r, new_end, block_type::TYPE_REGION);
+                            }
+                            else if (!is_seen)
+                            {
+                                if (type == block_type::TYPE_BORDER || type == block_type::TYPE_RESOURCE) {
+                                    mergeBlock(old_r, new_r, new_end, block_type::TYPE_REGION);
+                                }
                             }
                         }
                     }
+                    if (old_r == old_end) {
+                        break;
+                    }
+                    if (old_r->type() != block_type::TYPE_REGION)
+                    {
+                        ++old_r;
+                    }
                 }
-                if (old_r == old_end) {
-                    break;
+                else {
+                    ++old_r;
                 }
                 continue;
             }
@@ -558,6 +568,7 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
 				break;
             }
         }
+        ++old_r;
     }
     createHashTables();
 }
@@ -1184,6 +1195,12 @@ bool datafile::getFaction(datablock::itor& out, int id)
     return false;
 }
 
+bool datafile::hasFaction(int id)
+{
+    datablock::itor block = faction(id);
+    return (block != m_blocks.end());
+}
+
 datablock::itor datafile::building(int id)
 {
     std::map<int, datablock::itor>::iterator building = m_buildings.find(id);
@@ -1547,8 +1564,7 @@ void datafile::createHashTables()
 			m_units[block->info()] = block;
 
 			int factionId = block->valueInt(TYPE_FACTION, -1);
-
-			if (factionId < 0 || faction(factionId) == m_blocks.end())
+			if (factionId < 0 || !hasFaction(factionId))
 			{
 				datablock faction;
 				faction.string("PARTEI");
@@ -1597,7 +1613,7 @@ void datafile::createHashTables()
         }
         else if (block->type() == block_type::TYPE_ALLIANCE) {
             // alliance as placeholder-faction
-            if (faction(block->info()) == m_blocks.end()) {
+            if (!hasFaction(block->info())) {
                 m_factions[block->info()] = block;
             }
         }

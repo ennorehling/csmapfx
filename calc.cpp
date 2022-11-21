@@ -202,8 +202,7 @@ static FXString evaluate(const char* expr)
             std::string result = pt.str();
             return FXString(result.c_str());
         }
-        catch (std::exception& e) {
-            // return FXString(e.what());
+        catch (...) {
             return FXString("Fehler");
         }
     }
