@@ -2036,7 +2036,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
                         (block->info() == selection.sel_plane))
                     {
                         selection.region = block;
-                        selection.selected |= selection.REGION;
+                        selection.selected = pstate->selected;
                     }
                 }
                 else if (block->type() == block_type::TYPE_UNIT)
@@ -2045,7 +2045,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
                         block->info() == pstate->unit->info())
                     {
                         selection.region = region;
-                        selection.selected |= selection.REGION;
+                        selection.selected = pstate->selected;
                         selection.unit = block;
                         selection.selected |= selection.UNIT;
                         break;
