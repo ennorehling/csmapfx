@@ -1,2 +1,2 @@
-diff-ignore = "^(.git/.*|mjs/.*)"
-extend-diff-ignore = "^(.git/.*|mjs/.*)"
+diff-ignore = "^(.git/.*|cparse/.*)"
+extend-diff-ignore = "^(.git/.*|cparse/.*)"
