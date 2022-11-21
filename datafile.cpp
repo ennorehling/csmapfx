@@ -1570,7 +1570,7 @@ void datafile::createHashTables()
                     name.assign("Monster");
                 }
                 else {
-                    name.format("Partei %s", FXStringValEx(factionId, 36));
+                    name.format("Partei %s", FXStringValEx(factionId, 36).text());
                 }
 				datakey key;
 				key.key("Parteiname", block->type());
