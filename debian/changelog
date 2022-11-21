@@ -1,3 +1,9 @@
+csmapfx (1.4.19-3) stable; urgency=low
+
+  * package rebuild
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 21 Nov 2022 22:45:00 +0200
+
 csmapfx (1.4.19-2) stable; urgency=low
 
   * fix string format bug
