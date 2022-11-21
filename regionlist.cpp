@@ -369,79 +369,73 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
 		}
 	}
 
-	if (main == mapFile->blocks().end())
-	{
-        main = mapFile->dummyToItor(datablk);
-	}
+    if (main == mapFile->blocks().end())
+    {
+        main = iparent;
+        iparent = mapFile->blocks().end();
+    }
 
-	if (main == mapFile->blocks().end())
-	{
-		main = iparent;
-		iparent = mapFile->blocks().end();
-	}
+    if (main != mapFile->blocks().end())
+    {
+        // send new selection to main window
+        datafile::SelectionState sel_state;
 
-	if (main != mapFile->blocks().end())
-	{
-		// send new selection to main window
-		datafile::SelectionState sel_state;
-
-		if (main->type() == block_type::TYPE_REGION)
-		{
-			sel_state.selected = sel_state.REGION;
-			sel_state.region = main;
-		}
+        if (main->type() == block_type::TYPE_REGION)
+        {
+            sel_state.selected = sel_state.REGION;
+            sel_state.region = main;
+        }
         if (main->type() == block_type::TYPE_FACTION)
-		{
-			sel_state.selected = sel_state.FACTION;
-			sel_state.faction = main;
+        {
+            sel_state.selected = sel_state.FACTION;
+            sel_state.faction = main;
 
-			if (iparent != mapFile->blocks().end())
-			{
-				sel_state.selected |= sel_state.REGION;
-				sel_state.region = iparent;
-			}
-		}
-		if (main->type() == block_type::TYPE_BUILDING)
-		{
-			sel_state.selected = sel_state.BUILDING;
-			sel_state.building = main;
+            if (iparent != mapFile->blocks().end())
+            {
+                sel_state.selected |= sel_state.REGION;
+                sel_state.region = iparent;
+            }
+        }
+        if (main->type() == block_type::TYPE_BUILDING)
+        {
+            sel_state.selected = sel_state.BUILDING;
+            sel_state.building = main;
 
-			if (iparent != mapFile->blocks().end())
-			{
-				sel_state.selected |= sel_state.FACTION;
-				sel_state.faction = iparent;
-			}
-		}
-		if (main->type() == block_type::TYPE_SHIP)
-		{
-			sel_state.selected = sel_state.SHIP;
-			sel_state.ship = main;
+            if (iparent != mapFile->blocks().end())
+            {
+                sel_state.selected |= sel_state.FACTION;
+                sel_state.faction = iparent;
+            }
+        }
+        if (main->type() == block_type::TYPE_SHIP)
+        {
+            sel_state.selected = sel_state.SHIP;
+            sel_state.ship = main;
 
-			if (iparent != mapFile->blocks().end())
-			{
-				sel_state.selected |= sel_state.FACTION;
-				sel_state.faction = iparent;
-			}
-		}
+            if (iparent != mapFile->blocks().end())
+            {
+                sel_state.selected |= sel_state.FACTION;
+                sel_state.faction = iparent;
+            }
+        }
         if (main->type() == block_type::TYPE_UNIT)
-		{
-			sel_state.selected = sel_state.UNIT;
-			sel_state.unit = main;
+        {
+            sel_state.selected = sel_state.UNIT;
+            sel_state.unit = main;
 
-			if (iparent != mapFile->blocks().end())
-			{
-				sel_state.selected |= sel_state.FACTION;
-				sel_state.faction = iparent;
-			}			
-		}
+            if (iparent != mapFile->blocks().end())
+            {
+                sel_state.selected |= sel_state.FACTION;
+                sel_state.faction = iparent;
+            }
+        }
         if (selection.selected & selection.MULTIPLE_REGIONS) {
             sel_state.selected |= selection.MULTIPLE_REGIONS;
             sel_state.regionsSelected = selection.regionsSelected;
         }
         getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
-		return 1;
+        return 1;
     }
-
 	return 0;
 }
 
@@ -674,7 +668,7 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                             if (factionId >= 0 && mapFile->getFaction(faction, factionId)) {
                                 facPtr = &*faction;
 
-                                if (faction == selection.activefaction) {
+                                if (faction->info() == selection.activefaction->info()) {
                                     icon = blue;
                                 }
                                 name = faction->value(TYPE_FACTIONNAME);

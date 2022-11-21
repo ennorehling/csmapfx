@@ -547,11 +547,6 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 
 		if (main == mapFile->blocks().end())
 		{
-			main = mapFile->dummyToItor(dblock);
-		}
-
-		if (main == mapFile->blocks().end())
-		{
 			main = iparent;
 			iparent = mapFile->blocks().end();
 		}

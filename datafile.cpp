@@ -1187,9 +1187,9 @@ datablock::itor datafile::faction(int id)
 
 bool datafile::getFaction(datablock::itor& out, int id)
 {
-    datablock::itor block = faction(id);
-    if (block != m_blocks.end()) {
-        out = block;
+    std::map<int, datablock::itor>::iterator faction = m_factions.find(id);
+    if (faction != m_factions.end()) {
+        out = faction->second;
         return true;
     }
     return false;
@@ -1197,8 +1197,8 @@ bool datafile::getFaction(datablock::itor& out, int id)
 
 bool datafile::hasFaction(int id)
 {
-    datablock::itor block = faction(id);
-    return (block != m_blocks.end());
+    std::map<int, datablock::itor>::iterator faction = m_factions.find(id);
+    return faction != m_factions.end();
 }
 
 datablock::itor datafile::building(int id)
@@ -1261,15 +1261,6 @@ bool datafile::getIsland(datablock::itor& out, int id)
         return true;
     }
     return false;
-}
-
-datablock::itor datafile::dummyToItor(const datablock* block)
-{
-	for (datablock::itor itor = m_dummyBlocks.begin(); itor != m_dummyBlocks.end(); itor++)
-		if (block == &*itor)
-			return itor;
-
-	return m_blocks.end();
 }
 
 void datafile::findSelection(const datablock* select, datablock::itor& out, datablock::itor& region)
@@ -1400,7 +1391,6 @@ void datafile::createHashTables()
 	m_buildings.clear();
 	m_ships.clear();
 	m_islands.clear();
-	m_dummyBlocks.clear();
 
 	m_activefaction = m_blocks.end();
 	m_recruitment = 0;
@@ -1416,6 +1406,7 @@ void datafile::createHashTables()
 
     createHierarchy();
 	datablock::itor block;
+    datablock::itor insertFaction = m_blocks.end();
 	for (block = m_blocks.begin(); block != m_blocks.end(); block++)
 	{
 		// set turn number to that found in version block
@@ -1425,18 +1416,19 @@ void datafile::createHashTables()
 		// set faction as active faction (for ally-state)
 		if (block->type() == block_type::TYPE_FACTION)
 		{
-			if (m_activefaction == m_blocks.end())
-				if (/*block->value(TYPE_TYPE) != "" ||*/ block->value(TYPE_OPTIONS) != "")
-				{
-					m_activefaction = block;		// set active faction here
+            if (m_activefaction == m_blocks.end()) {
+                if (/*block->value(TYPE_TYPE) != "" ||*/ block->value(TYPE_OPTIONS) != "")
+                {
+                    m_activefaction = block;		// set active faction here
 
-					// get turn from faction block if VERSION block has none
-					if (!m_turn)
-						m_turn = block->valueInt(TYPE_TURN, m_turn);
-					if (!m_recruitment)
-						m_recruitment = block->valueInt(TYPE_RECRUITMENTCOST, m_recruitment);
-					break;
-				}
+                    // get turn from faction block if VERSION block has none
+                    if (!m_turn)
+                        m_turn = block->valueInt(TYPE_TURN, m_turn);
+                    if (!m_recruitment)
+                        m_recruitment = block->valueInt(TYPE_RECRUITMENTCOST, m_recruitment);
+                    break;
+                }
+            }
 		}
 	}
 
@@ -1455,6 +1447,7 @@ void datafile::createHashTables()
                 break;
             }
 		}
+        insertFaction = block;
 	}
 
 	for (block = m_blocks.begin(); block != m_blocks.end(); block++)
@@ -1564,22 +1557,26 @@ void datafile::createHashTables()
 			m_units[block->info()] = block;
 
 			int factionId = block->valueInt(TYPE_FACTION, -1);
-			if (factionId < 0 || !hasFaction(factionId))
+
+            if (factionId < 0 || !hasFaction(factionId))
 			{
 				datablock faction;
 				faction.string("PARTEI");
 				faction.infostr(FXStringVal(factionId));
 				
-				if (factionId == 0 || factionId == 666)	// Monster (0) and the new Monster (ii)
-				{
-					datakey key;
-					key.key("Parteiname", block->type());
-					key.value("Monster");
-					faction.data().push_back(key);
-				}
-
-                m_dummyBlocks.push_back(faction);
-				m_factions[factionId] = --m_dummyBlocks.end();
+                FXString name;
+                if (factionId == 0 || factionId == 666)	// Monster (0) and the new Monster (ii)
+                {
+                    name.assign("Monster");
+                }
+                else {
+                    name.format("Partei %s", FXStringValEx(factionId, 36));
+                }
+				datakey key;
+				key.key("Parteiname", block->type());
+				key.value(name);
+				faction.data().push_back(key);
+                m_factions[factionId] = m_blocks.insert(insertFaction, faction);
 			}
 
 			// set attachment for unit of active faction

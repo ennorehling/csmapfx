@@ -62,7 +62,6 @@ public:
     bool hasRegion(int x, int y, int plane) const;
     bool deleteRegion(datablock* region);
     FXString regionName(const datablock& block);
-    datablock::itor dummyToItor(const datablock* block);
 
     void findSelection(const datablock* select, datablock::itor& out, datablock::itor& region);
 	typedef std::list<datafile>::iterator itor;
@@ -205,9 +204,6 @@ protected:
     typedef std::map<koordinates, datablock::itor> regions_map;
     regions_map m_regions;
 	std::map<koordinates, datablock::itor> m_battles;
-
-	// temporaries (like FACTION block that don't exist in CR)
-	datablock::list_type m_dummyBlocks;
 };
 
 #endif //_CSMAP_DATAFILE
