@@ -168,8 +168,7 @@ long FXCalculator::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
     return 1;
 }
 
-#ifdef USE_CEVAL
-static FXString ev_format(double v) {
+static FXString format_double(double v) {
     FXString x = FXStringFormat("%lf", v);
     FXint pos = x.length();
     while (--pos > 0) {
@@ -180,12 +179,13 @@ static FXString ev_format(double v) {
     return x;
 }
 
+#ifdef USE_CEVAL
 static FXString evaluate(const char* expr)
 {
     if (expr && expr[0]) {
         double f = ceval_result(expr);
         if (!isnan(f)) {
-            return ev_format(f);
+            return format_double(f);
         }
     }
     return FXString_Empty;
@@ -199,8 +199,14 @@ static FXString evaluate(const char* expr)
         try {
             cl.compile(expr);
             cparse::packToken pt = cl.eval(vars);
-            std::string result = pt.str();
-            return FXString(result.c_str());
+            if (pt->type & cparse::tokType::NUM) {
+                double d = pt.asDouble();
+                return format_double(d);
+            }
+            else {
+                std::string result = pt.str();
+                return FXString(result.c_str());
+            }
         }
         catch (...) {
             return FXString("Fehler");

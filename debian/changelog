@@ -6,6 +6,12 @@ csmapfx (1.4.20-1) stable; urgency=low
 
  -- Enno Rehling <enno@eressea.de>  Fri, 09 Dec 2022 19:00:00 +0200
 
+csmapfx (1.4.19-4) stable; urgency=low
+
+  * calculator: improve display of large numbers
+
+ -- Enno Rehling <enno@eressea.de>  Tue, 22 Nov 2022 19:00:00 +0200
+
 csmapfx (1.4.19-3) stable; urgency=low
 
   * package rebuild
