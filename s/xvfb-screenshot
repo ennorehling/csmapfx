@@ -1,0 +1,1 @@
+xwd -display :100 -root | convert xwd:- png:screenshot.png
