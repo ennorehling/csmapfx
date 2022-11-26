@@ -31,6 +31,7 @@ set (CPARSE_SOURCES
 )
 
 set (SOURCES
+  ${PLATFORM_SOURCES}
   ${CPARSE_SOURCES}
 	calc.cpp
 	commands.cpp
@@ -61,7 +62,7 @@ set (SOURCES
 )
 
 if (WIN32)
-add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
+add_executable(${PROJECT_NAME} WIN32 ${SOURCES} version.rc)
 else (WIN32)
 add_executable(${PROJECT_NAME} ${SOURCES})
 endif (WIN32)

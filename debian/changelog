@@ -1,8 +1,9 @@
 csmapfx (1.4.19-4) stable; urgency=low
 
   * calculator: improve display of large numbers
+  * windows: include icon resource
 
- -- Enno Rehling <enno@eressea.de>  Tue, 22 Nov 2022 19:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sat, 26 Nov 2022 14:20:00 +0200
 
 csmapfx (1.4.19-3) stable; urgency=low
 
