@@ -598,7 +598,7 @@ int datafile::loadCmds(const FXString &filename)
 	if (filename.empty())
 		return 0;
 
-	if (activefaction() == m_blocks.end())
+	if (m_factionId == 0)
 		throw std::runtime_error("Kein Report geladen, kann Befehlsdatei nicht einlesen.");
 
 
@@ -669,11 +669,10 @@ int datafile::loadCmds(const FXString &filename)
 
 	char* endptr;
 	int factionId = strtol(id36.text(), &endptr, 36);
-    m_factionId = factionId;
 
     if (endptr && *endptr)		// id36 string has to be consumed by strtol
 		throw std::runtime_error((L"Keine g\u00fcltige Parteinummer: " + id36).text());
-	if (factionId != activefaction()->info())
+	if (factionId != m_factionId)
 		throw std::runtime_error((L"Die Befehle sind f\u00fcr eine andere Partei: " + id36).text());
 
     // consider command file as correct, read in commands
@@ -836,7 +835,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 	if (filename.empty())
 		return -1;
 
-    if (activefaction() == m_blocks.end())
+    if (m_factionId == 0)
 		return -1;
 
 	// Datei zum Schreiben \u00f6ffnen
@@ -859,7 +858,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 	else
 		out << "PARTEI";
 	
-	out << " " << activefaction()->id() << " ";
+	out << " " << FXStringValEx(m_factionId, 36) << " ";
 	
 	if (password.empty())	
 		out << "\"HIER-PASSWORT\"" << "\n";
@@ -882,8 +881,6 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 	}
 
 	// loop through regions and units and complete the ordering lists
-	int factionId = activefaction()->info();
-
 	std::vector<int> *unit_order = nullptr;
 	for (datablock::itor region = m_blocks.end(), block = m_blocks.begin(); block != m_blocks.end(); block++)
 	{
@@ -891,7 +888,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 			region = block;
 		else if (block->type() == block_type::TYPE_UNIT)
 		{
-			if (block->valueInt(TYPE_FACTION) != factionId)
+			if (block->valueInt(TYPE_FACTION) != m_factionId)
 				continue;
 
 			// add region to list when first unit of active faction occurs
@@ -1398,6 +1395,7 @@ void datafile::createHashTables()
 	m_islands.clear();
 
 	m_activefaction = m_blocks.end();
+    m_factionId = 0;
 	m_recruitment = 0;
 	m_turn = 0;
 
@@ -1425,6 +1423,7 @@ void datafile::createHashTables()
                 if (/*block->value(TYPE_TYPE) != "" ||*/ block->value(TYPE_OPTIONS) != "")
                 {
                     m_activefaction = block;		// set active faction here
+                    m_factionId = block->info();
 
                     // get turn from faction block if VERSION block has none
                     if (!m_turn)
@@ -1438,10 +1437,10 @@ void datafile::createHashTables()
 	}
 
 	// continue to evaluate ALLIANCE blocks for active faction
-	if (activefaction() != m_blocks.end())
+    block = m_activefaction;
+    if (block != m_blocks.end())
 	{
-		int factionDepth = activefaction()->depth();
-		block = activefaction();
+		int factionDepth = m_activefaction->depth();
 		for (block++; block != m_blocks.end() && block->depth() > factionDepth; block++)
 		{
             if (block->type() == block_type::TYPE_ALLIANCE) {
@@ -1521,10 +1520,10 @@ void datafile::createHashTables()
 				m_regions[koordinates(block->x(), block->y(), block->info())] = block;
 
 			// get region owner (E3 only)
-			if (activefaction() != m_blocks.end())
+			if (m_activefaction != m_blocks.end())
 			{
 				int ownerId = block->valueInt("owner", -1);
-				if (ownerId == activefaction()->info())
+				if (ownerId == m_factionId)
 					region->setFlags(datablock::FLAG_REGION_OWN);
                 else if (allied_status[ownerId] & HELP_GUARD) {
                     region->setFlags(datablock::FLAG_REGION_ALLY);
@@ -1582,7 +1581,7 @@ void datafile::createHashTables()
 			}
 
 			// set attachment for unit of active faction
-			if (activefaction() != m_blocks.end() && factionId == activefaction()->info())
+			else if (factionId == m_factionId)
 			{
 				// search for command block of unit
 				datablock::itor cmd = block;
@@ -1637,10 +1636,10 @@ void datafile::createHashTables()
 					UNIT_ALLY,
 				} owner = UNIT_ENEMY;
 
-				if (activefaction() != m_blocks.end())
+				if (m_factionId > 0)
 				{
 					int factionId = block->valueInt(TYPE_FACTION, -1);
-					if (factionId == activefaction()->info())
+					if (factionId == m_factionId)
 					{
 						region_own += number;
 						owner = UNIT_OWN;

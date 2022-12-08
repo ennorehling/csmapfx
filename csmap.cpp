@@ -1901,7 +1901,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
             planes->setNumVisible(planes->getNumItems());
 
             // get info about active faction
-            if (report->activefaction() != report->blocks().end()) {
+            if (report->getFactionId() != 0) {
                 datablock::itor block = report->activefaction();
 
                 // set first faction in file to active faction
@@ -2662,7 +2662,10 @@ long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
     if (!report)
         return 0;
 
-    FXString id = report->activefaction()->id();
+    int factionId = report->getFactionId();
+    if (factionId == 0)
+        return 0;
+    FXString id = FXStringValEx(factionId, 36);
     FXString passwd = askPasswordDlg(id);
     if (u_mkstemp(infile) && report->saveCmds(infile, passwd, true) == 0) {
         CURL *ch;
@@ -2775,7 +2778,10 @@ void CSMap::saveCommandsDlg(bool stripped, bool replace)
     if (!report)
         return;
 
-    FXString id = report->activefaction()->id();
+    int factionId = report->getFactionId();
+    if (factionId == 0)
+        return;
+    FXString id = FXStringValEx(factionId, 36);
     FXString filename = report->cmdfilename();
     FXString passwd = askPasswordDlg(id);
 

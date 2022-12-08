@@ -31,6 +31,7 @@ public:
 
     int turn() const;
 	int recruitment() const { return m_recruitment; }
+    int getFactionId() const { return m_factionId; }
 	datablock::itor activefaction() { return m_activefaction; }
 
 	int load(const char* filename);
@@ -44,7 +45,6 @@ public:
 	int saveCmds(const FXString &filename, const FXString &passwd, bool stripped);
 
     FXString getPassword() const { return m_password; }
-    int getFactionId() const { return m_factionId; }
 
 	datablock::list_type& blocks() { return m_blocks; }
 
