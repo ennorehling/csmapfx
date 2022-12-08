@@ -1829,7 +1829,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
         // store flags
         selection.fileChange++;
-        selection.map = pstate->map & ~(selection.MAPCHANGED | selection.NEWFILE);
+        selection.map = pstate->map & ~(selection.MAPCHANGED);
 
         // delete all planes except default
         planes->clearItems();        // clear planes

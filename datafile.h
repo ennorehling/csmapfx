@@ -99,7 +99,6 @@ public:
 		enum
 		{
 			MAPCHANGED = (1<<0),
-			NEWFILE = (1<<1)
 		};
 
 		// mini-c'tor
