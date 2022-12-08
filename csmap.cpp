@@ -971,10 +971,7 @@ bool CSMap::haveActiveFaction() const
     if (!report)
         return false;
 
-    if (!(selection.map & selection.ACTIVEFACTION))
-        return false;
-
-    return true;
+    return report->getFactionId() != 0;
 }
 
 datafile* CSMap::loadFile(const FXString& filename)
@@ -1090,7 +1087,7 @@ bool CSMap::loadCommands(const FXString& filename)
     if (filename.empty() || !report)
         return false;
 
-    if (!(selection.map & selection.ACTIVEFACTION))
+    if (!haveActiveFaction())
         return false;
 
     try
@@ -1132,7 +1129,7 @@ bool CSMap::saveCommands(const FXString &filename, bool stripped)
     if (filename.empty() || !report)
         return false;
 
-    if (!(selection.map & selection.ACTIVEFACTION))
+    if (!haveActiveFaction())
         return false;
 
     FXint res = report->saveCmds(filename.text(), settings.password, stripped);    // nicht \u00fcberschreiben
@@ -1832,7 +1829,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
         // store flags
         selection.fileChange++;
-        selection.map = pstate->map & ~(selection.ACTIVEFACTION | selection.MAPCHANGED | selection.NEWFILE);
+        selection.map = pstate->map & ~(selection.MAPCHANGED | selection.NEWFILE);
 
         // delete all planes except default
         planes->clearItems();        // clear planes
@@ -1903,10 +1900,6 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
             // get info about active faction
             if (report->getFactionId() != 0) {
                 datablock::itor block = report->activefaction();
-
-                // set first faction in file to active faction
-                selection.map |= selection.ACTIVEFACTION;
-                selection.activefaction = block;
 
                 // write faction statistics into faction menu
                 FXString name = block->value(TYPE_FACTIONNAME);
@@ -2001,7 +1994,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         }
 
         // enable/disable FACTION menu
-        if (selection.map & selection.ACTIVEFACTION)
+        if (haveActiveFaction())
         {
             if (!menu.faction->isEnabled())
                 menu.faction->enable();
@@ -2115,6 +2108,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         selection.sel_plane = selection.region->info();
     }
 
+    int factionId = 0;
     if (report) {
         int turn = report->turn();
         status_turn->setText(FXStringVal(turn));
@@ -2124,6 +2118,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         status_date->setText(date);
         status_date->show();
         status_ldate->show();
+        factionId = report->getFactionId();
     }
     else {
         status_turn->hide();
@@ -2136,11 +2131,12 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     }
 
     // update faction name in status bar
-    if (selection.map & selection.ACTIVEFACTION)
+    if (factionId > 0)
     {
         // update statusbar
-        FXString faction; faction.format("%s (%s)", selection.activefaction->value(TYPE_FACTIONNAME).text(),
-            selection.activefaction->id().text());
+        FXString faction;
+        faction.format("%s (%s)", report->activefaction()->value(TYPE_FACTIONNAME).text(),
+            FXStringValEx(factionId, 36).text());
 
         status_faction->setText(faction);
         status_faction->show();

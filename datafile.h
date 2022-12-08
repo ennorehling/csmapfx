@@ -79,8 +79,6 @@ public:
 		std::set<datablock*> regionsSelected;
         //Selection regionsSelected;
 
-		datablock::itor activefaction;
-
         int selChange, fileChange;	// incremented on changes to any datafile (loaded, closed or changed)
 
 		// selected flags
@@ -100,9 +98,8 @@ public:
 		// map flags
 		enum
 		{
-			ACTIVEFACTION = (1<<0),
-			MAPCHANGED = (1<<1),
-			NEWFILE = (1<<2)
+			MAPCHANGED = (1<<0),
+			NEWFILE = (1<<1)
 		};
 
 		// mini-c'tor

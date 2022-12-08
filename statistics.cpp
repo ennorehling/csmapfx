@@ -686,7 +686,6 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 	{
 		selection.fileChange = pstate->fileChange;
 		selection.map = pstate->map;
-		selection.activefaction = pstate->activefaction;
 
 		needUpdate = true;
 	}

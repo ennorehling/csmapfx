@@ -110,7 +110,6 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 	{
 		selection.fileChange = pstate->fileChange;
 		selection.map = pstate->map;
-		selection.activefaction = pstate->activefaction;
 	}
 
 	if (selection.selChange != pstate->selChange)
