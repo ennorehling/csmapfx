@@ -70,7 +70,6 @@ public:
 	struct SelectionState
 	{
         int selected;			// flags; what iterator contains valid information?
-		int map;				// flags that indicate map states
 
 		datablock::itor region, faction, building, ship, unit;
 
@@ -95,14 +94,8 @@ public:
 			CONFIRMED = (1<<8),
 		};
 
-		// map flags
-		enum
-		{
-			MAPCHANGED = (1<<0),
-		};
-
 		// mini-c'tor
-		SelectionState() : selected(0), map(0), sel_x(0), sel_y(0), sel_plane(0), selChange(0), fileChange(0) {}
+		SelectionState() : selected(0), sel_x(0), sel_y(0), sel_plane(0), selChange(0), fileChange(0) {}
         SelectionState(const SelectionState& state) {
             sel_x = state.sel_x;
             sel_y = state.sel_y;
@@ -116,7 +109,6 @@ public:
             building = state.building;
             ship = state.ship;
             unit = state.unit;
-            map = state.map;
             regionsSelected = state.regionsSelected;
             selected = state.selected;
         }

@@ -63,7 +63,6 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 	if (selection.fileChange != pstate->fileChange)
 	{
 		selection.fileChange = pstate->fileChange;
-		selection.map = pstate->map;
 
 		// clear list and build a new one from data in this->files
 		//clearItems();

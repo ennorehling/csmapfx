@@ -920,9 +920,8 @@ void CSMap::mapChange()
     datafile::SelectionState state = selection;
     if (report == nullptr) {
         state.selected = 0;
-        state.map = 0;
     }
-    state.map |= state.MAPCHANGED;
+    state.fileChange++;
 
     if (!(state.selected & (state.REGION|state.UNKNOWN_REGION)))
     {
@@ -1815,8 +1814,9 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     ++selection.selChange;
 
     // file change notification
-    if (pstate->map & selection.MAPCHANGED)
+    if (pstate->fileChange != selection.fileChange)
     {
+        selection.fileChange = pstate->fileChange;
         // notify info dialog of new game type
         FXString name_of_game;
         if (report) {
@@ -1826,10 +1826,6 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
             name_of_game = "default";
 
         infodlg->setGame(name_of_game);
-
-        // store flags
-        selection.fileChange++;
-        selection.map = pstate->map & ~(selection.MAPCHANGED);
 
         // delete all planes except default
         planes->clearItems();        // clear planes
@@ -2384,7 +2380,6 @@ void CSMap::loadFiles(const FXString filenames[])
         }
         ++selection.fileChange;
         // rebuild the resulting report
-        selection.selected |= selection.MAPCHANGED;
         mapChange();
         updateFileNames();
         checkCommands();
@@ -3206,8 +3201,7 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 
     datafile::SelectionState state = selection;
     state.selected &= ~state.MULTIPLE_REGIONS;
-
-    state.map |= state.MAPCHANGED;        // Datei wurde ge\u00e4ndert
+    state.fileChange++;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
     return 1;
 }

@@ -285,7 +285,7 @@ long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* p
                 sel_state.selected &= ~sel_state.FACTION;
             }
         }
-        sel_state.map = sel_state.MAPCHANGED;
+        sel_state.fileChange++;
         getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
     }
 	return 1;  
@@ -603,7 +603,6 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 	{
         getApp()->beginWaitCursor();
         selection.fileChange = pstate->fileChange;
-		selection.map = pstate->map;
 
 		// clear list and build a new one from data in this->files
 		clearItems();
