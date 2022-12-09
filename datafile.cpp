@@ -180,6 +180,11 @@ int datafile::save(const char* filename, map_type map_filter)
 		bool hideKeys = false;
         block_type type = block->type();
 
+        if (block->info() < 0)
+        {
+            // PARTEI -1 verhindern
+            continue;
+        }
         if (maxDepth) {
             if (block->depth() <= maxDepth) {
                 // reset the skip-child behavior
@@ -1443,9 +1448,6 @@ void datafile::createHashTables()
                 int status = block->valueInt("Status", 0);
                 allied_status[block->info()] = status;
             }
-            else if (block->type() == block_type::TYPE_GROUP) {
-                break;
-            }
 		}
         insertFaction = block;
 	}
@@ -1558,7 +1560,7 @@ void datafile::createHashTables()
 
 			int factionId = block->valueInt(TYPE_FACTION, -1);
 
-            if (factionId < 0 || !hasFaction(factionId))
+            if (!hasFaction(factionId))
 			{
 				datablock faction;
 				faction.string("PARTEI");
