@@ -69,15 +69,21 @@ int datafile::load(const char* filename)
 		throw std::runtime_error(FXString(L"Datei konnte nicht ge\u00f6ffnet werden.").text());
 	}
 
-	FXString buffer;
-	buffer.length(1024*100+1);
-
+	FXchar buffer[1024*16];
+	memset(buffer, 0, 4);
+	ptrdiff_t offset = 0;
+	file.load(buffer, 3);
+	if (strcmp("VER", buffer) == 0) {
+		offset = 3;
+	}
 	do
 	{
-		memset(&buffer[0], 0, buffer.length());
-		file.load(&buffer[0], buffer.length()-1);
-		data.append(buffer.text());
-
+		FXlong pos = file.position();
+		file.load(buffer + offset, sizeof(buffer) - offset - 1);
+		FXlong read = file.position() - pos;
+		buffer[offset + read] = 0;
+		data.append(buffer);
+		offset = 0;
 	} while(file.status() == FXStreamOK);
 		
 	file.close();
