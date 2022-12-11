@@ -73,22 +73,22 @@ int datafile::load(const char* filename)
 	memset(buffer, 0, 4);
 	ptrdiff_t offset = 0;
 	file.load(buffer, 3);
-	if (strcmp("VER", buffer) == 0) {
-		offset = 3;
-	}
+    // check for utf8 BOM: EF BB BF
+    if (!strncmp(buffer, UTF8BOM, strlen(UTF8BOM))) {
+        offset = strlen(UTF8BOM);
+    }
+
 	do
 	{
 		FXlong pos = file.position();
 		file.load(buffer + offset, sizeof(buffer) - offset - 1);
 		FXlong read = file.position() - pos;
 		buffer[offset + read] = 0;
-		data.append(buffer);
+		data.append(buffer + offset);
 		offset = 0;
 	} while(file.status() == FXStreamOK);
 		
 	file.close();
-
-	// ...
 
 	m_blocks.clear();
 	datablock *block = NULL, newblock;
@@ -96,12 +96,7 @@ int datafile::load(const char* filename)
     bool utf8 = true;
 	char *ptr, *next = &data[0];
 
-	// check for utf8 BOM: EF BB BF
-	if (!strncmp(next, UTF8BOM, strlen(UTF8BOM))) {
-        next += strlen(UTF8BOM);
-	}
-
-	while(*(ptr = next))
+	while (*(ptr = next))
 	{
 		// strip the line
 		next = getNextLine(ptr);
