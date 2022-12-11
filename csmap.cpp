@@ -980,39 +980,26 @@ bool CSMap::haveActiveFaction() const
 datafile* CSMap::loadFile(const FXString& filename)
 {
     datafile* cr = new datafile();
+    FXString errorMessage;
 
     try
     {
-        if (cr->load(filename.text()) <= 0) {
-            delete cr;
-            return nullptr;
-        }
         cr->filename(filename);
+        if (!cr->load(filename.text(), errorMessage)) {
+            delete cr;
+            cr = nullptr;
+        }
     }
     catch(const std::runtime_error& err)
     {
         recentFiles.removeFile(filename);
-        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", err.what());
+        errorMessage.assign(err.what());
         delete cr;
-        return nullptr;
+        cr = nullptr;
     }
-
-    if (cr->blocks().empty())
-    {
-        recentFiles.removeFile(filename);
-        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht gelesen werden.\nM\u00f6glicherweise wird das Format nicht unterst\u00fctzt.");
-        delete cr;
-        return nullptr;
+    if (!errorMessage.empty()) {
+        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", errorMessage.text());
     }
-
-    if (cr->blocks().front().type() != block_type::TYPE_VERSION)
-    {
-        recentFiles.removeFile(filename);
-        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei hat das falsche Format.");
-        delete cr;
-        return nullptr;
-    }
-
     return cr;
 }
 
@@ -1022,33 +1009,30 @@ datafile* CSMap::mergeFile(const FXString& filename)
     datafile* new_cr = new datafile;
     beginLoading(filename);
 
+    FXString errorMessage;
     try
     {
-        new_cr->load(filename.text());
+        if (!new_cr->load(filename.text(), errorMessage)) {
+            delete new_cr;
+            new_cr = nullptr;
+        }
     }
     catch(const std::runtime_error& err)
     {
         recentFiles.removeFile(filename);
-        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", (filename + ": " + FXString(err.what())).text());
+        errorMessage = FXString(filename) + ": " + FXString(err.what());
         delete new_cr;
-        return report;
+        new_cr = nullptr;
     }
 
-    if (new_cr->blocks().empty())
+    if (!errorMessage.empty())
     {
         recentFiles.removeFile(filename);
-        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s",
-        FXString(L"Die Datei konnte nicht gelesen werden.\nM\u00f6glicherweise wird das Format nicht unterst\u00fctzt.").text());
-        delete new_cr;
-        return report;
+        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", errorMessage.text());
     }
 
-    if (new_cr->blocks().front().type() != block_type::TYPE_VERSION)
-    {
-        recentFiles.removeFile(filename);
-        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei hat das falsche Format.");
-        delete new_cr;
-        return report;
+    if (new_cr == nullptr) {
+        return nullptr;
     }
 
     int turn = report->turn();
