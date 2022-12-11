@@ -2518,8 +2518,6 @@ long CSMap::onFileExportMap(FXObject*, FXSelector, void*)
 long CSMap::onFileClose(FXObject*, FXSelector, void*)
 {
     bool res = closeFile();
-    mapChange();
-    updateFileNames();
     return res ? 1 : 0;
 }
 
@@ -2545,6 +2543,8 @@ bool CSMap::closeFile()
     selection.selected = 0;
     delete report;
     report = nullptr;
+    mapChange();
+    updateFileNames();
     return true;
 }
 
