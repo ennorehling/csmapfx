@@ -175,9 +175,9 @@ CSMap::CSMap(FXApp *app) :
 
     setAutoReload(CSMap::reload_type::RELOAD_ASK);
     // create main window icon
-    FXIcon* ico = new FXICOIcon(app, data::csmap);
-    setMiniIcon(ico);
-    setIcon(ico);
+    appIcon = new FXICOIcon(app, data::csmap);
+    setMiniIcon(appIcon);
+    setIcon(appIcon);
 
     // activate Alt-F4
     getAccelTable()->addAccel(MKUINT(KEY_F4,ALTMASK),this, FXSEL(SEL_SIGNAL, ID_CLOSE));
@@ -694,6 +694,7 @@ CSMap::~CSMap()
     delete outputTabs;
 
     delete fontFixed;
+    delete appIcon;
 
     for (int i = 0; i < data::TERRAIN_LAST; i++)
         delete icons.terrain[i];

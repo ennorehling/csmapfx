@@ -223,6 +223,7 @@ private:
 
     // Fonts
     class FXFont* fontFixed = nullptr;
+    class FXIcon* appIcon = nullptr;
 
 	// Menubar
     class FXMenuBar		*menubar = nullptr;

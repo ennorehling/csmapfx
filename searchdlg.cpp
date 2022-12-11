@@ -129,6 +129,7 @@ void FXSearchDlg::create()
 
 FXSearchDlg::~FXSearchDlg()
 {
+    delete boldFont;
 }
 
 void FXSearchDlg::setMapFile(datafile *f)

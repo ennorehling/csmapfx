@@ -88,6 +88,7 @@ void FXCalculator::create()
 
 FXCalculator::~FXCalculator()
 {
+    delete closeIcon;
 }
 
 void FXCalculator::setMapFile(datafile *f) {
