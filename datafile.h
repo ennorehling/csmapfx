@@ -33,7 +33,7 @@ public:
 	int recruitment() const { return m_recruitment; }
 	datablock::itor activefaction() { return m_activefaction; }
 
-	int load(const char* filename);
+	bool load(const char* filename, FXString & outError);
 	int save(const char* filename, map_type map_filter);
 
     void removeTemporary();

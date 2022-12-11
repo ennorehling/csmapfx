@@ -53,58 +53,50 @@ int datafile::turn() const
 }
 
 // loads file, parses it and returns number of block
-int datafile::load(const char* filename)
+bool datafile::load(const char* filename, FXString & outError)
 {
-	if (!filename)
-		return 0;
-
-	FXString data;
+    std::ifstream file;
+    if (!filename) {
+        return false;
+    }
 
 	FXString filename_str = filename;
 	// load plain text CR
-	FXFileStream file;
-	file.open(filename,FXStreamLoad);
-	if (file.status() != FXStreamOK)
+	file.open(filename, std::ios::in);
+	if (!file.is_open())
 	{
-		throw std::runtime_error(FXString(L"Datei konnte nicht ge\u00f6ffnet werden.").text());
+		outError.assign(L"Datei konnte nicht ge\u00f6ffnet werden.");
+        return false;
 	}
 
-	FXString buffer;
-	buffer.length(1024*100+1);
-
-	do
-	{
-		memset(&buffer[0], 0, buffer.length());
-		file.load(&buffer[0], buffer.length()-1);
-		data.append(buffer.text());
-
-	} while(file.status() == FXStreamOK);
-		
-	file.close();
-
-	// ...
-
-	m_blocks.clear();
-	datablock *block = NULL, newblock;
-	datakey key;
+    m_blocks.clear();
+    
+    datablock* block = NULL, newblock;
+    datakey key;
     bool utf8 = true;
-	char *ptr, *next = &data[0];
+    FXchar buffer[1024];
+    size_t offset = strlen(UTF8BOM);
+    while (file.getline(buffer, sizeof(buffer) - 1))
+    {
+        char* str;
+        std::streamsize size = file.gcount();
+        buffer[size] = 0;
+        if (offset > 0)
+        {
+            // check for utf8 BOM: EF BB BF
+            if (strncmp(buffer, UTF8BOM, offset) != 0) {
+                offset = 0;
+            }
+        }
+        str = buffer + offset;
+        size -= offset;
+        str[size] = 0;
 
-	// check for utf8 BOM: EF BB BF
-	if (!strncmp(next, UTF8BOM, strlen(UTF8BOM))) {
-        next += strlen(UTF8BOM);
-	}
-
-	while(*(ptr = next))
-	{
-		// strip the line
-		next = getNextLine(ptr);
-
-		// erster versuch: enth\u00e4lt die Zeile einen datakey?
-		if (key.parse(ptr, block ? block->type() : block_type::TYPE_UNKNOWN, utf8))
-		{
-			if (block)
-			{
+        // erster versuch: enth\u00e4lt die Zeile einen datakey?
+        if (key.parse(str, block ? block->type() : block_type::TYPE_UNKNOWN, utf8))
+        {
+            if (block)
+            {
                 int terrain;
                 switch (key.type())
                 {
@@ -129,24 +121,40 @@ int datafile::load(const char* filename)
                 default:
                     block->data().push_back(key);			// appends "Value";Key - tags
                 }
-			}
-		}
-		// zweiter versuch: enth\u00e4lt die Zeile einen datablock-header?
-		else if (newblock.parse(ptr))
-		{
-			m_blocks.push_back(newblock);		// appends BLOCK Info - tags
-			block = &m_blocks.back();
-		}
+            }
+        }
+        // zweiter versuch: enth\u00e4lt die Zeile einen datablock-header?
+        else if (newblock.parse(str))
+        {
+            m_blocks.push_back(newblock);		// appends BLOCK Info - tags
+            block = &m_blocks.back();
+        }
         else if (block) {
             /* fix for a bug introduced by version 1.2.7 */
-            const char* semi = strchr(ptr, ';');
+            const char* semi = strchr(str, ';');
             if (semi) {
                 key.key(FXString(semi + 1), block->type());
-                key.value(FXString(ptr, semi - ptr));
+                key.value(FXString(str, semi - str));
                 block->data().push_back(key);
             }
         }
-	}
+
+        offset = 0;
+    }
+	file.close();
+
+    if (m_blocks.empty())
+    {
+        outError.assign("Die Datei konnte nicht gelesen werden.\nM\u00f6glicherweise wird das Format nicht unterst\u00fctzt.");
+        return false;
+    }
+
+    if (m_blocks.front().type() != block_type::TYPE_VERSION)
+    {
+        outError.assign("Die Datei hat das falsche Format.");
+        return false;
+    }
+
     createHashTables();
 	return m_blocks.size();
 }
