@@ -127,13 +127,14 @@ public:
 
 	void key(const FXString& s, enum block_type btype);
 	void value(const FXString& s);
+	void value(const FXchar * str, FXint length);
 
 	bool isInt() const { return (m_type & TYPE_INTEGER) != 0; }
 	int getInt() const;
 
 	// parses str and create datakey object
 	static int parseType(const FXString& type, enum block_type btype);
-	bool parse(char* str, enum block_type btype, bool isUtf8 = true);
+	bool parse(const char* str, enum block_type btype, bool isUtf8 = true);
 
 	typedef std::vector<datakey> list_type;
 	typedef list_type::iterator itor;
@@ -346,7 +347,7 @@ public:
 	static int parseTerrain(const FXString& str);			// Plains, Mountains, ... Volcano
 	static int parseSpecialTerrain(const FXString& str);	// Active volcano, ... (terrain that uses image of another terrain)
 	static FXString planeName(int plane);					// Eressea,Astralraum,Weihnachtsinsel...
-	bool parse(char* str);
+	bool parse(const char* str);
 
 
 protected:

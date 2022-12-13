@@ -31,6 +31,11 @@ void datakey::value(const FXString& s)
 	m_value = s;
 }
 
+void datakey::value(const FXchar* str, FXint length)
+{
+    m_value.assign(str, length);
+}
+
 int datakey::parseType(const FXString& type, enum block_type btype)
 {
     if (type.empty()) {
@@ -285,7 +290,7 @@ int datakey::getInt() const
 }
 
 // parses str and returns created datakey object or NULL pointer
-bool datakey::parse(char* str, enum block_type btype, bool isUtf8)
+bool datakey::parse(const char* str, enum block_type btype, bool isUtf8)
 {
 	if (!str)
 		return false;
@@ -294,11 +299,21 @@ bool datakey::parse(char* str, enum block_type btype, bool isUtf8)
 	while(*str && isspace(*str))
 		str++;
 
+    const char* begin = str;
+    int mask = 0;
 	// Ist die Zeile ein Tag?
-	if (*str != '\"' && *str != '-' && (*str < '0' || *str > '9'))
-        return false;		
+    if (*str == '\"') {
+        ++begin;
+    }
+    else if (*str == '-' || (*str >= '0' && *str <= '9')) {
+        mask = TYPE_INTEGER;
+    }
+    else {
+        return false;
+    }
 
-	char *srch = str, *semikolon = NULL;
+
+	const char *srch = str + 1, *semikolon = NULL;
 
 	for (; *srch; srch++)		// search for semicolon ';' in this line
 	{
@@ -310,79 +325,41 @@ bool datakey::parse(char* str, enum block_type btype, bool isUtf8)
 
 	// ok, so assign new values
 
-	if (semikolon)
-		key(semikolon+1, btype);			// ... and the FXString::operator=() copies the string itself.
-	else
-		key("", btype);					// no semikolon found.
-
-	if (*str == '\"')				// cuts the " at start and end of the string
-	{
-		str++;
-
-		if (semikolon)
-		{
-			if (semikolon[-1] == '\"')
-				semikolon--;
-		}
-		else
-		{
-			while (*srch == '\0' && srch > str)
-				srch--;
-
-			if (*srch == '\"')
-				*srch = '\0';
-		}
-	}
-	else
-		m_type |= TYPE_INTEGER;		// no "" found -> integer
-
-	if (semikolon)
-		*semikolon = '\0';			// 0 byte...
-	
-	/*
-	\\ ist ein \, \" ist ein ", einzelen " sind Anfang und Ende 
-	von Strings, \n ist ein Zeilenumbruch, (\x ist x, falls keine Sonderregel)
-	*/
-
-	int length;
-	if (semikolon)
-		length = semikolon - str;
-	else
-		length = srch - str;
-
-	if (length < 0)
-	{
-		value("");
-		return true;
-	}
-	
-	FXString val('\0', length+1);	// Speicherplatz reservieren
-
-	char *ptr = &val[0];
-	for (; *str; str++, ptr++)
-	{
-		if (*str == '\\')
-		{
-			str++;
-			if (*str == 'n')
-				*ptr = '\n';
-			else if (*str == '\0')
-				break;
-			else
-				*ptr = *str;
-		}
-		else
-			*ptr = *str;
-	}
-
-	val.length(ptr - &val[0]);
-	
-    if (!isUtf8) {
-        val = iso2utf(val);
+    if (semikolon) {
+        key(semikolon + 1, btype);			// ... and the FXString::operator=() copies the string itself.
     }
-	value(val);						// Wert speichern
-
-	return true;
+    else {
+        key("", btype);					// no semikolon found.
+    }
+    m_type |= mask;
+    const char* end = semikolon;
+    if (end) {
+        if (end > str && end[-1] == '\"')
+        {
+            --end;
+        }
+    }
+	else
+	{
+        end = srch - 1;
+        while (end > begin) {
+            --end;
+            if (*end == '\"') {
+                break;
+            }
+		}
+	}
+    if (end >= begin) {
+        FXint nsrc = (FXint)(end - begin);
+        if (isUtf8) {
+            value(begin, nsrc);
+        }
+        else {
+            value(iso2utf(begin, nsrc));
+        }
+        return true;
+    }
+    return false;
 }
 
 // =============================
@@ -567,47 +544,47 @@ const FXString datablock::terrainString() const
 	return FXStringFormat("Ebene %d", plane);
 }
 
-// parses str and returns created datablock object or NULL pointer
-bool datablock::parse(char* str)
+// try to parse str as a datablock header
+bool datablock::parse(const char* str)
 {
 	if (!str)
 		return false;
 
-	// skip indentation
+	// skip potential indentation
 	while (*str && isspace(*str))
 		str++;
 
 	if (*str < 'A' || *str > 'Z')
 		return false;
 
-	char* srch = str, *space = NULL;
+	const char* srch = str + 1, *space = NULL;
 
 	for (; *srch; srch++)
 	{
 		if (*srch == ' ' && !space)
 			space = srch;
 		
-		if (*srch == '\"' || *srch == ';')	// can't be a '\"' or ';'
+		if (*srch == '\"' || *srch == ';')	// block headers cannot contain '\"' or ';'
 			return false;
 	}
 
 	// unset flags
 	flags(FLAG_NONE);
 
-	if (space)
+    if (space)
 	{
-		*space++ = '\0';
-		infostr(space);
+        FXString name(str, space - str);
+        string(name);
+		infostr(FXString(space + 1));
 	}
-	else
-		infostr(FXString_Empty);
-
-	string(str);
+    else {
+        string(FXString(str));
+        infostr(FXString_Empty);
+    }
 
 	// unset all other states
 	terrain(data::TERRAIN_UNKNOWN);
-	// depth(0);
-	attachment(NULL);
+	attachment(nullptr);
 	return true;
 }
 

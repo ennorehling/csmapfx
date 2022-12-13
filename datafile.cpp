@@ -74,78 +74,77 @@ bool datafile::load(const char* filename, FXString & outError)
     datablock* block = NULL, newblock;
     datakey key;
     bool utf8 = true;
-    FXchar buffer[1024];
     size_t offset = strlen(UTF8BOM);
-    while (file.getline(buffer, sizeof(buffer) - 1))
+    int line_no = 0;
+    while (!file.eof())
     {
-        char* str;
-        std::streamsize size = file.gcount();
-        buffer[size] = 0;
-        if (offset > 0)
-        {
-            // check for utf8 BOM: EF BB BF
-            if (strncmp(buffer, UTF8BOM, offset) != 0) {
-                offset = 0;
-            }
-        }
-        str = buffer + offset;
-        size -= offset;
-        str[size] = 0;
-
-        // erster versuch: enth\u00e4lt die Zeile einen datakey?
-        if (key.parse(str, block ? block->type() : block_type::TYPE_UNKNOWN, utf8))
-        {
-            if (block)
+        std::string line;
+        ++line_no;
+        if (std::getline(file, line)) {
+            const char* str, * buffer = line.c_str();
+            if (offset > 0)
             {
-                int terrain;
-                switch (key.type())
+                // check for utf8 BOM: EF BB BF
+                if (strncmp(buffer, UTF8BOM, offset) != 0) {
+                    offset = 0;
+                }
+            }
+            str = buffer + offset;
+
+            // erster versuch: enth\u00e4lt die Zeile einen datakey?
+            if (key.parse(str, block ? block->type() : block_type::TYPE_UNKNOWN, utf8))
+            {
+                if (block)
                 {
-                case TYPE_CHARSET:
-                    if (utf8 && key.value() != "UTF-8")
+                    int terrain;
+                    switch (key.type())
                     {
-                        utf8 = false;
+                    case TYPE_CHARSET:
+                        if (utf8 && key.value() != "UTF-8")
+                        {
+                            utf8 = false;
+                        }
+                        break;
+                    case TYPE_TERRAIN:
+                        terrain = datablock::parseTerrain(key.value());
+
+                        if (terrain == data::TERRAIN_UNKNOWN)
+                        {
+                            block->data().push_back(key);		// need textual representation of terrain type
+
+                            terrain = datablock::parseSpecialTerrain(key.value());
+                        }
+
+                        block->terrain(terrain);
+                        break;
+                    default:
+                        block->data().push_back(key);			// appends "Value";Key - tags
                     }
-                    break;
-                case TYPE_TERRAIN:
-                    terrain = datablock::parseTerrain(key.value());
-
-                    if (terrain == data::TERRAIN_UNKNOWN)
-                    {
-                        block->data().push_back(key);		// need textual representation of terrain type
-
-                        terrain = datablock::parseSpecialTerrain(key.value());
-                    }
-
-                    block->terrain(terrain);
-                    break;
-                default:
-                    block->data().push_back(key);			// appends "Value";Key - tags
+                }
+            }
+            // zweiter versuch: enth\u00e4lt die Zeile einen datablock-header?
+            else if (newblock.parse(str))
+            {
+                m_blocks.push_back(newblock);		// appends BLOCK Info - tags
+                block = &m_blocks.back();
+            }
+            else if (block) {
+                /* fix for a bug introduced by version 1.2.7 */
+                const char* semi = strchr(str, ';');
+                if (semi) {
+                    key.key(FXString(semi + 1), block->type());
+                    key.value(FXString(str, semi - str));
+                    block->data().push_back(key);
                 }
             }
         }
-        // zweiter versuch: enth\u00e4lt die Zeile einen datablock-header?
-        else if (newblock.parse(str))
-        {
-            m_blocks.push_back(newblock);		// appends BLOCK Info - tags
-            block = &m_blocks.back();
-        }
-        else if (block) {
-            /* fix for a bug introduced by version 1.2.7 */
-            const char* semi = strchr(str, ';');
-            if (semi) {
-                key.key(FXString(semi + 1), block->type());
-                key.value(FXString(str, semi - str));
-                block->data().push_back(key);
-            }
-        }
-
         offset = 0;
     }
 	file.close();
 
     if (m_blocks.empty())
     {
-        outError.assign("Die Datei konnte nicht gelesen werden.\nM\u00f6glicherweise wird das Format nicht unterst\u00fctzt.");
+        outError.assign(L"Die Datei konnte nicht gelesen werden.\nM\u00f6glicherweise wird das Format nicht unterst\u00fctzt.");
         return false;
     }
 

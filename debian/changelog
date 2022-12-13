@@ -1,3 +1,10 @@
+csmapfx (1.4.22-1) stable; urgency=low
+
+  * restore unlimited line length in reports
+  * fix encoding in an error message 
+
+ -- Enno Rehling <enno@eressea.de>  Tue, 13 Dec 2022 18:15:00 +0200
+
 csmapfx (1.4.21-1) stable; urgency=low
 
   * deal with malformed report files

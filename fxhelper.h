@@ -24,17 +24,18 @@ T* end(T (&array)[size])
 // --------------------------------------
 FX::FXString utf2iso(const FX::FXString& s);
 FX::FXString iso2utf(const FX::FXString& s);
+FX::FXString iso2utf(const FXchar* src, FXint nsrc);
 
 // flatten strings: Removed spaces,
 // german umlauts to ae,oe,ue,ss and
 // all letters to lower case.
 // ---------------------------------
 std::string flatten(const std::string& str);
-FXString flatten(const FXString& str);
+FX::FXString flatten(const FX::FXString& str);
 
 // Small error functions
 // ---------------------
-void showError(const FXString& str);
+void showError(const FX::FXString& str);
 void showError(const std::string& str);
 
 // FXString operator<<

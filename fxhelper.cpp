@@ -27,6 +27,13 @@ FX::FXString iso2utf(const FX::FXString& s)
 	return codec.mb2utf(s);
 }
 
+FX::FXString iso2utf(const FXchar * src, FXint nsrc)
+{
+	static FX::FX88591Codec codec;
+
+	return codec.mb2utf(src, nsrc);
+}
+
 // flatten strings: Removed spaces,
 // german umlauts to ae,oe,ue,ss and
 // all letters to lower case.
@@ -54,9 +61,9 @@ std::string flatten(const std::string& str)
 	return out;
 }
 
-FXString flatten(const FXString& str)
+FX::FXString flatten(const FX::FXString& str)
 {
-	FXString out;
+    FX::FXString out;
 
 	for (int i = 0; i < str.length(); i = str.inc(i))
 	{
@@ -79,7 +86,7 @@ FXString flatten(const FXString& str)
 
 // Small error function
 // --------------------
-void showError(const FXString& str)
+void showError(const FX::FXString& str)
 {
 #ifdef WIN32
 	FXMessageBox::information(FXApp::instance(), MBOX_OK, CSMAP_APP_TITLE, str.text());
