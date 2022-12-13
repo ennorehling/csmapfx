@@ -341,9 +341,7 @@ bool datakey::parse(const char* str, enum block_type btype, bool isUtf8)
     }
 	else
 	{
-        end = srch - 1;
-        while (end > begin) {
-            --end;
+        for (end = srch - 1;  end >= begin; --end) {
             if (*end == '\"') {
                 break;
             }

@@ -1,3 +1,9 @@
+csmapfx (1.4.23-1) stable; urgency=high
+
+  * bugfix: empty list blocks
+
+ -- Enno Rehling <enno@eressea.de>  Tue, 13 Dec 2022 18:30:00 +0200
+
 csmapfx (1.4.22-1) stable; urgency=low
 
   * restore unlimited line length in reports
