@@ -1,3 +1,9 @@
+csmapfx (1.4.24) stable; urgency=high
+
+  * calculator: do not show large numbers in scientific notation
+
+ -- Enno Rehling <enno@eressea.de>  Wed, 14 Dec 2022 13:00:00 +0200
+
 csmapfx (1.4.23-1) stable; urgency=high
 
   * bugfix: empty list blocks
