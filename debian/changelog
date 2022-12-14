@@ -1,4 +1,4 @@
-csmapfx (1.4.24) stable; urgency=high
+csmapfx (1.4.24-dev) stable; urgency=low
 
   * calculator: do not show large numbers in scientific notation
 
