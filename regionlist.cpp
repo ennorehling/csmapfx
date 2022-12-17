@@ -288,7 +288,7 @@ long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* p
         sel_state.map = sel_state.MAPCHANGED;
         getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
     }
-	return 1;  
+	return 1;
 }
 
 long FXRegionList::onUpdateOwnFactionGroup(FXObject* sender, FXSelector, void* ptr)
@@ -297,22 +297,16 @@ long FXRegionList::onUpdateOwnFactionGroup(FXObject* sender, FXSelector, void* p
 	return 1;
 }
 
-long FXRegionList::onToggleUnitColors(FXObject *sender, FXSelector, void *ptr)
+long FXRegionList::onToggleUnitColors(FXObject *sender, FXSelector sel, void *ptr)
 {
     colorized_units = !colorized_units;
 
-    if (mapFile) {
-        update();
-    }
-
-    return 1;
+    return onUpdateUnitColors(sender, sel, ptr);
 }
 
 long FXRegionList::onUpdateUnitColors(FXObject* sender, FXSelector, void* ptr)
 {
-    if (mapFile) {
-        sender->handle(this, FXSEL(SEL_COMMAND, colorized_units ? ID_CHECK : ID_UNCHECK), NULL);
-    }
+    sender->handle(this, FXSEL(SEL_COMMAND, colorized_units ? ID_CHECK : ID_UNCHECK), NULL);
 	return 1;
 }
 
