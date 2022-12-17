@@ -179,16 +179,12 @@ void FXStatsInfos::collectData(std::vector<Info>& info, datablock::itor region)
 
     if (mapFile) {
         // search income messages for this region
-        datablock::itor faction, block, end = mapFile->blocks().end();
-        if (selection.map & selection.ACTIVEFACTION)
-        {
-            block = faction = selection.activefaction;
-            if (block != end)
-                block++;
+        datablock::itor faction, end = mapFile->blocks().end();
+        datablock::itor block = faction = mapFile->activefaction();
+        if (block != end) {
+            block++;
         }
-        else
-            faction = block = end;
-
+    
         /*
             modes:
             0: misc
@@ -330,8 +326,6 @@ long FXStatsInfos::onMapChange(FXObject*, FXSelector, void* ptr)
 	if (selection.fileChange != pstate->fileChange)
 	{
 		selection.fileChange = pstate->fileChange;
-		selection.map = pstate->map;
-		selection.activefaction = pstate->activefaction;
 
 		needUpdate = true;
 	}

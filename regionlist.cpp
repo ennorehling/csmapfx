@@ -285,7 +285,7 @@ long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* p
                 sel_state.selected &= ~sel_state.FACTION;
             }
         }
-        sel_state.map = sel_state.MAPCHANGED;
+        sel_state.fileChange++;
         getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
     }
 	return 1;
@@ -597,8 +597,6 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 	{
         getApp()->beginWaitCursor();
         selection.fileChange = pstate->fileChange;
-		selection.map = pstate->map;
-		selection.activefaction = pstate->activefaction;
 
 		// clear list and build a new one from data in this->files
 		clearItems();
@@ -662,7 +660,7 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                             if (factionId >= 0 && mapFile->getFaction(faction, factionId)) {
                                 facPtr = &*faction;
 
-                                if (faction->info() == selection.activefaction->info()) {
+                                if (faction->info() == mapFile->getFactionId()) {
                                     icon = blue;
                                 }
                                 name = faction->value(TYPE_FACTIONNAME);
@@ -687,27 +685,23 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                                 label.assign("Parteigetarnt");
                             }
                         }
-                        if (selection.map & selection.ACTIVEFACTION)
+                        datablock::itor block = mapFile->activefaction();
+                        for (block++; block != mapFile->blocks().end(); block++)
                         {
-                            datablock::itor block = selection.activefaction;
-                            for (block++; block != mapFile->blocks().end(); block++)
-                            {
-                                if (block->type() != block_type::TYPE_ALLIANCE &&
-                                    block->type() != block_type::TYPE_ITEMS &&
-                                    block->type() != block_type::TYPE_OPTIONS &&
-                                    block->type() != block_type::TYPE_GROUP)
-                                    break;
+                            if (block->type() != block_type::TYPE_ALLIANCE &&
+                                block->type() != block_type::TYPE_ITEMS &&
+                                block->type() != block_type::TYPE_OPTIONS &&
+                                block->type() != block_type::TYPE_GROUP)
+                                break;
 
-                                if (block->type() != block_type::TYPE_ALLIANCE)
-                                    continue;
+                            if (block->type() != block_type::TYPE_ALLIANCE)
+                                continue;
 
-                                if (block->info() != factionId)
-                                    continue;
+                            if (block->info() != factionId)
+                                continue;
 
-                                // change icon to green, if alliance status to faction is set
-                                icon = green;
-                            }
-
+                            // change icon to green, if alliance status to faction is set
+                            icon = green;
                         }
 
                         // add region only if it has units in it
@@ -721,11 +715,7 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                     }
                 }
 
-                FXTreeItem *act_faction = NULL;
-                if (selection.map & selection.ACTIVEFACTION)
-                {
-                    act_faction = factions[selection.activefaction->info()];
-                }
+                FXTreeItem *act_faction = factions[mapFile->getFactionId()];
 
                 unit = iblock;
                 for (unit++; unit != iend && unit->depth() > iblock->depth(); unit++)

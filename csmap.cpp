@@ -921,9 +921,8 @@ void CSMap::mapChange()
     datafile::SelectionState state = selection;
     if (report == nullptr) {
         state.selected = 0;
-        state.map = 0;
     }
-    state.map |= state.MAPCHANGED;
+    state.fileChange++;
 
     if (!(state.selected & (state.REGION|state.UNKNOWN_REGION)))
     {
@@ -972,10 +971,7 @@ bool CSMap::haveActiveFaction() const
     if (!report)
         return false;
 
-    if (!(selection.map & selection.ACTIVEFACTION))
-        return false;
-
-    return true;
+    return report->getFactionId() != 0;
 }
 
 datafile* CSMap::loadFile(const FXString& filename)
@@ -1075,7 +1071,7 @@ bool CSMap::loadCommands(const FXString& filename)
     if (filename.empty() || !report)
         return false;
 
-    if (!(selection.map & selection.ACTIVEFACTION))
+    if (!haveActiveFaction())
         return false;
 
     try
@@ -1117,7 +1113,7 @@ bool CSMap::saveCommands(const FXString &filename, bool stripped)
     if (filename.empty() || !report)
         return false;
 
-    if (!(selection.map & selection.ACTIVEFACTION))
+    if (!haveActiveFaction())
         return false;
 
     FXint res = report->saveCmds(filename.text(), settings.password, stripped);    // nicht \u00fcberschreiben
@@ -1803,8 +1799,9 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     ++selection.selChange;
 
     // file change notification
-    if (pstate->map & selection.MAPCHANGED)
+    if (pstate->fileChange != selection.fileChange)
     {
+        selection.fileChange = pstate->fileChange;
         // notify info dialog of new game type
         FXString name_of_game;
         if (report) {
@@ -1814,10 +1811,6 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
             name_of_game = "default";
 
         infodlg->setGame(name_of_game);
-
-        // store flags
-        selection.fileChange++;
-        selection.map = pstate->map & ~(selection.ACTIVEFACTION | selection.MAPCHANGED | selection.NEWFILE);
 
         // delete all planes except default
         planes->clearItems();        // clear planes
@@ -1886,12 +1879,8 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
             planes->setNumVisible(planes->getNumItems());
 
             // get info about active faction
-            if (report->activefaction() != report->blocks().end()) {
+            if (report->getFactionId() != 0) {
                 datablock::itor block = report->activefaction();
-
-                // set first faction in file to active faction
-                selection.map |= selection.ACTIVEFACTION;
-                selection.activefaction = block;
 
                 // write faction statistics into faction menu
                 FXString name = block->value(TYPE_FACTIONNAME);
@@ -1986,7 +1975,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         }
 
         // enable/disable FACTION menu
-        if (selection.map & selection.ACTIVEFACTION)
+        if (haveActiveFaction())
         {
             if (!menu.faction->isEnabled())
                 menu.faction->enable();
@@ -2100,6 +2089,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         selection.sel_plane = selection.region->info();
     }
 
+    int factionId = 0;
     if (report) {
         int turn = report->turn();
         status_turn->setText(FXStringVal(turn));
@@ -2109,6 +2099,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         status_date->setText(date);
         status_date->show();
         status_ldate->show();
+        factionId = report->getFactionId();
     }
     else {
         status_turn->hide();
@@ -2121,11 +2112,12 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     }
 
     // update faction name in status bar
-    if (selection.map & selection.ACTIVEFACTION)
+    if (factionId > 0)
     {
         // update statusbar
-        FXString faction; faction.format("%s (%s)", selection.activefaction->value(TYPE_FACTIONNAME).text(),
-            selection.activefaction->id().text());
+        FXString faction;
+        faction.format("%s (%s)", report->activefaction()->value(TYPE_FACTIONNAME).text(),
+            FXStringValEx(factionId, 36).text());
 
         status_faction->setText(faction);
         status_faction->show();
@@ -2373,7 +2365,6 @@ void CSMap::loadFiles(const FXString filenames[])
         }
         ++selection.fileChange;
         // rebuild the resulting report
-        selection.selected |= selection.MAPCHANGED;
         mapChange();
         updateFileNames();
         checkCommands();
@@ -2647,7 +2638,10 @@ long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
     if (!report)
         return 0;
 
-    FXString id = report->activefaction()->id();
+    int factionId = report->getFactionId();
+    if (factionId == 0)
+        return 0;
+    FXString id = FXStringValEx(factionId, 36);
     FXString passwd = askPasswordDlg(id);
     if (u_mkstemp(infile) && report->saveCmds(infile, passwd, true) == 0) {
         CURL *ch;
@@ -2760,7 +2754,10 @@ void CSMap::saveCommandsDlg(bool stripped, bool replace)
     if (!report)
         return;
 
-    FXString id = report->activefaction()->id();
+    int factionId = report->getFactionId();
+    if (factionId == 0)
+        return;
+    FXString id = FXStringValEx(factionId, 36);
     FXString filename = report->cmdfilename();
     FXString passwd = askPasswordDlg(id);
 
@@ -3189,8 +3186,7 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 
     datafile::SelectionState state = selection;
     state.selected &= ~state.MULTIPLE_REGIONS;
-
-    state.map |= state.MAPCHANGED;        // Datei wurde ge\u00e4ndert
+    state.fileChange++;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
     return 1;
 }

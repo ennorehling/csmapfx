@@ -183,10 +183,10 @@ void FXRegionInfos::collectData(std::vector<Info>& info, datablock::itor region)
 	if (Rekruten >= 0) addEntry(info, "Rekruten", Rekruten, 0, FXString(L"Anzahl der m\u00f6glichen Rekruten"));
 	if (Pferde >= 0) addEntry(info, "Pferde", Pferde, 0, "Anzahl Pferde");
 
-	int factionId = -1;
+	int factionId = 0;
 	bool myfaction = false;
-	if (selection.map & selection.ACTIVEFACTION)
-		factionId = selection.activefaction->info();
+	if (mapFile)
+		factionId = mapFile->getFactionId();
 
 	FXint Personen = 0, Parteipersonen = 0;
 	FXint Parteisilber = 0;
@@ -377,9 +377,6 @@ long FXRegionInfos::onMapChange(FXObject*, FXSelector, void* ptr)
 	if (selection.fileChange != pstate->fileChange)
 	{
 		selection.fileChange = pstate->fileChange;
-		selection.map = pstate->map;
-		selection.activefaction = pstate->activefaction;
-
 		needUpdate = true;
 	}
 

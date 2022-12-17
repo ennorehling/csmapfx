@@ -31,6 +31,7 @@ public:
 
     int turn() const;
 	int recruitment() const { return m_recruitment; }
+    int getFactionId() const { return m_factionId; }
 	datablock::itor activefaction() { return m_activefaction; }
 
 	bool load(const char* filename, FXString & outError);
@@ -44,7 +45,6 @@ public:
 	int saveCmds(const FXString &filename, const FXString &passwd, bool stripped);
 
     FXString getPassword() const { return m_password; }
-    int getFactionId() const { return m_factionId; }
 
 	datablock::list_type& blocks() { return m_blocks; }
 
@@ -70,7 +70,6 @@ public:
 	struct SelectionState
 	{
         int selected;			// flags; what iterator contains valid information?
-		int map;				// flags that indicate map states
 
 		datablock::itor region, faction, building, ship, unit;
 
@@ -78,8 +77,6 @@ public:
 
 		std::set<datablock*> regionsSelected;
         //Selection regionsSelected;
-
-		datablock::itor activefaction;
 
         int selChange, fileChange;	// incremented on changes to any datafile (loaded, closed or changed)
 
@@ -97,16 +94,8 @@ public:
 			CONFIRMED = (1<<8),
 		};
 
-		// map flags
-		enum
-		{
-			ACTIVEFACTION = (1<<0),
-			MAPCHANGED = (1<<1),
-			NEWFILE = (1<<2)
-		};
-
 		// mini-c'tor
-		SelectionState() : selected(0), map(0), sel_x(0), sel_y(0), sel_plane(0), selChange(0), fileChange(0) {}
+		SelectionState() : selected(0), sel_x(0), sel_y(0), sel_plane(0), selChange(0), fileChange(0) {}
         SelectionState(const SelectionState& state) {
             sel_x = state.sel_x;
             sel_y = state.sel_y;
@@ -120,7 +109,6 @@ public:
             building = state.building;
             ship = state.ship;
             unit = state.unit;
-            map = state.map;
             regionsSelected = state.regionsSelected;
             selected = state.selected;
         }

@@ -885,8 +885,8 @@ long FXCSMap::onLeftButtonRelease(FXObject* /*sender*/, FXSelector /*sel*/, void
 
 			datafile::SelectionState state = selection;
 			state.selected &= ~(state.REGION|state.UNKNOWN_REGION);
-			state.map |= state.MAPCHANGED;
-			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+            state.fileChange++;
+            getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 		}
 		return 1;
 	}
@@ -1229,7 +1229,7 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
                     mapFile->rebuildIslands();
 
                     datafile::SelectionState state = selection;
-					state.map |= state.MAPCHANGED;
+                    state.fileChange++;
 					getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 				}
 				return 1;
@@ -1271,7 +1271,7 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
                         mapFile->rebuildIslands();
 
 						datafile::SelectionState state = selection;
-						state.map |= state.MAPCHANGED;
+                        state.fileChange++;
 						getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 					}
 					return 1;
@@ -1306,7 +1306,7 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 
 						// map changed
 						datafile::SelectionState state = selection;
-						state.map |= state.MAPCHANGED;
+                        state.fileChange++;
 						getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 					}
 					return 1;
@@ -1429,7 +1429,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 
 		datafile::SelectionState state = selection;
 		state.selected &= ~(state.REGION|state.UNKNOWN_REGION);
-		state.map |= state.MAPCHANGED;
+        state.fileChange++;
 		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
 	}
 
@@ -2005,7 +2005,6 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 	if (selection.fileChange != pstate->fileChange)
 	{
 		selection.fileChange = pstate->fileChange;
-		selection.map = pstate->map;
 
 		datachanged = true;
 	}

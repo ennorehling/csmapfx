@@ -31,6 +31,7 @@ set (CPARSE_SOURCES
 )
 
 set (SOURCES
+  ${PLATFORM_SOURCES}
   ${CPARSE_SOURCES}
 	calc.cpp
 	commands.cpp
