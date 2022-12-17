@@ -61,7 +61,8 @@ set (SOURCES
 )
 
 if (WIN32)
-add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
+set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/version.rc")
+add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${APP_ICON_RESOURCE_WINDOWS})
 else (WIN32)
 add_executable(${PROJECT_NAME} ${SOURCES})
 endif (WIN32)
