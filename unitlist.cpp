@@ -529,7 +529,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                 prependItem(nullptr, node)->setExpanded(true);
 
 				// list unhandled keys
-				for (std::vector<datakey::list_type::const_iterator>::iterator& itag = unhandled.begin(); itag != unhandled.end(); ++itag)
+				for (std::vector<datakey::list_type::const_iterator>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
 				{
                     const datakey::list_type::const_iterator t = *itag;
                     datablock* owner_block = nullptr;
@@ -678,7 +678,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				}
 
 				// list unhandled keys
-				for (std::vector<datakey::list_type::const_iterator>::iterator& itag = unhandled.begin(); itag != unhandled.end(); ++itag)
+				for (std::vector<datakey::list_type::const_iterator>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
 				{
                     datakey::list_type::const_iterator t = *itag;
                     if (t->type() == TYPE_CAPTAIN) {
