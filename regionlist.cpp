@@ -630,7 +630,7 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                 FXTreeItem *region = NULL;
                 FXString regionlabel = label;
 
-                std::map<FXint, FXTreeItem *> factions;
+                std::map<FXint, FXRegionItem *> factions;
 
                 datablock::itor iend = mapFile->blocks().end();
                 datablock::itor unit = iblock;
@@ -644,50 +644,82 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                     const datablock* unitPtr = &*unit;
                     int factionId = mapFile->getFactionIdForUnit(unitPtr);
                     label = mapFile->getFactionName(factionId);
-                    FXTreeItem *&entry = factions[factionId];
+                    FXRegionItem*&entry = factions[factionId];
                     if (!entry)
                     {
                         FXIcon* icon = red;
                         datablock* facPtr = nullptr;
-                        if (factionId == mapFile->getFactionId()) {
-                            icon = blue;
-                        }
-                        else if (factionId < 0) {
+                        if (factionId == (int)datafile::special_faction::ANONYMOUS) {
                             icon = gray;
                         }
+                        else if (factionId == (int)datafile::special_faction::TRAITOR) {
+                            icon = red;
+                        }
                         else {
-                            datablock::itor block = mapFile->activefaction();
-                            for (block++; block != mapFile->blocks().end(); ++block)
-                            {
-                                if (block->type() != block_type::TYPE_ALLIANCE &&
-                                    block->type() != block_type::TYPE_ITEMS &&
-                                    block->type() != block_type::TYPE_OPTIONS &&
-                                    block->type() != block_type::TYPE_GROUP)
+                            datablock::itor faction;
+                            if (mapFile->getFaction(faction, factionId)) {
+                                facPtr = &*faction;
+                            }
+                            if (factionId == mapFile->getFactionId()) {
+                                icon = blue;
+                            }
+                            else {
+                                datablock::itor block = mapFile->activefaction();
+                                for (block++; block != mapFile->blocks().end(); ++block)
+                                {
+                                    if (block->type() != block_type::TYPE_ALLIANCE &&
+                                        block->type() != block_type::TYPE_ITEMS &&
+                                        block->type() != block_type::TYPE_OPTIONS &&
+                                        block->type() != block_type::TYPE_GROUP)
+                                        break;
+
+                                    if (block->type() != block_type::TYPE_ALLIANCE)
+                                        continue;
+
+                                    if (block->info() != factionId)
+                                        continue;
+
+                                    // change icon to green, if alliance status to faction is set
+                                    icon = green;
                                     break;
-
-                                if (block->type() != block_type::TYPE_ALLIANCE)
-                                    continue;
-
-                                if (block->info() != factionId)
-                                    continue;
-
-                                // change icon to green, if alliance status to faction is set
-                                icon = green;
-                                break;
+                                }
                             }
                         }
                         // add region only if it has units in it
-                        if (!region)
+                        if (!region) {
                             region = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], &*iblock));
+                        }
 
-                        if (icon == blue)
-                            entry = prependItem(region, new FXRegionItem(label, icon, icon, facPtr));
-                        else
-                            entry = appendItem(region, new FXRegionItem(label, icon, icon, facPtr));
+                        entry = new FXRegionItem(label, icon, icon, facPtr);
+                        entry->isBold();
                     }
                 }
 
-                FXTreeItem *act_faction = factions[mapFile->getFactionId()];
+                FXTreeItem* act_faction = nullptr;
+                if (!factions.empty()) {
+                    FXTreeItem* ins_faction = nullptr;
+                    for (auto& val : factions) {
+                        FXRegionItem* entry = val.second;
+                        FXTreeItem* ins = nullptr;
+                        if (entry->getOpenIcon() == blue) {
+                            act_faction = prependItem(region, entry);
+                        }
+                        else if (val.first < 0) {
+                            ins = appendItem(region, entry);
+                        }
+                        else {
+                            if (ins_faction == nullptr) {
+                                ins = appendItem(region, entry);
+                            }
+                            else {
+                                insertItem(ins_faction, region, entry);
+                            }
+                        }
+                        if (ins && !ins_faction) {
+                            ins_faction = ins;
+                        }
+                    }
+                }
 
                 unit = iblock;
                 for (unit++; unit != iend && unit->depth() > iblock->depth(); unit++)

@@ -316,23 +316,25 @@ namespace
 	{
 		if (block->type() != block_type::TYPE_UNIT)
 			return false;
-
+        const datablock* unitPtr = &*block;
 		const compare_func_t& compare = context.compare;
 
-		if (compare(block->value(TYPE_NAME)))
+		if (compare(unitPtr->value(TYPE_NAME)))
 			return true;
 
         // compare descriptions?
-		if (context.searchDescriptions && compare(block->value(TYPE_DESCRIPTION)))
+		if (context.searchDescriptions && compare(unitPtr->value(TYPE_DESCRIPTION)))
 			return true;
 
         // compare faction names?
         if (context.searchFactions) {
             datablock::itor faction;
-            int fac_id = block->valueInt(TYPE_FACTION);
-            if (fac_id > 0 && context.report->getFaction(faction, fac_id)) {
-                return compare(faction->value(TYPE_FACTIONNAME)) || context.compare_icase(FXStringValEx(fac_id, 36));
+            int fac_id = context.report->getFactionIdForUnit(unitPtr);
+            if (context.compare_icase(FXStringValEx(fac_id, 36))) {
+                return true;
             }
+            const FXString& fac_name = context.report->getFactionName(fac_id);
+            return compare(fac_name);
         }
 		return false;
 	}

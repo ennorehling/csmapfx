@@ -135,7 +135,7 @@ bool datafile::load(const char* filename, FXString & outError)
             }
             str = buffer + offset;
 
-            // erster versuch: enth\u00e4lt die Zeile einen datakey?
+            // erster versuch: enthaelt die Zeile einen datakey?
             if (key.parse(str, block ? block->type() : block_type::TYPE_UNKNOWN, utf8))
             {
                 if (block)
@@ -166,7 +166,7 @@ bool datafile::load(const char* filename, FXString & outError)
                     }
                 }
             }
-            // zweiter versuch: enth\u00e4lt die Zeile einen datablock-header?
+            // zweiter versuch: enthaelt die Zeile einen datablock-header?
             else if (newblock.parse(str))
             {
                 m_blocks.push_back(newblock);		// appends BLOCK Info - tags
@@ -1043,7 +1043,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 			}
 
 			// unit has command block
-			//  EINHEIT wz5t;  Botschafter des Konzils [1,146245$,Beqwx(1/3)] k\u00e4mpft nicht
+			//  EINHEIT wz5t;  Botschafter des Konzils [1,146245$,Beqwx(1/3)] kaempft nicht
 
 			att_commands* attcmds = dynamic_cast<att_commands*>(cmdb->attachment());
 			if (attcmds && !attcmds->header.empty())
@@ -1510,18 +1510,8 @@ void datafile::createHashTables()
 			{
 				region->setFlags(region_own ? datablock::FLAG_REGION_SEEN : 0);
 
-				int own_log = 0, ally_log = 0, enemy_log = 0;
-
-				while (region_own)
-					own_log++, region_own /= 2;
-
-				while (region_ally)
-					ally_log++, region_ally /= 2;
-
-				while (region_enemy)
-					enemy_log++, region_enemy /= 2;
-
-				if (own_log) own_log++;		// f\u00fcr st\u00e4rkere Auspr\u00e4gung
+                int own_log = (int)log2(region_own), ally_log = (int)log2(region_ally), enemy_log = (int)log2(region_enemy);
+                if (own_log) own_log++;		// fuer staerkere Auspraegung
 				if (ally_log) ally_log++;
 				if (enemy_log) enemy_log++;
 
@@ -1669,43 +1659,44 @@ void datafile::createHashTables()
 		{
 			if (block->type() == block_type::TYPE_UNIT)
 			{
-				region->setFlags(datablock::FLAG_TROOPS);			// region has units
+                const datablock* unitPtr = &*block;
+                region->setFlags(datablock::FLAG_TROOPS);			// region has units
 
 				// count persons
 				int number = block->valueInt(TYPE_NUMBER, 0);
 
-				enum
+				enum class owner_t
 				{
 					UNIT_ENEMY,
 					UNIT_OWN,
 					UNIT_ALLY,
-				} owner = UNIT_ENEMY;
+				} owner = owner_t::UNIT_ENEMY;
 
-				if (m_factionId > 0)
+				if (m_factionId != 0)
 				{
-					int factionId = block->valueInt(TYPE_FACTION, -1);
-					if (factionId == m_factionId)
+					int factionId = getFactionIdForUnit(unitPtr);
+                    if (factionId <= 0)
+                    {
+                        region_enemy += number;
+                        owner = owner_t::UNIT_ENEMY;
+                    }
+                    else if (factionId == m_factionId)
 					{
 						region_own += number;
-						owner = UNIT_OWN;
+						owner = owner_t::UNIT_OWN;
 					}
 					else if (allied_status[factionId] != 0)
 					{
 						region_ally += number;
-						owner = UNIT_ALLY;
-					}
-					else
-					{
-						region_enemy += number;
-						owner = UNIT_ENEMY;
+						owner = owner_t::UNIT_ALLY;
 					}
 				}
 
 				if (block->valueInt("bewacht") == 1)
 				{
-					if (owner == UNIT_OWN)
+					if (owner == owner_t::UNIT_OWN)
 						region->setFlags(datablock::FLAG_GUARD_OWN);
-					else if (owner == UNIT_ALLY)
+					else if (owner == owner_t::UNIT_ALLY)
 						region->setFlags(datablock::FLAG_GUARD_ALLY);
 					else
 						region->setFlags(datablock::FLAG_GUARD_ENEMY);
