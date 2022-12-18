@@ -79,7 +79,9 @@ FXString datafile::getFactionName(int factionId)
                 name.format("Partei %s (%s)", fid.text(), fid.text());
             }
             else {
-                name.format("%s (%s)", name.text(), fid.text());
+                name += " (";
+                name += fid;
+                name += ')';
             }
         }
     }

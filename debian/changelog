@@ -1,3 +1,9 @@
+csmapfx (1.4.26-2) stable; urgency=low
+
+  * faction names were broken.
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 18 Dec 2022 22:45:00 +0200
+
 csmapfx (1.4.26-1) stable; urgency=low
 
   * show units that pretend to be us as traitors.
