@@ -53,19 +53,19 @@ protected:
     datafile *mapFile;
 
 	FXIcon			*terrainIcons[data::TERRAIN_LAST];
-	FXIcon			*green, *red, *blue, *cyan, *yellow, *orange, *gray, *black;
+	FXIcon			*green = nullptr, *red = nullptr, *blue = nullptr, *cyan = nullptr, *yellow = nullptr, *orange = nullptr, *gray = nullptr, *black = nullptr;
 
-	FXFont			*boldfont;
+	FXFont			*boldfont = nullptr;
 
 	// rekursivly searches item with userdata=data in treeitem list
 	FXTreeItem* findTreeItem(FXTreeItem* first, void* data);
 
-	bool active_faction_group;
-	bool colorized_units;
+	bool active_faction_group = false;
+	bool colorized_units = true;
 
 protected:
-	FXRegionList(){}
-	FXRegionList(const FXRegionList&) {}
+	FXRegionList() {}
+    FXRegionList(const FXRegionList&) = delete;
 
 };
 

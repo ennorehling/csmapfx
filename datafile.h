@@ -20,6 +20,11 @@ class datafile
 public:
 	datafile();
 
+    enum class special_faction : int {
+        ANONYMOUS = -1,
+        TRAITOR = -2
+    };
+
 	const FXString& filename() const { return m_filename; }
 	void filename(const FXString& s) { m_filename = s; }
 	
@@ -32,7 +37,11 @@ public:
     int turn() const;
 	int recruitment() const { return m_recruitment; }
     int getFactionId() const { return m_factionId; }
-	datablock::itor activefaction() { return m_activefaction; }
+
+    int getFactionIdForUnit(const datablock* unit);
+    FXString getFactionName(int factionId);
+
+    datablock::itor activefaction() { return m_activefaction; }
 
 	bool load(const char* filename, FXString & outError);
 	int save(const char* filename, map_type map_filter);

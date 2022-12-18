@@ -88,6 +88,8 @@ int datakey::parseType(const FXString& type, enum block_type btype)
 		return TYPE_FACTION;
 	if (type == "Anderepartei")
 		return TYPE_OTHER_FACTION;
+	if (type == "Verraeter")
+		return TYPE_TRAITOR;
 	if (type == "Parteiname")
 		return TYPE_FACTIONNAME;
     if (type == "Parteitarnung")
@@ -186,6 +188,8 @@ FXString datakey::key() const
         return "id";
     case TYPE_FACTION:
         return "Partei";
+    case TYPE_TRAITOR:
+        return "Verraeter";
     case TYPE_OTHER_FACTION:
         return "Anderepartei";
     case TYPE_FACTIONNAME:
@@ -683,7 +687,7 @@ void datablock::attachment(::attachment* attach)
 	m_attachment = attach;
 }
 
-bool datablock::hasKey(const key_type& type) const
+bool datablock::hasKey(const key_type type) const
 {
     for (datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
     {

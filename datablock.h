@@ -57,6 +57,7 @@ typedef enum key_type
     TYPE_ID,
     TYPE_FACTION,
     TYPE_OTHER_FACTION,
+    TYPE_TRAITOR,
     TYPE_FACTIONNAME,
     TYPE_FACTIONSTEALTH,
     TYPE_NUMBER,
@@ -120,8 +121,8 @@ public:
 	~datakey() {}
 
 	const FXString& value() const { return m_value; }
-    key_type type() const {
-        return (key_type)(m_type & TYPE_MASK);
+    enum key_type type() const {
+        return (enum key_type)(m_type & TYPE_MASK);
     }
     FXString key() const;
 
@@ -250,7 +251,7 @@ public:
 class datablock
 {
 public:
-    typedef std::list<datablock/*, boost::fast_pool_allocator<datablock>*/ > list_type;
+    typedef std::list<datablock> list_type;
     typedef list_type::iterator itor;
     typedef list_type::const_iterator citor;
     
@@ -267,7 +268,7 @@ public:
 	int terrain() const { return m_terrain; }
 	int flags() const { return m_flags; }
 	const FXString string() const;
-	datakey::list_type& data(){ return m_data; }
+	const datakey::list_type& data() const { return m_data; }
 
 	void string(const FXString& s);
 	void infostr(const FXString& s);
@@ -283,8 +284,21 @@ public:
 	
 	const FXString terrainString() const;
 
-	bool hasKey(const key_type& type) const;
-	const FXString& value(const FXString& key) const;
+	bool hasKey(const key_type type) const;
+    void addKey(const datakey& data) {
+        m_data.push_back(data);
+    }
+    void setKey(enum key_type type, const FXString& value) {
+        for (datakey::itor tags = m_data.begin(); tags != m_data.end(); ++tags)
+        {
+            if (tags->type() == type) {
+                tags->value(value);
+                return;
+            }
+        }
+        addKey(datakey(type, value));
+    }
+    const FXString& value(const FXString& key) const;
 	const FXString& value(key_type key) const;
 	int valueInt(const FXString& key, int def = 0) const;
 	int valueInt(key_type key, int def = 0) const;

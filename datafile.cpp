@@ -52,6 +52,50 @@ int datafile::turn() const
     return m_turn;
 }
 
+int datafile::getFactionIdForUnit(const datablock* unit)
+{
+    FXASSERT(unit->type() == block_type::TYPE_UNIT);
+    bool isTraitor = unit->valueInt(TYPE_TRAITOR, 0) != 0;
+    return isTraitor ? (int)special_faction::TRAITOR : unit->valueInt(TYPE_FACTION, (int)special_faction::ANONYMOUS);
+}
+
+FXString datafile::getFactionName(int factionId)
+{
+    FXString name;
+    datablock::itor faction;
+    if (factionId >= 0 && getFaction(faction, factionId)) {
+        datablock* facPtr = &*faction;
+        name = facPtr->value(TYPE_FACTIONNAME);
+        if (facPtr->info() < 0)
+        {
+            if (name.empty()) {
+                name.assign("Parteigetarnt");
+            }
+        }
+        else
+        {
+            FXString fid = facPtr->id();
+            if (name.empty()) {
+                name.format("Partei %s (%s)", fid.text(), fid.text());
+            }
+            else {
+                name.format("%s (%s)", name.text(), fid.text());
+            }
+        }
+    }
+    else {
+        datablock block;
+        block.infostr(FXStringVal(factionId));
+        if (factionId == (int)special_faction::ANONYMOUS) {
+            name.assign("Parteigetarnt");
+        }
+        else {
+            name.assign(L"Verr\u00e4ter");
+        }
+    }
+    return name;
+}
+
 // loads file, parses it and returns number of block
 bool datafile::load(const char* filename, FXString & outError)
 {
@@ -110,7 +154,7 @@ bool datafile::load(const char* filename, FXString & outError)
 
                         if (terrain == data::TERRAIN_UNKNOWN)
                         {
-                            block->data().push_back(key);		// need textual representation of terrain type
+                            block->addKey(key);		// need textual representation of terrain type
 
                             terrain = datablock::parseSpecialTerrain(key.value());
                         }
@@ -118,7 +162,7 @@ bool datafile::load(const char* filename, FXString & outError)
                         block->terrain(terrain);
                         break;
                     default:
-                        block->data().push_back(key);			// appends "Value";Key - tags
+                        block->addKey(key);			// appends "Value";Key - tags
                     }
                 }
             }
@@ -134,7 +178,7 @@ bool datafile::load(const char* filename, FXString & outError)
                 if (semi) {
                     key.key(FXString(semi + 1), block->type());
                     key.value(FXString(str, semi - str));
-                    block->data().push_back(key);
+                    block->addKey(key);
                 }
             }
         }
@@ -262,19 +306,13 @@ int datafile::save(const char* filename, map_type map_filter)
 		// Konfiguration-Block anpassen und Charset auf ISO-8859-1 setzen
 		else if (type == block_type::TYPE_VERSION)
 		{
-			for (datakey::itor tags = block->data().begin(); tags != block->data().end(); tags++)
-			{
-				if (tags->type() == TYPE_KONFIGURATION)
-				{
-                    tags->value(getConfigurationName(map_filter));
-				}
-			}
+            block->setKey(key_type::TYPE_KONFIGURATION, getConfigurationName(map_filter));
 		}
 		else if (type == block_type::TYPE_UNIT)
 		{
 			// search for command block of unit
 			datablock::itor cmd = block;
-			for (cmd++; cmd != last_block && cmd->depth() > block->depth(); cmd++)
+			for (cmd++; cmd != last_block && cmd->depth() > block->depth(); ++cmd)
 				if (cmd->type() == block_type::TYPE_COMMANDS)
 					break;				// found
 
@@ -324,8 +362,8 @@ int datafile::save(const char* filename, map_type map_filter)
 		}
 
 		// Datakeys ausgeben
-		datakey::itor tags = block->data().begin();
-		datakey::itor iend = block->data().end();
+        datakey::list_type::const_iterator& tags = block->data().begin();
+        datakey::list_type::const_iterator& iend = block->data().end();
 
 		if (hideKeys)
 			tags = iend;		// don't save keys of this block
@@ -508,7 +546,7 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
                     if (!new_r->valueKey(TYPE_ISLAND))
                     {
                         if (islandkey && !islandkey->isInt())        // add only Vorlage-style islands (easier)
-                            new_r->data().push_back(*islandkey);
+                            new_r->addKey(*islandkey);
                     }
                 }
                 if (was_seen) {
@@ -520,7 +558,7 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
                                 continue;
                             }
                             if (!new_r->hasKey(key.type())) {
-                                new_r->data().push_back(key);
+                                new_r->addKey(key);
                             }
                         }
                     }
@@ -1057,9 +1095,9 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 			else
 			{
 				// output default commands
-				datakey::list_type &list = cmdb->data();
+				const datakey::list_type &list = cmdb->data();
 
-				for (datakey::itor itor = list.begin(); itor != list.end(); itor++)
+				for (datakey::list_type::const_iterator& itor = list.begin(); itor != list.end(); ++itor)
 					out << "    " << itor->value() << "\n";
 			}
 		}
@@ -1583,7 +1621,7 @@ void datafile::createHashTables()
 				datakey key;
 				key.key("Parteiname", block->type());
 				key.value(name);
-				faction.data().push_back(key);
+				faction.addKey(key);
                 m_factions[factionId] = m_blocks.insert(insertFaction, faction);
 			}
 
@@ -1604,9 +1642,9 @@ void datafile::createHashTables()
 					
 					cmds->confirmed = block->valueInt(TYPE_ORDERS_CONFIRMED) != 0;
 
-					datakey::list_type &list = cmd->data();
+					const datakey::list_type &list = cmd->data();
 
-					for (datakey::itor itor = list.begin(); itor != list.end(); itor++)
+					for (datakey::list_type::const_iterator& itor = list.begin(); itor != list.end(); ++itor)
 						cmds->commands.push_back(itor->value());
 				}
 			}

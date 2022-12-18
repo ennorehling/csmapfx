@@ -285,10 +285,12 @@ void FXCommands::setConfirmed(bool confirmed)
 				block->attachment(cmds = new att_commands);
 				cmds->confirmed = confirmed;
 
-				datakey::list_type &list = block->data();
+				const datakey::list_type &list = block->data();
 
-				for (datakey::itor itor = list.begin(); itor != list.end(); itor++)
-					cmds->commands.push_back(itor->value());
+                for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); itor++)
+                {
+                    cmds->commands.push_back((*itor).value());
+                }
 			}
 		}
 	}
@@ -360,10 +362,11 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 					// copy commands of selected unit
 					block->attachment(cmds = new att_commands);
 
-					datakey::list_type &list = block->data();
+					const datakey::list_type &list = block->data();
 
-					for (datakey::itor itor = list.begin(); itor != list.end(); itor++)
-						cmds->commands.push_back(itor->value());
+                    for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); itor++) {
+                        cmds->commands.push_back((*itor).value());
+                    }
 				}
 
 				// show commands of selected unit

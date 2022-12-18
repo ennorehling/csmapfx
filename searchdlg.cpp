@@ -390,8 +390,8 @@ namespace
 		else
 		{
 			// search in default command list
-			datakey::itor end = block->data().end();
-			for (datakey::itor itor = block->data().begin(); itor != end; itor++)
+            datakey::list_type::const_iterator& end = block->data().end();
+			for (datakey::list_type::const_iterator& itor = block->data().begin(); itor != end; itor++)
 			{
 				if (compare(itor->value()))
 					return true;
@@ -678,18 +678,14 @@ FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor& buil
     {
         FXString name = unit->value(TYPE_NAME);
         FXString id = unit->id();
-        int fac_id = unit->valueInt(TYPE_FACTION);
-        if (fac_id > 0) {
-            datablock::itor faction;
-            if (mapFile->getFaction(faction, fac_id)) {
-                faction_str = faction->value(TYPE_FACTIONNAME) + " (" + faction->id() + ")";
-            }
-        }
+        const datablock* unitPtr = &*unit;
+        int factionId = mapFile->getFactionIdForUnit(unitPtr);
 
         if (name.empty())
             name = "Einheit " + id;
 
         object_str = name + " (" + id + ")";
+        faction_str = mapFile->getFactionName(factionId);
 
         datablock::itor block = unit;
         for (block++; block != end && block->depth() > unit->depth(); block++)

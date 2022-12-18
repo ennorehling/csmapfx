@@ -163,7 +163,7 @@ void FXTradeInfos::collectData(std::vector<Info>& info, datablock::itor region)
 			-5;Seide		// wird verkauft
 		*/
 
-		for (datakey::itor goods = block->data().begin(); goods != block->data().end(); goods++)
+		for (datakey::list_type::const_iterator& goods = block->data().begin(); goods != block->data().end(); ++goods)
 			if (goods->key().length() && goods->value().length())
 			{
 				FXint price = atoi(goods->value().text());

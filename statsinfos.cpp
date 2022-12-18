@@ -207,12 +207,12 @@ void FXStatsInfos::collectData(std::vector<Info>& info, datablock::itor region)
                 if (type != 771334452 && type != 443066738)
                     continue;
 
-                datakey::list_type &list = block->data();
+                const datakey::list_type &list = block->data();
 
-                datakey::itor reg = list.end();
+                datakey::list_type::const_iterator& reg = list.end();
                 int amount = 0, mode = 0;
 
-                for (datakey::itor itor = list.begin(); itor != list.end(); itor++)
+                for (datakey::list_type::const_iterator& itor = list.begin(); itor != list.end(); itor++)
                 {
                     key_type key = itor->type();
                     if (key == key_type::TYPE_MSG_REGION) {

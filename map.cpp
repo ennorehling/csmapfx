@@ -1192,37 +1192,19 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 					datablock* region = *selection.regionsSelected.begin();
 
 					// change island name
-					datakey::itor key;
-					for (key = region->data().begin(); key != region->data().end(); key++)
-						if (key->type() == TYPE_ISLAND)
-						{
-							if (input.getText().empty())
-								region->data().erase(key);
-							else
-								key->value(input.getText());
-							break;
-						}
+                    if (input.getText().empty()) {
+                        region->removeKey(TYPE_ISLAND);
+                    }
+                    else {
+                        region->setKey(TYPE_ISLAND, input.getText());
+                    }
 
-					// if no name set, add a Insel key
-					if (key == region->data().end() && input.getText().length())
-					{
-						datakey namekey;
-						namekey.key("Insel", region->type());
-						namekey.value(input.getText());
-						region->data().push_back(namekey);
-					}
-
-					// delete Insel key from other regions
+                    // delete Insel key from other regions
 					std::set<datablock*>::iterator itor = selection.regionsSelected.begin();
 					for (itor++; itor != selection.regionsSelected.end(); itor++)
 					{
 						region = *itor;
-						for (key = region->data().begin(); key != region->data().end(); key++)
-							if (key->type() == TYPE_ISLAND)
-							{
-								region->data().erase(key);
-								break;
-							}
+                        region->removeKey(TYPE_ISLAND);
 					}
 
                     // islands changed, rebuild:
@@ -1248,24 +1230,14 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 
 					if (input.execute(PLACEMENT_SCREEN))
 					{
+                        const FXString& name = input.getText();
 						// change island name
-						datakey::itor key;
-						for (key = region->data().begin(); key != region->data().end(); key++)
-							if (key->type() == TYPE_ISLAND)
-							{
-								if (input.getText().empty())
-									region->data().erase(key);
-								else
-									key->value(input.getText());
-								break;
-							}
-
-						// if no name set, add a Insel key
-						if (key == region->data().end() && input.getText().length())
-						{
-							datakey namekey(key_type::TYPE_ISLAND, input.getText());
-							region->data().push_back(namekey);
-						}
+                        if (name.empty()) {
+                            region->removeKey(TYPE_ISLAND);
+                        }
+                        else {
+                            region->setKey(TYPE_ISLAND, name);
+                        }
 
 						// islands changed, rebuild:
                         mapFile->rebuildIslands();
@@ -1284,26 +1256,12 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 					if (input.execute(PLACEMENT_SCREEN))
 					{
 						// change name
-						datakey::itor key;
-						for (key = region->data().begin(); key != region->data().end(); key++)
-							if (key->type() == TYPE_NAME)
-							{
-								if (input.getText().empty())
-									region->data().erase(key);
-								else
-									key->value(input.getText());
-								break;
-							}
-
-						// if no name set, add a name key
-						if (key == region->data().end() && input.getText().length())
-						{
-							datakey namekey;
-							namekey.key("Name", region->type());
-							namekey.value(input.getText());
-							region->data().push_back(namekey);
-						}
-
+                        const FXString& name = input.getText();
+                        if (name.empty())
+                            region->removeKey(TYPE_NAME);
+                        else
+                            region->setKey(TYPE_NAME, name);
+                        
 						// map changed
 						datafile::SelectionState state = selection;
                         state.fileChange++;
@@ -1336,12 +1294,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 			region->terrain(new_terrain);
 
 			// delete ;terrain tags (they are for special terrain names)
-			for (datakey::itor key = region->data().begin(); key != region->data().end(); key++)
-				if (key->type() == TYPE_TERRAIN)
-				{
-					region->data().erase(key);
-					break;
-				}
+            region->removeKey(TYPE_TERRAIN);
 		}
 	}
 
@@ -1375,12 +1328,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
             iregion->terrain(new_terrain);
 
 			// delete ;terrain tags (they are for special terrain names)
-			for (datakey::itor key = iregion->data().begin(); key != iregion->data().end(); key++)
-				if (key->type() == TYPE_TERRAIN)
-				{
-                    iregion->data().erase(key);
-					break;
-				}
+            iregion->removeKey(TYPE_TERRAIN);
 		}
 		else
 		{

@@ -641,69 +641,41 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                         continue;
 
                     // get faction id, -1 means unknown faction (or stealth/anonymous)
-                    FXint factionId = unit->valueInt(TYPE_FACTION, -1);
-
+                    const datablock* unitPtr = &*unit;
+                    int factionId = mapFile->getFactionIdForUnit(unitPtr);
+                    label = mapFile->getFactionName(factionId);
                     FXTreeItem *&entry = factions[factionId];
                     if (!entry)
                     {
                         FXIcon* icon = red;
                         datablock* facPtr = nullptr;
-                        if (factionId == 0) {
-                            icon = black;
+                        if (factionId == mapFile->getFactionId()) {
+                            icon = blue;
+                        }
+                        else if (factionId < 0) {
+                            icon = gray;
                         }
                         else {
-                            if (factionId < 0) {
-                                icon = gray;
-                            }
+                            datablock::itor block = mapFile->activefaction();
+                            for (block++; block != mapFile->blocks().end(); ++block)
+                            {
+                                if (block->type() != block_type::TYPE_ALLIANCE &&
+                                    block->type() != block_type::TYPE_ITEMS &&
+                                    block->type() != block_type::TYPE_OPTIONS &&
+                                    block->type() != block_type::TYPE_GROUP)
+                                    break;
 
-                            datablock::itor faction;
-                            if (factionId >= 0 && mapFile->getFaction(faction, factionId)) {
-                                facPtr = &*faction;
+                                if (block->type() != block_type::TYPE_ALLIANCE)
+                                    continue;
 
-                                if (faction->info() == mapFile->getFactionId()) {
-                                    icon = blue;
-                                }
-                                name = faction->value(TYPE_FACTIONNAME);
-                                if (faction->info() < 0)
-                                {
-                                    if (name.empty())
-                                        name = "Parteigetarnt";
-                                    label.format("%s", name.text());
-                                }
-                                else
-                                {
-                                    FXString fid = faction->id();
-                                    if (name.empty())
-                                        label.format("Partei %s (%s)", fid.text(), fid.text());
-                                    else
-                                        label.format("%s (%s)", name.text(), fid.text());
-                                }
-                            }
-                            else {
-                                datablock block;
-                                block.infostr(FXStringVal(factionId));
-                                label.assign("Parteigetarnt");
-                            }
-                        }
-                        datablock::itor block = mapFile->activefaction();
-                        for (block++; block != mapFile->blocks().end(); block++)
-                        {
-                            if (block->type() != block_type::TYPE_ALLIANCE &&
-                                block->type() != block_type::TYPE_ITEMS &&
-                                block->type() != block_type::TYPE_OPTIONS &&
-                                block->type() != block_type::TYPE_GROUP)
+                                if (block->info() != factionId)
+                                    continue;
+
+                                // change icon to green, if alliance status to faction is set
+                                icon = green;
                                 break;
-
-                            if (block->type() != block_type::TYPE_ALLIANCE)
-                                continue;
-
-                            if (block->info() != factionId)
-                                continue;
-
-                            // change icon to green, if alliance status to faction is set
-                            icon = green;
+                            }
                         }
-
                         // add region only if it has units in it
                         if (!region)
                             region = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], &*iblock));
@@ -725,17 +697,15 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                         continue;
 
                     // get treeitem node from faction
-                    FXint factionId = -1;
-                    FXString fac = unit->value(TYPE_FACTION);
-                    if (!fac.empty())
-                        factionId = strtol(fac.text(), NULL, 10);
+                    const datablock* unitPtr = &*unit;
+                    FXint factionId = mapFile->getFactionIdForUnit(unitPtr);
 
                     FXTreeItem *faction = factions[factionId];
 
                     FXString uname, number;
                     FXColor color = 0;
 
-                    for (datakey::itor key = unit->data().begin(); key != unit->data().end(); key++)
+                    for (datakey::list_type::const_iterator& key = unit->data().begin(); key != unit->data().end(); key++)
                     {
                         if (key->type() == TYPE_NAME)
                             uname = key->value();
