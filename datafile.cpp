@@ -362,8 +362,8 @@ int datafile::save(const char* filename, map_type map_filter)
 		}
 
 		// Datakeys ausgeben
-        datakey::list_type::const_iterator& tags = block->data().begin();
-        datakey::list_type::const_iterator& iend = block->data().end();
+        datakey::list_type::const_iterator tags = block->data().begin();
+        datakey::list_type::const_iterator iend = block->data().end();
 
 		if (hideKeys)
 			tags = iend;		// don't save keys of this block
@@ -1097,7 +1097,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 				// output default commands
 				const datakey::list_type &list = cmdb->data();
 
-				for (datakey::list_type::const_iterator& itor = list.begin(); itor != list.end(); ++itor)
+				for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); ++itor)
 					out << "    " << itor->value() << "\n";
 			}
 		}
@@ -1644,7 +1644,7 @@ void datafile::createHashTables()
 
 					const datakey::list_type &list = cmd->data();
 
-					for (datakey::list_type::const_iterator& itor = list.begin(); itor != list.end(); ++itor)
+					for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); ++itor)
 						cmds->commands.push_back(itor->value());
 				}
 			}

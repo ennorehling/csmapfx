@@ -390,8 +390,8 @@ namespace
 		else
 		{
 			// search in default command list
-            datakey::list_type::const_iterator& end = block->data().end();
-			for (datakey::list_type::const_iterator& itor = block->data().begin(); itor != end; itor++)
+            datakey::list_type::const_iterator end = block->data().end();
+			for (datakey::list_type::const_iterator itor = block->data().begin(); itor != end; itor++)
 			{
 				if (compare(itor->value()))
 					return true;

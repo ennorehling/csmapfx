@@ -170,7 +170,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
                         "Untote schrecken vor dieser Region zurueck. (njr4)"
                         */
 
-                        for (datakey::list_type::const_iterator& msg = block->data().begin(); msg != block->data().end(); msg++)
+                        for (datakey::list_type::const_iterator msg = block->data().begin(); msg != block->data().end(); msg++)
                             appendItem(groups.effects, msg->value());
                     }
                     else if (block->type() == block_type::TYPE_BORDER)
@@ -220,7 +220,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
                         if (block->type() == block_type::TYPE_DURCHSCHIFFUNG)
                             prefix = "Die ";	// fuer Schiffe
 
-                        for (datakey::list_type::const_iterator& msg = block->data().begin(); msg != block->data().end(); msg++)
+                        for (datakey::list_type::const_iterator msg = block->data().begin(); msg != block->data().end(); msg++)
                             appendItem(groups.travel, prefix + msg->value());
                     }
                 }

@@ -705,7 +705,7 @@ long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                     FXString uname, number;
                     FXColor color = 0;
 
-                    for (datakey::list_type::const_iterator& key = unit->data().begin(); key != unit->data().end(); key++)
+                    for (datakey::list_type::const_iterator key = unit->data().begin(); key != unit->data().end(); key++)
                     {
                         if (key->type() == TYPE_NAME)
                             uname = key->value();

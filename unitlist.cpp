@@ -111,7 +111,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 			std::vector<datakey::list_type::const_iterator> unhandled;
 
-			for (datakey::list_type::const_iterator& key = unit->data().begin(); key != unit->data().end(); ++key)
+			for (datakey::list_type::const_iterator key = unit->data().begin(); key != unit->data().end(); ++key)
 			{
                 switch (key->type()) {
                 case TYPE_NAME:
@@ -358,7 +358,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 			{
 				FXTreeItem *node = appendItem(unititem, FXString(L"Zauberspr\u00fcche"));
 
-				for (datakey::list_type::const_iterator& key = spells->data().begin(); key != spells->data().end(); ++key)
+				for (datakey::list_type::const_iterator key = spells->data().begin(); key != spells->data().end(); ++key)
 				{
                     label = key->value();
                     appendItem(node, makePopupTreeItem(label, nullptr, &label));
@@ -397,7 +397,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				FXTreeItem *node = appendItem(unititem, "Effekte");
 				node->setExpanded(true);
 
-				for (datakey::list_type::const_iterator& key = effects->data().begin(); key != effects->data().end(); ++key)
+				for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
 					appendItem(node, key->value());
 			}
 
@@ -409,7 +409,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				FXTreeItem *node = appendItem(unititem, "Talente");
 				node->setExpanded(true);
 
-				for (datakey::list_type::const_iterator& key = talents->data().begin(); key != talents->data().end(); ++key)
+				for (datakey::list_type::const_iterator key = talents->data().begin(); key != talents->data().end(); ++key)
 				{
                     FXString info = key->key();
                     FXString value = key->value().section(' ', 1);
@@ -430,7 +430,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				FXTreeItem *node = appendItem(unititem, FXString(L"Gegenst\u00e4nde"));
 				node->setExpanded(true);
 
-				for (datakey::list_type::const_iterator& key = items->data().begin(); key != items->data().end(); ++key)
+				for (datakey::list_type::const_iterator key = items->data().begin(); key != items->data().end(); ++key)
 				{
                     const FXString& info = key->key();
                     const FXString& value = key->value();
@@ -500,7 +500,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				FXString type = FXString(L"Geb\u00e4ude");
 				factionId = -1;
 
-				for (datakey::list_type::const_iterator& key = building->data().begin(); key != building->data().end(); ++key)
+				for (datakey::list_type::const_iterator key = building->data().begin(); key != building->data().end(); ++key)
 				{
 					if (key->type() == TYPE_NAME)
 						name = key->value();
@@ -531,7 +531,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				// list unhandled keys
 				for (std::vector<datakey::list_type::const_iterator>::iterator& itag = unhandled.begin(); itag != unhandled.end(); ++itag)
 				{
-                    const datakey::list_type::const_iterator& t = *itag;
+                    const datakey::list_type::const_iterator t = *itag;
                     datablock* owner_block = nullptr;
 
                     if (t->type() == TYPE_OWNER) {
@@ -586,7 +586,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					FXTreeItem *effnode = appendItem(node, "Effekte");
 					effnode->setExpanded(true);
 
-					for (datakey::list_type::const_iterator& key = effects->data().begin(); key != effects->data().end(); ++key)
+					for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
 						appendItem(effnode, key->value());
 				}
 			}
@@ -600,7 +600,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				FXString type = "Schiff";
 				factionId = -1;
 
-				for (datakey::list_type::const_iterator& key = ship->data().begin(); key != ship->data().end(); ++key)
+				for (datakey::list_type::const_iterator key = ship->data().begin(); key != ship->data().end(); ++key)
 				{
 					if (key->type() == TYPE_NAME)
 						name = key->value();
@@ -680,7 +680,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				// list unhandled keys
 				for (std::vector<datakey::list_type::const_iterator>::iterator& itag = unhandled.begin(); itag != unhandled.end(); ++itag)
 				{
-                    datakey::list_type::const_iterator& t = *itag;
+                    datakey::list_type::const_iterator t = *itag;
                     if (t->type() == TYPE_CAPTAIN) {
                         FXint uid = FXIntVal(t->value());
                         datablock::itor unit_owner;
@@ -725,7 +725,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					FXTreeItem *effnode = appendItem(node, "Effekte");
 					effnode->setExpanded(true);
 
-					for (datakey::list_type::const_iterator& key = effects->data().begin(); key != effects->data().end(); ++key)
+					for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
 						appendItem(effnode, key->value());
 				}
 			}
