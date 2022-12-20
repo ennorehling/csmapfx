@@ -12,7 +12,9 @@ endif (WIN32)
 
 project (csmapfx CXX C)
 
+if (NOT WIN32)
 find_package(PhysFS 2.1)
+endif (NOT WIN32)
 find_package(PNG)
 find_package(CURL)
 

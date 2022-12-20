@@ -1,3 +1,9 @@
+csmapfx (1.4.27-1) stable; urgency=low
+
+  * do not use PhysFS on windows until Win7 compatibility is fixed. 
+
+ -- Enno Rehling <enno@eressea.de>  Tue, 20 Dec 2022 21:10:00 +0200
+
 csmapfx (1.4.26-2) stable; urgency=low
 
   * faction names were broken.
