@@ -1,14 +1,20 @@
 cmake_minimum_required(VERSION 3.0)
 
 if (WIN32)
+if (NOT VCPKG_TARGET_TRIPLET)
 if (CMAKE_GENERATOR_PLATFORM EQUAL x64)
 set (VCPKG_TARGET_TRIPLET x64-windows)
 else (CMAKE_GENERATOR_PLATFORM EQUAL x64)
 set (VCPKG_TARGET_TRIPLET x86-windows)
 endif (CMAKE_GENERATOR_PLATFORM EQUAL x64)
+endif (NOT VCPKG_TARGET_TRIPLET)
 endif (WIN32)
 
-project (csmapfx CXX C)
+project (csmapfx CXX)
+
+find_package(PhysFS 2.1)
+find_package(PNG)
+find_package(CURL)
 
 include (CheckIncludeFile)
 check_include_file(unistd.h UNISTD_H_FOUND)
@@ -59,6 +65,16 @@ set (SOURCES
 	tradeinfos.cpp
 	unitlist.cpp
 )
+if (PNG_FOUND)
+set(SOURCES ${SOURCES} imageio.cpp)
+endif (PNG_FOUND)
+
+if (WIN32)
+set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/version.rc")
+add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${APP_ICON_RESOURCE_WINDOWS})
+else (WIN32)
+add_executable(${PROJECT_NAME} ${SOURCES})
+endif (WIN32)
 
 if (CURL_FOUND)
 add_compile_definitions(HAVE_CURL)
@@ -73,7 +89,7 @@ endif(CURL_FOUND)
 if (PHYSFS_FOUND)
 add_compile_definitions(HAVE_PHYSFS)
 target_link_libraries(${PROJECT_NAME}
-  ${PHYSFS_LIBRARIES}
+  ${PHYSFS_LIBRARY}
 )
 include_directories(
   ${PHYSFS_INCLUDE_DIRS}
@@ -81,7 +97,6 @@ include_directories(
 endif(PHYSFS_FOUND)
 
 if (PNG_FOUND)
-set(SOURCES ${SOURCES} imageio.cpp)
 add_compile_definitions(HAVE_PNG)
 target_link_libraries(${PROJECT_NAME}
   ${PNG_LIBRARIES}
@@ -90,17 +105,6 @@ include_directories(
   ${PNG_INCLUDE_DIRS}
 )
 endif(PNG_FOUND)
-
-if (WIN32)
-set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/version.rc")
-add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${APP_ICON_RESOURCE_WINDOWS})
-else (WIN32)
-add_executable(${PROJECT_NAME} ${SOURCES})
-endif (WIN32)
-
-find_package(PhysFS 2.1)
-find_package(PNG)
-find_package(CURL)
 
 find_library(LEGACY_STDIO_LIBRARY NAMES legacy_stdio_definitions)
 if (LEGACY_STDIO_LIBRARY)
