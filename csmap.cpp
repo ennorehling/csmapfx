@@ -400,7 +400,7 @@ CSMap::CSMap(FXApp *app) :
     menu.minimap = new FXMenuCheck(viewmenu,FXString(L"\u00dcbersichts&karte\tCtrl-N\t\u00dcbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
     menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tCtrl-B\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
     new FXMenuSeparatorEx(viewmenu, "Liste");
-    menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tStrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
+    menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tCtrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
     menu.colorizeUnits = new FXMenuCheck(viewmenu, "Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
     new FXMenuSeparatorEx(viewmenu, "Karte");
     menu.streets = new FXMenuCheck(viewmenu,"&Strassen zeigen\tCtrl-F1\tStrassen auf der Karte anzeigen.");
