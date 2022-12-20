@@ -70,6 +70,16 @@ include_directories(
 )
 endif(CURL_FOUND)
 
+if (PHYSFS_FOUND)
+add_compile_definitions(HAVE_PHYSFS)
+target_link_libraries(${PROJECT_NAME}
+  ${PHYSFS_LIBRARIES}
+)
+include_directories(
+  ${PHYSFS_INCLUDE_DIRS}
+)
+endif(PHYSFS_FOUND)
+
 if (PNG_FOUND)
 set(SOURCES ${SOURCES} imageio.cpp)
 add_compile_definitions(HAVE_PNG)
@@ -88,7 +98,7 @@ else (WIN32)
 add_executable(${PROJECT_NAME} ${SOURCES})
 endif (WIN32)
 
-find_package(PhysFS 2.1 REQUIRED)
+find_package(PhysFS 2.1)
 find_package(PNG)
 find_package(CURL)
 
@@ -112,7 +122,6 @@ endif (WIN32)
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	CXX_STANDARD 11)
 target_link_libraries(${PROJECT_NAME}
-  ${PHYSFS_LIBRARY}
   ${FOX_LIBRARIES}
   ${CMAKE_DL_LIBS} 
 )
@@ -123,7 +132,6 @@ if (FOX_LIBRARY_DIRS)
   target_link_libraries(${PROJECT_NAME} -L${FOX_LIBRARY_DIRS})
 endif(FOX_LIBRARY_DIRS)
 include_directories(
-  ${PHYSFS_INCLUDE_DIR}
 	${FOX_INCLUDE_DIRS}
 )
 

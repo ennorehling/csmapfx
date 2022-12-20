@@ -4,7 +4,9 @@
 #include "symbols.h"
 #include "FXMenuSeparatorEx.h"
 
+#ifdef HAVE_PHYSFS
 #include <physfs.h>
+#endif
 
 #include <cctype>
 #include <climits>
@@ -127,6 +129,7 @@ void FXInfoDlg::setGame(const FXString& game)
 
 	for (auto i = fileNames.begin(); i != fileNames.end(); ++i) {
         const std::string& filename = *i;
+#ifdef HAVE_PHYSFS
         PHYSFS_File* file = PHYSFS_openRead(filename.c_str());
         if (file) {
             // parse data
@@ -144,6 +147,7 @@ void FXInfoDlg::setGame(const FXString& game)
                 delete[] text;
             }
         }
+#endif
 	}
 }
 

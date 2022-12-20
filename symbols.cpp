@@ -24,8 +24,9 @@
 
 #include <string>
 #include <climits>
+#ifdef HAVE_PHYSFS
 #include <physfs.h>
-
+#endif
 namespace data
 {
 	const unsigned int infodlg_data_size = sizeof(infodlg_data);
@@ -111,6 +112,7 @@ namespace data
         const unsigned char* getTerrainIcon(int i) {
             if (m_icons[i] == nullptr) {
                 std::string filename("terrain/icons/");
+#ifdef HAVE_PHYSFS
                 PHYSFS_File* file;
                 filename.append(terrains[i].filename);
                 file = PHYSFS_openRead(filename.c_str());
@@ -134,6 +136,7 @@ namespace data
                     }
                     PHYSFS_close(file);
                 }
+#endif
                 // give up, don't try loading again. hack: cast, but never free this!
                 m_icons[i] = (unsigned char*)sym_undefined;
             }
@@ -146,6 +149,7 @@ namespace data
         const unsigned char *getTerrainData(int i) {
             if (m_terrains[i] == nullptr) {
                 std::string filename("terrain/");
+#ifdef HAVE_PHYSFS
                 PHYSFS_File* file;
                 filename.append(terrains[i].filename);
 
@@ -170,6 +174,7 @@ namespace data
                     }
                     PHYSFS_close(file);
                 }
+#endif
                 // give up, don't try loading again. hack: cast, but never free this!
                 m_terrains[i] = (unsigned char*)undefined;
             }

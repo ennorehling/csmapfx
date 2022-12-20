@@ -28,7 +28,9 @@
 #include <sstream>
 #include <string>
 #include <fx.h>
+#ifdef HAVE_PHYSFS
 #include <physfs.h>
+#endif
 #ifdef HAVE_CURL
 #include <curl/curl.h>
 #endif
@@ -77,9 +79,11 @@ void showVersion()
 
 int main(int argc, char *argv[])
 {
+#ifdef HAVE_PHYSFS
     PHYSFS_init(argv[0]);
     PHYSFS_mount(PHYSFS_getBaseDir(), NULL, 0);
     PHYSFS_mount(PHYSFS_getPrefDir("Eressea", "CsMapFX"), NULL, 0);
+#endif
     initSystems();		// inits COM under windows
 #ifdef HAVE_CURL
     curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -208,6 +212,8 @@ int main(int argc, char *argv[])
 #ifdef HAVE_CURL
     curl_global_cleanup();
 #endif
+#ifdef HAVE_PHYSFS
     PHYSFS_deinit();
+#endif
     return exitcode;
 }
