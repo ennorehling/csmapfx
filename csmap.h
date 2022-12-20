@@ -63,9 +63,11 @@ public:		// this functions are slots for menu commands
 	long onFileOpenCommands(FXObject*, FXSelector, void* ptr);
 	long onFileSaveCommands(FXObject*, FXSelector, void* ptr);
     long onFileExportCommands(FXObject*, FXSelector, void* ptr);
-    long onFileUploadCommands(FXObject*, FXSelector, void* ptr);
     long onFileCheckCommands(FXObject*, FXSelector, void* ptr);
     long onFileRecent(FXObject*, FXSelector, void* ptr);
+#ifdef HAVE_CURL
+    long onFileUploadCommands(FXObject*, FXSelector, void* ptr);
+#endif
 
     long onQuit(FXObject*, FXSelector, void* ptr);
 
@@ -156,9 +158,11 @@ public:
         ID_FILE_SAVE_ORDERS,
         ID_FILE_CHECK_ORDERS,
         ID_FILE_EXPORT_ORDERS,
-        ID_FILE_UPLOAD_ORDERS,
         ID_FILE_MODIFY_CHECK,
         ID_FILE_QUIT,
+#ifdef HAVE_CURL
+        ID_FILE_UPLOAD_ORDERS,
+#endif
 
         // ECheck error list
         ID_ERRROR_SELECTED,

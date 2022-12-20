@@ -50,8 +50,9 @@
 #include <climits>
 #include <cstdio>
 #include <cstring>
+#ifdef HAVE_CURL
 #include <curl/curl.h>
-
+#endif
 FXDEFMAP(CSMap) MessageMap[]=
 {
     //________Message_Type_____________________ID_______________Message_Handler_______
@@ -70,10 +71,14 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_MAP,          CSMap::onFileExportMap),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_IMAGE,        CSMap::onFileExportImage),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_ORDERS,       CSMap::onFileExportCommands),
-    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_UPLOAD_ORDERS,       CSMap::onFileUploadCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_RECENT,              CSMap::onFileRecent),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_PREFERENCES,         CSMap::onFilePreferences),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_QUIT,                CSMap::onQuit),
+
+#ifdef HAVE_CURL
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_UPLOAD_ORDERS,       CSMap::onFileUploadCommands),
+    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_UPLOAD_ORDERS,       CSMap::updOpenFile),
+#endif
 
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_MERGE,               CSMap::updOpenFile),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ALL,            CSMap::updOpenFile),
@@ -82,7 +87,6 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_IMAGE,        CSMap::updOpenFile),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_MAP,          CSMap::updOpenFile),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_ORDERS,       CSMap::updOpenFile),
-    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_UPLOAD_ORDERS,       CSMap::updOpenFile),
 
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_LOAD_ORDERS,         CSMap::updActiveFaction),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ORDERS,         CSMap::updActiveFaction),
@@ -362,10 +366,12 @@ CSMap::CSMap(FXApp *app) :
         filemenu,
         L"Befehle pr\u00fcfen\t\tPr\u00fct die Befehle.",
         nullptr, this, ID_FILE_CHECK_ORDERS);
+#ifdef HAVE_CURL
     new FXMenuCommand(
         filemenu,
         L"Befehle einsenden...\t\tDie Befehle an den Server versenden.",
         nullptr, this, ID_FILE_UPLOAD_ORDERS);
+#endif
     new FXMenuCommand(
         filemenu,
         L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",
@@ -2631,6 +2637,7 @@ static size_t write_data(void *data, size_t size, size_t nmemb, void *userp)
     return realsize;
 }
 
+#ifdef HAVE_CURL
 long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
 {
     char infile[PATH_MAX];
@@ -2695,6 +2702,7 @@ long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
     }
     return 0;
 }
+#endif
 
 FXString CSMap::askPasswordDlg(const FXString &faction_id) {
     FXString passwd = settings.password;

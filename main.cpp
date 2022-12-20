@@ -29,8 +29,9 @@
 #include <string>
 #include <fx.h>
 #include <physfs.h>
+#ifdef HAVE_CURL
 #include <curl/curl.h>
-
+#endif
 void showHelpText()
 {
 	std::ostringstream help;
@@ -80,8 +81,9 @@ int main(int argc, char *argv[])
     PHYSFS_mount(PHYSFS_getBaseDir(), NULL, 0);
     PHYSFS_mount(PHYSFS_getPrefDir("Eressea", "CsMapFX"), NULL, 0);
     initSystems();		// inits COM under windows
+#ifdef HAVE_CURL
     curl_global_init(CURL_GLOBAL_DEFAULT);
-
+#endif
 	// Make application 
 	FXApp CSApp("CSMap", "Eressea"); 
 
@@ -203,7 +205,9 @@ int main(int argc, char *argv[])
     }
     // Run 
 	int exitcode = CSApp.run(); 
+#ifdef HAVE_CURL
     curl_global_cleanup();
+#endif
     PHYSFS_deinit();
     return exitcode;
 }
