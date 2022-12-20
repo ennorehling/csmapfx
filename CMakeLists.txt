@@ -43,7 +43,6 @@ set (SOURCES
 	fxhelper.cpp
 	FXMenuSeparatorEx.cpp
 	FXSplitterEx.cpp
-	imageio.cpp
 	infodlg.cpp
 	main.cpp
 	mapcanvas.cpp
@@ -61,6 +60,27 @@ set (SOURCES
 	unitlist.cpp
 )
 
+if (CURL_FOUND)
+add_compile_definitions(HAVE_CURL)
+target_link_libraries(${PROJECT_NAME}
+  ${CURL_LIBRARIES}
+)
+include_directories(
+  ${CURL_INCLUDE_DIRS}
+)
+endif(CURL_FOUND)
+
+if (PNG_FOUND)
+set(SOURCES ${SOURCES} imageio.cpp)
+add_compile_definitions(HAVE_PNG)
+target_link_libraries(${PROJECT_NAME}
+  ${PNG_LIBRARIES}
+)
+include_directories(
+  ${PNG_INCLUDE_DIRS}
+)
+endif(PNG_FOUND)
+
 if (WIN32)
 set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/version.rc")
 add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${APP_ICON_RESOURCE_WINDOWS})
@@ -68,8 +88,8 @@ else (WIN32)
 add_executable(${PROJECT_NAME} ${SOURCES})
 endif (WIN32)
 
-find_package(PNG REQUIRED)
 find_package(PhysFS 2.1 REQUIRED)
+find_package(PNG)
 find_package(CURL)
 
 find_library(LEGACY_STDIO_LIBRARY NAMES legacy_stdio_definitions)
@@ -89,21 +109,10 @@ pkg_search_module(FOX REQUIRED fox>=1.6)
 endif (PKG_CONFIG_FOUND)
 endif (WIN32)
 
-if (CURL_FOUND)
-add_compile_definitions(HAVE_CURL)
-target_link_libraries(${PROJECT_NAME}
-  ${CURL_LIBRARIES}
-)
-include_directories(
-  ${CURL_INCLUDE_DIRS}
-)
-endif(CURL_FOUND)
-
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	CXX_STANDARD 11)
 target_link_libraries(${PROJECT_NAME}
   ${PHYSFS_LIBRARY}
-  ${PNG_LIBRARIES}
   ${FOX_LIBRARIES}
   ${CMAKE_DL_LIBS} 
 )
@@ -115,7 +124,6 @@ if (FOX_LIBRARY_DIRS)
 endif(FOX_LIBRARY_DIRS)
 include_directories(
   ${PHYSFS_INCLUDE_DIR}
-	${PNG_INCLUDE_DIRS}
 	${FOX_INCLUDE_DIRS}
 )
 

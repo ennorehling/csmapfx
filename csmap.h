@@ -28,25 +28,6 @@ public:
     void ParseCommandLine(int argc, char** argv);
 #endif
 
-private:
-    bool saveReport(const FXString& filename, map_type mode, bool merge_commands = false);
-    void mapChange();
-	bool haveActiveFaction() const;
-    void loadFiles(const FXString filenames[]);
-    datafile* loadFile(const FXString& filename);
-    datafile* mergeFile(const FXString& filename);
-    bool closeFile();
-    void saveCommandsDlg(bool stripped, bool replace);
-    FXString askFileName(const FXString &title, const FXString &patterns);
-    FXString askPasswordDlg(const FXString &faction_id);
-    bool confirmOverwrite();
-    bool loadCommands(const FXString& filename);
-    bool updateCommands(const FXString &filename);
-    bool saveCommands(const FXString &filename, bool stripped);
-    bool checkCommands();
-    bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
-    void updateFileNames();
-
 public:		// this functions are slots for menu commands
     long onFileOpen(FXObject*, FXSelector, void*);
     long updOpenFile(FXObject *sender, FXSelector, void *);
@@ -56,18 +37,15 @@ public:		// this functions are slots for menu commands
 	long onFileSaveMap(FXObject*, FXSelector, void*);
 	long onFileSaveAll(FXObject*, FXSelector, void*);
     long onFileExportMap(FXObject*, FXSelector, void*);
-	long onFileExportImage(FXObject*, FXSelector, void*);
+    long onFileExportImage(FXObject*, FXSelector, void*);
     long onFileClose(FXObject*, FXSelector, void*);
     long onFilePreferences(FXObject*, FXSelector, void*);
-
 	long onFileOpenCommands(FXObject*, FXSelector, void* ptr);
 	long onFileSaveCommands(FXObject*, FXSelector, void* ptr);
     long onFileExportCommands(FXObject*, FXSelector, void* ptr);
     long onFileCheckCommands(FXObject*, FXSelector, void* ptr);
     long onFileRecent(FXObject*, FXSelector, void* ptr);
-#ifdef HAVE_CURL
     long onFileUploadCommands(FXObject*, FXSelector, void* ptr);
-#endif
 
     long onQuit(FXObject*, FXSelector, void* ptr);
 
@@ -137,7 +115,6 @@ public:		// this functions are slots for menu commands
 	
 	long onCalculator(FXObject*, FXSelector, void* ptr);
 
-public:
 	enum
 	{
 		ID_REGIONS = FXMainWindow::ID_LAST,
@@ -160,9 +137,7 @@ public:
         ID_FILE_EXPORT_ORDERS,
         ID_FILE_MODIFY_CHECK,
         ID_FILE_QUIT,
-#ifdef HAVE_CURL
         ID_FILE_UPLOAD_ORDERS,
-#endif
 
         // ECheck error list
         ID_ERRROR_SELECTED,
@@ -215,7 +190,31 @@ public:
 		ID_LAST
 	};
 
-private: 
+private:
+    bool saveReport(const FXString& filename, map_type mode, bool merge_commands = false);
+    void mapChange();
+    bool haveActiveFaction() const;
+    void loadFiles(const FXString filenames[]);
+    datafile* loadFile(const FXString& filename);
+    datafile* mergeFile(const FXString& filename);
+    bool closeFile();
+    void saveCommandsDlg(bool stripped, bool replace);
+    FXString askFileName(const FXString& title, const FXString& patterns);
+    FXString askPasswordDlg(const FXString& faction_id);
+    bool confirmOverwrite();
+    bool loadCommands(const FXString& filename);
+    bool updateCommands(const FXString& filename);
+    bool saveCommands(const FXString& filename, bool stripped);
+    bool checkCommands();
+    void updateFileNames();
+
+#ifdef HAVE_PNG
+    bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
+#endif
+#ifdef HAVE_CURL
+    long curlUpload();
+#endif
+
     typedef enum class reload_type { RELOAD_NEVER, RELOAD_AUTO, RELOAD_ASK } reload_type;
     reload_type reload_mode = reload_type::RELOAD_NEVER;
 

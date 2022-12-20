@@ -68,24 +68,22 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_CHECK_ORDERS,        CSMap::onFileCheckCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ALL,            CSMap::onFileSaveAll),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_MAP,            CSMap::onFileSaveMap),
-    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_MAP,          CSMap::onFileExportMap),
-    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_IMAGE,        CSMap::onFileExportImage),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_ORDERS,       CSMap::onFileExportCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_RECENT,              CSMap::onFileRecent),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_PREFERENCES,         CSMap::onFilePreferences),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_QUIT,                CSMap::onQuit),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_MAP,          CSMap::onFileExportMap),
+    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_MAP,          CSMap::updOpenFile),
 
-#ifdef HAVE_CURL
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_IMAGE,        CSMap::onFileExportImage),
+    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_IMAGE,        CSMap::updOpenFile),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_UPLOAD_ORDERS,       CSMap::onFileUploadCommands),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_UPLOAD_ORDERS,       CSMap::updOpenFile),
-#endif
 
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_MERGE,               CSMap::updOpenFile),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ALL,            CSMap::updOpenFile),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_MAP,            CSMap::updOpenFile),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_CLOSE,               CSMap::updOpenFile),
-    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_IMAGE,        CSMap::updOpenFile),
-    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_MAP,          CSMap::updOpenFile),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_ORDERS,       CSMap::updOpenFile),
 
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_LOAD_ORDERS,         CSMap::updActiveFaction),
@@ -366,12 +364,10 @@ CSMap::CSMap(FXApp *app) :
         filemenu,
         L"Befehle pr\u00fcfen\t\tPr\u00fct die Befehle.",
         nullptr, this, ID_FILE_CHECK_ORDERS);
-#ifdef HAVE_CURL
     new FXMenuCommand(
         filemenu,
         L"Befehle einsenden...\t\tDie Befehle an den Server versenden.",
         nullptr, this, ID_FILE_UPLOAD_ORDERS);
-#endif
     new FXMenuCommand(
         filemenu,
         L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",
@@ -1251,6 +1247,7 @@ bool CSMap::checkCommands()
     return true;
 }
 
+#ifdef HAVE_PNG
 extern FXbool csmap_savePNG(FXStream& store, FXCSMap& map, FXImage& image, FXProgressDialog& win);
 
 bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool show_koords, bool show_islands, int color)
@@ -1302,6 +1299,7 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
 
     return true;
 }
+#endif
 
 long CSMap::onViewMapOnly(FXObject*, FXSelector, void*)
 {
@@ -2637,8 +2635,18 @@ static size_t write_data(void *data, size_t size, size_t nmemb, void *userp)
     return realsize;
 }
 
-#ifdef HAVE_CURL
 long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
+{
+#ifdef HAVE_CURL
+    return curlUpload();
+#else
+    return FXMessageBox::error(this, MBOX_OK, "Not Implemented", 
+        "Sorry, this version of CsMap was compiled without CURL support");
+#endif
+}
+
+#ifdef HAVE_CURL
+long CSMap::curlUpload()
 {
     char infile[PATH_MAX];
     memory response = { 0 };
@@ -2799,6 +2807,7 @@ long CSMap::onFilePreferences(FXObject*, FXSelector, void*)
 
 long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
 {
+#ifdef HAVE_PNG
     FXExportDlg exp(this, "Karte exportieren...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100, 100, 400, 250);
     FXint res = exp.execute(PLACEMENT_SCREEN);
     if (!res)
@@ -2842,8 +2851,11 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
         exportMapFile(filename, scale, show_names, show_koords, show_islands, color);
         getApp()->endWaitCursor();
     }
-
-    return 1;
+    return 0;
+#else
+    return FXMessageBox::error(this, MBOX_OK, "Not Implemented",
+        "Sorry, this version of CsMap was compiled without PNG support");
+#endif
 }
 
 long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
