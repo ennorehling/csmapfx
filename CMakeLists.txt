@@ -10,7 +10,7 @@ endif (CMAKE_GENERATOR_PLATFORM EQUAL x64)
 endif (NOT VCPKG_TARGET_TRIPLET)
 endif (WIN32)
 
-project (csmapfx CXX)
+project (csmapfx CXX C)
 
 find_package(PhysFS 2.1)
 find_package(PNG)
