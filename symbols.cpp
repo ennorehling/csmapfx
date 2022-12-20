@@ -138,8 +138,8 @@ namespace data
                     }
                 }
                 PHYSFS_close(file);
-                return result;
             }
+            return result;
 #elif defined(WIN32)
             TCHAR pf[MAX_PATH];
             if (SHGetSpecialFolderPath(0, pf, CSIDL_APPDATA, FALSE))
