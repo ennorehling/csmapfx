@@ -1,8 +1,9 @@
 csmapfx (1.4.27-1) stable; urgency=low
 
   * do not use PhysFS on windows until Win7 compatibility is fixed. 
+  * support for CR with non-ascii filenames.
 
- -- Enno Rehling <enno@eressea.de>  Tue, 20 Dec 2022 21:10:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Wed, 21 Dec 2022 11:15:00 +0200
 
 csmapfx (1.4.26-2) stable; urgency=low
 
