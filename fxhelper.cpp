@@ -8,6 +8,14 @@
 #include "shlobj.h"		// SHGetSpecialFolderPath
 #endif
 
+#ifdef HAVE_PHYSFS
+#include <physfs.h>
+#elif defined(WIN32)
+#include <shlobj_core.h>
+#include <fstream>
+#include <vector>
+#endif
+
 #include "version.h"
 #include "fxhelper.h"
 
@@ -121,4 +129,59 @@ FXString FXStringValEx(FXulong num, unsigned int base)
 
         return FXString(p, buf + sizeof(buf) - 1 - p);
     }
+}
+
+unsigned char* loadResourceFile(const FXString& relpath)
+{
+    unsigned char* result = nullptr;
+#ifdef HAVE_PHYSFS
+    PHYSFS_File* file;
+    file = PHYSFS_openRead(relpath.text());
+    if (file) {
+        PHYSFS_sint64 filesize = PHYSFS_fileLength(file);
+
+        if (filesize > 0) {
+            size_t size = (size_t)filesize;
+            unsigned char* data = new unsigned char[size];
+            if (data) {
+                if (PHYSFS_readBytes(file, data, size) == size) {
+                    result = data;
+                }
+                else {
+                    delete[] data;
+                }
+            }
+        }
+        PHYSFS_close(file);
+    }
+#elif defined(WIN32)
+    TCHAR pf[MAX_PATH];
+    if (SHGetSpecialFolderPath(0, pf, CSIDL_APPDATA, FALSE))
+    {
+        FXString filename(pf);
+        filename.append("\\Eressea\\CsMapFX\\");
+        filename += relpath;
+        std::ifstream file;
+        file.open(filename.text(), std::ios::in | std::ios::binary);
+        std::vector<unsigned char> data;
+        if (file.is_open())
+        {
+            unsigned char buffer[1024];
+            size_t bsize = sizeof(buffer);
+            while (!file.eof())
+            {
+                file.read((char*)buffer, bsize);
+                std::streamsize bytes = file.gcount();
+                if (bytes > 0) {
+                    std::copy(buffer, buffer + bytes, std::back_inserter(data));
+                }
+            }
+            if (!data.empty()) {
+                result = new unsigned char[data.size()];
+                std::copy(data.begin(), data.end(), (char*)result);
+            }
+        }
+    }
+#endif
+    return result;
 }

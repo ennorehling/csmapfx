@@ -1,5 +1,7 @@
 #include "symbols.h"
 
+#include "fxhelper.h"
+
 // application icon
 #include "csicon.data"
 
@@ -24,13 +26,6 @@
 
 #include <string>
 #include <climits>
-#ifdef HAVE_PHYSFS
-#include <physfs.h>
-#elif defined(WIN32)
-#include <shlobj_core.h>
-#include <fstream>
-#include <vector>
-#endif
 namespace data
 {
 	const unsigned int infodlg_data_size = sizeof(infodlg_data);
@@ -115,64 +110,11 @@ namespace data
 
         static unsigned char* loadTexture(const char* folder, const char* name)
         {
-#ifdef HAVE_PHYSFS
             unsigned char* result = nullptr;
-            std::string filename(folder);
+            FXString filename(folder);
             filename += '/';
             filename += name;
-            PHYSFS_File* file;
-            file = PHYSFS_openRead(filename.c_str());
-            if (file) {
-                PHYSFS_sint64 filesize = PHYSFS_fileLength(file);
-
-                if (filesize > 0) {
-                    size_t size = (size_t)filesize;
-                    unsigned char* data = new unsigned char[size];
-                    if (data) {
-                        if (PHYSFS_readBytes(file, data, size) == size) {
-                            result = data;
-                        }
-                        else {
-                            delete[] data;
-                        }
-                    }
-                }
-                PHYSFS_close(file);
-            }
-            return result;
-#elif defined(WIN32)
-            TCHAR pf[MAX_PATH];
-            if (SHGetSpecialFolderPath(0, pf, CSIDL_APPDATA, FALSE))
-            {
-                std::string filename(pf);
-                filename.append("\\Eressea\\CsMapFX\\");
-                filename += folder;
-                filename += '\\';
-                filename += name;
-                std::ifstream file;
-                file.open(filename, std::ios::in | std::ios::binary);
-                std::vector<char> data;
-                if (file.is_open())
-                {
-                    char buffer[1024];
-                    size_t bsize = sizeof(buffer);
-                    while (!file.eof())
-                    {
-                        file.read(buffer, bsize);
-                        std::streamsize bytes = file.gcount();
-                        if (bytes > 0) {
-                            std::copy(buffer, buffer + bytes, std::back_inserter(data));
-                        }
-                    }
-                    if (!data.empty()) {
-                        unsigned char* icon = new unsigned char[data.size()];
-                        std::copy(data.begin(), data.end(), (char*)icon);
-                        return icon;
-                    }
-                }
-            }
-            return nullptr;
-#endif
+            return loadResourceFile(filename);
         }
 
         const unsigned char* getTerrainIcon(int i) {

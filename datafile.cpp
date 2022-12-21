@@ -106,7 +106,6 @@ bool datafile::load(const char* filename, FXString & outError)
         return false;
     }
 
-	FXString filename_str = filename;
 	// load plain text CR
 	file.open(filename, std::ios::in);
 	if (!file.is_open())
@@ -213,14 +212,10 @@ int datafile::save(const char* filename, map_type map_filter)
 	// open file for writing
 	std::ostringstream file;
 
-	FXFileStream plainfile;
-	FXStream *filestr_ptr;
+	FXFileStream filestr;
 
-	FXString filename_str = filename;
-	plainfile.open(filename, FXStreamSave);
-	filestr_ptr = &plainfile;
+    filestr.open(filename, FXStreamSave);
 
-	FXStream& filestr = *filestr_ptr;
 	if (filestr.status() != FXStreamOK)
 	{
 		return -1;
