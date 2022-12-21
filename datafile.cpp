@@ -9,6 +9,11 @@
 #include <iostream>
 #include <sstream>
 
+#ifdef _MSC_VER
+#include <windows.h>
+#include <stringapiset.h>
+#endif
+
 #define HELP_GUARD 16
 
 datafile::datafile() : m_factionId(0), m_recruitment(0), m_turn(-1), m_activefaction(m_blocks.end())
@@ -105,9 +110,15 @@ bool datafile::load(const char* filename, FXString & outError)
     if (!filename) {
         return false;
     }
+#ifdef _MSC_VER
+    WCHAR pf[MAX_PATH];
+    MultiByteToWideChar(CP_UTF8, 0, filename, strlen(filename) + 1, pf, MAX_PATH);
+    std::wstring wname(pf);
+    file.open(wname, std::ios::in);
+#else
+    file.open(filename, std::ios::in);
+#endif
 
-	// load plain text CR
-	file.open(filename, std::ios::in);
 	if (!file.is_open())
 	{
 		outError.assign(L"Datei konnte nicht ge\u00f6ffnet werden.");
