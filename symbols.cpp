@@ -84,77 +84,74 @@ namespace data
         sym_mahlstrom
     };
 
-    class TextureData {
+    class Textures {
     private:
-        static TextureData* instance;
-        unsigned char* m_terrains[data::TERRAIN_LAST];
-        unsigned char* m_icons[data::TERRAIN_LAST];
+        struct TextureData {
+            std::string str;
+            const unsigned char* bitmap;
+        } data;
+        static Textures* instance;
+        TextureData m_terrains[data::TERRAIN_LAST];
+        TextureData m_icons[data::TERRAIN_LAST];
 
     public:
-        ~TextureData() {
-            for (int i = 0; i != data::TERRAIN_LAST; ++i) {
-                if (m_terrains[i] != undefined) {
-                    delete m_terrains[i];
-                }
-                if (m_icons[i] != sym_undefined) {
-                    delete m_icons[i];
-                }
-            }
-        }
-        static TextureData* get() {
+        static Textures* get() {
             if (!instance) {
-                instance = new TextureData();
+                instance = new Textures();
             }
             return instance;
         }
 
-        static unsigned char* loadTexture(const char* folder, const char* name)
+        static std::string loadTexture(const char* folder, const char* name)
         {
             unsigned char* result = nullptr;
-            FXString filename(folder);
+            std::string filename(folder);
             filename += '/';
             filename += name;
-            return loadResourceFile(filename);
+            return loadResourceFile(filename.c_str());
         }
 
         const unsigned char* getTerrainIcon(int i) {
-            if (m_icons[i] == nullptr) {
-                if ((m_icons[i] = TextureData::loadTexture("terrain/icons", terrains[i].filename)) == nullptr)
+            if (m_icons[i].bitmap == nullptr) {
+                m_icons[i].str = Textures::loadTexture("terrain/icons", terrains[i].filename);
+                m_icons[i].bitmap = (const unsigned char *)m_icons[i].str.c_str();
+                if (m_icons[i].str.empty())
                 {
                     // give up, don't try loading again. hack: cast, but never free this!
-                    m_icons[i] = (unsigned char*)sym_undefined;
+                    m_icons[i].bitmap = sym_undefined;
                 }
             }
-            if (m_icons[i] && m_icons[i] != sym_undefined) {
-                return m_icons[i];
+            if (m_icons[i].bitmap && m_icons[i].bitmap != sym_undefined) {
+                return m_icons[i].bitmap;
             }
             return terrainSymbols[i];
         }
 
         const unsigned char *getTerrainData(int i) {
-            if (m_terrains[i] == nullptr) {
-                std::string filename("terrain/");
-                if ((m_terrains[i] = TextureData::loadTexture("terrain", terrains[i].filename)) == nullptr)
+            if (m_terrains[i].bitmap == nullptr) {
+                m_terrains[i].str = Textures::loadTexture("terrain", terrains[i].filename);
+                m_terrains[i].bitmap = (const unsigned char*)m_terrains[i].str.c_str();
+                if (m_terrains[i].str.empty())
                 {
                     // give up, don't try loading again. hack: cast, but never free this!
-                    m_terrains[i] = (unsigned char*)undefined;
+                    m_terrains[i].bitmap = undefined;
                 }
             }
-            if (m_terrains[i] && m_terrains[i] != undefined) {
-                return m_terrains[i];
+            if (m_terrains[i].bitmap && m_terrains[i].bitmap != undefined) {
+                return m_terrains[i].bitmap;
             }
             return terrains[i].image;
         }
     };
 
-    TextureData* TextureData::instance;
+    Textures* Textures::instance;
 
     const unsigned char* terrain_data(int i) {
-        return TextureData::get()->getTerrainData(i);
+        return Textures::get()->getTerrainData(i);
     }
 
     const unsigned char* terrain_icon(int i) {
-        return TextureData::get()->getTerrainIcon(i);
+        return Textures::get()->getTerrainIcon(i);
     }
 
 }

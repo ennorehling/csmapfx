@@ -47,5 +47,5 @@ inline std::ostream& operator<<(std::ostream& out, const FX::FXString& str)
 
 FXString FXStringValEx(FXulong num, unsigned int base = 10);
 
-unsigned char* loadResourceFile(const FXString& relpath);
+std::string loadResourceFile(const char * relpath);
 #endif //_CSMAP_FXHELPER_H

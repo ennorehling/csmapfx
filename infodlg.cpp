@@ -127,27 +127,13 @@ void FXInfoDlg::setGame(const FXString& game)
     }
 	fileNames.push_back("csmapfx.info");
 
-	for (auto i = fileNames.begin(); i != fileNames.end(); ++i) {
+    for (auto i = fileNames.begin(); i != fileNames.end(); ++i) {
         const std::string& filename = *i;
-#ifdef HAVE_PHYSFS
-        PHYSFS_File* file = PHYSFS_openRead(filename.c_str());
-        if (file) {
-            // parse data
-            PHYSFS_sint64 filesize = PHYSFS_fileLength(file);
-            if (filesize > 0) {
-                size_t count = (size_t)filesize;
-                char* text = new char[count];
-                if (PHYSFS_readBytes(file, text, count) == count) {
-                    std::istringstream input(std::string(text, count));
-                    if (parseTableData(input)) {
-                        delete[] text;
-                        break;
-                    }
-                }
-                delete[] text;
-            }
+        std::string str = loadResourceFile(filename.c_str());
+        if (!str.empty()) {
+            std::istringstream input(str);
+            if (parseTableData(input)) break;
         }
-#endif
 	}
 }
 

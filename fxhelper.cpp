@@ -131,25 +131,23 @@ FXString FXStringValEx(FXulong num, unsigned int base)
     }
 }
 
-unsigned char* loadResourceFile(const FXString& relpath)
+std::string loadResourceFile(const char *relpath)
 {
-    unsigned char* result = nullptr;
+    std::string result;
 #ifdef HAVE_PHYSFS
     PHYSFS_File* file;
-    file = PHYSFS_openRead(relpath.text());
+    file = PHYSFS_openRead(relpath);
     if (file) {
         PHYSFS_sint64 filesize = PHYSFS_fileLength(file);
 
         if (filesize > 0) {
             size_t size = (size_t)filesize;
-            unsigned char* data = new unsigned char[size];
+            char* data = new char[size];
             if (data) {
-                if (PHYSFS_readBytes(file, data, size) == size) {
-                    result = data;
+                if (PHYSFS_readBytes(file, data, filesize) == filesize) {
+                    result.assign(data, size);
                 }
-                else {
-                    delete[] data;
-                }
+                delete[] data;
             }
         }
         PHYSFS_close(file);
@@ -158,28 +156,16 @@ unsigned char* loadResourceFile(const FXString& relpath)
     TCHAR pf[MAX_PATH];
     if (SHGetSpecialFolderPath(0, pf, CSIDL_APPDATA, FALSE))
     {
-        FXString filename(pf);
-        filename.append("\\Eressea\\CsMapFX\\");
+        std::string filename(pf);
+        filename += "\\Eressea\\CsMapFX\\";
         filename += relpath;
         std::ifstream file;
-        file.open(filename.text(), std::ios::in | std::ios::binary);
-        std::vector<unsigned char> data;
+        file.open(filename.c_str(), std::ios::in | std::ios::binary);
         if (file.is_open())
         {
-            unsigned char buffer[1024];
-            size_t bsize = sizeof(buffer);
-            while (!file.eof())
-            {
-                file.read((char*)buffer, bsize);
-                std::streamsize bytes = file.gcount();
-                if (bytes > 0) {
-                    std::copy(buffer, buffer + bytes, std::back_inserter(data));
-                }
-            }
-            if (!data.empty()) {
-                result = new unsigned char[data.size()];
-                std::copy(data.begin(), data.end(), (char*)result);
-            }
+            std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+            file.close();
+            return str;
         }
     }
 #endif

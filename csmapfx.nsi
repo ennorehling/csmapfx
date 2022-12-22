@@ -14,7 +14,7 @@ RequestExecutionLevel admin
 Unicode True
 
 ; The default installation directory
-InstallDir $PROGRAMFILES\CsMapFX
+InstallDir $PROGRAMFILES\Eressea\CsMapFX
 
 ; Registry key to check for directory (so if you install again, it will 
 ; overwrite the old one automatically)
@@ -60,7 +60,7 @@ SectionEnd
 Section "Additional Game Information"
 
   ; Set output path to the installation directory.
-  SetOutPath $INSTDIR
+  SetOutPath $APPDATA\Eressea\CsMapFX
   
   ; Put file there
   File csmapfx.Eressea.info
