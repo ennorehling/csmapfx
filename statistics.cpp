@@ -554,7 +554,7 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 		if (main != mapFile->blocks().end())
 		{
 			// send new selection to main window
-			datafile::SelectionState state;
+			datafile::SelectionState state = selection;
 
 			if (main->type() == block_type::TYPE_REGION)
 			{

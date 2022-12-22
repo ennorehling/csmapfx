@@ -1624,7 +1624,7 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
         MessageInfo *info = static_cast<MessageInfo *>(list->getItemData(item));
 
         if (info) {
-            datafile::SelectionState state;
+            datafile::SelectionState state = selection;
             if (info->unit_id) {
                 if (report->getUnit(state.unit, info->unit_id)) {
                     state.selected = selection.UNIT;
@@ -1654,7 +1654,7 @@ long CSMap::onMapSelectMarked(FXObject*, FXSelector, void*)
         return 0;
 
     // select/deselect marked region (toggle selection)
-    datafile::SelectionState state;
+    datafile::SelectionState state = selection;
 
     state.selected = selection.REGION;
     state.region = selection.region;
@@ -1711,7 +1711,7 @@ long CSMap::onMapMoveMarker(FXObject*, FXSelector sel, void*)
         x++, y--;
 
     // set new marked region
-    datafile::SelectionState state;
+    datafile::SelectionState state = selection;
     state.sel_x = x, state.sel_y = y, state.sel_plane = plane;
     if (report->getRegion(state.region, x, y, plane)) {
         state.selected = state.REGION;
@@ -2290,7 +2290,7 @@ long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)
     report->findSelection(select, block, region);
 
     // propagate selection
-    datafile::SelectionState state;
+    datafile::SelectionState state = selection;
     state.selected = 0;
     if (selection.selected & selection.MULTIPLE_REGIONS)
     {

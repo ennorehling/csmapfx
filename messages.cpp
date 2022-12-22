@@ -256,7 +256,7 @@ long FXMessages::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
     datablock* select = (datablock*)item->getData();
     if (select != nullptr)
 	{
-        datafile::SelectionState sel_state;
+        datafile::SelectionState sel_state = selection;
         sel_state.selected = 0;
 
         if (select->type() == block_type::TYPE_REGION) {

@@ -78,16 +78,16 @@ public:
 	// data of selection state (what region, what unit is actually selected?)
 	struct SelectionState
 	{
-        int selected;			// flags; what iterator contains valid information?
+        int selected = 0;			// flags; what iterator contains valid information?
 
 		datablock::itor region, faction, building, ship, unit;
 
-		int sel_x, sel_y, sel_plane;
+		int sel_x = 0, sel_y = 0, sel_plane = 0;
 
 		std::set<datablock*> regionsSelected;
         //Selection regionsSelected;
 
-        int selChange, fileChange;	// incremented on changes to any datafile (loaded, closed or changed)
+        int selChange = 0, fileChange = 0;	// incremented on changes to any datafile (loaded, closed or changed)
 
 		// selected flags
 		enum
@@ -104,7 +104,7 @@ public:
 		};
 
 		// mini-c'tor
-		SelectionState() : selected(0), sel_x(0), sel_y(0), sel_plane(0), selChange(0), fileChange(0) {}
+		SelectionState() {}
         SelectionState(const SelectionState& state) {
             sel_x = state.sel_x;
             sel_y = state.sel_y;

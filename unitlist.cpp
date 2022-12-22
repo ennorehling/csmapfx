@@ -777,8 +777,8 @@ long FXUnitList::onGotoItem(FXObject* sender, FXSelector sel, void *ptr)
 {
     FXMenuCommand* command = static_cast<FXMenuCommand*>(sender);
     const datablock * block = static_cast<const datablock*>(command->getUserData());
-    datafile::SelectionState sel_state;
-    sel_state.selChange = selection.selChange + 1;
+    datafile::SelectionState sel_state = selection;
+    sel_state.selChange++;
     if (sel_state.regionsSelected.empty()) {
         sel_state.selected = 0;
     }

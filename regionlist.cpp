@@ -285,8 +285,7 @@ long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* p
                 sel_state.selected &= ~sel_state.FACTION;
             }
         }
-        sel_state.fileChange++;
-        getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
+        onMapChange(this, 0, &selection);
     }
 	return 1;
 }
@@ -372,7 +371,7 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
     if (main != mapFile->blocks().end())
     {
         // send new selection to main window
-        datafile::SelectionState sel_state;
+        datafile::SelectionState sel_state = selection;
 
         if (main->type() == block_type::TYPE_REGION)
         {
@@ -588,12 +587,12 @@ FXTreeItem* FXRegionList::findTreeItem(FXTreeItem* item, void* udata)
 	return NULL;
 }
 
-long FXRegionList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
+long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
 {
     datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
 	// any data changed, so need to update list?
-	if (selection.fileChange != pstate->fileChange)
+	if (sender == this || selection.fileChange != pstate->fileChange)
 	{
         getApp()->beginWaitCursor();
         selection.fileChange = pstate->fileChange;

@@ -803,8 +803,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 		}
 
 		// set mark cursor
-		datafile::SelectionState state;
-
+		datafile::SelectionState state = selection;
 		if (mapFile)
 		{
 			state.selected = 0;
@@ -2194,7 +2193,7 @@ long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
 		FXint plane = selection.sel_plane;
 
 		// set new marked region
-		datafile::SelectionState state;
+		datafile::SelectionState state = selection;
         state.selected = 0;
         state.sel_x = x, state.sel_y = y, state.sel_plane = plane;
 
@@ -2218,7 +2217,7 @@ long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
 			return 0;
 
 		// select/deselect marked region (toggle selection)
-		datafile::SelectionState state;
+		datafile::SelectionState state = selection;
 
 		state.selected = selection.REGION;
 		state.region = selection.region;
