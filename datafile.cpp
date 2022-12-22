@@ -21,6 +21,19 @@ datafile::datafile() : m_factionId(0), m_recruitment(0), m_turn(-1), m_activefac
 	m_cmds.modified = false;
 }
 
+const char* UTF8BOM = "\xEF\xBB\xBF";
+
+static void skip_bom(std::ifstream& file)
+{
+    // skip BOM, if any
+    for (int i = 0; i != sizeof(UTF8BOM); ++i) {
+        if (file.get() != UTF8BOM[i]) {
+            file.seekg(0);
+            break;
+        }
+    }
+}
+
 // helper function that strips lines and return pointer to next line
 static inline char* getNextLine(char* str)
 {
@@ -38,8 +51,6 @@ static inline char* getNextLine(char* str)
 
 	return next;
 }
-
-const char* UTF8BOM = "\xEF\xBB\xBF";
 
 int datafile::turn() const
 {
@@ -130,22 +141,14 @@ bool datafile::load(const char* filename, FXString & outError)
     datablock* block = NULL, newblock;
     datakey key;
     bool utf8 = true;
-    size_t offset = strlen(UTF8BOM);
     int line_no = 0;
+    skip_bom(file);
     while (!file.eof())
     {
         std::string line;
         ++line_no;
         if (std::getline(file, line)) {
-            const char* str, * buffer = line.c_str();
-            if (offset > 0)
-            {
-                // check for utf8 BOM: EF BB BF
-                if (strncmp(buffer, UTF8BOM, offset) != 0) {
-                    offset = 0;
-                }
-            }
-            str = buffer + offset;
+            const char* str = line.c_str();
 
             // erster versuch: enthaelt die Zeile einen datakey?
             if (key.parse(str, block ? block->type() : block_type::TYPE_UNKNOWN, utf8))
@@ -194,7 +197,6 @@ bool datafile::load(const char* filename, FXString & outError)
                 }
             }
         }
-        offset = 0;
     }
 	file.close();
 
@@ -646,177 +648,152 @@ const char* datafile::getConfigurationName(map_type type)
 // === datafile command loading routine
 
 // loads command file and attaches the commands to the units
-int datafile::loadCmds(const FXString &filename)
+int datafile::loadCmds(const FXString& filename)
 {
-	if (filename.empty())
-		return 0;
+    if (filename.empty())
+        return 0;
 
-	if (m_factionId == 0)
-		throw std::runtime_error("Kein Report geladen, kann Befehlsdatei nicht einlesen.");
+    if (m_factionId == 0)
+        throw std::runtime_error("Kein Report geladen, kann Befehlsdatei nicht einlesen.");
 
 
-	// load plain text file
-	FXFileStream file;
-	file.open(filename,FXStreamLoad);
-	if (file.status() != FXStreamOK)
+    // load plain text file
+    std::ifstream file;
+    file.open(filename.text(), std::ios::in);
+    if (!file.is_open()) {
         throw std::runtime_error(FXString(L"Datei konnte nicht ge\u00f6ffnet werden.").text());
-
-	// load file into 'data'
-	FXString data;
-
-	FXString buffer;
-	buffer.length(1024*100+1);
-
-	do
-	{
-		memset(&buffer[0], 0, buffer.length());
-		file.load(&buffer[0], buffer.length()-1);
-		data.append(buffer.text());
-
-	} while(file.status() == FXStreamOK);
-	
-	buffer.clear();
-	file.close();
-
-	// read in the data
-	char *ptr, *next = &data[0];
-
-	// check for utf8 BOM: EF BB BF
-	if (!strncmp(next, UTF8BOM, strlen(UTF8BOM))) {
-        next += strlen(UTF8BOM);
-	}
-
-	// search first non-empty line
-	while(*(ptr = next))
-	{
-		// strip the line
-		next = getNextLine(ptr);
-
-		// skip indentation
-		while (*ptr && isspace(*ptr))
-			ptr++;
-
-		// when not empty, break
-		if (*ptr && *ptr != ';')
-			break;
-	}
-
-	// found first non-empty line
-	FXString line = ptr;
-	if (!*ptr || (line.section(' ', 0) != "ERESSEA" && line.section(' ', 0) != "PARTEI"))
-		throw std::runtime_error(FXString(L"Keine g\u00fcltige Befehlsdatei.").text());
-
-	// parse header line:
-	// ERESSEA ioen "PASSWORT"
-	FXString id36 = line.section(' ', 1);
-    FXString password = line.section(' ', 2);
-
-    FXint pos = password.find('"', 0);
-    while (pos >= 0) {
-        password.erase(pos);
-        pos = password.find('"', pos);
     }
-    if (!password.empty()) {
-        m_password = password;
+    skip_bom(file);
+    while (!file.eof())
+	{
+        std::string line;
+        if (std::getline(file, line)) {
+            const char* ptr = line.c_str();
+            // skip indentation
+            while (*ptr && isspace(*ptr))
+                ptr++;
+
+            // when not empty, break
+            if (*ptr && *ptr != ';') {
+                // found first non-empty line
+                FXString header(ptr);
+                if (header.section(' ', 0) != "ERESSEA" && header.section(' ', 0) != "PARTEI") {
+                    throw std::runtime_error(FXString(L"Keine g\u00fcltige Befehlsdatei.").text());
+                }
+                // parse header line:
+                // ERESSEA ioen "PASSWORT"
+                FXString id36 = header.section(' ', 1);
+                char* endptr = nullptr;
+                int factionId = strtol(id36.text(), &endptr, 36);
+
+                if (endptr && *endptr)		// id36 string has to be consumed by strtol
+                    throw std::runtime_error((L"Keine g\u00fcltige Parteinummer: " + id36).text());
+                if (factionId != m_factionId)
+                    throw std::runtime_error((L"Die Befehle sind f\u00fcr eine andere Partei: " + id36).text());
+
+                FXString password = header.section(' ', 2);
+
+                FXint pos = password.find('"', 0);
+                while (pos >= 0) {
+                    password.erase(pos);
+                    pos = password.find('"', pos);
+                }
+                if (!password.empty()) {
+                    m_password = password;
+                }
+                break;
+            }
+        }
     }
-
-	char* endptr;
-	int factionId = strtol(id36.text(), &endptr, 36);
-
-    if (endptr && *endptr)		// id36 string has to be consumed by strtol
-		throw std::runtime_error((L"Keine g\u00fcltige Parteinummer: " + id36).text());
-	if (factionId != m_factionId)
-		throw std::runtime_error((L"Die Befehle sind f\u00fcr eine andere Partei: " + id36).text());
 
     // consider command file as correct, read in commands
 	m_cmds.prefix_lines.clear();
 	m_cmds.region_lines.clear();
 	m_cmds.region_order.clear();
 
-	FXString cmd;
-
     int headerindent = 0, indent = 0;
 	// process lines
-	while(*(ptr = next))
+    FXString cmd, line;
+	while(!file.eof())
 	{
-		// strip the line
-		next = getNextLine(ptr);
+        std::string str;
+        if (std::getline(file, str)) {
+            // strip the line
+            if (!str.empty()) {
+                // check if line is REGION or EINHEIT command
+                line.assign(str.c_str());
+                indent = line.find_first_not_of("\t ");
+                if (!line.trim().empty()) {}
+                cmd = line.before(' ');
+                cmd.upper();
 
-		// check if line is REGION or EINHEIT command
-		line = ptr;
-        indent = line.find_first_not_of("\t ");
-		cmd = line.trim().before(' ');
-		cmd.upper();
-
-        if (cmd == "REGION" || cmd == "EINHEIT") {
-            break;
-        }
-
-        // add line to prefix
-        if (!line.empty()) {
-            m_cmds.prefix_lines.push_back(line);
+                if (cmd == "REGION" || cmd == "EINHEIT") {
+                    break;
+                }
+                // add line to prefix
+                m_cmds.prefix_lines.push_back(line);
+            }
         }
 	}
 
 	// check for end of file:
-	if (!*ptr)
+    if (file.eof())
 		throw std::runtime_error("Keine Befehle gefunden.");
 
 	att_commands* cmds_list = NULL;
 	std::vector<int> *unit_order = NULL;
 
-	do
-	{
-		if (cmd == "REGION" || cmd == "EINHEIT")
-		{
-			FXString param = line.section(' ', 1);
+    while (!file.eof())
+    {
+        if (cmd == "REGION" || cmd == "EINHEIT")
+        {
+            FXString param = line.section(' ', 1);
             headerindent = indent;
 
-			if (cmd == "REGION")
-			{
-				
-				FXString xstr = param.section(',', 0);
-				FXString ystr = param.section(',', 1);
-				FXString zstr = param.section(',', 2);
+            if (cmd == "REGION")
+            {
+                FXString xstr = param.section(',', 0);
+                FXString ystr = param.section(',', 1);
+                FXString zstr = param.section(',', 2);
 
-				int x = strtol(xstr.text(), &endptr, 10);
-				int y = strtol(ystr.text(), &endptr, 10);
-				int z = strtol(zstr.text(), &endptr, 10);
+                int x = strtol(xstr.text(), nullptr, 10);
+                int y = strtol(ystr.text(), nullptr, 10);
+                int z = strtol(zstr.text(), nullptr, 10);
 
-				// add to order list if not already in it
-				if (m_cmds.region_lines.find(koordinates(x, y, z)) == m_cmds.region_lines.end())
-				{
-					m_cmds.region_order.push_back(std::make_pair(koordinates(x, y, z), std::vector<int>()));
-					unit_order = &m_cmds.region_order.back().second;
-				}
-				else
-					unit_order = NULL;
+                // add to order list if not already in it
+                if (m_cmds.region_lines.find(koordinates(x, y, z)) == m_cmds.region_lines.end())
+                {
+                    m_cmds.region_order.push_back(std::make_pair(koordinates(x, y, z), std::vector<int>()));
+                    unit_order = &m_cmds.region_order.back().second;
+                }
+                else
+                    unit_order = NULL;
 
-				cmds_list = &m_cmds.region_lines[koordinates(x, y, z)];
-			}
-			else if (cmd == "EINHEIT")
-			{
-				int unitId = strtol(param.text(), &endptr, 36);
+                cmds_list = &m_cmds.region_lines[koordinates(x, y, z)];
+            }
+            else if (cmd == "EINHEIT")
+            {
+                int unitId = strtol(param.text(), nullptr, 36);
 
-				// add to order list for units of this region
-				if (unit_order)
-					unit_order->push_back(unitId);
-				
-				// search for command block of unit
-				int unitDepth = -1;
-				datablock::itor block = unit(unitId);
-				if (block != m_blocks.end())
-				{
-					unitDepth = block->depth();
-					block++;
-				}
+                // add to order list for units of this region
+                if (unit_order)
+                    unit_order->push_back(unitId);
+
+                // search for command block of unit
+                int unitDepth = -1;
+                datablock::itor block = unit(unitId);
+                if (block != m_blocks.end())
+                {
+                    unitDepth = block->depth();
+                    block++;
+                }
                 else {
                     throw std::runtime_error(("Einheit nicht gefunden: " + line).text());
                 }
                 for (cmds_list = NULL; block != m_blocks.end() && block->depth() > unitDepth; block++) {
                     if (block->type() == block_type::TYPE_COMMANDS) {
                         // TODO: why can't this be a static_cast?
-                        if (att_commands *cmds = dynamic_cast<att_commands *>(block->attachment())) {
+                        if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment())) {
                             cmds_list = cmds;
                             break;
                         }
@@ -826,18 +803,18 @@ int datafile::loadCmds(const FXString &filename)
                 if (!cmds_list) {
                     throw std::runtime_error(("Einheit hat keinen Befehlsblock: " + line).text());
                 }
-			}
+            }
 
-			if (cmds_list) {
-				cmds_list->confirmed = false;
-				cmds_list->prefix_lines.clear();
-				cmds_list->commands.clear();
-				cmds_list->postfix_lines.clear();
-				cmds_list->header = line;
-			}
-		}
-		else if (cmds_list)
-		{
+            if (cmds_list) {
+                cmds_list->confirmed = false;
+                cmds_list->prefix_lines.clear();
+                cmds_list->commands.clear();
+                cmds_list->postfix_lines.clear();
+                cmds_list->header = line;
+            }
+        }
+        else if (cmds_list)
+        {
             if (!line.empty()) {
                 if (line.left(1) == ";") {
                     cmd = line.after(';');
@@ -861,22 +838,24 @@ int datafile::loadCmds(const FXString &filename)
                     cmds_list->addCommand(line);
                 }
             }
-		}
+        }
 
-		if (!*(ptr = next))
-			break;
+        if (file.eof()) {
+            break;
+        }
 
-		// strip the line
-		next = getNextLine(ptr);
-
-		// check if line is REGION oder EINHEIT command
-		line = ptr;
-        indent = line.find_first_not_of("\t ");
-        cmd = line.trim().before(' ');
-		cmd.upper();
-
-	} while (flatten(cmd) != "naechster");
-
+        // strip the line
+        std::string str;
+        if (std::getline(file, str)) {
+            // check if line is REGION oder EINHEIT command
+            line.assign(str.c_str());
+            indent = line.find_first_not_of("\t ");
+            cmd = line.trim().before(' ');
+            cmd.upper();
+        }
+        if (flatten(cmd) == "naechster") break;
+    }
+    file.close();
     cmdfilename(filename);
     modifiedCmds(false);
     return true;
