@@ -1,3 +1,10 @@
+csmapfx (1.4.28-1) stable; urgency=low
+
+  * fix accidental clearing of errors and search results.
+  * support for orders with non-ascii filenames.
+
+ -- Enno Rehling <enno@eressea.de>  Thu, 22 Dec 2022 09:00:00 +0200
+
 csmapfx (1.4.27-1) stable; urgency=low
 
   * do not use PhysFS on windows until Win7 compatibility is fixed. 

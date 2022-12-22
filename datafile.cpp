@@ -114,22 +114,26 @@ FXString datafile::getFactionName(int factionId)
     return name;
 }
 
-// loads file, parses it and returns number of block
-bool datafile::load(const char* filename, FXString & outError)
+void datafile::openFile(const char* filename, std::ifstream& file, std::ios::openmode mode)
 {
-    std::ifstream file;
-    if (!filename) {
-        return false;
-    }
 #ifdef _MSC_VER
     WCHAR pf[MAX_PATH];
     MultiByteToWideChar(CP_UTF8, 0, filename, strlen(filename) + 1, pf, MAX_PATH);
     std::wstring wname(pf);
-    file.open(wname, std::ios::in);
+    file.open(wname, mode);
 #else
     file.open(filename, std::ios::in);
 #endif
+}
+// loads file, parses it and returns number of block
+bool datafile::load(const FXString& filename, FXString & outError)
+{
+    if (filename.empty()) {
+        return false;
+    }
 
+    std::ifstream file;
+    openFile(filename.text(), file);
 	if (!file.is_open())
 	{
 		outError.assign(L"Datei konnte nicht ge\u00f6ffnet werden.");
@@ -659,7 +663,7 @@ int datafile::loadCmds(const FXString& filename)
 
     // load plain text file
     std::ifstream file;
-    file.open(filename.text(), std::ios::in);
+    openFile(filename.text(), file);
     if (!file.is_open()) {
         throw std::runtime_error(FXString(L"Datei konnte nicht ge\u00f6ffnet werden.").text());
     }

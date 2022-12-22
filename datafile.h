@@ -5,6 +5,8 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <fstream>
+
 #include <fx.h>
 
 #include "datablock.h"
@@ -43,7 +45,7 @@ public:
 
     datablock::itor activefaction() { return m_activefaction; }
 
-	bool load(const char* filename, FXString & outError);
+	bool load(const FXString& filename, FXString & outError);
 	int save(const char* filename, map_type map_filter);
 
     void removeTemporary();
@@ -129,6 +131,8 @@ public:
 protected:
     void createHashTables();
     void createHierarchy();
+    
+    static void openFile(const char* filename, std::ifstream& stream, std::ios::openmode mode = std::ios::in);
 
     void mergeBlock(datablock::itor& block, const datablock::itor& begin, const datablock::itor& end, block_type parent_type);
     const char* getConfigurationName(map_type type);

@@ -984,7 +984,7 @@ datafile* CSMap::loadFile(const FXString& filename)
     try
     {
         cr->filename(filename);
-        if (!cr->load(filename.text(), errorMessage)) {
+        if (!cr->load(filename, errorMessage)) {
             delete cr;
             cr = nullptr;
         }
@@ -1011,7 +1011,7 @@ datafile* CSMap::mergeFile(const FXString& filename)
     FXString errorMessage;
     try
     {
-        if (!new_cr->load(filename.text(), errorMessage)) {
+        if (!new_cr->load(filename, errorMessage)) {
             delete new_cr;
             new_cr = nullptr;
         }
