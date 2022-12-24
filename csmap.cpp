@@ -1,6 +1,10 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #ifdef WIN32
+#ifndef UNICODE
+#error "This program was written as a Unicode only application."
+#endif
+
 #include <windows.h>
 #include <shlobj_core.h>
 #elif defined (HAVE_UNISTD_H)
@@ -52,6 +56,8 @@
 #include <cstring>
 #ifdef HAVE_CURL
 #include <curl/curl.h>
+#elif defined(WIN32)
+#include <winhttp.h>
 #endif
 FXDEFMAP(CSMap) MessageMap[]=
 {
@@ -1186,8 +1192,13 @@ bool CSMap::checkCommands()
                 si.cb = sizeof(si);
                 ZeroMemory(&pi, sizeof(pi));
                 // hack: set ECheck locale to German, since we don't support English CsMap yet:
-                if (!CreateProcess(nullptr, (LPSTR)cmdline.text(), nullptr, nullptr, FALSE, 0, (LPVOID)"LC_MESSAGES=de\0",
-                    settings.echeck_dir.text(), &si, &pi)) {
+                WCHAR dir[MAX_PATH];
+                WCHAR cmd[MAX_PATH];
+                MultiByteToWideChar(CP_UTF8, 0, cmdline.text(), cmdline.length() + 1, cmd, MAX_PATH);
+                const FXString& echeck_dir = settings.echeck_dir;
+                MultiByteToWideChar(CP_UTF8, 0, echeck_dir.text(), echeck_dir.length() + 1, dir, MAX_PATH);
+                if (!CreateProcess(nullptr, cmd, nullptr, nullptr, FALSE, 0, (LPVOID)"LC_MESSAGES=de\0",
+                    dir, &si, &pi)) {
                     errorList->appendItem("CreateProcess failed: " + cmdline);
                 }
 
@@ -2635,30 +2646,38 @@ static size_t write_data(void *data, size_t size, size_t nmemb, void *userp)
     return realsize;
 }
 
+#define SERVER_URL "https://www.eressea.kn-bremen.de/eressea/orders-php/upload.php"
+
 long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
 {
-#ifdef HAVE_CURL
-    return curlUpload();
-#else
-    return FXMessageBox::error(this, MBOX_OK, "Not Implemented", 
-        "Sorry, this version of CsMap was compiled without CURL support");
-#endif
-}
-
-#ifdef HAVE_CURL
-long CSMap::curlUpload()
-{
     char infile[PATH_MAX];
-    memory response = { 0 };
     if (!report)
         return 0;
 
     int factionId = report->getFactionId();
     if (factionId == 0)
         return 0;
-    FXString id = FXStringValEx(factionId, 36);
-    FXString passwd = askPasswordDlg(id);
-    if (u_mkstemp(infile) && report->saveCmds(infile, passwd, true) == 0) {
+    if (u_mkstemp(infile)) {
+        FXString id = FXStringValEx(factionId, 36);
+        FXString passwd = askPasswordDlg(id);
+#ifdef HAVE_CURL
+        return curlUpload(id, passwd, SERVER_URL, infile);
+#elif WIN32
+        return httpUpload(id, passwd, SERVER_URL, infile);
+#else
+        return FXMessageBox::error(this, MBOX_OK, "Not Implemented",
+            "Sorry, this version of CsMap was compiled without CURL support");
+#endif
+        unlink(infile);
+    }
+    return 0;
+}
+
+#ifdef HAVE_CURL
+long CSMap::curlUpload(const FXString& factionId, const FXString& password, const FXString& url, const char *filename)
+{
+    memory response = { 0 };
+    if (report->saveCmds(filename, password, true) == 0) {
         CURL *ch;
         CURLcode success;
         ch = curl_easy_init();
@@ -2670,17 +2689,17 @@ long CSMap::curlUpload()
                 curl_mimepart *field;
                 field = curl_mime_addpart(form);
                 curl_mime_name(field, "input");
-                curl_mime_filedata(field, infile);
+                curl_mime_filedata(field, filename);
                 field = curl_mime_addpart(form);
                 curl_mime_name(field, "submit");
                 curl_mime_data(field, "submit", CURL_ZERO_TERMINATED);
 
-                curl_easy_setopt(ch, CURLOPT_URL, "https://www.eressea.kn-bremen.de/eressea/orders-php/upload.php");
+                curl_easy_setopt(ch, CURLOPT_URL, UPLOAD_URL);
                 curl_easy_setopt(ch, CURLOPT_WRITEDATA, &response);
                 curl_easy_setopt(ch, CURLOPT_WRITEFUNCTION, write_data);
                 curl_easy_setopt(ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-                curl_easy_setopt(ch, CURLOPT_USERNAME, id.text());
-                curl_easy_setopt(ch, CURLOPT_PASSWORD, passwd.text());
+                curl_easy_setopt(ch, CURLOPT_USERNAME, factionId.text());
+                curl_easy_setopt(ch, CURLOPT_PASSWORD, password.text());
                 curl_easy_setopt(ch, CURLOPT_MIMEPOST, form);
                 success = curl_easy_perform(ch);
                 if (success == CURLE_OK) {
@@ -2705,10 +2724,14 @@ long CSMap::curlUpload()
             }
             curl_easy_cleanup(ch);
         }
-        unlink(infile);
         return 1;
     }
     return 0;
+}
+#elif defined(WIN32)
+long CSMap::httpUpload(const FXString& id, const FXString& password, const FXString &url, const char* filename)
+{
+    return 1;
 }
 #endif
 

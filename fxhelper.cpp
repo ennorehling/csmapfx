@@ -152,15 +152,16 @@ std::string loadResourceFile(const char *relpath)
         }
         PHYSFS_close(file);
     }
-#elif defined(WIN32)
-    TCHAR pf[MAX_PATH];
+#elif WIN32
+    WCHAR pf[MAX_PATH];
     if (SHGetSpecialFolderPath(0, pf, CSIDL_APPDATA, FALSE))
     {
-        std::string filename(pf);
-        filename += "\\Eressea\\CsMapFX\\";
-        filename += relpath;
+        std::wstring filename(pf);
+        filename += L"\\Eressea\\CsMapFX\\";
+        MultiByteToWideChar(CP_UTF8, 0, relpath, strlen(relpath) + 1, pf, MAX_PATH);
+        filename.append(pf);
         std::ifstream file;
-        file.open(filename.c_str(), std::ios::in | std::ios::binary);
+        file.open(filename, std::ios::in | std::ios::binary);
         if (file.is_open())
         {
             std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
