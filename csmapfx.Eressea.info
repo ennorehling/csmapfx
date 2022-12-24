@@ -1,4 +1,4 @@
-; (c) Xolgrim, v0.990   mit Magie Gwyrrd und Cerddor +Waffenbautalent Mallornwaffen korrigiert
+; (c) Xolgrim, v0.991   mit Magie Gwyrrd und Cerddor +Waffenbautalent Mallornwaffen korrigiert
 
 [Alchemie]
 Stufe	Trankname				Beschreibung (Zutaten)
@@ -252,7 +252,7 @@ Stufe 9			Weg der Bäume						3 Aura * Stufe						Keine					x		Der Geode kann St
 _			Sog des Lebens						2 Aura * Stufe						Keine					x		Der Geode kann Stufe*5 GE aus dem Astralraum zurückholen
 _			Heiliger Boden						80/3 Aura						Keine					x		Untote schrecken vor dieser Region zurück
 Stufe 10		Erwecke Ents						6 Aura * Stufe						Keine					x		Einige Bäume der Region erheben sich zu Ents
-_			Vertrauten binden					100/5 Aura						Vertraute nicht zaubern			x		Ein Vertrautentier schließt sich dem Magier an
+_			Vertrauten rufen					100/5 Aura						Vertraute nicht zaubern			x		Ein Vertrautentier schließt sich dem Magier an
 Stufe 11		Segne Steinkreis					350/5 Aura						Keine					x		Dieses Ritual segnet einen Steinkreis
 Stufe 12		Rindenhaut						4 Aura * Stufe						Keine					x		Eigene Truppen werden von einer natürlichen Rüstung geschützt
 Stufe 13		Beschwörung eines Hitzeelementar			600 Aura						Fernzauber				x		Eine ganze Region verdorrt
