@@ -1,3 +1,10 @@
+csmapfx (1.4.29-1) stable; urgency=low
+
+  * fix loading files with a BOM.
+  * undo broken info dialog optimizations.
+
+ -- Enno Rehling <enno@eressea.de>  Sat, 24 Dec 2022 11:20:00 +0200
+
 csmapfx (1.4.28-1) stable; urgency=low
 
   * fix accidental clearing of errors and search results.

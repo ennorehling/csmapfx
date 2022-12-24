@@ -94,7 +94,7 @@ void FXInfoDlg::setGame(const FXString& game)
 		size_t		size;
 	};
 
-	GameInfo infoData[] = {
+	static GameInfo infoData[] = {
 		{ "default", (const char*)data::infodlg_data, data::infodlg_data_size },
 		{ "E3", (const char*)data::infodlg_data_e3, data::infodlg_data_e3_size },
 	};

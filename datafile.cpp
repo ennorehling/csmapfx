@@ -26,8 +26,9 @@ const char* UTF8BOM = "\xEF\xBB\xBF";
 static void skip_bom(std::ifstream& file)
 {
     // skip BOM, if any
-    for (int i = 0; i != sizeof(UTF8BOM); ++i) {
-        if (file.get() != UTF8BOM[i]) {
+    for (int i = 0; i != 3; ++i) {
+        char c = file.get();
+        if (c != UTF8BOM[i]) {
             file.seekg(0);
             break;
         }
