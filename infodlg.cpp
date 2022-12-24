@@ -83,40 +83,41 @@ void FXInfoDlg::saveState(FXRegistry& reg)
 
 void FXInfoDlg::setGame(const FXString& game)
 {
-	if (current_game == game)
-		return;
-	current_game = game;
+    if (current_game == game)
+        return;
 
-	// internal data storage
-	struct GameInfo {
-		const char* game;
-		const char*	data;
-		size_t		size;
-	};
+    // internal data storage
+    struct GameInfo {
+        const char* game;
+        const char* data;
+        size_t		size;
+    };
 
-	static GameInfo infoData[] = {
-		{ "default", (const char*)data::infodlg_data, data::infodlg_data_size },
-		{ "E3", (const char*)data::infodlg_data_e3, data::infodlg_data_e3_size },
-	};
+    static GameInfo infoData[] = {
+        { "default", (const char*)data::infodlg_data, data::infodlg_data_size },
+        { "E3", (const char*)data::infodlg_data_e3, data::infodlg_data_e3_size },
+    };
 
-	// clear current data
-	blocks.clear();
+    // clear current data
+    blocks.clear();
 
-	// load internal data for specific game
-	GameInfo* loadInfo = &infoData[0];		// load "default" info by default
-    for (GameInfo* info = begin(infoData); info != end(infoData); ++info) {
-        if (game == info->game) {
-            loadInfo = info;
-            break;
+    if (current_game != "default") {
+        // load internal data for specific game
+        GameInfo* loadInfo = &infoData[0];		// load "default" info by default
+        for (GameInfo* info = begin(infoData); info != end(infoData); ++info) {
+            if (game == info->game) {
+                loadInfo = info;
+                break;
+            }
         }
+	    if (loadInfo && loadInfo->data) {
+		    std::istringstream stream( std::string(loadInfo->data, loadInfo->size) );
+		    parseTableData(stream);
+	    }
     }
 
-	if (loadInfo && loadInfo->data) {
-		std::istringstream stream( std::string(loadInfo->data, loadInfo->size) );
-		parseTableData(stream);
-	}
-
-	// load additional info from file
+    current_game = game;
+    // load additional info from file
 	// try game specific file first ("csmapfx.Eressea.info"),
 	// then try default file name ("csmapfx.info").
 	// use all files in getSearchPath().
