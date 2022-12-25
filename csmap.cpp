@@ -36,6 +36,7 @@
 #include "searchdlg.h"
 #include "prefsdlg.h"
 
+#include <png.h>
 #include "fxkeys.h"
 #include "FXMenuSeparatorEx.h"
 #include "FXSplitterEx.h"
@@ -3230,7 +3231,9 @@ long CSMap::onHelpAbout(FXObject*, FXSelector, void*)
     abouttext.append("\n\n" CSMAP_APP_COPYRIGHT "\nWeb: " CSMAP_APP_URL);
     abouttext.append("\n\nSpecial thanks to Xolgrim for assembling Eressea rules information.\nThanks to all users for suggesting features and finding bugs.");
     abouttext.append("\n\nThis software uses the FOX Toolkit Library (http://www.fox-toolkit.org).");
-    abouttext.append("\nThis software uses the mJS library (https://github.com/cesanta/mjs).");
+    abouttext.append("\nThis software uses the cparse library (https://github.com/cparse/cparse).");
+    abouttext.append("\nThis software uses the curl library (https://curl.se/).\n");
+    abouttext.append(png_get_copyright(NULL));
     abouttext.append("\nThis software is based in part on the work of the Independent JPEG Group.");
 
     FXMessageBox about(this, "Wer mich schuf...", abouttext, getIcon(), MBOX_OK);
