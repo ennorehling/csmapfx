@@ -1420,6 +1420,11 @@ void datafile::createHierarchy()
 	}
 }
 
+static int barHeight2(int people) {
+    int log = people ? std::log2(people * 2 + 1) : 0;
+    return log;
+}
+
 void datafile::createHashTables()
 {
 	m_battles.clear();
@@ -1502,14 +1507,11 @@ void datafile::createHashTables()
 			{
 				region->setFlags(region_own ? datablock::FLAG_REGION_SEEN : 0);
 
-                int own_log = region_own ? (int)log2(region_own) : 0;
-                int ally_log = region_ally ? (int)log2(region_ally) : 0;
-                int enemy_log = region_enemy ?(int)log2(region_enemy) : 0;
-                if (own_log) own_log++;		// fuer staerkere Auspraegung
-                if (ally_log) ally_log++;
-				if (enemy_log) enemy_log++;
-
-				// generate new style flag information. log_2(people) = 1 to 13
+                int own_log = barHeight2(region_own);
+                int ally_log = barHeight2(region_ally);
+                int enemy_log = barHeight2(region_enemy);
+				
+                // generate new style flag information. log_2(people) = 1 to 13
 				if (own_log || ally_log || enemy_log)
 				{
 					att_region* stats = new att_region;
