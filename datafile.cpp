@@ -1421,7 +1421,7 @@ void datafile::createHierarchy()
 }
 
 static int barHeight2(int people) {
-    int log = people ? std::log2(people * 2 + 1) : 0;
+    int log = static_cast<int>(std::log2(people * 4 + 1));
     return log;
 }
 

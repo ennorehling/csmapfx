@@ -2,7 +2,7 @@ csmapfx (1.4.30-1) stable; urgency=low
 
   * fix enemy bar in region, logarithm calculation.
 
- -- Enno Rehling <enno@eressea.de>  Sun, 25 Dec 2022 09:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 25 Dec 2022 16:20:00 +0200
 
 csmapfx (1.4.29-1) stable; urgency=low
 
