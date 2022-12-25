@@ -1502,9 +1502,11 @@ void datafile::createHashTables()
 			{
 				region->setFlags(region_own ? datablock::FLAG_REGION_SEEN : 0);
 
-                int own_log = (int)log2(region_own), ally_log = (int)log2(region_ally), enemy_log = (int)log2(region_enemy);
+                int own_log = region_own ? (int)log2(region_own) : 0;
+                int ally_log = region_ally ? (int)log2(region_ally) : 0;
+                int enemy_log = region_enemy ?(int)log2(region_enemy) : 0;
                 if (own_log) own_log++;		// fuer staerkere Auspraegung
-				if (ally_log) ally_log++;
+                if (ally_log) ally_log++;
 				if (enemy_log) enemy_log++;
 
 				// generate new style flag information. log_2(people) = 1 to 13
@@ -1667,22 +1669,23 @@ void datafile::createHashTables()
 				if (m_factionId != 0)
 				{
 					int factionId = getFactionIdForUnit(unitPtr);
-                    if (factionId <= 0)
+                    if (factionId > 0)
                     {
-                        region_enemy += number;
-                        owner = owner_t::UNIT_ENEMY;
+                        if (factionId == m_factionId)
+                        {
+                            region_own += number;
+                            number = 0;
+                            owner = owner_t::UNIT_OWN;
+                        }
+                        else if (allied_status[factionId] != 0)
+                        {
+                            region_ally += number;
+                            owner = owner_t::UNIT_ALLY;
+                            number = 0;
+                        }
                     }
-                    else if (factionId == m_factionId)
-					{
-						region_own += number;
-						owner = owner_t::UNIT_OWN;
-					}
-					else if (allied_status[factionId] != 0)
-					{
-						region_ally += number;
-						owner = owner_t::UNIT_ALLY;
-					}
 				}
+                region_enemy += number;
 
 				if (block->valueInt("bewacht") == 1)
 				{
