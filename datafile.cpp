@@ -5,6 +5,7 @@
 #include "fxhelper.h"
 #include "terrain.h"
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -1421,7 +1422,7 @@ void datafile::createHierarchy()
 }
 
 static int barHeight2(int people) {
-    int log = static_cast<int>(std::log2(people * 4 + 1));
+    int log = static_cast<int>(log2(people * 4 + 1));
     return log;
 }
 
