@@ -1786,10 +1786,9 @@ void datafile::createHashTables()
 			if (islandkey->isInt())		// Magellan-style: integer-Island-tags and ISLAND blocks with names
 			{
 				datablock::itor island = this->island(islandkey->getInt());
-				if (island != m_blocks.end())
-					name = island->value(TYPE_NAME);
-				else
-					name = "Insel " + FXStringVal(islandkey->getInt());
+                if (island != m_blocks.end()) {
+                    name = island->value(TYPE_NAME);
+                }
 			}
 			else						// Vorlage-style: string-Island-tags that flood the island
 			{
@@ -1798,16 +1797,15 @@ void datafile::createHashTables()
 				floodislands.push_back(block);		// Vorlage-style floods the islands
 			}
 
-			if (name.empty())
-				name = "Unbekannte Insel";
+            if (!name.empty()) {
+                att_region* stats = dynamic_cast<att_region*>(block->attachment());
+                if (!stats) {
+                    stats = new att_region;
+                    block->attachment(stats);
+                }
 
-			att_region* stats = dynamic_cast<att_region*>(block->attachment());
-			if (!stats) {
-				stats = new att_region;
-				block->attachment(stats);
-			}
-
-			stats->island = name;
+                stats->island = name;
+            }
 		}
 	}
 

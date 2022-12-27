@@ -1,3 +1,9 @@
+csmapfx (1.4.32-1) stable; urgency=low
+
+  * do not try to show island names when they are missing.
+
+ -- Enno Rehling <enno@eressea.de>  Tue, 27 Dec 2022 19:15:00 +0200
+
 csmapfx (1.4.31-2) stable; urgency=low
 
   * fix use of activefaction when report does not have one.
