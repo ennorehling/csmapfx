@@ -1474,7 +1474,7 @@ void datafile::createHashTables()
 		// set faction as active faction (for ally-state)
 		if (block->type() == block_type::TYPE_FACTION)
 		{
-            if (m_activefaction == m_blocks.end()) {
+            if (m_factionId == 0) {
                 if (/*block->value(TYPE_TYPE) != "" ||*/ block->value(TYPE_OPTIONS) != "")
                 {
                     m_activefaction = block;		// set active faction here

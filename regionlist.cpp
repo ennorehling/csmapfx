@@ -662,7 +662,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                             if (factionId == mapFile->getFactionId()) {
                                 icon = blue;
                             }
-                            else {
+                            else if (mapFile->hasActiveFaction()) {
                                 datablock::itor block = mapFile->activefaction();
                                 for (block++; block != mapFile->blocks().end(); ++block)
                                 {

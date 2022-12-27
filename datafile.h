@@ -44,6 +44,7 @@ public:
     FXString getFactionName(int factionId);
 
     datablock::itor activefaction() { return m_activefaction; }
+    bool hasActiveFaction() const { return m_factionId > 0; }
 
 	bool load(const FXString& filename, FXString & outError);
 	int save(const char* filename, map_type map_filter);
