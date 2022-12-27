@@ -34,7 +34,6 @@ namespace data
     struct {
         const char* filename;
         const unsigned char* image;
-        const unsigned char* icon;
     } terrains[data::TERRAIN_LAST] = {
         { "undefined.gif", undefined },
         { "ocean.gif", ocean },
@@ -114,33 +113,30 @@ namespace data
         const unsigned char* getTerrainIcon(int i) {
             if (m_icons[i].bitmap == nullptr) {
                 m_icons[i].str = Textures::loadTexture("terrain/icons", terrains[i].filename);
-                m_icons[i].bitmap = (const unsigned char *)m_icons[i].str.c_str();
                 if (m_icons[i].str.empty())
                 {
-                    // give up, don't try loading again. hack: cast, but never free this!
-                    m_icons[i].bitmap = sym_undefined;
+                    m_icons[i].bitmap = terrainSymbols[i];
+                }
+                else {
+                    m_icons[i].bitmap = (const unsigned char*)m_icons[i].str.c_str();
                 }
             }
-            if (m_icons[i].bitmap && m_icons[i].bitmap != sym_undefined) {
-                return m_icons[i].bitmap;
-            }
-            return terrainSymbols[i];
+            return m_icons[i].bitmap;
         }
 
         const unsigned char *getTerrainData(int i) {
             if (m_terrains[i].bitmap == nullptr) {
                 m_terrains[i].str = Textures::loadTexture("terrain", terrains[i].filename);
-                m_terrains[i].bitmap = (const unsigned char*)m_terrains[i].str.c_str();
                 if (m_terrains[i].str.empty())
                 {
                     // give up, don't try loading again. hack: cast, but never free this!
-                    m_terrains[i].bitmap = undefined;
+                    m_terrains[i].bitmap = terrains[i].image;
+                }
+                else {
+                    m_terrains[i].bitmap = (const unsigned char*)m_terrains[i].str.c_str();
                 }
             }
-            if (m_terrains[i].bitmap && m_terrains[i].bitmap != undefined) {
-                return m_terrains[i].bitmap;
-            }
-            return terrains[i].image;
+            return m_terrains[i].bitmap;
         }
     };
 
