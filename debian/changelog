@@ -1,3 +1,9 @@
+csmapfx (1.4.33-1) stable; urgency=low
+
+  * fix handling of Magellan-Style islands..
+
+ -- Enno Rehling <enno@eressea.de>  Tue, 27 Dec 2022 20:30:00 +0200
+
 csmapfx (1.4.32-1) stable; urgency=low
 
   * do not try to show island names when they are missing.

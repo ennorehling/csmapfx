@@ -1755,10 +1755,11 @@ void datafile::createHashTables()
 		if (const datakey* islandkey = block->valueKey(TYPE_ISLAND))
 		{
 			FXString name;
+            FXint islandId = FXIntVal(islandkey->value());
 
-			if (islandkey->isInt())		// Magellan-style: integer-Island-tags and ISLAND blocks with names
+			if (islandId > 0)		// Magellan-style: integer-Island-tags and ISLAND blocks with names
 			{
-				datablock::itor island = this->island(islandkey->getInt());
+				datablock::itor island = this->island(islandId);
                 if (island != m_blocks.end()) {
                     name = island->value(TYPE_NAME);
                 }
