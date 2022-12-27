@@ -311,7 +311,7 @@ void FXInfoDlg::createTable()
 			if (father)
 				father->setExpanded(true);
 
-			FXFoldingItem *item = list->appendItem(father, text, NULL,NULL, (void*)line);
+			FXFoldingItem *item = list->appendItem(father, text, NULL, NULL, (void*)line);
 			fathers.push_back(item);
 			line++;
 		}
