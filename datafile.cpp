@@ -1288,16 +1288,6 @@ datablock::itor datafile::island(int id)
 	return island->second;
 }
 
-bool datafile::getIsland(datablock::itor& out, int id)
-{
-    datablock::itor block = island(id);
-    if (block != m_blocks.end()) {
-        out = block;
-        return true;
-    }
-    return false;
-}
-
 void datafile::findSelection(const datablock* select, datablock::itor& out, datablock::itor& region)
 {
     datablock::itor end = m_blocks.end();
