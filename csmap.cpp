@@ -1210,31 +1210,30 @@ bool CSMap::checkCommands()
                 std::ifstream results;
                 results.open(outfile, std::ios::in);
                 if (results.is_open()) {
-                    std::string str;
-                    while (!results.eof()) {
-                        std::getline(results, str);
-                        if (!str.empty()) {
+                    std::string line;
+                    while (std::getline(results, line)) {
+                        if (!line.empty()) {
                             MessageInfo* error = new MessageInfo();
                             if (error) {
-                                FXString line, display;
+                                FXString str, display;
                                 FXString tok;
-                                line.assign(str.c_str());
-                                error->level = FXIntVal(line.section("|", 1));
-                                tok = line.section("|", 2);
+                                str.assign(line.c_str());
+                                error->level = FXIntVal(str.section("|", 1));
+                                tok = str.section("|", 2);
                                 if (tok == "U") {
-                                    error->unit_id = FXIntVal(line.section("|", 3), 36);
+                                    error->unit_id = FXIntVal(str.section("|", 3), 36);
                                 }
                                 else if (tok == "R") {
-                                    tok = line.section("|", 3);
+                                    tok = str.section("|", 3);
                                     error->region_x = FXIntVal(tok.section(",", 0));
                                     error->region_y = FXIntVal(tok.section(",", 1));
                                 }
                                 output.push_back(error);
-                                display = line.section("|", 5);
+                                display = str.section("|", 5);
                                 if (!display.empty()) {
                                     display += ": ";
                                 }
-                                display += line.section("|", 4);
+                                display += str.section("|", 4);
                                 errorList->appendItem(display, nullptr, error);
                             }
                         }
@@ -1294,7 +1293,6 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
     getApp()->refresh();
     progress.show(PLACEMENT_SCREEN);
     csmap_savePNG(file, *csmap, image, progress);
-    file.close();
 
     delete csmap;
 

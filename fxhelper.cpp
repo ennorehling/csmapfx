@@ -164,7 +164,6 @@ std::string loadResourceFile(const char *relpath)
         if (file.is_open())
         {
             std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            file.close();
             return str;
         }
     }
