@@ -124,7 +124,7 @@ void datafile::openFile(const char* filename, std::ifstream& file, std::ios::ope
     std::wstring wname(pf);
     file.open(wname, mode);
 #else
-    file.open(filename, std::ios::in);
+    file.open(filename, mode);
 #endif
 }
 // loads file, parses it and returns number of block
@@ -154,6 +154,9 @@ bool datafile::load(const FXString& filename, FXString & outError)
         std::string line;
         ++line_no;
         if (std::getline(file, line)) {
+            if (line.back() == '\r') {
+                line.pop_back();
+            }
             const char* str = line.c_str();
 
             // erster versuch: enthaelt die Zeile einen datakey?
@@ -674,6 +677,9 @@ int datafile::loadCmds(const FXString& filename)
 	{
         std::string line;
         if (std::getline(file, line)) {
+            if (line.back() == '\r') {
+                line.pop_back();
+            }
             const char* ptr = line.c_str();
             // skip indentation
             while (*ptr && isspace(*ptr))
@@ -724,6 +730,9 @@ int datafile::loadCmds(const FXString& filename)
 	{
         std::string str;
         if (std::getline(file, str)) {
+            if (str.back() == '\r') {
+                str.pop_back();
+            }
             // strip the line
             if (!str.empty()) {
                 // check if line is REGION or EINHEIT command
@@ -853,6 +862,9 @@ int datafile::loadCmds(const FXString& filename)
         // strip the line
         std::string str;
         if (std::getline(file, str)) {
+            if (str.back() == '\r') {
+                str.pop_back();
+            }
             // check if line is REGION oder EINHEIT command
             line.assign(str.c_str());
             indent = line.find_first_not_of("\t ");
