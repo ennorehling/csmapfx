@@ -1,3 +1,9 @@
+csmapfx (1.4.33-2) stable; urgency=low
+
+  * ignore gcc 7.2 abi change warning.
+
+ -- Enno Rehling <enno@eressea.de>  Wed, 28 Dec 2022 19:30:00 +0200
+
 csmapfx (1.4.33-1) stable; urgency=low
 
   * fix handling of Magellan-Style islands..
