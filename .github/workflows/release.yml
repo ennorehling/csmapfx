@@ -11,12 +11,12 @@ jobs:
     strategy:
       matrix:
         dist:
-          - buster
           - bullseye
         arch:
           - amd64
           - i386
           - arm64
+          - armhf
     steps:
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@latest
@@ -35,7 +35,6 @@ jobs:
            cpu_architecture: ${{ matrix.arch }}
            artifacts_directory: artifacts
       - name: Upload to Packagecloud
-        if: matrix.dist != 'buster' || matrix.arch != 'arm64'
         continue-on-error: true
         uses: danielmundi/upload-packagecloud@v1
         with:
