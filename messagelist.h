@@ -20,7 +20,7 @@ public:
     void setMapFile(datafile *f);
 
 public:
-    virtual long onMapChange(FXObject*, FXSelector, void*) = 0;
+    virtual long onMapChange(FXObject*, FXSelector, void*);
 	long onDoubleClick(FXObject*,FXSelector,void*);
 
 protected:

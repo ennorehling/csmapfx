@@ -1,6 +1,6 @@
 #include "main.h"
 #include "fxhelper.h"
-#include "messages.h"
+#include "messagelist.h"
 
 #include <set>
 
@@ -78,6 +78,18 @@ void FXMessageList::addMessage(FXTreeItem* group, datablock * block)
     }
 }
 
+long FXMessageList::onMapChange(FXObject*target, FXSelector sel, void*ptr)
+{
+    datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
+
+    // any data changed, so need to update list?
+    if (selection.fileChange != pstate->fileChange)
+    {
+        selection.fileChange = pstate->fileChange;
+    }
+    selection = *pstate;
+    return 1;
+}
 long FXMessageList::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 {
     if (this != sender) {

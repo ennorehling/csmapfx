@@ -31,16 +31,8 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
 {
     datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
 
-    // any data changed, so need to update list?
-    if (selection.fileChange != pstate->fileChange)
-    {
-        selection.fileChange = pstate->fileChange;
-    }
-
     if (selection.selChange != pstate->selChange)
     {
-        selection = *pstate;
-
         clearSiblings(effects);
         clearSiblings(streets);
         clearSiblings(travel);
@@ -53,13 +45,13 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
         clearSiblings(guards);
 
         if (mapFile) {
-            if (selection.selected & selection.REGION)
+            if (pstate->selected & selection.REGION)
             {
-                datablock::itor region = selection.region;
+                datablock::itor region = pstate->region;
                 datablock::itor end = mapFile->blocks().end();
                 datablock::itor block;
                 std::set<FXint> guard_ids;
-                if (mapFile->getBattle(block, selection.sel_x, selection.sel_y, selection.sel_plane)) {
+                if (mapFile->getBattle(block, pstate->sel_x, pstate->sel_y, pstate->sel_plane)) {
                     int depth = block->depth();
                     battle = appendItem(nullptr, "Kampf");
                     for (++block; block != end && block->depth() > depth; block++)
@@ -163,6 +155,6 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
         }
     }
 
-    return 1;
+    return FXMessageList::onMapChange(target, sel, ptr);
 
 }

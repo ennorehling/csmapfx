@@ -1,6 +1,6 @@
 #ifndef CSMAP_REGIONINFO_H
 #define CSMAP_REGIONINFO_H
-#include "messages.h"
+#include "messagelist.h"
 
 class FXRegionInfo : public FXMessageList
 {

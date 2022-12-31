@@ -50,7 +50,7 @@ set (SOURCES
 	main.cpp
 	mapcanvas.cpp
 	map.cpp
-	messages.cpp
+	messagelist.cpp
   regioninfo.cpp
 	prefsdlg.cpp
 	regionpanel.cpp
