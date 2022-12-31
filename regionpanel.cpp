@@ -1,6 +1,6 @@
 #include "main.h"
 #include "fxhelper.h"
-#include "regioninfos.h"
+#include "regionpanel.h"
 #include "symbols.h"
 
 #include <algorithm>

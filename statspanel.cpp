@@ -2,7 +2,7 @@
 
 #include "main.h"
 #include "fxhelper.h"
-#include "statsinfos.h"
+#include "statspanel.h"
 
 #include <cstdio>
 

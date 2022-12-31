@@ -1,6 +1,6 @@
 #include "main.h"
 #include "fxhelper.h"
-#include "tradeinfos.h"
+#include "tradepanel.h"
 #include "symbols.h"
 
 // *********************************************************************************************************
