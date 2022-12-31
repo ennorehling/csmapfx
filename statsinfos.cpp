@@ -12,15 +12,15 @@
 // *********************************************************************************************************
 // *** FXStatsInfos implementation
 
-FXDEFMAP(FXStatsInfos) MessageMap[]=
+FXDEFMAP(FXStatsPanel) MessageMap[]=
 { 
 	//________Message_Type_____________________ID_______________Message_Handler_______ 
-	FXMAPFUNC(SEL_COMMAND,		FXStatsInfos::ID_UPDATE,				FXStatsInfos::onMapChange), 
+	FXMAPFUNC(SEL_COMMAND,		FXStatsPanel::ID_UPDATE,				FXStatsPanel::onMapChange), 
 }; 
 
-FXIMPLEMENT(FXStatsInfos,FXVerticalFrame,MessageMap, ARRAYNUMBER(MessageMap))
+FXIMPLEMENT(FXStatsPanel,FXVerticalFrame,MessageMap, ARRAYNUMBER(MessageMap))
 
-FXStatsInfos::FXStatsInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h)
+FXStatsPanel::FXStatsPanel(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h)
 		: FXVerticalFrame(p, opts, x,y,w,h, 0,0,0,0, 0,0)
 {
 	// set target etc.
@@ -44,18 +44,18 @@ FXStatsInfos::FXStatsInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	tags.rightmatrix = new FXMatrix(tags.matrixframe,3,MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
 }
 
-void FXStatsInfos::create()
+void FXStatsPanel::create()
 {
 	FXVerticalFrame::create();
 
 	createLabels("Keine Statistik", "", "", 0);
 }
 
-FXStatsInfos::~FXStatsInfos()
+FXStatsPanel::~FXStatsPanel()
 {
 }
 
-void FXStatsInfos::setMapFile(datafile *f)
+void FXStatsPanel::setMapFile(datafile *f)
 {
     mapFile = f;
 }
@@ -77,7 +77,7 @@ inline FXString thousandsPoints(FXint value, bool plusSign = false)
 	return str;
 }
 
-void FXStatsInfos::clearLabels()
+void FXStatsPanel::clearLabels()
 {
 	for (std::vector<FXLabel*>::iterator itor = tags.entries.begin(); itor != tags.entries.end(); itor++)
 		delete *itor;
@@ -85,7 +85,7 @@ void FXStatsInfos::clearLabels()
 	tags.entries.clear();
 }
 
-void FXStatsInfos::createLabels(const FXString& name, const FXString& one, const FXString& two, int column)
+void FXStatsPanel::createLabels(const FXString& name, const FXString& one, const FXString& two, int column)
 {
 	FXMatrix *matrix = (column==0) ? tags.leftmatrix : tags.rightmatrix;
 
@@ -102,7 +102,7 @@ void FXStatsInfos::createLabels(const FXString& name, const FXString& one, const
 	tags.entries.push_back(lsecond);
 }
 
-void FXStatsInfos::setInfo(const std::vector<Info>& info)
+void FXStatsPanel::setInfo(const std::vector<Info>& info)
 {
 	clearLabels();
 
@@ -130,7 +130,7 @@ void FXStatsInfos::setInfo(const std::vector<Info>& info)
 	}
 }
 
-void FXStatsInfos::addEntry(std::vector<Info>& info, FXString name, int value, FXString tip)
+void FXStatsPanel::addEntry(std::vector<Info>& info, FXString name, int value, FXString tip)
 {
     std::vector<Info>::iterator itor;
 	for (itor = info.begin(); itor != info.end(); itor++)
@@ -144,7 +144,7 @@ void FXStatsInfos::addEntry(std::vector<Info>& info, FXString name, int value, F
 		info.push_back(Info(name, tip, value));
 }
 
-void FXStatsInfos::collectData(std::vector<Info>& info, datablock::itor region)
+void FXStatsPanel::collectData(std::vector<Info>& info, datablock::itor region)
 {
 	int WorkPerRegion[] =	// Arbeitsplaetze pro Regionstyp
 	{
@@ -268,7 +268,7 @@ void FXStatsInfos::collectData(std::vector<Info>& info, datablock::itor region)
     }
 }
 
-void FXStatsInfos::updateData()
+void FXStatsPanel::updateData()
 {
 	if (selection.selected & selection.MULTIPLE_REGIONS)
 	{
@@ -316,7 +316,7 @@ void FXStatsInfos::updateData()
 	}
 }
 
-long FXStatsInfos::onMapChange(FXObject*, FXSelector, void* ptr)
+long FXStatsPanel::onMapChange(FXObject*, FXSelector, void* ptr)
 {
 	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 

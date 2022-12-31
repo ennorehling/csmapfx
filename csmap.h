@@ -273,8 +273,8 @@ private:
 
 	// Rechts
     class FXRegionPanel* regionPanel = nullptr;
-    class FXStatsInfos* statsinfos = nullptr;
-    class FXTradeInfos* tradeinfos = nullptr;
+    class FXStatsPanel* statsPanel = nullptr;
+    class FXTradePanel* tradePanel = nullptr;
     class FXVerticalFrame *rightframe = nullptr;
     class FXSplitterEx	*commandsplitter = nullptr;
     class FXTabBook		*tabbook = nullptr;

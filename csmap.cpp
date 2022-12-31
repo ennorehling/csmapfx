@@ -573,12 +573,12 @@ CSMap::CSMap(FXApp *app) :
     FXHorizontalFrame *siFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
     siTab = new FXToolBarTab(siFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
     siTab->setTipText("Statistik ein- und ausblenden");
-    statsinfos = new FXStatsInfos(siFrame, this,ID_SELECTION, LAYOUT_FILL_X);
+    statsPanel = new FXStatsPanel(siFrame, this,ID_SELECTION, LAYOUT_FILL_X);
 
     FXHorizontalFrame *tiFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
     tiTab = new FXToolBarTab(tiFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
     tiTab->setTipText("Handelsinformationen ein- und ausblenden");
-    tradeinfos = new FXTradeInfos(tiFrame, this, ID_SELECTION, LAYOUT_FILL_X);
+    tradePanel = new FXTradePanel(tiFrame, this, ID_SELECTION, LAYOUT_FILL_X);
 
     commandsplitter = new FXSplitterEx(rightframe, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
@@ -939,9 +939,9 @@ void CSMap::mapChange()
     minimap->setMapFile(report);
     commands->setMapFile(report);
     unitlist->setMapFile(report);
-    tradeinfos->setMapFile(report);
+    tradePanel->setMapFile(report);
     statistics->setMapFile(report);
-    statsinfos->setMapFile(report);
+    statsPanel->setMapFile(report);
     regionPanel->setMapFile(report);
     mathbar->setMapFile(report);
     reportInfo->setMapFile(report);

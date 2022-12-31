@@ -7,15 +7,15 @@
 
 #include <vector>
 
-class FXStatsInfos : public FXVerticalFrame
+class FXStatsPanel : public FXVerticalFrame
 {
-	FXDECLARE(FXStatsInfos)
+	FXDECLARE(FXStatsPanel)
 
 public:
-	FXStatsInfos(FXComposite* p, FXObject* tgt=NULL,FXSelector sel=0, FXuint opts=0, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
+	FXStatsPanel(FXComposite* p, FXObject* tgt=NULL,FXSelector sel=0, FXuint opts=0, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
 	void create();
-	virtual ~FXStatsInfos();
+	virtual ~FXStatsPanel();
 
     void setMapFile(datafile *f);
 
@@ -64,8 +64,8 @@ protected:
 	void updateData();
 
 protected:
-	FXStatsInfos(){}
-	FXStatsInfos(const FXStatsInfos&) {}
+	FXStatsPanel(){}
+	FXStatsPanel(const FXStatsPanel&) {}
 };
 
 #endif //_CSMAP_STATSINFOS
