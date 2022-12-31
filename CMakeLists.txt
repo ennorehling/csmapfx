@@ -51,6 +51,7 @@ set (SOURCES
 	mapcanvas.cpp
 	map.cpp
 	messages.cpp
+  regioninfo.cpp
 	prefsdlg.cpp
 	regionpanel.cpp
 	regionlist.cpp
@@ -62,6 +63,7 @@ set (SOURCES
 	tradepanel.cpp
 	unitlist.cpp
 )
+
 if (PNG_FOUND)
 set(SOURCES ${SOURCES} imageio.cpp)
 endif (PNG_FOUND)

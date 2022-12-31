@@ -16,8 +16,8 @@
 #include "main.h"
 #include "fxhelper.h"
 #include "csmap.h"
-#include "messages.h"
 #include "reportinfo.h"
+#include "regioninfo.h"
 #include "commands.h"
 #include "datafile.h"
 #include "symbols.h"
@@ -543,7 +543,7 @@ CSMap::CSMap(FXApp *app) :
     new FXTabItem(outputTabs, "Rep&ort");
     reportInfo = new FXReportInfo(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
     new FXTabItem(outputTabs, "Re&gion");
-    messages = new FXMessageList(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
+    regionInfo = new FXRegionInfo(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
     new FXTabItem(outputTabs, "&Fehler");
     errorList = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
     new FXTabItem(outputTabs, "&Suchergebnisse");
@@ -945,7 +945,7 @@ void CSMap::mapChange()
     regionPanel->setMapFile(report);
     mathbar->setMapFile(report);
     reportInfo->setMapFile(report);
-    messages->setMapFile(report);
+    regionInfo->setMapFile(report);
     map->setMapFile(report);
     regions->setMapFile(report);
 }

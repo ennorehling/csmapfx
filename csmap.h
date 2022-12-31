@@ -265,7 +265,7 @@ private:
 	// Mitte
     class FXCSMap* map = nullptr;
     class FXReportInfo* reportInfo = nullptr;
-    class FXMessageList* messages = nullptr;
+    class FXRegionInfo* regionInfo = nullptr;
     class FXCommands* commands = nullptr;
     class FXCalculator* mathbar = nullptr;
     class FXVerticalFrame	*middle = nullptr;
