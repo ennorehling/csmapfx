@@ -565,10 +565,10 @@ CSMap::CSMap(FXApp *app) :
     FXHorizontalFrame *riFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
     riTab = new FXToolBarTab(riFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
     riTab->setTipText("Regionsinformationen ein- und ausblenden");
-    regioninfos = new FXRegionInfos(riFrame, this,ID_SELECTION, LAYOUT_FILL_X);
+    regionPanel = new FXRegionPanel(riFrame, this,ID_SELECTION, LAYOUT_FILL_X);
 
-    menu.regdescription->setTarget(regioninfos);
-    menu.regdescription->setSelector(FXRegionInfos::ID_TOGGLEDESCRIPTION);
+    menu.regdescription->setTarget(regionPanel);
+    menu.regdescription->setSelector(FXRegionPanel::ID_TOGGLEDESCRIPTION);
 
     FXHorizontalFrame *siFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
     siTab = new FXToolBarTab(siFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
@@ -811,7 +811,7 @@ void CSMap::create()
         map->handle(this, FXSEL(SEL_COMMAND, FXCSMap::ID_TOGGLESHADOWREGIONS), nullptr);
 
     if (reg.readUnsignedEntry("SHOW", "REGDESCRIPTION", 1))
-        regioninfos->handle(this, FXSEL(SEL_COMMAND, FXRegionInfos::ID_TOGGLEDESCRIPTION), nullptr);
+        regionPanel->handle(this, FXSEL(SEL_COMMAND, FXRegionPanel::ID_TOGGLEDESCRIPTION), nullptr);
 
     if (reg.readUnsignedEntry("SHOW", "OWNFACTIONGROUP", 1))
         regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLEOWNFACTIONGROUP), nullptr);
@@ -942,7 +942,7 @@ void CSMap::mapChange()
     tradeinfos->setMapFile(report);
     statistics->setMapFile(report);
     statsinfos->setMapFile(report);
-    regioninfos->setMapFile(report);
+    regionPanel->setMapFile(report);
     mathbar->setMapFile(report);
     reportInfo->setMapFile(report);
     messages->setMapFile(report);

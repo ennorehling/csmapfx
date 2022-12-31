@@ -1,5 +1,4 @@
-#ifndef _CSMAP_REGIONINFOS
-#define _CSMAP_REGIONINFOS
+#pragma once
 
 #include "datafile.h"
 #include "terrain.h"
@@ -8,15 +7,15 @@
 
 #include <vector>
 
-class FXRegionInfos : public FXVerticalFrame
+class FXRegionPanel : public FXVerticalFrame
 {
-	FXDECLARE(FXRegionInfos)
+	FXDECLARE(FXRegionPanel)
 
 public:
-	FXRegionInfos(FXComposite* p, FXObject* tgt=NULL,FXSelector sel=0, FXuint opts=0, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
+	FXRegionPanel(FXComposite* p, FXObject* tgt=NULL,FXSelector sel=0, FXuint opts=0, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
 	void create();
-	virtual ~FXRegionInfos();
+	virtual ~FXRegionPanel();
 
     void setMapFile(datafile *f);
 
@@ -80,8 +79,6 @@ protected:
 	void updateData();
 
 protected:
-	FXRegionInfos() {}
-	FXRegionInfos(const FXRegionInfos&) {}
+	FXRegionPanel() {}
+	FXRegionPanel(const FXRegionPanel&) {}
 };
-
-#endif

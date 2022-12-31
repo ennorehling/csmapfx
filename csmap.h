@@ -272,7 +272,7 @@ private:
     class FXVerticalFrame *msgBorder = nullptr;
 
 	// Rechts
-    class FXRegionInfos* regioninfos = nullptr;
+    class FXRegionPanel* regionPanel = nullptr;
     class FXStatsInfos* statsinfos = nullptr;
     class FXTradeInfos* tradeinfos = nullptr;
     class FXVerticalFrame *rightframe = nullptr;

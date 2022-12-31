@@ -30,7 +30,6 @@ FXReportInfo::FXReportInfo(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	setSelBackColor(getBackColor());
 
 	groups.messages = appendItem(nullptr, "Meldungen");
-	groups.factions = appendItem(nullptr, "Parteien");
 	groups.battles = appendItem(nullptr, L"K\u00e4mpfe");
 }
 
@@ -49,7 +48,6 @@ void FXReportInfo::setMapFile(datafile *f)
         datablock::itor it, end;
         mapFile = f;
         clearSiblings(groups.messages);
-        clearSiblings(groups.factions);
         clearSiblings(groups.battles);
         if (mapFile) {
             end = mapFile->blocks().end();

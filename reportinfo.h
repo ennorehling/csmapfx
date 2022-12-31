@@ -37,7 +37,6 @@ protected:
     struct
     {
         FXTreeItem* messages;
-        FXTreeItem* factions;
         FXTreeItem* battles;
     } groups = { 0 };
 

@@ -8,20 +8,20 @@
 // *********************************************************************************************************
 // *** FXRegionInfos implementation
 
-FXDEFMAP(FXRegionInfos) MessageMap[]=
+FXDEFMAP(FXRegionPanel) MessageMap[]=
 {
 	//________Message_Type_____________________ID_______________Message_Handler_______
-	FXMAPFUNC(SEL_COMMAND,		FXRegionInfos::ID_UPDATE,				FXRegionInfos::onMapChange),
+	FXMAPFUNC(SEL_COMMAND,		FXRegionPanel::ID_UPDATE,				FXRegionPanel::onMapChange),
 
-	FXMAPFUNC(SEL_COMMAND,		FXRegionInfos::ID_TOGGLEDESCRIPTION,	FXRegionInfos::onToggleDescription),
-	FXMAPFUNC(SEL_UPDATE,		FXRegionInfos::ID_TOGGLEDESCRIPTION,	FXRegionInfos::onUpdateToggleDescription),
+	FXMAPFUNC(SEL_COMMAND,		FXRegionPanel::ID_TOGGLEDESCRIPTION,	FXRegionPanel::onToggleDescription),
+	FXMAPFUNC(SEL_UPDATE,		FXRegionPanel::ID_TOGGLEDESCRIPTION,	FXRegionPanel::onUpdateToggleDescription),
 
-	FXMAPFUNC(SEL_UPDATE,		FXRegionInfos::ID_DESCRIPTION,			FXRegionInfos::onUpdateDescription),
+	FXMAPFUNC(SEL_UPDATE,		FXRegionPanel::ID_DESCRIPTION,			FXRegionPanel::onUpdateDescription),
 };
 
-FXIMPLEMENT(FXRegionInfos,FXVerticalFrame,MessageMap, ARRAYNUMBER(MessageMap))
+FXIMPLEMENT(FXRegionPanel,FXVerticalFrame,MessageMap, ARRAYNUMBER(MessageMap))
 
-FXRegionInfos::FXRegionInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h)
+FXRegionPanel::FXRegionPanel(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h)
 		: FXVerticalFrame(p, opts, x,y,w,h, 0,0,0,0, 0,0)
 {
 	// set target etc.
@@ -63,7 +63,7 @@ FXRegionInfos::FXRegionInfos(FXComposite* p, FXObject* tgt,FXSelector sel, FXuin
 	tags.desc->disable();
 }
 
-void FXRegionInfos::create()
+void FXRegionPanel::create()
 {
 	FXVerticalFrame::create();
 
@@ -72,14 +72,14 @@ void FXRegionInfos::create()
 		terrainIcons[i]->create();
 }
 
-FXRegionInfos::~FXRegionInfos()
+FXRegionPanel::~FXRegionPanel()
 {
 	// terrain icons for region list
 	for (int i = 0; i <  data::TERRAIN_LAST; i++)
 		delete terrainIcons[i];
 }
 
-void FXRegionInfos::setMapFile(datafile *f)
+void FXRegionPanel::setMapFile(datafile *f)
 {
     mapFile = f;
 }
@@ -100,7 +100,7 @@ inline FXString thousandsPoints(FXulong value, bool plusSign = false)
 	return str;
 }
 
-void FXRegionInfos::clearLabels()
+void FXRegionPanel::clearLabels()
 {
 	for (std::vector<FXLabel*>::iterator itor = tags.entries.begin(); itor != tags.entries.end(); itor++)
 		delete *itor;
@@ -108,7 +108,7 @@ void FXRegionInfos::clearLabels()
 	tags.entries.clear();
 }
 
-void FXRegionInfos::createLabels(const FXString& name, const FXString& label, int column)
+void FXRegionPanel::createLabels(const FXString& name, const FXString& label, int column)
 {
 	FXMatrix *matrix = (column==0) ? tags.leftmatrix : tags.rightmatrix;
 
@@ -123,7 +123,7 @@ void FXRegionInfos::createLabels(const FXString& name, const FXString& label, in
 	tags.entries.push_back(lfirst);
 }
 
-void FXRegionInfos::setInfo(const std::vector<Info>& info)
+void FXRegionPanel::setInfo(const std::vector<Info>& info)
 {
 	clearLabels();
 
@@ -152,7 +152,7 @@ void FXRegionInfos::setInfo(const std::vector<Info>& info)
 	}
 }
 
-void FXRegionInfos::addEntry(std::vector<Info>& info, FXString name, FXulong value, int skill, FXString tip)
+void FXRegionPanel::addEntry(std::vector<Info>& info, FXString name, FXulong value, int skill, FXString tip)
 {
     std::vector<Info>::iterator itor;
 	for (itor = info.begin(); itor != info.end(); itor++)
@@ -169,7 +169,7 @@ void FXRegionInfos::addEntry(std::vector<Info>& info, FXString name, FXulong val
 		info.push_back(Info(name, tip, value, skill));
 }
 
-void FXRegionInfos::collectData(std::vector<Info>& info, datablock::itor region)
+void FXRegionPanel::collectData(std::vector<Info>& info, datablock::itor region)
 {
 	FXint Bauern = region->valueInt("Bauern", -1);
 	FXint Silber = region->valueInt("Silber", -1);
@@ -257,7 +257,7 @@ void FXRegionInfos::collectData(std::vector<Info>& info, datablock::itor region)
 	}
 }
 
-void FXRegionInfos::updateData()
+void FXRegionPanel::updateData()
 {
 	//if (files->empty())
 		//return;
@@ -368,7 +368,7 @@ void FXRegionInfos::updateData()
 	}
 }
 
-long FXRegionInfos::onMapChange(FXObject*, FXSelector, void* ptr)
+long FXRegionPanel::onMapChange(FXObject*, FXSelector, void* ptr)
 {
 	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
@@ -409,20 +409,20 @@ long FXRegionInfos::onMapChange(FXObject*, FXSelector, void* ptr)
 	return 1;
 }
 
-long FXRegionInfos::onToggleDescription(FXObject*,FXSelector,void*)
+long FXRegionPanel::onToggleDescription(FXObject*,FXSelector,void*)
 {
 	show_description = !show_description;
 	updateData();
 	return 1;
 }
 
-long FXRegionInfos::onUpdateToggleDescription(FXObject* sender,FXSelector,void*)
+long FXRegionPanel::onUpdateToggleDescription(FXObject* sender,FXSelector,void*)
 {
 	sender->handle(this, FXSEL(SEL_COMMAND, show_description?ID_CHECK:ID_UNCHECK), NULL);
 	return 1;
 }
 
-long FXRegionInfos::onUpdateDescription(FXObject* sender,FXSelector,void*)
+long FXRegionPanel::onUpdateDescription(FXObject* sender,FXSelector,void*)
 {
 	if (tags.desc->getText().empty())
 	{
