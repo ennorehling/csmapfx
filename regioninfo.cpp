@@ -19,12 +19,12 @@ void FXRegionInfo::create()
 FXRegionInfo::FXRegionInfo(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x, FXint y, FXint w, FXint h)
     : FXMessageList(p, tgt, sel, opts, x, y, w, h)
 {
-    groups.messages = appendItem(nullptr, "Meldungen");
-    groups.effects = appendItem(nullptr, "Effekte");
-    groups.travel = appendItem(nullptr, "Durchreise");
-    groups.battle = nullptr;
-    groups.streets = appendItem(nullptr, FXString(L"Stra\u00dfen"));
-    groups.guards = appendItem(nullptr, "Bewacher");
+    messages = appendItem(nullptr, "Meldungen");
+    effects = appendItem(nullptr, "Effekte");
+    travel = appendItem(nullptr, "Durchreise");
+    battle = nullptr;
+    streets = appendItem(nullptr, FXString(L"Stra\u00dfen"));
+    guards = appendItem(nullptr, "Bewacher");
 }
 
 long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
@@ -41,16 +41,16 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
     {
         selection = *pstate;
 
-        clearSiblings(groups.effects);
-        clearSiblings(groups.streets);
-        clearSiblings(groups.travel);
-        clearSiblings(groups.messages);
-        if (groups.battle) {
-            clearSiblings(groups.battle);
-            removeItem(groups.battle);
-            groups.battle = nullptr;
+        clearSiblings(effects);
+        clearSiblings(streets);
+        clearSiblings(travel);
+        clearSiblings(messages);
+        if (battle) {
+            clearSiblings(battle);
+            removeItem(battle);
+            battle = nullptr;
         }
-        clearSiblings(groups.guards);
+        clearSiblings(guards);
 
         if (mapFile) {
             if (selection.selected & selection.REGION)
@@ -61,11 +61,11 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                 std::set<FXint> guard_ids;
                 if (mapFile->getBattle(block, selection.sel_x, selection.sel_y, selection.sel_plane)) {
                     int depth = block->depth();
-                    groups.battle = appendItem(nullptr, "Kampf");
+                    battle = appendItem(nullptr, "Kampf");
                     for (++block; block != end && block->depth() > depth; block++)
                     {
                         if (block->type() == block_type::TYPE_MESSAGE) {
-                            addMessage(groups.battle, &*block);
+                            addMessage(battle, &*block);
                         }
                     }
                 }
@@ -77,7 +77,7 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                         MESSAGE 324149248
                         "von Figo (g351): 'KABUMM *kicher*'";rendered
                         */
-                        addMessage(groups.messages, &*block);
+                        addMessage(messages, &*block);
                     }
                     else if (block->depth() > region->depth() + 1) {
                         continue;
@@ -97,7 +97,7 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                         */
 
                         for (datakey::list_type::const_iterator msg = block->data().begin(); msg != block->data().end(); msg++)
-                            appendItem(groups.effects, msg->value());
+                            appendItem(effects, msg->value());
                     }
                     else if (block->type() == block_type::TYPE_BORDER)
                     {
@@ -133,7 +133,7 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                         else
                             label += artikel + "zu " + FXStringVal(procent) + "% vollendete " + typ + ".";
 
-                        appendItem(groups.streets, label);
+                        appendItem(streets, label);
                     }
                     else if (block->type() == block_type::TYPE_DURCHREISE || block->type() == block_type::TYPE_DURCHSCHIFFUNG)
                     {
@@ -147,7 +147,7 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                             prefix = "Die ";	// fuer Schiffe
 
                         for (datakey::list_type::const_iterator msg = block->data().begin(); msg != block->data().end(); msg++)
-                            appendItem(groups.travel, prefix + msg->value());
+                            appendItem(travel, prefix + msg->value());
                     }
                 }
                 if (!guard_ids.empty()) {
@@ -155,7 +155,7 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                         datablock::itor faction;
                         if (mapFile->getFaction(faction, id)) {
                             FXString label = faction->value("Parteiname") + " (" + faction->id() + ")";
-                            appendItem(groups.guards, label);
+                            appendItem(guards, label);
                         }
                     }
                 }

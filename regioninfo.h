@@ -16,14 +16,11 @@ public:
 public:
     virtual long onMapChange(FXObject*, FXSelector, void*);
 protected:
-    struct
-    {
-        FXTreeItem* messages = nullptr;
-        FXTreeItem* effects = nullptr;
-        FXTreeItem* streets = nullptr;
-        FXTreeItem* travel = nullptr;
-        FXTreeItem* guards = nullptr;
-        FXTreeItem* battle = nullptr;
-    } groups;
+    FXTreeItem* messages = nullptr;
+    FXTreeItem* effects = nullptr;
+    FXTreeItem* streets = nullptr;
+    FXTreeItem* travel = nullptr;
+    FXTreeItem* guards = nullptr;
+    FXTreeItem* battle = nullptr;
 };
 #endif
