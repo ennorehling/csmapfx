@@ -7,17 +7,17 @@
 // *********************************************************************************************************
 // *** FXMessages implementation
 
-FXDEFMAP(FXMessages) MessageMap[]=
+FXDEFMAP(FXMessageList) MessageMap[]=
 {
 	//________Message_Type_____________________ID_______________Message_Handler_______
-	FXMAPFUNC(SEL_COMMAND,			FXMessages::ID_UPDATE,			FXMessages::onMapChange),
+	FXMAPFUNC(SEL_COMMAND,			FXMessageList::ID_UPDATE,			FXMessageList::onMapChange),
 
-	FXMAPFUNC(SEL_DOUBLECLICKED,	0,								FXMessages::onDoubleClick),
+	FXMAPFUNC(SEL_DOUBLECLICKED,	0,								FXMessageList::onDoubleClick),
 };
 
-FXIMPLEMENT(FXMessages,FXTreeList,MessageMap, ARRAYNUMBER(MessageMap))
+FXIMPLEMENT(FXMessageList,FXTreeList,MessageMap, ARRAYNUMBER(MessageMap))
 
-FXMessages::FXMessages(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h) :
+FXMessageList::FXMessageList(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h) :
     FXTreeList(p, tgt,sel, opts|TREELIST_SINGLESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES, x,y,w,h)
 {
 	// init variables
@@ -37,16 +37,16 @@ FXMessages::FXMessages(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 	groups.guards = appendItem(nullptr, "Bewacher");
 }
 
-void FXMessages::create()
+void FXMessageList::create()
 {
 	FXTreeList::create();
 }
 
-FXMessages::~FXMessages()
+FXMessageList::~FXMessageList()
 {
 }
 
-void FXMessages::setMapFile(datafile *f)
+void FXMessageList::setMapFile(datafile *f)
 {
     if (f != mapFile) {
         datablock::itor block, end;
@@ -54,7 +54,7 @@ void FXMessages::setMapFile(datafile *f)
     }
 }
 
-void FXMessages::addMessage(FXTreeItem* group, datablock * block)
+void FXMessageList::addMessage(FXTreeItem* group, datablock * block)
 {
     if (block->type() == block_type::TYPE_BATTLE) {
         datablock::itor region;
@@ -101,7 +101,7 @@ void FXMessages::addMessage(FXTreeItem* group, datablock * block)
     }
 }
 
-long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
+long FXMessageList::onMapChange(FXObject*, FXSelector, void* ptr)
 {
 	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
@@ -240,7 +240,7 @@ long FXMessages::onMapChange(FXObject*, FXSelector, void* ptr)
 	return 1;
 }
 
-long FXMessages::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
+long FXMessageList::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 {
     if (this != sender) {
         return 0;
@@ -285,7 +285,7 @@ long FXMessages::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 	return FXTreeList::onDoubleClicked(this, sel, ptr);
 }
 
-void FXMessages::clearSiblings(FXTreeItem* parent_item)
+void FXMessageList::clearSiblings(FXTreeItem* parent_item)
 {
 	FXTreeItem *item = parent_item->getFirst();
 	while (item)
