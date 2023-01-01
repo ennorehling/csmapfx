@@ -18,7 +18,7 @@ FXDEFMAP(FXReportInfo) MessageMap[]=
 FXIMPLEMENT(FXReportInfo,FXTreeList,MessageMap, ARRAYNUMBER(MessageMap))
 
 FXReportInfo::FXReportInfo(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h) :
-    FXTreeList(p, tgt, sel, opts|TREELIST_SINGLESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES, x, y, w, h)
+    FXMessageList(p, tgt, sel, opts|TREELIST_SINGLESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES, x, y, w, h)
 {
 	// init variables
 	mapFile = nullptr;
@@ -29,8 +29,8 @@ FXReportInfo::FXReportInfo(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	setSelTextColor(getTextColor());
 	setSelBackColor(getBackColor());
 
-	groups.messages = appendItem(nullptr, "Meldungen");
-	groups.battles = appendItem(nullptr, L"K\u00e4mpfe");
+	messages = appendItem(nullptr, "Meldungen");
+	battles = appendItem(nullptr, L"K\u00e4mpfe");
 }
 
 void FXReportInfo::create()
@@ -47,8 +47,8 @@ void FXReportInfo::setMapFile(datafile *f)
     if (f != mapFile) {
         datablock::itor it, end;
         mapFile = f;
-        clearSiblings(groups.messages);
-        clearSiblings(groups.battles);
+        clearSiblings(messages);
+        clearSiblings(battles);
         if (mapFile) {
             end = mapFile->blocks().end();
             for (it = mapFile->blocks().begin(); it != end;) {
@@ -66,12 +66,13 @@ void FXReportInfo::setMapFile(datafile *f)
                     continue;
                 }
                 else if (block->type() == block_type::TYPE_MESSAGE && block->depth() == 3) {
-                    addMessage(groups.messages, block);
+                    addMessage(messages, block);
                 }
                 ++it;
             }
         }
     }
+    FXMessageList::setMapFile(f);
 }
 
 const char *FXReportInfo::messageSection(const FXString& section)
@@ -146,7 +147,7 @@ void FXReportInfo::addBattle(datablock::itor& block)
     FXString label;
     label.format(" (%d,%d)", block->x(), block->y());
     label = name + label;
-    FXTreeItem* group = appendItem(groups.battles, label);
+    FXTreeItem* group = appendItem(battles, label);
 
     datablock::itor it;
     if (mapFile->getRegion(it, block->x(), block->y(), block->info())) {
@@ -172,60 +173,4 @@ long FXReportInfo::onMapChange(FXObject*, FXSelector, void* ptr)
 
     selection = *pstate;
 	return 1;
-}
-
-long FXReportInfo::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
-{
-    if (this != sender) {
-        return 0;
-    }
-    if (!mapFile)
-		return 0;
-
-	FXTreeItem* item = (FXTreeItem*)ptr;
-	if (!item)
-		return FXTreeList::onDoubleClicked(sender, sel, ptr);
-
-	// select MESSAGE.unit on double-click
-    datablock* select = (datablock*)item->getData();
-    if (select != nullptr)
-	{
-        datafile::SelectionState sel_state = selection;
-        sel_state.selected = 0;
-
-        if (select->type() == block_type::TYPE_REGION) {
-            if (mapFile->getRegion(sel_state.region, select->x(), select->y(), select->info())) {
-                sel_state.selected = selection.selected & selection.REGION;
-            }
-        }
-        else {
-            datablock::itor block;
-            datablock::itor region, end = mapFile->blocks().end();
-            mapFile->findSelection(select, block, region);
-            if (region != end) {
-                sel_state.region = region;
-                sel_state.selected = selection.selected & selection.REGION;
-            }
-            if (select->type() == block_type::TYPE_UNIT) {
-                sel_state.unit = block;
-                sel_state.selected |= sel_state.UNIT;
-            }
-        }
-
-		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
-		return 1;
-	}
-
-	return FXTreeList::onDoubleClicked(this, sel, ptr);
-}
-
-void FXReportInfo::clearSiblings(FXTreeItem* parent_item)
-{
-	FXTreeItem *item = parent_item->getFirst();
-	while (item)
-	{
-        FXTreeItem *next_item = item->getNext();
-		removeItem(item);
-		item = next_item;
-	}
 }
