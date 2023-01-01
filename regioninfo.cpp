@@ -61,8 +61,7 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                         }
                     }
                 }
-                block = region;
-                for (block++; block != end && block->depth() > region->depth(); block++)
+                for (block = std::next(region); block != end && block->depth() > region->depth(); block++)
                 {
                     if (block->type() == block_type::TYPE_MESSAGE) {
                         /*

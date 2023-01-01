@@ -192,8 +192,7 @@ void FXRegionPanel::collectData(std::vector<Info>& info, datablock::itor region)
 	FXint Parteisilber = 0;
 
 	datablock::itor end = mapFile->blocks().end();
-	datablock::itor block = region;
-	for (block++; block != end && block->depth() > region->depth(); block++)
+	for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
 	{
 		if (block->type() == block_type::TYPE_RESOURCE)
 		{

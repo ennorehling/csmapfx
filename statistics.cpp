@@ -111,8 +111,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
     if (!mapFile) return;
     
     datablock::itor end = mapFile->blocks().end();
-	datablock::itor block = region;
-	for (block++; block != end && block->depth() > region->depth(); block++)
+	for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
 	{
 		if (block->type() == block_type::TYPE_SHIP)
 		{
@@ -637,8 +636,7 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
     if (!mapFile) return;
 	// list factions of selected region
 	datablock::itor end = mapFile->blocks().end();
-	datablock::itor block = region;
-	for (block++; block != end && block->depth() > region->depth(); block++)
+	for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
 	{
 		if (block->type() == block_type::TYPE_UNIT)
 		{

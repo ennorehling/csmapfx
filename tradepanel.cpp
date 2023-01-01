@@ -149,9 +149,8 @@ void FXTradePanel::addEntry(std::vector<Info>& info, FXString name, int value, F
 void FXTradePanel::collectData(std::vector<Info>& info, datablock::itor region)
 {
 	// search prices block of this region
-	datablock::itor end = mapFile->blocks().end();
-	datablock::itor block = region;
-	for (block++; block != end && block->depth() > region->depth(); block++)
+	datablock::itor end = mapFile->blocks().end(), block = end;
+	for (block = std::next(region); block != end && block->depth() > region->depth(); block++)
 		if (block->type() == block_type::TYPE_PRICES)
 			break;				// found
 
