@@ -701,6 +701,36 @@ void datablock::attachment(::attachment* attach)
 	m_attachment = attach;
 }
 
+const char* datablock::UNITKEYS[] = {
+    "target", "unit", "mage", "spy", "teacher", nullptr
+};
+
+bool datablock::hasReference(datablock* target) const
+{
+    int id = target->info();
+    if (target->type() == block_type::TYPE_UNIT) {
+        for (int i = 0; UNITKEYS[i]; ++i)
+        {
+            int uid = valueInt(UNITKEYS[i]);
+            if (uid == id) return true;
+        }
+    }
+    return false;
+}
+
+int datablock::getReference(block_type type) const
+{
+    if (type == block_type::TYPE_UNIT) {
+        for (int i = 0; UNITKEYS[i]; ++i) {
+            int uid = valueInt(UNITKEYS[i]);
+            if (uid > 0) {
+                return uid;
+            }
+        }
+    }
+    return 0;
+}
+
 bool datablock::hasKey(const key_type type) const
 {
     for (datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)

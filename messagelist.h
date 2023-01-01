@@ -24,7 +24,7 @@ public:
 	long onDoubleClick(FXObject*, FXSelector, void*);
 
 protected:
-	datafile::SelectionState selection;
+    datafile::SelectionState selection;
 
     datafile *mapFile = nullptr;
 

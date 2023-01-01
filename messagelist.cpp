@@ -45,16 +45,7 @@ void FXMessageList::addMessage(FXTreeItem* group, datablock * block)
     }
     else if (block->type() == block_type::TYPE_MESSAGE) {
         FXTreeItem* item = appendItem(group, block->value("rendered"));
-        FXival uid = block->valueInt("target");
-
-        if (uid <= 0)
-            uid = block->valueInt("unit");
-        if (uid <= 0)
-            uid = block->valueInt("mage");
-        if (uid <= 0)
-            uid = block->valueInt("spy");
-        if (uid <= 0)
-            uid = block->valueInt("teacher");
+        FXival uid = block->getReference(block_type::TYPE_UNIT);
 
         datablock::itor select;
         if (uid > 0 && mapFile->getUnit(select, uid)) {
@@ -90,6 +81,7 @@ long FXMessageList::onMapChange(FXObject*target, FXSelector sel, void*ptr)
     selection = *pstate;
     return 1;
 }
+
 long FXMessageList::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 {
     if (this != sender) {

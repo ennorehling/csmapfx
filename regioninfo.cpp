@@ -54,8 +54,17 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
             if (pstate->selected & selection.UNIT)
             {
                 datablock::itor unit = pstate->unit;
-                FXString unitName = unit->getName();
-                unitMessages = appendItem(nullptr, unitName);
+                FXString label = unit->getName() + " (" + unit->id() + ")";
+                unitMessages = appendItem(nullptr, label);
+                datablock::itor block = std::next(mapFile->activefaction());
+                while (block->type() != block_type::TYPE_MESSAGE) ++block;
+                for (; block->type() == block_type::TYPE_MESSAGE; ++block)
+                {
+                    datablock* message = &*block;
+                    if (message->hasReference(&*unit)) {
+                        addMessage(unitMessages, message);
+                    }
+                }
             }
             if (pstate->selected & selection.REGION)
             {
