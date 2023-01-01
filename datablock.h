@@ -283,6 +283,7 @@ public:
 	void attachment(::attachment* attach);
 	
 	const FXString terrainString() const;
+    FXString getName() const;
 
 	bool hasKey(const key_type type) const;
     void addKey(const datakey& data) {

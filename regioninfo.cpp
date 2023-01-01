@@ -19,7 +19,8 @@ void FXRegionInfo::create()
 FXRegionInfo::FXRegionInfo(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x, FXint y, FXint w, FXint h)
     : FXMessageList(p, tgt, sel, opts, x, y, w, h)
 {
-    messages = appendItem(nullptr, "Meldungen");
+    regionMessages = appendItem(nullptr, "Meldungen");
+    unitMessages = nullptr;
     effects = appendItem(nullptr, "Effekte");
     travel = appendItem(nullptr, "Durchreise");
     battle = nullptr;
@@ -36,15 +37,26 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
         clearSiblings(effects);
         clearSiblings(streets);
         clearSiblings(travel);
-        clearSiblings(messages);
+        clearSiblings(regionMessages);
         if (battle) {
             clearSiblings(battle);
             removeItem(battle);
             battle = nullptr;
         }
+        if (unitMessages) {
+            clearSiblings(unitMessages);
+            removeItem(unitMessages);
+            unitMessages = nullptr;
+        }
         clearSiblings(guards);
 
         if (mapFile) {
+            if (pstate->selected & selection.UNIT)
+            {
+                datablock::itor unit = pstate->unit;
+                FXString unitName = unit->getName();
+                unitMessages = appendItem(nullptr, unitName);
+            }
             if (pstate->selected & selection.REGION)
             {
                 datablock::itor region = pstate->region;
@@ -68,7 +80,7 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                         MESSAGE 324149248
                         "von Figo (g351): 'KABUMM *kicher*'";rendered
                         */
-                        addMessage(messages, &*block);
+                        addMessage(regionMessages, &*block);
                     }
                     else if (block->depth() > region->depth() + 1) {
                         continue;

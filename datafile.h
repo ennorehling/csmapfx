@@ -40,7 +40,7 @@ public:
 	int recruitment() const { return m_recruitment; }
     int getFactionId() const { return m_factionId; }
 
-    int getFactionIdForUnit(const datablock* unit);
+    int getFactionIdForUnit(const datablock* unit) const;
     FXString getFactionName(int factionId);
 
     datablock::itor activefaction() { return m_activefaction; }

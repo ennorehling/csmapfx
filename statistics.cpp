@@ -461,6 +461,7 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 		{
 			datablock::itor block;
 
+            FXString label, name;
             if (entryType == 0) {
                 if (!mapFile->getUnit(block, itor->first)) continue;		// get unit
             }
@@ -474,16 +475,12 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
                 // something done effed up
                 continue;
             }
-
-            FXString name = block->value(TYPE_NAME);
-			if (name.empty())
-				name = block->id();
-
-            FXString label;
-			label.format("%s (%s): ", name.text(), block->id().text());
-			if (entryType != 0)
-				label += FXString(L"Gr\u00f6\u00dfe ");
-			label += FXStringVal(itor->second);
+            name = block->getName();
+            label.format("%s (%s): ", name.text(), block->id().text());
+            if (entryType > 0) {
+                label += FXString(L"Gr\u00f6\u00dfe ");
+            }
+            label += FXStringVal(itor->second);
 			FXMenuCommand *menuitem = new FXMenuCommand(menu, label, NULL, this,ID_POPUP_CLICKED);
 			menuitem->setUserData((void*)&*block);
 

@@ -19,7 +19,8 @@ protected:
     FXRegionInfo() {}
     FXRegionInfo(const FXRegionInfo&) = delete;
 
-    FXTreeItem* messages = nullptr;
+    FXTreeItem* regionMessages = nullptr;
+    FXTreeItem* unitMessages = nullptr;
     FXTreeItem* effects = nullptr;
     FXTreeItem* streets = nullptr;
     FXTreeItem* travel = nullptr;

@@ -70,7 +70,7 @@ int datafile::turn() const
     return m_turn;
 }
 
-int datafile::getFactionIdForUnit(const datablock* unit)
+int datafile::getFactionIdForUnit(const datablock* unit) const
 {
     FXASSERT(unit->type() == block_type::TYPE_UNIT);
     bool isTraitor = unit->valueInt(TYPE_TRAITOR, 0) != 0;
@@ -1052,7 +1052,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 				// output unit header
 				out << "EINHEIT " << unit->id();
 
-				out << ";  " << (unit->value(TYPE_NAME)).text();
+				out << ";  " << unit->getName();
 			
 				out << " " << "[" << unit->valueInt(TYPE_NUMBER) << "," << silver << "$]";
 

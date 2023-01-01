@@ -468,6 +468,20 @@ const FXString datablock::terrainString() const
     return "Unbekannt";
 }
 
+FXString datablock::getName() const
+{
+    FXString name = value(TYPE_NAME);
+    if (name.empty()) {
+        if (type() == block_type::TYPE_UNIT) {
+            name = "Einheit " + id();
+        }
+        else {
+            name = value(TYPE_TYPE) + " " + id();
+        }
+    }
+    return name;
+}
+
 /*static*/ int datablock::parseTerrain(const FXString& terrain)
 {
 	// this terrain does not need textual representation
