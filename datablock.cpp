@@ -707,8 +707,16 @@ const char* datablock::UNITKEYS[] = {
 
 bool datablock::hasReference(datablock* target) const
 {
-    int id = target->info();
-    if (target->type() == block_type::TYPE_UNIT) {
+    if (target->type() == block_type::TYPE_REGION) {
+        FXString match;
+        match.format("%d %d %d", target->x(), target->y(), target->info());
+        for (const datakey& key : m_data)
+        {
+            if (key.value() == match) return true;
+        }
+    }
+    else if (target->type() == block_type::TYPE_UNIT) {
+        int id = target->info();
         for (int i = 0; UNITKEYS[i]; ++i)
         {
             int uid = valueInt(UNITKEYS[i]);

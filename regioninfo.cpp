@@ -51,27 +51,18 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
         clearSiblings(guards);
 
         if (mapFile) {
+            datablock *unitPtr = nullptr, *regionPtr = nullptr;
             if (pstate->selected & selection.UNIT)
             {
-                datablock::itor unit = pstate->unit;
-                FXString label = unit->getName() + " (" + unit->id() + ")";
-                unitMessages = appendItem(nullptr, label);
-                datablock::itor block = std::next(mapFile->activefaction());
-                while (block->type() != block_type::TYPE_MESSAGE) ++block;
-                for (; block->type() == block_type::TYPE_MESSAGE; ++block)
-                {
-                    datablock* message = &*block;
-                    if (message->hasReference(&*unit)) {
-                        addMessage(unitMessages, message);
-                    }
-                }
+                unitPtr = &*pstate->unit;
+                unitMessages = appendItem(nullptr, unitPtr->getName() + " (" + unitPtr->id() + ")");
             }
             if (pstate->selected & selection.REGION)
             {
-                datablock::itor region = pstate->region;
                 datablock::itor end = mapFile->blocks().end();
                 datablock::itor block;
                 std::set<FXint> guard_ids;
+                regionPtr = &*pstate->region;
                 if (mapFile->getBattle(block, pstate->sel_x, pstate->sel_y, pstate->sel_plane)) {
                     int depth = block->depth();
                     battle = appendItem(nullptr, "Kampf");
@@ -82,7 +73,7 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                         }
                     }
                 }
-                for (block = std::next(region); block != end && block->depth() > region->depth(); block++)
+                for (block = std::next(pstate->region); block != end && block->depth() > regionPtr->depth(); block++)
                 {
                     if (block->type() == block_type::TYPE_MESSAGE) {
                         /*
@@ -91,7 +82,7 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                         */
                         addMessage(regionMessages, &*block);
                     }
-                    else if (block->depth() > region->depth() + 1) {
+                    else if (block->depth() > regionPtr->depth() + 1) {
                         continue;
                     }
                     else if (block->type() == block_type::TYPE_UNIT) {
@@ -169,6 +160,21 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                             FXString label = faction->value("Parteiname") + " (" + faction->id() + ")";
                             appendItem(guards, label);
                         }
+                    }
+                }
+            }
+            if (unitPtr || regionPtr)
+            {
+                datablock::itor block = std::next(mapFile->activefaction());
+                while (block->type() != block_type::TYPE_MESSAGE) ++block;
+                for (; block->type() == block_type::TYPE_MESSAGE; ++block)
+                {
+                    datablock* message = &*block;
+                    if (unitPtr && message->hasReference(unitPtr)) {
+                        addMessage(unitMessages, message);
+                    }
+                    if (regionPtr && message->hasReference(regionPtr)) {
+                        addMessage(regionMessages, message);
                     }
                 }
             }
