@@ -265,16 +265,16 @@ private:
 	// Mitte
     class FXCSMap* map = nullptr;
     class FXReportInfo* reportInfo = nullptr;
-    class FXMessages* messages = nullptr;
+    class FXRegionInfo* regionInfo = nullptr;
     class FXCommands* commands = nullptr;
     class FXCalculator* mathbar = nullptr;
     class FXVerticalFrame	*middle = nullptr;
     class FXVerticalFrame *msgBorder = nullptr;
 
 	// Rechts
-    class FXRegionInfos* regioninfos = nullptr;
-    class FXStatsInfos* statsinfos = nullptr;
-    class FXTradeInfos* tradeinfos = nullptr;
+    class FXRegionPanel* regionPanel = nullptr;
+    class FXStatsPanel* statsPanel = nullptr;
+    class FXTradePanel* tradePanel = nullptr;
     class FXVerticalFrame *rightframe = nullptr;
     class FXSplitterEx	*commandsplitter = nullptr;
     class FXTabBook		*tabbook = nullptr;

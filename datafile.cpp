@@ -70,7 +70,7 @@ int datafile::turn() const
     return m_turn;
 }
 
-int datafile::getFactionIdForUnit(const datablock* unit)
+int datafile::getFactionIdForUnit(const datablock* unit) const
 {
     FXASSERT(unit->type() == block_type::TYPE_UNIT);
     bool isTraitor = unit->valueInt(TYPE_TRAITOR, 0) != 0;
@@ -150,6 +150,7 @@ bool datafile::load(const FXString& filename, FXString & outError)
     skip_bom(file);
     std::string line;
     while (std::getline(file, line)) {
+        if (line.empty()) continue;
         if (line.back() == '\r') {
             line.pop_back();
         }
@@ -670,6 +671,7 @@ int datafile::loadCmds(const FXString& filename)
     std::string line;
     while (std::getline(file, line)) 
     {
+        if (line.empty()) continue;
         if (line.back() == '\r') {
             line.pop_back();
         }
@@ -719,6 +721,7 @@ int datafile::loadCmds(const FXString& filename)
 	// process lines
     FXString cmd, str;
 	while(std::getline(file, line)) {
+        if (line.empty()) continue;
         if (line.back() == '\r') {
             line.pop_back();
         }
@@ -847,6 +850,7 @@ int datafile::loadCmds(const FXString& filename)
         if (!std::getline(file, line)) {
             break;
         }
+        if (line.empty()) continue;
         if (line.back() == '\r') {
             line.pop_back();
         }
@@ -1052,7 +1056,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 				// output unit header
 				out << "EINHEIT " << unit->id();
 
-				out << ";  " << (unit->value(TYPE_NAME)).text();
+				out << ";  " << unit->getName();
 			
 				out << " " << "[" << unit->valueInt(TYPE_NUMBER) << "," << silver << "$]";
 

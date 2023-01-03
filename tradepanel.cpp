@@ -1,20 +1,20 @@
 #include "main.h"
 #include "fxhelper.h"
-#include "tradeinfos.h"
+#include "tradepanel.h"
 #include "symbols.h"
 
 // *********************************************************************************************************
 // *** FXTradeInfos implementation
 
-FXDEFMAP(FXTradeInfos) MessageMap[]=
+FXDEFMAP(FXTradePanel) MessageMap[]=
 { 
 	//________Message_Type_____________________ID_______________Message_Handler_______ 
-	FXMAPFUNC(SEL_COMMAND, 		FXTradeInfos::ID_UPDATE, 				FXTradeInfos::onMapChange), 
+	FXMAPFUNC(SEL_COMMAND, 		FXTradePanel::ID_UPDATE, 				FXTradePanel::onMapChange), 
 }; 
 
-FXIMPLEMENT(FXTradeInfos, FXVerticalFrame, MessageMap, ARRAYNUMBER(MessageMap))
+FXIMPLEMENT(FXTradePanel, FXVerticalFrame, MessageMap, ARRAYNUMBER(MessageMap))
 
-FXTradeInfos::FXTradeInfos(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x, FXint y, FXint w, FXint h)
+FXTradePanel::FXTradePanel(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x, FXint y, FXint w, FXint h)
 		: FXVerticalFrame(p, opts, x, y, w, h, 0, 0, 0, 0, 0, 0)
 {
 	// set target etc.
@@ -44,19 +44,19 @@ FXTradeInfos::FXTradeInfos(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint
 	tags.rightmatrix = new FXMatrix(tags.matrixframe, 2, MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0);
 }
 
-void FXTradeInfos::create()
+void FXTradePanel::create()
 {
 	FXVerticalFrame::create();
 
 	createLabels("Kein Handel", "", -1);	// -1 == topmatrix
 }
 
-FXTradeInfos::~FXTradeInfos()
+FXTradePanel::~FXTradePanel()
 {
     clearLabels();
 }
 
-void FXTradeInfos::setMapFile(datafile *f)
+void FXTradePanel::setMapFile(datafile *f)
 {
     mapFile = f;
 }
@@ -78,7 +78,7 @@ inline FXString thousandsPoints(FXint value, bool plusSign = false)
 	return str;
 }
 
-void FXTradeInfos::clearLabels()
+void FXTradePanel::clearLabels()
 {
 	for (std::vector<FXLabel*>::iterator itor = tags.entries.begin(); itor != tags.entries.end(); itor++)
 		delete *itor;
@@ -86,7 +86,7 @@ void FXTradeInfos::clearLabels()
 	tags.entries.clear();
 }
 
-void FXTradeInfos::createLabels(const FXString& name, const FXString& info, int column)
+void FXTradePanel::createLabels(const FXString& name, const FXString& info, int column)
 {
 	FXMatrix *matrix = NULL;
 	
@@ -107,7 +107,7 @@ void FXTradeInfos::createLabels(const FXString& name, const FXString& info, int 
 	tags.entries.push_back(lfirst);
 }
 
-void FXTradeInfos::setInfo(const std::vector<Info>& info)
+void FXTradePanel::setInfo(const std::vector<Info>& info)
 {
 	int number = info.size();
 	int index = 0;
@@ -132,7 +132,7 @@ void FXTradeInfos::setInfo(const std::vector<Info>& info)
 	}
 }
 
-void FXTradeInfos::addEntry(std::vector<Info>& info, FXString name, int value, FXString tip)
+void FXTradePanel::addEntry(std::vector<Info>& info, FXString name, int value, FXString tip)
 {
 	std::vector<Info>::iterator itor;
 	for (itor = info.begin(); itor != info.end(); itor++)
@@ -146,12 +146,11 @@ void FXTradeInfos::addEntry(std::vector<Info>& info, FXString name, int value, F
 		info.push_back(Info(name, tip, value));
 }
 
-void FXTradeInfos::collectData(std::vector<Info>& info, datablock::itor region)
+void FXTradePanel::collectData(std::vector<Info>& info, datablock::itor region)
 {
 	// search prices block of this region
-	datablock::itor end = mapFile->blocks().end();
-	datablock::itor block = region;
-	for (block++; block != end && block->depth() > region->depth(); block++)
+	datablock::itor end = mapFile->blocks().end(), block = end;
+	for (block = std::next(region); block != end && block->depth() > region->depth(); block++)
 		if (block->type() == block_type::TYPE_PRICES)
 			break;				// found
 
@@ -178,7 +177,7 @@ void FXTradeInfos::collectData(std::vector<Info>& info, datablock::itor region)
 	}
 }
 
-void FXTradeInfos::updateData()
+void FXTradePanel::updateData()
 {
 	//if (files->empty())
 		//return;
@@ -224,7 +223,7 @@ void FXTradeInfos::updateData()
 	}
 }
 
-long FXTradeInfos::onMapChange(FXObject*, FXSelector, void* ptr)
+long FXTradePanel::onMapChange(FXObject*, FXSelector, void* ptr)
 {
 	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 

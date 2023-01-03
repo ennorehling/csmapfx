@@ -8,7 +8,7 @@ endif (NOT WIN32)
 find_package(PNG)
 find_package(CURL)
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
   #GCC >= 7.2 needs -Wno-psabi
   add_compile_options(-Wno-psabi)
 endif()
@@ -50,18 +50,20 @@ set (SOURCES
 	main.cpp
 	mapcanvas.cpp
 	map.cpp
-	messages.cpp
+	messagelist.cpp
+  regioninfo.cpp
 	prefsdlg.cpp
-	regioninfos.cpp
+	regionpanel.cpp
 	regionlist.cpp
 	reportinfo.cpp
 	searchdlg.cpp
 	statistics.cpp
-	statsinfos.cpp
+	statspanel.cpp
 	symbols.cpp
-	tradeinfos.cpp
+	tradepanel.cpp
 	unitlist.cpp
 )
+
 if (PNG_FOUND)
 set(SOURCES ${SOURCES} imageio.cpp)
 endif (PNG_FOUND)

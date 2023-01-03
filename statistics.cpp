@@ -111,8 +111,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
     if (!mapFile) return;
     
     datablock::itor end = mapFile->blocks().end();
-	datablock::itor block = region;
-	for (block++; block != end && block->depth() > region->depth(); block++)
+	for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
 	{
 		if (block->type() == block_type::TYPE_SHIP)
 		{
@@ -462,6 +461,7 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 		{
 			datablock::itor block;
 
+            FXString label, name;
             if (entryType == 0) {
                 if (!mapFile->getUnit(block, itor->first)) continue;		// get unit
             }
@@ -475,16 +475,12 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
                 // something done effed up
                 continue;
             }
-
-            FXString name = block->value(TYPE_NAME);
-			if (name.empty())
-				name = block->id();
-
-            FXString label;
-			label.format("%s (%s): ", name.text(), block->id().text());
-			if (entryType != 0)
-				label += FXString(L"Gr\u00f6\u00dfe ");
-			label += FXStringVal(itor->second);
+            name = block->getName();
+            label.format("%s (%s): ", name.text(), block->id().text());
+            if (entryType > 0) {
+                label += FXString(L"Gr\u00f6\u00dfe ");
+            }
+            label += FXStringVal(itor->second);
 			FXMenuCommand *menuitem = new FXMenuCommand(menu, label, NULL, this,ID_POPUP_CLICKED);
 			menuitem->setUserData((void*)&*block);
 
@@ -637,8 +633,7 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
     if (!mapFile) return;
 	// list factions of selected region
 	datablock::itor end = mapFile->blocks().end();
-	datablock::itor block = region;
-	for (block++; block != end && block->depth() > region->depth(); block++)
+	for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
 	{
 		if (block->type() == block_type::TYPE_UNIT)
 		{

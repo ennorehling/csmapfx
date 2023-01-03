@@ -678,15 +678,11 @@ FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor& buil
     }
     else if (unit != end)
     {
-        FXString name = unit->value(TYPE_NAME);
-        FXString id = unit->id();
         const datablock* unitPtr = &*unit;
         int factionId = mapFile->getFactionIdForUnit(unitPtr);
 
-        if (name.empty())
-            name = "Einheit " + id;
-
-        object_str = name + " (" + id + ")";
+        FXString name = unitPtr->getName();
+        object_str = name + " (" + unitPtr->id() + ")";
         faction_str = mapFile->getFactionName(factionId);
 
         datablock::itor block = unit;

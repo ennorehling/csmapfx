@@ -468,6 +468,20 @@ const FXString datablock::terrainString() const
     return "Unbekannt";
 }
 
+FXString datablock::getName() const
+{
+    FXString name = value(TYPE_NAME);
+    if (name.empty()) {
+        if (type() == block_type::TYPE_UNIT) {
+            name = "Einheit " + id();
+        }
+        else {
+            name = value(TYPE_TYPE) + " " + id();
+        }
+    }
+    return name;
+}
+
 /*static*/ int datablock::parseTerrain(const FXString& terrain)
 {
 	// this terrain does not need textual representation
@@ -685,6 +699,44 @@ void datablock::attachment(::attachment* attach)
 {
 	delete m_attachment;		// free old attachment and set new
 	m_attachment = attach;
+}
+
+const char* datablock::UNITKEYS[] = {
+    "target", "unit", "mage", "spy", "teacher", nullptr
+};
+
+bool datablock::hasReference(datablock* target) const
+{
+    if (target->type() == block_type::TYPE_REGION) {
+        FXString match;
+        match.format("%d %d %d", target->x(), target->y(), target->info());
+        for (const datakey& key : m_data)
+        {
+            if (key.value() == match) return true;
+        }
+    }
+    else if (target->type() == block_type::TYPE_UNIT) {
+        int id = target->info();
+        for (int i = 0; UNITKEYS[i]; ++i)
+        {
+            int uid = valueInt(UNITKEYS[i]);
+            if (uid == id) return true;
+        }
+    }
+    return false;
+}
+
+int datablock::getReference(block_type type) const
+{
+    if (type == block_type::TYPE_UNIT) {
+        for (int i = 0; UNITKEYS[i]; ++i) {
+            int uid = valueInt(UNITKEYS[i]);
+            if (uid > 0) {
+                return uid;
+            }
+        }
+    }
+    return 0;
 }
 
 bool datablock::hasKey(const key_type type) const

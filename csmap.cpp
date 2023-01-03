@@ -16,15 +16,15 @@
 #include "main.h"
 #include "fxhelper.h"
 #include "csmap.h"
-#include "messages.h"
 #include "reportinfo.h"
+#include "regioninfo.h"
 #include "commands.h"
 #include "datafile.h"
 #include "symbols.h"
 #include "regionlist.h"
-#include "regioninfos.h"
-#include "statsinfos.h"
-#include "tradeinfos.h"
+#include "regionpanel.h"
+#include "statspanel.h"
+#include "tradepanel.h"
 #include "unitlist.h"
 #include "statistics.h"
 #include "commands.h"
@@ -543,7 +543,7 @@ CSMap::CSMap(FXApp *app) :
     new FXTabItem(outputTabs, "Rep&ort");
     reportInfo = new FXReportInfo(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
     new FXTabItem(outputTabs, "Re&gion");
-    messages = new FXMessages(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
+    regionInfo = new FXRegionInfo(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
     new FXTabItem(outputTabs, "&Fehler");
     errorList = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
     new FXTabItem(outputTabs, "&Suchergebnisse");
@@ -565,20 +565,20 @@ CSMap::CSMap(FXApp *app) :
     FXHorizontalFrame *riFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
     riTab = new FXToolBarTab(riFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
     riTab->setTipText("Regionsinformationen ein- und ausblenden");
-    regioninfos = new FXRegionInfos(riFrame, this,ID_SELECTION, LAYOUT_FILL_X);
+    regionPanel = new FXRegionPanel(riFrame, this,ID_SELECTION, LAYOUT_FILL_X);
 
-    menu.regdescription->setTarget(regioninfos);
-    menu.regdescription->setSelector(FXRegionInfos::ID_TOGGLEDESCRIPTION);
+    menu.regdescription->setTarget(regionPanel);
+    menu.regdescription->setSelector(FXRegionPanel::ID_TOGGLEDESCRIPTION);
 
     FXHorizontalFrame *siFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
     siTab = new FXToolBarTab(siFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
     siTab->setTipText("Statistik ein- und ausblenden");
-    statsinfos = new FXStatsInfos(siFrame, this,ID_SELECTION, LAYOUT_FILL_X);
+    statsPanel = new FXStatsPanel(siFrame, this,ID_SELECTION, LAYOUT_FILL_X);
 
     FXHorizontalFrame *tiFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
     tiTab = new FXToolBarTab(tiFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
     tiTab->setTipText("Handelsinformationen ein- und ausblenden");
-    tradeinfos = new FXTradeInfos(tiFrame, this, ID_SELECTION, LAYOUT_FILL_X);
+    tradePanel = new FXTradePanel(tiFrame, this, ID_SELECTION, LAYOUT_FILL_X);
 
     commandsplitter = new FXSplitterEx(rightframe, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
@@ -811,7 +811,7 @@ void CSMap::create()
         map->handle(this, FXSEL(SEL_COMMAND, FXCSMap::ID_TOGGLESHADOWREGIONS), nullptr);
 
     if (reg.readUnsignedEntry("SHOW", "REGDESCRIPTION", 1))
-        regioninfos->handle(this, FXSEL(SEL_COMMAND, FXRegionInfos::ID_TOGGLEDESCRIPTION), nullptr);
+        regionPanel->handle(this, FXSEL(SEL_COMMAND, FXRegionPanel::ID_TOGGLEDESCRIPTION), nullptr);
 
     if (reg.readUnsignedEntry("SHOW", "OWNFACTIONGROUP", 1))
         regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLEOWNFACTIONGROUP), nullptr);
@@ -939,13 +939,13 @@ void CSMap::mapChange()
     minimap->setMapFile(report);
     commands->setMapFile(report);
     unitlist->setMapFile(report);
-    tradeinfos->setMapFile(report);
+    tradePanel->setMapFile(report);
     statistics->setMapFile(report);
-    statsinfos->setMapFile(report);
-    regioninfos->setMapFile(report);
+    statsPanel->setMapFile(report);
+    regionPanel->setMapFile(report);
     mathbar->setMapFile(report);
     reportInfo->setMapFile(report);
-    messages->setMapFile(report);
+    regionInfo->setMapFile(report);
     map->setMapFile(report);
     regions->setMapFile(report);
 }
