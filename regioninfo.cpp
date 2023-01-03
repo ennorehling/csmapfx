@@ -50,7 +50,7 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
         }
         clearSiblings(guards);
 
-        if (mapFile) {
+        if (mapFile && mapFile->hasActiveFaction()) {
             datablock *unitPtr = nullptr, *regionPtr = nullptr;
             if (pstate->selected & selection.UNIT)
             {
@@ -165,9 +165,10 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
             }
             if (unitPtr || regionPtr)
             {
+                datablock::citor end = mapFile->blocks().end();
                 datablock::itor block = std::next(mapFile->activefaction());
-                while (block->type() != block_type::TYPE_MESSAGE) ++block;
-                for (; block->type() == block_type::TYPE_MESSAGE; ++block)
+                while (block != end && block->type() != block_type::TYPE_MESSAGE) ++block;
+                for (; block != end && block->type() == block_type::TYPE_MESSAGE; ++block)
                 {
                     datablock* message = &*block;
                     if (unitPtr && message->hasReference(unitPtr)) {

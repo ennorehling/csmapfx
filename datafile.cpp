@@ -150,6 +150,7 @@ bool datafile::load(const FXString& filename, FXString & outError)
     skip_bom(file);
     std::string line;
     while (std::getline(file, line)) {
+        if (line.empty()) continue;
         if (line.back() == '\r') {
             line.pop_back();
         }
@@ -670,6 +671,7 @@ int datafile::loadCmds(const FXString& filename)
     std::string line;
     while (std::getline(file, line)) 
     {
+        if (line.empty()) continue;
         if (line.back() == '\r') {
             line.pop_back();
         }
@@ -719,6 +721,7 @@ int datafile::loadCmds(const FXString& filename)
 	// process lines
     FXString cmd, str;
 	while(std::getline(file, line)) {
+        if (line.empty()) continue;
         if (line.back() == '\r') {
             line.pop_back();
         }
@@ -847,6 +850,7 @@ int datafile::loadCmds(const FXString& filename)
         if (!std::getline(file, line)) {
             break;
         }
+        if (line.empty()) continue;
         if (line.back() == '\r') {
             line.pop_back();
         }
