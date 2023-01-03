@@ -353,12 +353,16 @@ bool datakey::parse(const char* str, enum block_type btype, bool isUtf8)
 	}
     if (end >= begin) {
         FXint nsrc = (FXint)(end - begin);
+        FXString val;
         if (isUtf8) {
-            value(begin, nsrc);
+            val.assign(begin, nsrc);
         }
         else {
-            value(iso2utf(begin, nsrc));
+            val = iso2utf(begin, nsrc);
         }
+        val.substitute("\\\\", "\\");
+        val.substitute("\\\"", "\"");
+        value(val);
         return true;
     }
     return false;

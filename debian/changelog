@@ -1,3 +1,9 @@
+csmapfx (1.4.35-1) stable; urgency=low
+
+  * fix escaping of quotes read from the report.
+
+ -- Enno Rehling <enno@eressea.de>  Tue, 03 Jan 2023 13:00:00 +0200
+
 csmapfx (1.4.34-1) stable; urgency=low
 
   * display additional messages for current region and unit.
