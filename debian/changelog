@@ -1,3 +1,9 @@
+csmapfx (1.4.36-1) stable; urgency=low
+
+  * regression: loading orders made some units have duplicate commands
+
+ -- Enno Rehling <enno@eressea.de>  Tue, 03 Jan 2023 16:45:00 +0200
+
 csmapfx (1.4.35-1) stable; urgency=low
 
   * fix escaping of quotes read from the report.

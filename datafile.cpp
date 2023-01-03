@@ -850,9 +850,10 @@ int datafile::loadCmds(const FXString& filename)
         if (!std::getline(file, line)) {
             break;
         }
-        if (line.empty()) continue;
-        if (line.back() == '\r') {
-            line.pop_back();
+        if (!line.empty()) {
+            if (line.back() == '\r') {
+                line.pop_back();
+            }
         }
         // check if line is REGION oder EINHEIT command
         str.assign(line.c_str());
