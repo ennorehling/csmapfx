@@ -129,11 +129,13 @@ long FXMessageList::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 
 void FXMessageList::clearSiblings(FXTreeItem* parent_item)
 {
-	FXTreeItem *item = parent_item->getFirst();
-	while (item)
-	{
-        FXTreeItem *next_item = item->getNext();
-		removeItem(item);
-		item = next_item;
-	}
+    if (parent_item) {
+        FXTreeItem* item = parent_item->getFirst();
+        while (item)
+        {
+            FXTreeItem* next_item = item->getNext();
+            removeItem(item);
+            item = next_item;
+        }
+    }
 }

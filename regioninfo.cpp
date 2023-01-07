@@ -37,26 +37,29 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
         clearSiblings(effects);
         clearSiblings(streets);
         clearSiblings(travel);
-        clearSiblings(regionMessages);
-        if (battle) {
-            clearSiblings(battle);
-            removeItem(battle);
-            battle = nullptr;
-        }
-        if (unitMessages) {
-            clearSiblings(unitMessages);
-            removeItem(unitMessages);
-            unitMessages = nullptr;
-        }
         clearSiblings(guards);
+        clearSiblings(regionMessages);
+        clearSiblings(unitMessages);
+        clearSiblings(battle);
 
         if (mapFile && mapFile->hasActiveFaction()) {
             datablock *unitPtr = nullptr, *regionPtr = nullptr;
             if (pstate->selected & selection.UNIT)
             {
                 unitPtr = &*pstate->unit;
-                unitMessages = appendItem(nullptr, unitPtr->getName() + " (" + unitPtr->id() + ")");
+                FXString name = unitPtr->getName() + " (" + unitPtr->id() + ")";
+                if (!unitMessages) {
+                    unitMessages = insertItem(battle, nullptr, name);
+                }
+                else {
+                    unitMessages->setText(name);
+                }
             }
+            else if (unitMessages) {
+                removeItem(unitMessages);
+                unitMessages = nullptr;
+            }
+
             if (pstate->selected & selection.REGION)
             {
                 datablock::itor end = mapFile->blocks().end();
@@ -65,7 +68,9 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                 regionPtr = &*pstate->region;
                 if (mapFile->getBattle(block, pstate->sel_x, pstate->sel_y, pstate->sel_plane)) {
                     int depth = block->depth();
-                    battle = appendItem(nullptr, "Kampf");
+                    if (!battle) {
+                        battle = appendItem(nullptr, "Kampf");
+                    }
                     for (++block; block != end && block->depth() > depth; block++)
                     {
                         if (block->type() == block_type::TYPE_MESSAGE) {
@@ -73,6 +78,11 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                         }
                     }
                 }
+                else if (battle) {
+                    removeItem(battle);
+                    battle = nullptr;
+                }
+
                 for (block = std::next(pstate->region); block != end && block->depth() > regionPtr->depth(); block++)
                 {
                     if (block->type() == block_type::TYPE_MESSAGE) {

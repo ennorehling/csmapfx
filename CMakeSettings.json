@@ -16,7 +16,7 @@
       "generator": "Ninja",
       "configurationType": "Release",
       "inheritEnvironments": [ "msvc_x86" ],
-      "buildRoot": "${projectDir}/Release",
+      "buildRoot": "${ProjectDir}/Release",
       "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
