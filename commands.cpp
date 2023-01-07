@@ -106,15 +106,16 @@ long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
 		return 0;
 
 	datablock::citor end = mapFile->blocks().end();
+	datablock::citor begin = mapFile->blocks().begin();
 	datablock::itor unit;
 	if (selection.selected & selection.UNIT)
-		unit = selection.unit;
+		unit = std::prev(selection.unit);
 	else if (selection.selected & selection.REGION)
-		unit = selection.region;
+		unit = std::prev(selection.region);
     else
 		return 0;
 
-	for (unit--; unit != end; unit--)
+	for (; unit != begin; --unit)
 	{
 		if (unit->type() != block_type::TYPE_UNIT)
 			continue;
@@ -150,11 +151,8 @@ long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
 		}
 	}
 
-	// no next unit found: beep & deselect active unit
+	// no next unit found: beep
 	datafile::SelectionState state = selection;
-	state.selected = 0;
-	getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
-	flags |= FLAG_UPDATE;
 	getApp()->beep();
 	return 1;
 }
@@ -167,13 +165,13 @@ long FXCommands::onNextUnit(FXObject *, FXSelector, void *)
 	datablock::citor end = mapFile->blocks().end();
 	datablock::itor unit;
 	if (selection.selected & selection.UNIT)
-		unit = selection.unit;
+		unit = std::next(selection.unit);
 	else if (selection.selected & selection.REGION)
-		unit = selection.region;
+		unit = std::next(selection.region);
     else
         return 0;
 
-	for (unit++; unit != end; unit++)
+	for (; unit != end; ++unit)
 	{
 		if (unit->type() != block_type::TYPE_UNIT)
 			continue;
@@ -210,11 +208,7 @@ long FXCommands::onNextUnit(FXObject *, FXSelector, void *)
 		}
 	}
 
-	// no next unit found: beep & deselect active unit
-	datafile::SelectionState state = selection;
-	state.selected = 0;
-	getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
-	flags |= FLAG_UPDATE;
+	// no next unit found: beep
 	getApp()->beep();
 	return 0;
 }
