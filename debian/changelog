@@ -2,8 +2,9 @@ csmapfx (1.4.37-1) stable; urgency=low
 
   * cosmetic changes to region info treeview.
   * change handling of next/prev unit on first/last unit.
+  * fix messagelist double-click selection.
 
- -- Enno Rehling <enno@eressea.de>  Sat, 07 Jan 2023 18:15:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sat, 07 Jan 2023 21:05:00 +0200
 
 csmapfx (1.4.36-1) stable; urgency=low
 

@@ -100,10 +100,11 @@ long FXMessageList::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 	{
         datafile::SelectionState sel_state = selection;
         sel_state.selected = 0;
+        ++sel_state.selChange;
 
         if (select->type() == block_type::TYPE_REGION) {
             if (mapFile->getRegion(sel_state.region, select->x(), select->y(), select->info())) {
-                sel_state.selected = selection.selected & selection.REGION;
+                sel_state.selected = selection.REGION;
             }
         }
         else {
@@ -112,7 +113,7 @@ long FXMessageList::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
             mapFile->findSelection(select, block, region);
             if (region != end) {
                 sel_state.region = region;
-                sel_state.selected = selection.selected & selection.REGION;
+                sel_state.selected = selection.selected | selection.REGION;
             }
             if (select->type() == block_type::TYPE_UNIT) {
                 sel_state.unit = block;

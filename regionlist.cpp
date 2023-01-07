@@ -584,7 +584,7 @@ FXTreeItem* FXRegionList::findTreeItem(FXTreeItem* item, void* udata)
 		item = item->getNext();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
@@ -690,7 +690,6 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                         }
 
                         entry = new FXRegionItem(label, icon, icon, facPtr);
-                        entry->isBold();
                     }
                 }
 
@@ -810,6 +809,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                 FXTreeItem* item = nullptr;
                 if (selection.selected & selection.UNIT) {
                     item = findTreeItem(region ? region : top, &*selection.unit);
+                    FXASSERT(item);
                     FXRegionItem* ri = static_cast<FXRegionItem *>(item);
                     if (ri->isBold() != !(selection.selected & selection.CONFIRMED)) {
                         int unconfirmed = ri->isBold() ? 0 : 1;
