@@ -481,12 +481,8 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
                 label += FXString(L"Gr\u00f6\u00dfe ");
             }
             label += FXStringVal(itor->second);
-			FXMenuCommand *menuitem = new FXMenuCommand(menu, label, NULL, this,ID_POPUP_CLICKED);
+			FXMenuCommand *menuitem = new FXMenuCommand(menu, label, NULL, this, ID_POPUP_CLICKED);
 			menuitem->setUserData((void*)&*block);
-
-			/* -- removed in rev70.
-			menuitem->setUserData((void*)block->info());
-			*/
 		}
 	}
 

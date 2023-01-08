@@ -482,53 +482,40 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 
 			if (name.length())
 			{
-				labels.push_back("Name: "+name);
+				labels.push_back("Name: " + name);
 				texts.push_back(name);
 			}
 
-			labels.push_back("Nummer: "+id);
+			labels.push_back("Nummer: " + id);
 			texts.push_back(id);
-
-			labels.push_back("Anzahl: "+number);
-			texts.push_back(number);
-
-			labels.push_back("Rasse: "+type);
-			texts.push_back(type);
 		}
 		else if (block->type() == block_type::TYPE_FACTION)
 		{
 			FXString name = block->value(TYPE_FACTIONNAME);
-			FXString id = block->id();
 
 			if (name.length())
 			{
-				labels.push_back("Name: "+name);
+				labels.push_back("Name: " + name);
 				texts.push_back(name);
 			}
 
-			if (id == "-1")
-			{
-				labels.push_back("anonym");
-				texts.push_back("anonym");
-			}
-			else
-			{
-				labels.push_back("Nummer: "+id);
+            if (block->info() > 0) {
+                FXString id = block->id();
+				labels.push_back("Nummer: " + id);
 				texts.push_back(id);
 			}
 
-			FXString email = block->value(TYPE_EMAIL);
-			FXString banner = block->value(TYPE_BANNER);
-
-			if (email.length())
+            FXString email = block->value(TYPE_EMAIL);
+            if (email.length())
 			{
-				labels.push_back("eMail: "+email);
+				labels.push_back("eMail: " + email);
 				texts.push_back(email);
 			}
 
-			if (banner.length())
+            FXString banner = block->value(TYPE_BANNER);
+            if (banner.length())
 			{
-				labels.push_back("Banner: "+banner);
+				labels.push_back("Banner: " + banner);
 				texts.push_back(banner);
 			}
 		}
