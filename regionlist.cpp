@@ -590,45 +590,47 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
         if (mapFile) {
             FXString label, terrainString;
 
-            for (datablock::itor iblock = mapFile->blocks().begin(); iblock != mapFile->blocks().end(); iblock++)
+            for (datablock::itor region = mapFile->blocks().begin(); region != mapFile->blocks().end(); region++)
             {
+                const datablock* regionPtr = &*region;
                 // handle only regions
-                if (iblock->type() != block_type::TYPE_REGION)
+                if (regionPtr->type() != block_type::TYPE_REGION)
                     continue;
 
-                terrainString = iblock->terrainString();
+                if (!active_regions_only || regionPtr->hasKey(TYPE_VISIBILITY))
+                    continue;
 
-                FXString name = iblock->value(TYPE_NAME);
+                terrainString = regionPtr->terrainString();
+
+                FXString name = regionPtr->value(TYPE_NAME);
 
                 if (name.empty())
                     name = terrainString;
                 if (name.empty())
                     name = "Unbekannt";
 
-                if (iblock->info())
-                    label.format("%s (%d,%d,%s)", name.text(), iblock->x(), iblock->y(), datablock::planeName(iblock->info()).text());
+                if (regionPtr->info())
+                    label.format("%s (%d,%d,%s)", name.text(), regionPtr->x(), regionPtr->y(), datablock::planeName(regionPtr->info()).text());
                 else
-                    label.format("%s (%d,%d)", name.text(), iblock->x(), iblock->y());
+                    label.format("%s (%d,%d)", name.text(), regionPtr->x(), regionPtr->y());
 
                 // select terrain image
-                FXint terrain = iblock->terrain();
+                FXint terrain = regionPtr->terrain();
 
-                FXTreeItem *region = NULL;
+                FXTreeItem *regionItem = nullptr;
+
                 FXString regionlabel = label;
-
                 std::map<FXint, FXRegionItem *> factions;
 
                 datablock::itor iend = mapFile->blocks().end();
-                datablock::itor unit = iblock;
-                for (unit++; unit != iend && unit->depth() > iblock->depth(); unit++)
+                for (datablock::itor unit = std::next(region); unit != iend && unit->depth() > regionPtr->depth(); ++unit)
                 {
-                    // display units until next region
+                    const datablock* objectPtr = &*unit;
                     if (unit->type() != block_type::TYPE_UNIT)
                         continue;
 
                     // get faction id, -1 means unknown faction (or stealth/anonymous)
-                    const datablock* unitPtr = &*unit;
-                    int factionId = mapFile->getFactionIdForUnit(unitPtr);
+                    int factionId = mapFile->getFactionIdForUnit(objectPtr);
                     label = mapFile->getFactionName(factionId);
                     FXRegionItem*&entry = factions[factionId];
                     if (!entry)
@@ -672,8 +674,8 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                             }
                         }
                         // add region only if it has units in it
-                        if (!region) {
-                            region = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], &*iblock));
+                        if (!regionItem) {
+                            regionItem = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void *)regionPtr));
                         }
 
                         entry = new FXRegionItem(label, icon, icon, facPtr);
@@ -687,17 +689,17 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                         FXRegionItem* entry = val.second;
                         FXTreeItem* ins = nullptr;
                         if (entry->getOpenIcon() == blue) {
-                            act_faction = prependItem(region, entry);
+                            act_faction = prependItem(regionItem, entry);
                         }
                         else if (val.first < 0) {
-                            ins = appendItem(region, entry);
+                            ins = appendItem(regionItem, entry);
                         }
                         else {
                             if (ins_faction == nullptr) {
-                                ins = appendItem(region, entry);
+                                ins = appendItem(regionItem, entry);
                             }
                             else {
-                                insertItem(ins_faction, region, entry);
+                                insertItem(ins_faction, regionItem, entry);
                             }
                         }
                         if (ins && !ins_faction) {
@@ -706,15 +708,43 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                     }
                 }
 
-                unit = iblock;
-                for (unit++; unit != iend && unit->depth() > iblock->depth(); unit++)
+                FXTreeItem* ships = nullptr;
+                FXTreeItem* buildings = nullptr;
+                for (datablock::itor unit = std::next(region); unit != iend && unit->depth() > regionPtr->depth(); ++unit)
                 {
+                    const datablock* objectPtr = &*unit;
+                    FXTreeItem* child = nullptr;
+                    if (unit->type() == block_type::TYPE_BUILDING)
+                    {
+                        if (!buildings) {
+                            if (!regionItem) {
+                                regionItem = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void *)regionPtr));
+                            }
+                            buildings = prependItem(regionItem, L"Geb\u00e4ude");
+                        }
+                        FXString label = objectPtr->getLabel() + ", " + objectPtr->value(TYPE_TYPE) + L" Gr\u00f6\u00dfe " + objectPtr->value(TYPE_SIZE);
+                        child = appendItem(buildings, label);
+                    }
+                    else if (unit->type() == block_type::TYPE_SHIP)
+                    {
+                        if (!ships) {
+                            if (!regionItem) {
+                                regionItem = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void *)regionPtr));
+                            }
+                            ships = prependItem(regionItem, L"Schiffe");
+                        }
+                        FXString label = objectPtr->getLabel() + ", " + objectPtr->value(TYPE_TYPE) + L" Gr\u00f6\u00dfe " + objectPtr->value(TYPE_SIZE);
+                        child = appendItem(ships, label);
+                    }
+                    if (child) {
+                        child->setData((void*)objectPtr);
+                    }
                     // display units until next region
                     if (unit->type() != block_type::TYPE_UNIT)
                         continue;
 
                     // get treeitem node from faction
-                    const datablock* unitPtr = &*unit;
+                    const datablock* unitPtr = objectPtr;
                     FXint factionId = mapFile->getFactionIdForUnit(unitPtr);
 
                     FXTreeItem *faction = factions[factionId];
@@ -722,7 +752,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                     FXString uname, number;
                     FXColor color = 0;
 
-                    for (datakey::list_type::const_iterator key = unit->data().begin(); key != unit->data().end(); key++)
+                    for (datakey::list_type::const_iterator key = unitPtr->data().begin(); key != unitPtr->data().end(); key++)
                     {
                         if (key->type() == TYPE_NAME)
                             uname = key->value();
@@ -736,23 +766,22 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                         }
                     }
 
-                    label.format("%s (%s): %s", uname.text(), unit->id().text(), number.text());
+                    label.format("%s (%s): %s", uname.text(), unitPtr->id().text(), number.text());
 
                     // with active_faction_group not set, units of own faction are inserted
                     // directly as child of region node.
                     FXRegionItem *item;
 
                     if (!active_faction_group && faction == act_faction)
-                        insertItem(faction, region, item = new FXRegionItem(label, 0, 0, &*unit));
+                        insertItem(faction, regionItem, item = new FXRegionItem(label, 0, 0, (void*)unitPtr));
                     else
-                        appendItem(faction, item = new FXRegionItem(label, 0, 0, &*unit));
+                        appendItem(faction, item = new FXRegionItem(label, 0, 0, (void *)unitPtr));
 
                     if (color) {
                         item->setTextColor(color);
                     }
 
-                    datablock::itor block = unit;
-                    for (block++; block != iend && block->depth() > unit->depth(); block++)
+                    for (datablock::itor block = std::next(unit); block != iend && block->depth() > unit->depth(); ++block)
                     {
                         if (block->type() != block_type::TYPE_COMMANDS)
                             continue;
@@ -766,6 +795,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                         {
                             item->setUnconfirmed(1);
 
+                            // FIXME: this is a lot of dynamic_cast
                             for (FXRegionItem* father = dynamic_cast<FXRegionItem*>(item->getParent());
                                 father; father = dynamic_cast<FXRegionItem*>(father->getParent()))
                             {

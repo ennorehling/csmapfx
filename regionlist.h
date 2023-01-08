@@ -50,20 +50,21 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-    datafile *mapFile;
+    datafile *mapFile = nullptr;
 
-	FXIcon			*terrainIcons[data::TERRAIN_LAST];
-	FXIcon			*green = nullptr, *red = nullptr, *blue = nullptr, *cyan = nullptr, *yellow = nullptr, *orange = nullptr, *gray = nullptr, *black = nullptr;
+	FXIcon *terrainIcons[data::TERRAIN_LAST];
+	FXIcon *green = nullptr, *red = nullptr, *blue = nullptr, *cyan = nullptr, *yellow = nullptr, *orange = nullptr, *gray = nullptr, *black = nullptr;
 
-	FXFont			*boldfont = nullptr;
+	FXFont *boldfont = nullptr;
 
 	// rekursivly searches item with userdata=data in treeitem list
 	FXTreeItem* findTreeItem(FXTreeItem* first, void* data);
 
 	bool active_faction_group = false;
+	bool active_regions_only = true;
 	bool colorized_units = true;
 
-protected:
+private:
 	FXRegionList() {}
     FXRegionList(const FXRegionList&) = delete;
 

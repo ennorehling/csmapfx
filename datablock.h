@@ -284,6 +284,7 @@ public:
 	
 	const FXString terrainString() const;
     FXString getName() const;
+    FXString getLabel() const;
 
     /* TYPE_MESSAGE: */
     bool hasReference(datablock* target) const;

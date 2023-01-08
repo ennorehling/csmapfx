@@ -47,7 +47,7 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
             if (pstate->selected & selection.UNIT)
             {
                 unitPtr = &*pstate->unit;
-                FXString name = unitPtr->getName() + " (" + unitPtr->id() + ")";
+                FXString name = unitPtr->getLabel();
                 if (!unitMessages) {
                     unitMessages = insertItem(battle, nullptr, name);
                 }
@@ -167,7 +167,7 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                     for (FXint id : guard_ids) {
                         datablock::itor faction;
                         if (mapFile->getFaction(faction, id)) {
-                            FXString label = faction->value("Parteiname") + " (" + faction->id() + ")";
+                            FXString label = faction->getLabel();
                             appendItem(guards, label);
                         }
                     }
