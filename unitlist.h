@@ -25,7 +25,6 @@ public:
 	long onQueryHelp(FXObject*, FXSelector, void*);
 
     long onPopup(FXObject*, FXSelector, void*);
-    long onCopyTree(FXObject*, FXSelector, void*);
 	long onCopyText(FXObject*, FXSelector, void*);
 	long onShowInfo(FXObject*, FXSelector, void*);
 	long onGotoItem(FXObject*, FXSelector, void*);
@@ -34,7 +33,6 @@ public:
 	enum
 	{
         ID_POPUP_SHOW_INFO = FXTreeList::ID_LAST,
-        ID_POPUP_COPY_TREE,
         ID_POPUP_COPY_TEXT,
         ID_POPUP_SELECT,
 		ID_LAST

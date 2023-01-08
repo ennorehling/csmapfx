@@ -11,7 +11,6 @@ FXDEFMAP(FXUnitList) MessageMap[]=
 { 
 	//________Message_Type_____________________ID_______________Message_Handler_______ 
 	FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_UPDATE,				FXUnitList::onMapChange), 
-    FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_POPUP_COPY_TREE,		FXUnitList::onCopyTree),
     FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_POPUP_COPY_TEXT,	    FXUnitList::onCopyText),
     FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_POPUP_SHOW_INFO,	    FXUnitList::onShowInfo),
     FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_POPUP_SELECT,	    FXUnitList::onGotoItem),
@@ -735,26 +734,14 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 	return 1;
 }
 
-long FXUnitList::onCopyTree(FXObject* sender, FXSelector sel, void* ptr)
-{
-    if (sender)
-    {
-        FXMenuCommand *cmd = static_cast<FXMenuCommand*>(sender);
-        FXTreeItem *item = static_cast<FXTreeItem *>(cmd->getUserData());
-        setClipboard(getSubTreeText(item));
-        return 1;
-    }
-    return 0;
-}
-
 long FXUnitList::onCopyText(FXObject* sender, FXSelector sel, void* ptr)
 {
     if (sender)
     {
         FXMenuCommand *cmd = static_cast<FXMenuCommand*>(sender);
-        FXTreeItem* item = static_cast<FXTreeItem*>(cmd->getUserData());
-        if (item) {
-            setClipboard(item->getText());
+        const datablock* block = static_cast<const datablock*>(cmd->getUserData());
+        if (block) {
+            setClipboard(block->id());
             return 1;
         }
     }
@@ -865,32 +852,28 @@ long FXUnitList::onPopup(FXObject* sender, FXSelector sel, void* ptr)
             datablock* block = popup->block;
             FXMenuCommand* command = nullptr;
             if (block->type() == block_type::TYPE_UNIT) {
-                command = new FXMenuCommand(menu, "Zeige Einheit", nullptr, this, ID_POPUP_SELECT);
+                command = new FXMenuCommand(menu, "Zeige &Einheit", nullptr, this, ID_POPUP_SELECT);
             }
             else if (block->type() == block_type::TYPE_SHIP) {
-                command = new FXMenuCommand(menu, "Zeige Schiff", nullptr, this, ID_POPUP_SELECT);
+                command = new FXMenuCommand(menu, "Zeige &Schiff", nullptr, this, ID_POPUP_SELECT);
             }
             else if (block->type() == block_type::TYPE_BUILDING) {
-                command = new FXMenuCommand(menu, L"Zeige Geb\u00e4ude", nullptr, this, ID_POPUP_SELECT);
+                command = new FXMenuCommand(menu, L"Zeige &Geb\u00e4ude", nullptr, this, ID_POPUP_SELECT);
             }
             if (command) {
                 command->setUserData(block);
             }
+            command = new FXMenuCommand(menu, "&Kopieren", nullptr, this, ID_POPUP_COPY_TEXT);
+            command->setUserData(block);
         }
         else {
             new FXPopupMenuCommand(menu, "Zeige Info", popup->info, nullptr, this);
         }
     }
-    
-	FXMenuPane *clipboard = new FXMenuPane(this);
-    new FXMenuCascade(menu, "&Zwischenablage", nullptr, clipboard, 0);
-    (new FXMenuCommand(clipboard, L"Alles", nullptr, this, ID_POPUP_COPY_TREE))->setUserData(nullptr);
-    (new FXMenuCommand(clipboard, L"Baum", nullptr, this, ID_POPUP_COPY_TREE))->setUserData(item);
-    (new FXMenuCommand(clipboard, L"Eintrag", nullptr, this, ID_POPUP_COPY_TEXT))->setUserData(item);
 
 	// show popup
 	menu->create();
-	menu->popup(nullptr, event->root_x,event->root_y);
+	menu->popup(nullptr, event->root_x, event->root_y);
 
     getApp()->runModalWhileShown(menu);
 	return 1;
