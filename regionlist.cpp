@@ -279,15 +279,14 @@ long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* p
 
 	// map change notify rebuilds treelist
     if (mapFile && mapFile->hasActiveFaction()) {
-        datafile::SelectionState sel_state = selection;
         if (!active_faction_group) {
             if (selection.selected & selection.FACTION) {
                 if (selection.faction == mapFile->activefaction()) {
-                    sel_state.selected &= ~sel_state.FACTION;
+                    selection.selected &= ~selection.FACTION;
                 }
             }
         }
-        onMapChange(this, 0, &sel_state);
+        onMapChange(this, 0, &selection);
     }
 	return 1;
 }
@@ -331,8 +330,10 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
 	datablock* datablk = (datablock*)current->getData();
 	datablock* parentdata = nullptr;
     FXTreeItem* folder = current->getParent();
-	if (folder)
-		parentdata = (datablock*)folder->getData();
+    while (folder && !parentdata) {
+        parentdata = (datablock*)folder->getData();
+        folder = folder->getParent();
+    }
 
 	datablock::itor main = mapFile->blocks().end();
 	datablock::itor iparent = mapFile->blocks().end();
@@ -355,12 +356,12 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
 		if (datablk && datablk == &*block)
 		{
 			main = block;
-			datablk = NULL;		// to indicate that block was found.
+			datablk = nullptr;		// to indicate that block was found.
 		}
 		else if (parentdata && parentdata == &*block)
 		{
 			iparent = block;
-			parentdata = NULL;	// found
+			parentdata = nullptr;	// found
 		}
 	}
 
@@ -373,62 +374,60 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
     if (main != mapFile->blocks().end())
     {
         // send new selection to main window
-        datafile::SelectionState sel_state = selection;
-
         if (main->type() == block_type::TYPE_REGION)
         {
-            sel_state.selected = sel_state.REGION;
-            sel_state.region = main;
+            selection.selected = selection.REGION;
+            selection.region = main;
         }
-        if (main->type() == block_type::TYPE_FACTION)
+        else if (main->type() == block_type::TYPE_FACTION)
         {
-            sel_state.selected = sel_state.FACTION;
-            sel_state.faction = main;
+            selection.selected = selection.FACTION;
+            selection.faction = main;
 
             if (iparent != mapFile->blocks().end())
             {
-                sel_state.selected |= sel_state.REGION;
-                sel_state.region = iparent;
+                selection.selected |= selection.REGION;
+                selection.region = iparent;
             }
         }
-        if (main->type() == block_type::TYPE_BUILDING)
+        else if (main->type() == block_type::TYPE_BUILDING)
         {
-            sel_state.selected = sel_state.BUILDING;
-            sel_state.building = main;
+            selection.selected = selection.BUILDING;
+            selection.building = main;
 
             if (iparent != mapFile->blocks().end())
             {
-                sel_state.selected |= sel_state.FACTION;
-                sel_state.faction = iparent;
+                selection.selected |= selection.REGION;
+                selection.region = iparent;
             }
         }
-        if (main->type() == block_type::TYPE_SHIP)
+        else if (main->type() == block_type::TYPE_SHIP)
         {
-            sel_state.selected = sel_state.SHIP;
-            sel_state.ship = main;
+            selection.selected = selection.SHIP;
+            selection.ship = main;
 
             if (iparent != mapFile->blocks().end())
             {
-                sel_state.selected |= sel_state.FACTION;
-                sel_state.faction = iparent;
+                selection.selected |= selection.REGION;
+                selection.region = iparent;
             }
         }
-        if (main->type() == block_type::TYPE_UNIT)
+        else if (main->type() == block_type::TYPE_UNIT)
         {
-            sel_state.selected = sel_state.UNIT;
-            sel_state.unit = main;
+            selection.selected = selection.UNIT;
+            selection.unit = main;
 
             if (iparent != mapFile->blocks().end())
             {
-                sel_state.selected |= sel_state.FACTION;
-                sel_state.faction = iparent;
+                selection.selected |= selection.FACTION;
+                selection.faction = iparent;
             }
         }
         if (selection.selected & selection.MULTIPLE_REGIONS) {
-            sel_state.selected |= selection.MULTIPLE_REGIONS;
-            sel_state.regionsSelected = selection.regionsSelected;
+            selection.selected |= selection.MULTIPLE_REGIONS;
+            selection.regionsSelected = selection.regionsSelected;
         }
-        getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
+        getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
         return 1;
     }
 	return 0;
@@ -844,6 +843,12 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                         }
                         update();
                     }
+                }
+                else if (selection.selected & selection.SHIP) {
+                    item = findTreeItem(region, &*selection.ship);
+                }
+                else if (selection.selected & selection.BUILDING) {
+                    item = findTreeItem(region, &*selection.building);
                 }
                 else if (selection.selected & selection.FACTION)
                     item = findTreeItem(region, &*selection.faction);

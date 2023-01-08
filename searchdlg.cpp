@@ -442,31 +442,25 @@ long FXSearchDlg::onSelectResults(FXObject*, FXSelector, void*)
     mapFile->findSelection(select, block, region);
 
     // propagate selection
-    datafile::SelectionState state = selection;
-    state.selected = 0;
-    if (selection.selected & selection.MULTIPLE_REGIONS) {
-        state.selected = selection.MULTIPLE_REGIONS;
-        state.regionsSelected = selection.regionsSelected;
-    }
     if (region != end) {
-        state.region = region;
-        state.selected |= state.REGION;
+        selection.region = region;
+        selection.selected |= selection.REGION;
     }
     if (block != end) {
         if (block->type() == block_type::TYPE_UNIT) {
-            state.unit = block;
-            state.selected |= state.UNIT;
+            selection.unit = block;
+            selection.selected |= selection.UNIT;
         }
         else if (block->type() == block_type::TYPE_BUILDING) {
-            state.building = block;
-            state.selected |= state.BUILDING;
+            selection.building = block;
+            selection.selected |= selection.BUILDING;
         }
         else if (block->type() == block_type::TYPE_SHIP) {
-            state.ship = block;
-            state.selected |= state.SHIP;
+            selection.ship = block;
+            selection.selected |= selection.SHIP;
         }
     }
-    getOwner()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    getOwner()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
 

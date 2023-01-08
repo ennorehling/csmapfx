@@ -364,8 +364,10 @@ long FXStatsPanel::onMapChange(FXObject*, FXSelector, void* ptr)
 			selection.regionsSelected = pstate->regionsSelected;
 	}
 
-	if (needUpdate)
-		updateData();
-
+    if (needUpdate) {
+        getApp()->beginWaitCursor();
+        updateData();
+        getApp()->endWaitCursor();
+    }
 	return 1;
 }

@@ -307,7 +307,7 @@ long FXCSMap::onUpdateIslands(FXObject* sender, FXSelector, void*)
 
 long FXCSMap::onSetModus(FXObject* sender, FXSelector, void*)
 {
-	if (!sender || !sender->isMemberOf(&FXId::metaClass))
+	if (!mapFile || !sender || !sender->isMemberOf(&FXId::metaClass))
 		return 0;
 
 	FXId *item = (FXId*)sender;
@@ -803,26 +803,21 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 		}
 
 		// set mark cursor
-		datafile::SelectionState state = selection;
 		if (mapFile)
 		{
-			state.selected = 0;
-
-			if (selection.selected & selection.MULTIPLE_REGIONS)
-				state.regionsSelected = selection.regionsSelected;
-
-            if (mapFile->getRegion(state.region, x, y, visiblePlane)) {
-                state.selected |= state.REGION;
+            if (mapFile->getRegion(selection.region, x, y, visiblePlane)) {
+                selection.selected |= selection.REGION;
+                selection.selected &= ~selection.UNKNOWN_REGION;
 
                 if ((event->state & CONTROLMASK) || modus == MODUS_SELECT)
 				{
 					// already selected? then deselect the region
-					std::set<datablock*>::iterator itor = state.regionsSelected.find(&*state.region);
-					if (itor == state.regionsSelected.end())
+					std::set<datablock*>::iterator itor = selection.regionsSelected.find(&*selection.region);
+					if (itor == selection.regionsSelected.end())
 					{
 						if (mouse_select == 0 || mouse_select == 1)		// select on mouse-over
 						{
-							state.regionsSelected.insert(&*state.region);
+                            selection.regionsSelected.insert(&*selection.region);
 							mouse_select = 1;
 						}
 					}
@@ -830,7 +825,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 					{
 						if (mouse_select == 0 || mouse_select == 2)		// unselect on mouse-over
 						{
-							state.regionsSelected.erase(itor);
+                            selection.regionsSelected.erase(itor);
 							mouse_select = 2;
 						}
 					}
@@ -839,14 +834,19 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
             }
             else {
 				// mark unknown region (no region-block in report)
-				state.sel_x = x, state.sel_y = y, state.sel_plane = visiblePlane;
-				state.selected |= state.UNKNOWN_REGION;
+                selection.sel_x = x, selection.sel_y = y, selection.sel_plane = visiblePlane;
+                selection.selected |= selection.UNKNOWN_REGION;
+                selection.selected &= ~selection.REGION;
 			}
 
-			if (!state.regionsSelected.empty())
-				state.selected |= state.MULTIPLE_REGIONS;
+            if (!selection.regionsSelected.empty()) {
+                selection.selected |= selection.MULTIPLE_REGIONS;
+            }
+            else {
+                selection.selected &= ~selection.MULTIPLE_REGIONS;
+            }
 
-			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 		}
 		return 1;
 	}
@@ -880,12 +880,13 @@ long FXCSMap::onLeftButtonRelease(FXObject* /*sender*/, FXSelector /*sel*/, void
 		// when in painting mode, relayout should not be done when button is pressed, so do it on buttonrelease
 		if (modus >= MODUS_SETTERRAIN && modus < MODUS_SETTERRAIN+ data::TERRAIN_LAST)
 		{
-            mapFile->rebuildRegions();
+            if (mapFile) {
+                mapFile->rebuildRegions();
 
-			datafile::SelectionState state = selection;
-			state.selected &= ~(state.REGION|state.UNKNOWN_REGION);
-            state.fileChange++;
-            getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+                selection.selected &= ~(selection.REGION | selection.UNKNOWN_REGION);
+                ++selection.fileChange;
+                getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
+            }
 		}
 		return 1;
 	}
@@ -1207,11 +1208,12 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 					}
 
                     // islands changed, rebuild:
-                    mapFile->rebuildIslands();
+                    if (mapFile) {
+                        mapFile->rebuildIslands();
 
-                    datafile::SelectionState state = selection;
-                    state.fileChange++;
-					getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+                        ++selection.fileChange;
+                        getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
+                    }
 				}
 				return 1;
 			}
@@ -1241,9 +1243,8 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 						// islands changed, rebuild:
                         mapFile->rebuildIslands();
 
-						datafile::SelectionState state = selection;
-                        state.fileChange++;
-						getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+                        ++selection.fileChange;
+                        getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 					}
 					return 1;
 				}
@@ -1261,10 +1262,9 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
                         else
                             region->setKey(TYPE_NAME, name);
                         
-						// map changed
-						datafile::SelectionState state = selection;
-                        state.fileChange++;
-						getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+                        // map changed
+                        ++selection.fileChange;
+						getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 					}
 					return 1;
 				}
@@ -1372,12 +1372,13 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 	// map changed
 	if (!(flags&FLAG_PRESSED) || modus < MODUS_SETTERRAIN || modus >= MODUS_SETTERRAIN+ data::TERRAIN_LAST)
 	{
-        mapFile->rebuildRegions();			// don't do this in painting mode
+        if (mapFile) {
+            mapFile->rebuildRegions();			// don't do this in painting mode
 
-		datafile::SelectionState state = selection;
-		state.selected &= ~(state.REGION|state.UNKNOWN_REGION);
-        state.fileChange++;
-		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+            selection.selected &= ~(selection.REGION | selection.UNKNOWN_REGION);
+            ++selection.fileChange;
+            getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
+        }
 	}
 
 	map->update();
@@ -2193,21 +2194,11 @@ long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
 		FXint plane = selection.sel_plane;
 
 		// set new marked region
-		datafile::SelectionState state = selection;
-        state.selected = 0;
-        state.sel_x = x, state.sel_y = y, state.sel_plane = plane;
+        selection.selected |= ~(selection.REGION | selection.UNKNOWN_REGION);
+        selection.sel_x = x, selection.sel_y = y, selection.sel_plane = plane;
+        selection.selected = mapFile->getRegion(selection.region, x, y, plane) ? selection.REGION : selection.UNKNOWN_REGION;
 
-        state.selected = mapFile->getRegion(state.region, x, y, plane) ? state.REGION : state.UNKNOWN_REGION;
-
-		// dont touch multiregions selected
-		if (selection.selected & selection.MULTIPLE_REGIONS)
-		{
-			state.regionsSelected = selection.regionsSelected;
-			if (!state.regionsSelected.empty())
-				state.selected |= selection.MULTIPLE_REGIONS;
-		}
-
-		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 		return 1;
 	}
 	else if (move_marker)
@@ -2216,28 +2207,19 @@ long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
 		if (!(selection.selected & selection.REGION))
 			return 0;
 
-		// select/deselect marked region (toggle selection)
-		datafile::SelectionState state = selection;
-
-		state.selected = selection.REGION;
-		state.region = selection.region;
-
-		if (selection.selected & selection.MULTIPLE_REGIONS)
-			state.regionsSelected = selection.regionsSelected;
-		else
-			state.regionsSelected.clear();		// should be cleared already
+        selection.selected = selection.REGION;
 
 		// already selected? then deselect the region
-		std::set<datablock*>::iterator itor = state.regionsSelected.find(&*state.region);
-		if (itor == state.regionsSelected.end())
-			state.regionsSelected.insert(&*state.region);
+		std::set<datablock*>::iterator itor = selection.regionsSelected.find(&*selection.region);
+		if (itor == selection.regionsSelected.end())
+            selection.regionsSelected.insert(&*selection.region);
 		else
-			state.regionsSelected.erase(itor);
+            selection.regionsSelected.erase(itor);
 
-		if (!state.regionsSelected.empty())
-			state.selected |= state.MULTIPLE_REGIONS;
+		if (!selection.regionsSelected.empty())
+            selection.selected |= selection.MULTIPLE_REGIONS;
 
-		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 		return 1;
 	}
 	else if (offx || offy)	// move map
