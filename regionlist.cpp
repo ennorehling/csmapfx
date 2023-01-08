@@ -278,14 +278,17 @@ long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* p
 	active_faction_group = !active_faction_group;
 
 	// map change notify rebuilds treelist
-    if (mapFile) {
+    if (mapFile && mapFile->hasActiveFaction()) {
         datafile::SelectionState sel_state = selection;
         if (!active_faction_group) {
-            if (selection.faction == mapFile->activefaction()) {
-                sel_state.selected &= ~sel_state.FACTION;
+            if (selection.selected & selection.FACTION) {
+                if (selection.faction == mapFile->activefaction()) {
+                    sel_state.selected &= ~sel_state.FACTION;
+                }
             }
         }
-        onMapChange(this, 0, &selection);
+        ++sel_state.selChange;
+        onMapChange(this, 0, &sel_state);
     }
 	return 1;
 }

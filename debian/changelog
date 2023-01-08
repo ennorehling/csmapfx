@@ -1,3 +1,10 @@
+csmapfx (1.5.0-1) stable; urgency=low
+
+  * show buildings and ships in region list.
+  * make onToggleOwnFactionGroup not crash.
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 08 Jan 2023 17:00:00 +0200
+
 csmapfx (1.4.38-1) stable; urgency=low
 
   * copy building and ship ids to clipboard
