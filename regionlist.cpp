@@ -287,7 +287,6 @@ long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* p
                 }
             }
         }
-        ++sel_state.selChange;
         onMapChange(this, 0, &sel_state);
     }
 	return 1;
@@ -302,7 +301,7 @@ long FXRegionList::onUpdateOwnFactionGroup(FXObject* sender, FXSelector, void* p
 long FXRegionList::onToggleUnitColors(FXObject *sender, FXSelector sel, void *ptr)
 {
     colorized_units = !colorized_units;
-
+    onMapChange(this, 0, &selection);
     return onUpdateUnitColors(sender, sel, ptr);
 }
 
@@ -818,7 +817,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
         getApp()->endWaitCursor();
     }
 
-	if (selection.selChange != pstate->selChange)
+	if (sender == this || selection.selChange != pstate->selChange)
 	{
         selection = *pstate;
         if (selection.selected & selection.REGION)
