@@ -301,7 +301,7 @@ long FXRegionList::onUpdateOwnFactionGroup(FXObject* sender, FXSelector, void* p
 long FXRegionList::onToggleUnitColors(FXObject *sender, FXSelector sel, void *ptr)
 {
     colorized_units = !colorized_units;
-    onMapChange(this, 0, &selection);
+    update();
     return onUpdateUnitColors(sender, sel, ptr);
 }
 
@@ -576,6 +576,17 @@ FXTreeItem* FXRegionList::findTreeItem(FXTreeItem* item, void* udata)
 	return nullptr;
 }
 
+FXColor FXRegionList::getUnitColor(const datablock* unitPtr)
+{
+    if (unitPtr->hasKey(TYPE_BUILDING)) {
+       return FXRGB(0, 127, 0);
+    }
+    if (unitPtr->hasKey(TYPE_SHIP)) {
+        return FXRGB(0, 0, 255);
+    }
+    return 0;
+}
+
 long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
 {
     datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
@@ -751,24 +762,10 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
 
                     FXTreeItem *faction = factions[factionId];
 
-                    FXString uname, number;
-                    FXColor color = 0;
+                    FXString label = unitPtr->getLabel();
+                    int number = unitPtr->valueInt(TYPE_NUMBER);
 
-                    for (datakey::list_type::const_iterator key = unitPtr->data().begin(); key != unitPtr->data().end(); key++)
-                    {
-                        if (key->type() == TYPE_NAME)
-                            uname = key->value();
-                        else if (key->type() == TYPE_NUMBER)
-                            number = key->value();
-                        else if (key->type() == TYPE_BUILDING) {
-                            color = FXRGB(0, 127, 0);
-                        }
-                        else if (key->type() == TYPE_SHIP) {
-                            color = FXRGB(0, 0, 255);
-                        }
-                    }
-
-                    label.format("%s (%s): %s", uname.text(), unitPtr->id().text(), number.text());
+                    label.format("%s: %d", label.text(), number);
 
                     // with active_faction_group not set, units of own faction are inserted
                     // directly as child of region node.
@@ -779,6 +776,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                     else
                         appendItem(faction, item = new FXRegionItem(label, 0, 0, (void *)unitPtr));
 
+                    FXColor color = getUnitColor(unitPtr);
                     if (color) {
                         item->setTextColor(color);
                     }

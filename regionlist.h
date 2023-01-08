@@ -52,7 +52,7 @@ protected:
 
     datafile *mapFile = nullptr;
 
-	FXIcon *terrainIcons[data::TERRAIN_LAST];
+    FXIcon* terrainIcons[data::TERRAIN_LAST] = {};
 	FXIcon *green = nullptr, *red = nullptr, *blue = nullptr, *cyan = nullptr, *yellow = nullptr, *orange = nullptr, *gray = nullptr, *black = nullptr;
 
 	FXFont *boldfont = nullptr;
@@ -68,6 +68,7 @@ private:
 	FXRegionList() {}
     FXRegionList(const FXRegionList&) = delete;
 
+    static FXColor getUnitColor(const datablock* unitPtr);
 };
 
 #endif //_CSMAP_REGIONLIST
