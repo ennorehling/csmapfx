@@ -1,3 +1,9 @@
+csmapfx (1.4.38-1) stable; urgency=low
+
+  * copy building and ship ids to clipboard
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 08 Jan 2023 13:00:00 +0200
+
 csmapfx (1.4.37-1) stable; urgency=low
 
   * cosmetic changes to region info treeview.

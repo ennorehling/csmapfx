@@ -546,9 +546,11 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 		if (main != mapFile->blocks().end())
 		{
 			// send new selection to main window
-			datafile::SelectionState state = selection;
+            FXString clipboard;
+            datafile::SelectionState state = selection;
+            state.selected = 0;
 
-			if (main->type() == block_type::TYPE_REGION)
+            if (main->type() == block_type::TYPE_REGION)
 			{
 				state.selected = state.REGION;
 				state.region = main;
@@ -566,26 +568,12 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 			}
 			if (main->type() == block_type::TYPE_BUILDING)
 			{
-				state.selected = state.BUILDING;
-				state.building = main;
-
-				if (iparent != mapFile->blocks().end())
-				{
-					state.selected |= state.REGION;
-					state.region = iparent;
-				}
+                clipboard = main->id();
 			}
 			if (main->type() == block_type::TYPE_SHIP)
 			{
-				state.selected = state.SHIP;
-				state.ship = main;
-
-				if (iparent != mapFile->blocks().end())
-				{
-					state.selected |= state.REGION;
-					state.region = iparent;
-				}
-			}
+                clipboard = main->id();
+            }
 			if (main->type() == block_type::TYPE_UNIT)
 			{
 				state.selected = state.UNIT;
@@ -601,8 +589,12 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
                 state.selected |= selection.MULTIPLE_REGIONS;
                 state.regionsSelected = selection.regionsSelected;
             }
-
-			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+            if (state.selected) {
+                getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+            }
+            if (!clipboard.empty()) {
+                getTarget()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void *)clipboard.text());
+            }
 			return 1;
 		}
 	}
