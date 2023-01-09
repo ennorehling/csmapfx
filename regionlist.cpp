@@ -554,6 +554,20 @@ long FXRegionList::onPopupClicked(FXObject* sender,FXSelector, void*)
 	return 0;
 }
 
+bool FXRegionList::isConfirmed(const datablock::itor& unit) const
+{
+
+    for (datablock::itor block = std::next(unit); block != mapFile->blocks().end() && block->depth() > unit->depth(); ++block)
+    {
+        if (block->type() != block_type::TYPE_COMMANDS)
+            continue;
+        if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
+            return cmds->confirmed;
+        return false;
+    }
+    return true;
+}
+
 // rekursivly searches item with userdata=data in treeitem list
 FXTreeItem* FXRegionList::findTreeItem(FXTreeItem* item, void* udata)
 {
@@ -780,29 +794,16 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                         item->setTextColor(color);
                     }
 
-                    for (datablock::itor block = std::next(unit); block != iend && block->depth() > unit->depth(); ++block)
-                    {
-                        if (block->type() != block_type::TYPE_COMMANDS)
-                            continue;
-
-                        bool cmd_confirmed = false;
-
-                        if (att_commands *cmds = dynamic_cast<att_commands *>(block->attachment()))
-                            cmd_confirmed = cmds->confirmed;
-
-                        if (!cmd_confirmed)
+                    if (!isConfirmed(unit)) {
+                        item->setUnconfirmed(1);
+                        for (FXTreeItem* father = item->getParent(); father; father = father->getParent())
                         {
-                            item->setUnconfirmed(1);
-
-                            // FIXME: this is a lot of dynamic_cast
-                            for (FXRegionItem* father = dynamic_cast<FXRegionItem*>(item->getParent());
-                                father; father = dynamic_cast<FXRegionItem*>(father->getParent()))
-                            {
-                                int unconfirmed = father->getUnconfirmed() + 1;
-                                father->setUnconfirmed(unconfirmed);
+                            FXRegionItem* ri = dynamic_cast<FXRegionItem*>(father);
+                            if (ri) {
+                                int unconfirmed = ri->getUnconfirmed() + 1;
+                                ri->setUnconfirmed(unconfirmed);
                             }
                         }
-
                     }
                 }
 
@@ -827,7 +828,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                     item = findTreeItem(region ? region : top, &*selection.unit);
                     FXASSERT(item);
                     FXRegionItem* ri = static_cast<FXRegionItem *>(item);
-                    if (ri->isBold() != !(selection.selected & selection.CONFIRMED)) {
+                    if (isConfirmed(selection.unit) == ri->isBold()) {
                         int unconfirmed = ri->isBold() ? 0 : 1;
                         ri->setUnconfirmed(unconfirmed);
                         FXRegionItem* pi = static_cast<FXRegionItem*>(ri->getParent());

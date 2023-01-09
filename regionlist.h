@@ -57,6 +57,7 @@ protected:
 
 	FXFont *boldfont = nullptr;
 
+    bool isConfirmed(const datablock::itor& unit) const;
 	// rekursivly searches item with userdata=data in treeitem list
 	FXTreeItem* findTreeItem(FXTreeItem* first, void* data);
 
