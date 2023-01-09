@@ -761,10 +761,10 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
 
                     FXTreeItem *faction = factions[factionId];
 
-                    FXString label = unitPtr->getLabel();
+                    FXString label;
                     int number = unitPtr->valueInt(TYPE_NUMBER);
 
-                    label.format("%s: %d", label.text(), number);
+                    label.format("%s: %d", unitPtr->getLabel().text(), number);
 
                     // with active_faction_group not set, units of own faction are inserted
                     // directly as child of region node.
