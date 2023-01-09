@@ -1778,25 +1778,17 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 {
     datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
 
+    if (!report) return 0;
     getApp()->beginWaitCursor();
 
-    if (report) {
-        updateFileNames();
-    }
-
-    // save new selection state, mark dirty (update selChange)
-    selection.selected = pstate->selected;
-    ++selection.selChange;
+    updateFileNames();
 
     // file change notification
     if (pstate->fileChange != selection.fileChange)
     {
-        selection.fileChange = pstate->fileChange;
         // notify info dialog of new game type
         FXString name_of_game;
-        if (report) {
-            name_of_game = report->blocks().front().value("Spiel");
-        }
+        name_of_game = report->blocks().front().value("Spiel");
         if (name_of_game.empty())
             name_of_game = "default";
 
@@ -2015,56 +2007,61 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
                         break;
                     }
                 }
+                else if (block->type() == block_type::TYPE_SHIP)
+                {
+                    if (pstate->selected & selection.SHIP &&
+                        block->info() == pstate->ship->info())
+                    {
+                        selection.region = region;
+                        selection.selected = pstate->selected;
+                        selection.ship = block;
+                        selection.selected |= selection.SHIP;
+                        break;
+                    }
+                }
+                else if (block->type() == block_type::TYPE_BUILDING)
+                {
+                    if (pstate->selected & selection.BUILDING &&
+                        block->info() == pstate->ship->info())
+                    {
+                        selection.region = region;
+                        selection.selected = pstate->selected;
+                        selection.building = block;
+                        selection.selected |= selection.BUILDING;
+                        break;
+                    }
+                }
             }
         }
+        selection.fileChange = pstate->fileChange;
     }
-    else
-    {
-        if (pstate->selected & selection.MULTIPLE_REGIONS) {
-            selection.regionsSelected = pstate->regionsSelected;
-        }
-        if (pstate->selected & selection.REGION) {
-            selection.region = pstate->region;
-        }
-        if (pstate->selected & selection.UNIT) {
-            selection.unit = pstate->unit;
-            if (isConfirmed(selection.unit)) {
-                selection.selected |= selection.CONFIRMED;
-            }
-            else {
-                selection.selected &= ~selection.CONFIRMED;
-            }
-        }
-        if (pstate->selected & selection.FACTION) {
-            selection.faction = pstate->faction;
-        }
-        if (pstate->selected & selection.UNKNOWN_REGION) {
-            selection.sel_x = pstate->sel_x;
-            selection.sel_y = pstate->sel_y;
-            selection.sel_plane = pstate->sel_plane;
-        }
-    }
+    selection = *pstate;
+    ++selection.selChange;
 
     // make sure that a region is always selected (when something in it is selected)
     if (!(selection.selected & selection.REGION))
     {
+        // start with selected item and search containing region
+        datablock::itor block = report->blocks().begin();
         if (selection.selected & selection.UNIT)
         {
-            // start with selected unit and search containing region
-            datablock::itor end = report->blocks().end();    // begin()-- does a wrap-around to end()
-
-            datablock::itor block = selection.unit;
-            for (; block != end; block--)
-            {
-                if (block->type() == block_type::TYPE_REGION)
-                    break;
-            }
-
-            // found region?
-            if (block != end)
+            block = selection.unit;
+        }
+        else if (selection.selected & selection.SHIP)
+        {
+            block = selection.ship;
+        }
+        else if (selection.selected & selection.BUILDING)
+        {
+            block = selection.building;
+        }
+        while (block != report->blocks().begin()) {
+            --block;
+            if (block->type() == block_type::TYPE_REGION)
             {
                 selection.region = block;
                 selection.selected |= selection.REGION;
+                break;
             }
         }
     }
@@ -2073,7 +2070,6 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     if (selection.selected & selection.REGION)
     {
         selection.selected &= ~selection.UNKNOWN_REGION;
-
         selection.sel_x = selection.region->x();
         selection.sel_y = selection.region->y();
         selection.sel_plane = selection.region->info();

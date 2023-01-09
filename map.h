@@ -203,7 +203,7 @@ protected:
 	std::vector<arrow> arrows;
 	std::vector<arrow> routeArrows[2];		// saved
     
-    datafile *mapFile;
+    datafile *mapFile = nullptr;
 
 	// Return default width / height
 	virtual FXint getDefaultWidth();
@@ -214,6 +214,8 @@ protected:
 	FXint GetHexFromScreenX(FXint scrx, FXint scry);
 	FXint GetScreenFromHexY(FXint x, FXint y);
 	FXint GetScreenFromHexX(FXint x, FXint y);
+
+    void updateMap();
 
 protected:
 	FXCSMap() {}

@@ -608,7 +608,6 @@ void FXCommands::mapShowRoute()
 
 void FXCommands::updateSelection()
 {
-    ++selection.selChange;
     getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 }
 

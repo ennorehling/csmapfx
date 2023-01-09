@@ -360,14 +360,18 @@ long FXStatsPanel::onMapChange(FXObject*, FXSelector, void* ptr)
 
         selection = *pstate;
 
-		if (needUpdate && selection.selected & selection.MULTIPLE_REGIONS) // expensive operation
+		if (needUpdate && (selection.selected & selection.MULTIPLE_REGIONS)) // expensive operation
 			selection.regionsSelected = pstate->regionsSelected;
 	}
 
     if (needUpdate) {
-        getApp()->beginWaitCursor();
+        if (selection.selected & selection.MULTIPLE_REGIONS) {
+            getApp()->beginWaitCursor();
+        }
         updateData();
-        getApp()->endWaitCursor();
+        if (selection.selected & selection.MULTIPLE_REGIONS) {
+            getApp()->endWaitCursor();
+        }
     }
 	return 1;
 }

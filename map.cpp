@@ -806,8 +806,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 		if (mapFile)
 		{
             if (mapFile->getRegion(selection.region, x, y, visiblePlane)) {
-                selection.selected |= selection.REGION;
-                selection.selected &= ~selection.UNKNOWN_REGION;
+                selection.selected = selection.REGION | (selection.selected & selection.MULTIPLE_REGIONS);
 
                 if ((event->state & CONTROLMASK) || modus == MODUS_SELECT)
 				{
@@ -845,7 +844,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
             else {
                 selection.selected &= ~selection.MULTIPLE_REGIONS;
             }
-
+            onMapChange(this, 0, &selection);
 			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 		}
 		return 1;
@@ -1944,7 +1943,7 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 	return 1;
 }
 
-long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
+long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
 {
 	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
@@ -1957,7 +1956,7 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 		datachanged = true;
 	}
 
-	if (selection.selChange != pstate->selChange)
+	if (sender == this || selection.selChange != pstate->selChange)
 	{
         selection = *pstate;
 		selection.regionsSelected = pstate->regionsSelected;
@@ -1982,33 +1981,7 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 	}
 
     // things changed
-	if (datachanged)
-	{
-		if (!minimap)
-			layout();
-
-		if (minimap)
-		{
-			scale = 1.0f;
-			calculateContentSize();
-
-			while (scale >= 2/64.0f && (image_w > getWidth() || image_h > getHeight()))
-			{
-				scale /= 2;
-				image_w /= 2;
-				image_h /= 2;
-			}
-
-            // resize (& layout() & calculateContentSize())
-			float sc = scale;
-			scale = 0;
-			scaleChange(sc);	// sc must be != scale
-
-			// paint map into buffer
-			imagebuffer->resize(image_w, image_h);
-			paintMap(imagebuffer.get());	// minimap paints map only when changed data
-		}
-	}
+    if (datachanged) updateMap();
 
 	if (scroll)
 		scrollTo(sel_x, sel_y);
@@ -2020,6 +1993,35 @@ long FXCSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 
     return 1;
 }
+
+void FXCSMap::updateMap()
+{
+    if (!minimap)
+        layout();
+
+    if (minimap)
+    {
+        scale = 1.0f;
+        calculateContentSize();
+
+        while (scale >= 2 / 64.0f && (image_w > getWidth() || image_h > getHeight()))
+        {
+            scale /= 2;
+            image_w /= 2;
+            image_h /= 2;
+        }
+
+        // resize (& layout() & calculateContentSize())
+        float sc = scale;
+        scale = 0;
+        scaleChange(sc);	// sc must be != scale
+
+        // paint map into buffer
+        imagebuffer->resize(image_w, image_h);
+        paintMap(imagebuffer.get());	// minimap paints map only when changed data
+    }
+}
+
 
 FXint FXCSMap::sendRouteCmds(const FXString& str, int which)
 {

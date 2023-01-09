@@ -546,24 +546,22 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 		if (main != mapFile->blocks().end())
 		{
 			// send new selection to main window
+            selection.selected = 0;
             FXString clipboard;
-            datafile::SelectionState state = selection;
-            state.selected = 0;
-
             if (main->type() == block_type::TYPE_REGION)
 			{
-				state.selected = state.REGION;
-				state.region = main;
+                selection.selected = selection.REGION;
+                selection.region = main;
 			}
 			if (main->type() == block_type::TYPE_FACTION)
 			{
-				state.selected = state.FACTION;
-				state.faction = main;
+                selection.selected = selection.FACTION;
+                selection.faction = main;
 
 				if (iparent != mapFile->blocks().end())
 				{
-					state.selected |= state.REGION;
-					state.region = iparent;
+                    selection.selected |= selection.REGION;
+                    selection.region = iparent;
 				}
 			}
 			if (main->type() == block_type::TYPE_BUILDING)
@@ -576,22 +574,19 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
             }
 			if (main->type() == block_type::TYPE_UNIT)
 			{
-				state.selected = state.UNIT;
-				state.unit = main;
+                selection.selected = selection.UNIT;
+                selection.unit = main;
 
 				if (iparent != mapFile->blocks().end())
 				{
-					state.selected |= state.FACTION;
-					state.faction = iparent;
+                    selection.selected |= selection.FACTION;
+                    selection.faction = iparent;
 				}			
 			}
-            if (selection.selected & selection.MULTIPLE_REGIONS) {
-                state.selected |= selection.MULTIPLE_REGIONS;
-                state.regionsSelected = selection.regionsSelected;
+            if (!selection.regionsSelected.empty()) {
+                selection.selected |= selection.MULTIPLE_REGIONS;
             }
-            if (state.selected) {
-                getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
-            }
+            getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
             if (!clipboard.empty()) {
                 getTarget()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void *)clipboard.text());
             }
