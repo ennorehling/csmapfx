@@ -1,3 +1,9 @@
+csmapfx (1.4.39-1) stable; urgency=low
+
+  * show unit descriptions
+
+ -- Enno Rehling <enno@eressea.de>  Tue, 10 Jan 2023 09:30:00 +0200
+
 csmapfx (1.4.38-1) stable; urgency=low
 
   * copy building and ship ids to clipboard

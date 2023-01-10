@@ -193,6 +193,11 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 			FXTreeItem *unititem = appendItem(nullptr, label);
 			unititem->setExpanded(true);
 
+            label = unit->value(TYPE_DESCRIPTION);
+            if (!label.empty()) {
+                item = appendItem(unititem, label);
+            }
+
             if (factionId < 0 && otherFactionId < 0)
             {
                 label.assign("Parteigetarnt");
@@ -233,7 +238,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                     }
                 }
             }
-            item = appendItem(unititem, label.text());
+            item = appendItem(unititem, label);
 
             if (group > 0)
             {
@@ -245,7 +250,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                     // TODO: find group name in mapFile
                     label += FXStringVal(group);
                 }
-                item = appendItem(unititem, label.text());
+                item = appendItem(unititem, label);
             }
 
             if (familiarMage > 0) {
@@ -253,7 +258,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                 if (mapFile->getUnit(mage, familiarMage)) {
                     FXString mage_name = mage->value(TYPE_NAME);
                     label.format("Vertrauter von %s (%s)", mage_name.text(), FXStringValEx(familiarMage, 36).text());
-                    item = appendItem(unititem, label.text());
+                    item = appendItem(unititem, label);
                     item->setData(&*mage);
                 }
             }
