@@ -17,8 +17,6 @@ public:
 
 	void setClipboard(const FXString& text);
 	void showInfo(const FXString& text);
-	FXString trimNumbers(const FXString& str) const;
-	FXString getSubTreeText(const FXTreeItem* item) const;
 
 public:
 	long onMapChange(FXObject*, FXSelector, void*);

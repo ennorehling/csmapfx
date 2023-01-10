@@ -844,12 +844,11 @@ long FXUnitList::onPopup(FXObject* sender, FXSelector sel, void* ptr)
 
 	FXMenuPane pane(this);
 	FXMenuPane *menu = &pane;
+    FXMenuSeparatorEx* sep = nullptr;
 
-	FXString title = item->getText();
+    FXString title = item->getText();
 	if (title.length() > 20)
 		title = title.left(17) + "...";
-
-    new FXMenuSeparatorEx(menu, title);
 
     void* udata = item->getData();
     if (udata) {
@@ -857,6 +856,9 @@ long FXUnitList::onPopup(FXObject* sender, FXSelector sel, void* ptr)
         if (popup->block) {
             datablock* block = popup->block;
             FXMenuCommand* command = nullptr;
+            if (!sep) {
+                sep = new FXMenuSeparatorEx(menu, title);
+            }
             if (block->type() == block_type::TYPE_UNIT) {
                 command = new FXMenuCommand(menu, "Zeige &Einheit", nullptr, this, ID_POPUP_SELECT);
             }
@@ -878,11 +880,12 @@ long FXUnitList::onPopup(FXObject* sender, FXSelector sel, void* ptr)
     }
 
 	// show popup
-	menu->create();
-	menu->popup(nullptr, event->root_x, event->root_y);
-
-    getApp()->runModalWhileShown(menu);
-	return 1;
+    if (menu->numChildren()) {
+        menu->create();
+        menu->popup(nullptr, event->root_x, event->root_y);
+        getApp()->runModalWhileShown(menu);
+    }
+    return 1;
 }
 
 void FXUnitList::setClipboard(const FXString& text)
@@ -893,69 +896,6 @@ void FXUnitList::setClipboard(const FXString& text)
 void FXUnitList::showInfo(const FXString& text)
 {
 	getShell()->handle(this, FXSEL(SEL_QUERY_HELP, ID_SETSTRINGVALUE), (void*)text.text());
-}
-
-FXString FXUnitList::trimNumbers(const FXString& str) const
-{
-	FXString text = str;
-
-	FXString l = text.left(1);
-	FXString r = text.right(1);
-	if (l[0] >= '0' && l[0] <= '9')
-	{
-		int pos = text.find(' ');
-        if (pos > 0)
-			text = text.erase(0, pos+1);
-	}
-	else if (r[0] >= '0' && r[0] <= '9')
-	{
-		int pos = text.rfind(' ');
-        if (pos > 0)
-			text = text.erase(pos, text.length()-pos);
-	}
-
-	return text;
-}
-
-FXString FXUnitList::getSubTreeText(const FXTreeItem* item) const
-{
-	int mindepth = 0, depth = 0;
-
-	if (!item)
-	{
-		item = getFirstItem();
-		mindepth--;
-	}
-
-	FXString text;
-
-	if (!item)
-		return text;
-	
-	do
-	{
-		text += FXString('\t', depth);
-		text += item->getText();
-		text += '\n';
-
-		if (item->getFirst())
-		{
-			item = item->getFirst();
-			depth++;
-		}
-		else
-		{
-			while (item && !item->getNext())
-			{
-				item = item->getParent();
-				depth--;
-			}
-			if (item)
-				item = item->getNext();
-		}
-	} while (item && depth > mindepth);
-
-	return text;
 }
 
 long FXUnitList::onQueryHelp(FXObject* /*sender*/, FXSelector, void* /*ptr*/)
