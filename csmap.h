@@ -79,8 +79,7 @@ public:		// this functions are slots for menu commands
 	long onRegionRemoveSel(FXObject*, FXSelector, void* ptr);
 
 	long onHelpAbout(FXObject*, FXSelector, void* ptr);
-	long onViewUnitTab(FXObject*, FXSelector, void* ptr);
-	long onViewStatsTab(FXObject*, FXSelector, void* ptr);
+	long onShowTab(FXObject*, FXSelector, void* ptr);
 
 	long onChangeZoom(FXObject*, FXSelector, void* ptr);
 	long onUpdateZoom(FXObject*, FXSelector, void* ptr);
@@ -181,8 +180,10 @@ public:		// this functions are slots for menu commands
 		ID_HELP_ABOUT,
 
         // TabBook accelarators
-        ID_TAB_UNIT,
-        ID_TAB_STATS,
+        ID_TAB_1,
+        ID_TAB_2,
+        ID_TAB_3,
+        ID_TAB_4,
 
         // file watch callback
         ID_WATCH_FILES,

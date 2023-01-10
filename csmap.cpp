@@ -128,8 +128,10 @@ FXDEFMAP(CSMap) MessageMap[]=
 
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_HELP_ABOUT,               CSMap::onHelpAbout),
 
-    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_TAB_UNIT,                 CSMap::onViewUnitTab),
-    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_TAB_STATS,                CSMap::onViewStatsTab),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_TAB_1,                    CSMap::onShowTab),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_TAB_2,                    CSMap::onShowTab),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_TAB_3,                    CSMap::onShowTab),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_TAB_4,                    CSMap::onShowTab),
 
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_ZOOM,                 CSMap::onChangeZoom),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_MAP_ZOOM,                 CSMap::onUpdateZoom),
@@ -588,16 +590,27 @@ CSMap::CSMap(FXApp *app) :
 
     tabbook = new FXTabBook(commandsplitter, nullptr,0, TABBOOK_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
 
-    new FXTabItem(tabbook, "Einheiten");
-    FXVerticalFrame* frame = new FXVerticalFrame(tabbook, LAYOUT_FILL_X);
-    unitlist = new FXUnitList(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
-        TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
-    frame->setBorderColor(getApp()->getShadowColor());
-    frame->setFrameStyle(FRAME_LINE);
     new FXTabItem(tabbook, "Statistik");
     statistics = new FXStatistics(tabbook, this, ID_SELECTION, LAYOUT_FILL_X);
-    getAccelTable()->addAccel(MKUINT(KEY_1, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_UNIT));
-    getAccelTable()->addAccel(MKUINT(KEY_2, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_STATS));
+    new FXTabItem(tabbook, "Einheit");
+    FXVerticalFrame* frame;
+    frame = new FXVerticalFrame(tabbook, LAYOUT_FILL_X);
+    frame->setBorderColor(getApp()->getShadowColor());
+    frame->setFrameStyle(FRAME_LINE);
+    unitlist = new FXUnitList(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
+        TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
+    new FXTabItem(tabbook, "Schiff");
+    frame = new FXVerticalFrame(tabbook, LAYOUT_FILL_X);
+    frame->setBorderColor(getApp()->getShadowColor());
+    frame->setFrameStyle(FRAME_LINE);
+    new FXTabItem(tabbook, L"Geb\u00e4ude");
+    frame = new FXVerticalFrame(tabbook, LAYOUT_FILL_X);
+    frame->setBorderColor(getApp()->getShadowColor());
+    frame->setFrameStyle(FRAME_LINE);
+    getAccelTable()->addAccel(MKUINT(KEY_1, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_1));
+    getAccelTable()->addAccel(MKUINT(KEY_2, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_2));
+    getAccelTable()->addAccel(MKUINT(KEY_3, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_3));
+    getAccelTable()->addAccel(MKUINT(KEY_4, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_4));
 
     // Befehlseditor
     commandframe = new FXVerticalFrame(commandsplitter,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 0,0,0,0);
@@ -3188,15 +3201,9 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
     return 1;
 }
 
-long CSMap::onViewStatsTab(FXObject *, FXSelector, void *)
+long CSMap::onShowTab(FXObject *, FXSelector sel, void *)
 {
-    tabbook->setCurrent(1);
-    return 1;
-}
-
-long CSMap::onViewUnitTab(FXObject *, FXSelector, void *)
-{
-    tabbook->setCurrent(0);
+    tabbook->setCurrent(FXSELID(sel) - ID_TAB_1);
     return 1;
 }
 
