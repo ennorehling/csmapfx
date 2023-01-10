@@ -193,11 +193,6 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 			FXTreeItem *unititem = appendItem(nullptr, label);
 			unititem->setExpanded(true);
 
-            label = unit->value(TYPE_DESCRIPTION);
-            if (!label.empty()) {
-                item = appendItem(unititem, label);
-            }
-
             if (factionId < 0 && otherFactionId < 0)
             {
                 label.assign("Parteigetarnt");
@@ -240,6 +235,12 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
             }
             item = appendItem(unititem, label);
 
+            label = unit->value(TYPE_DESCRIPTION);
+            if (!label.empty()) {
+                item = appendItem(unititem, label);
+            }
+
+
             if (group > 0)
             {
                 label = "Gruppe: ";
@@ -281,7 +282,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                 label += ", ";
                 label += (count == 1) ? "Held" : "Helden";
             }
-			item = appendItem(unititem, label.text());
+			item = appendItem(unititem, label);
 
 			if (!combatstatus.empty() || !hp.empty() || !hungry.empty() || !guards.empty())
 			{
@@ -327,13 +328,13 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 					label += "bewacht";
 				}
 
-				item = appendItem(unititem, label.text());
+				item = appendItem(unititem, label);
 			}
 
 			if (!aura.empty() || !auramax.empty())
 			{
 				label.format("%s von %s Aura", aura.text(), auramax.text());
-				item = appendItem(unititem, label.text());
+				item = appendItem(unititem, label);
 			}
 
             if (!weight.empty())
@@ -355,7 +356,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 			for (std::vector<datakey::list_type::const_iterator>::const_iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
 			{
 				label.format("%s: %s", (*itag)->key().text(), (*itag)->value().text());
-				appendItem(unititem, label.text());
+				appendItem(unititem, label);
 			}
 
 			if (spells != end)		// does a SPRUECHE block exist?
@@ -573,7 +574,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                         item = appendItem(node, item);
                     }
                     else {
-                        item = appendItem(node, label.text());
+                        item = appendItem(node, label);
                     }
                 }
 
@@ -713,7 +714,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                     else {
                         label.format("%s: %s", t->key().text(), t->value().text());
                     }
-                    item = appendItem(node, label.text());
+                    item = appendItem(node, label);
                 }
 
 				effects = end;
