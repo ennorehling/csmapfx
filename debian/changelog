@@ -1,3 +1,9 @@
+csmapfx (1.5.1-1) stable; urgency=low
+
+  * navigate to passing ships and units (Durchreise).
+
+ -- Enno Rehling <enno@eressea.de>  Tue, 10 Jan 2023 21:30:00 +0200
+
 csmapfx (1.5.0-1) stable; urgency=low
 
   * show buildings and ships in region list.

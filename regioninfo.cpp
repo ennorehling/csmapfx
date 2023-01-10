@@ -159,8 +159,28 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                         if (block->type() == block_type::TYPE_DURCHSCHIFFUNG)
                             prefix = "Die ";	// fuer Schiffe
 
-                        for (datakey::list_type::const_iterator msg = block->data().begin(); msg != block->data().end(); msg++)
-                            appendItem(travel, prefix + msg->value());
+                        for (const datakey& msg : block->data()) {
+                            datablock* data = nullptr;
+                            FXString val = msg.value();
+                            FXint right = val.find_last_of(')', val.length());
+                            if (right >= 0) {
+                                datablock::itor match;
+                                FXint left = val.find_last_of('(', right);
+                                FXString id = val.mid(left + 1, right - left - 1);
+                                FXuint no = FXUIntVal(id, 36);
+                                if (block->type() == block_type::TYPE_DURCHSCHIFFUNG)
+                                {
+                                    if (mapFile->getShip(match, no)) {
+                                        data = &*match;
+                                    }
+                                }
+                                else if (mapFile->getUnit(match, no)) {
+                                    data = &*match;
+                                }
+                            }
+                            FXTreeItem * item = appendItem(travel, prefix + val);
+                            item->setData(data);
+                        }
                     }
                 }
                 if (!guard_ids.empty()) {
