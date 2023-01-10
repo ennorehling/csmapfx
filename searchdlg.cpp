@@ -442,6 +442,7 @@ long FXSearchDlg::onSelectResults(FXObject*, FXSelector, void*)
     mapFile->findSelection(select, block, region);
 
     // propagate selection
+    selection.selected &= selection.MULTIPLE_REGIONS;
     if (region != end) {
         selection.region = region;
         selection.selected |= selection.REGION;

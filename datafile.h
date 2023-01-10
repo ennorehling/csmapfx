@@ -101,8 +101,7 @@ public:
 			BUILDING = (1<<4),
 			SHIP = (1<<5),
 			UNIT = (1<<6),
-			BATTLE = (1<<7),
-			CONFIRMED = (1<<8),
+			BATTLE = (1<<7)
 		};
 
 		// mini-c'tor
