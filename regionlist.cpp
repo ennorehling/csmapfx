@@ -195,11 +195,14 @@ FXDEFMAP(FXRegionList) MessageMap[]=
 	FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	0,								FXRegionList::onPopup), 
 	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_POPUP_CLICKED,		FXRegionList::onPopupClicked), 
 
-	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_TOGGLEOWNFACTIONGROUP, FXRegionList::onToggleOwnFactionGroup), 
-	FXMAPFUNC(SEL_UPDATE,			FXRegionList::ID_TOGGLEOWNFACTIONGROUP, FXRegionList::onUpdateOwnFactionGroup),
+	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_TOGGLE_OWNFACTIONGROUP, FXRegionList::onToggleOwnFactionGroup), 
+	FXMAPFUNC(SEL_UPDATE,			FXRegionList::ID_TOGGLE_OWNFACTIONGROUP, FXRegionList::onUpdateOwnFactionGroup),
 
-	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_TOGGLEUNITCOLORS, FXRegionList::onToggleUnitColors),
-	FXMAPFUNC(SEL_UPDATE,			FXRegionList::ID_TOGGLEUNITCOLORS, FXRegionList::onUpdateUnitColors),
+	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_TOGGLE_INACTIVE_REGIONS, FXRegionList::onToggleActiveRegions), 
+	FXMAPFUNC(SEL_UPDATE,			FXRegionList::ID_TOGGLE_INACTIVE_REGIONS, FXRegionList::onUpdateActiveRegions),
+
+	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_TOGGLE_UNITCOLORS, FXRegionList::onToggleUnitColors),
+	FXMAPFUNC(SEL_UPDATE,			FXRegionList::ID_TOGGLE_UNITCOLORS, FXRegionList::onUpdateUnitColors),
 
 	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_UPDATE,			FXRegionList::onMapChange), 
 	FXMAPFUNC(SEL_QUERY_HELP,		0,									FXRegionList::onQueryHelp), 
@@ -276,25 +279,27 @@ FXRegionList::~FXRegionList()
 long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* ptr)
 {
 	active_faction_group = !active_faction_group;
-
-	// map change notify rebuilds treelist
-    if (mapFile && mapFile->hasActiveFaction()) {
-        if (!active_faction_group) {
-            if (selection.selected & selection.FACTION) {
-                if (selection.faction == mapFile->activefaction()) {
-                    selection.selected &= ~selection.FACTION;
-                }
-            }
-        }
-        onMapChange(this, 0, &selection);
-    }
+    rebuildTree();
 	return 1;
 }
 
 long FXRegionList::onUpdateOwnFactionGroup(FXObject* sender, FXSelector, void* ptr)
 {
 	sender->handle(this, FXSEL(SEL_COMMAND, active_faction_group?ID_CHECK:ID_UNCHECK), NULL);
-	return 1;
+    return 1;
+}
+
+long FXRegionList::onToggleActiveRegions(FXObject* sender, FXSelector sel, void* ptr)
+{
+    active_regions_only = !active_regions_only;
+    rebuildTree();
+    return onUpdateActiveRegions(sender, sel, ptr);
+}
+
+long FXRegionList::onUpdateActiveRegions(FXObject* sender, FXSelector, void* ptr)
+{
+    sender->handle(this, FXSEL(SEL_COMMAND, active_regions_only ? ID_CHECK : ID_UNCHECK), NULL);
+    return 1;
 }
 
 long FXRegionList::onToggleUnitColors(FXObject *sender, FXSelector sel, void *ptr)
@@ -474,12 +479,10 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 			labels.push_back("Terrain: "+terrain);
 			texts.push_back(terrain);
 		}
-		else if (block->type() == block_type::TYPE_UNIT)
+		else if (block->type() == block_type::TYPE_UNIT || block->type() == block_type::TYPE_SHIP || block->type() == block_type::TYPE_BUILDING)
 		{
 			FXString name = block->value(TYPE_NAME);
 			FXString id = block->id();
-			FXString number = block->value(TYPE_NUMBER);
-			FXString type = block->value(TYPE_TYPE);
 
 			if (name.length())
 			{
@@ -589,6 +592,21 @@ FXTreeItem* FXRegionList::findTreeItem(FXTreeItem* item, void* udata)
 	return nullptr;
 }
 
+void FXRegionList::rebuildTree()
+{
+    // map change notify rebuilds treelist
+    if (mapFile && mapFile->hasActiveFaction()) {
+        if (!active_faction_group) {
+            if (selection.selected & selection.FACTION) {
+                if (selection.faction == mapFile->activefaction()) {
+                    selection.selected &= ~selection.FACTION;
+                }
+            }
+        }
+        onMapChange(this, 0, &selection);
+    }
+}
+
 FXColor FXRegionList::getUnitColor(const datablock* unitPtr)
 {
     if (unitPtr->hasKey(TYPE_BUILDING)) {
@@ -616,14 +634,11 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
         if (mapFile) {
             FXString label, terrainString;
 
-            for (datablock::itor region = mapFile->blocks().begin(); region != mapFile->blocks().end(); region++)
+            for (datablock::itor region = mapFile->blocks().begin(); region != mapFile->blocks().end(); ++region)
             {
                 const datablock* regionPtr = &*region;
                 // handle only regions
                 if (regionPtr->type() != block_type::TYPE_REGION)
-                    continue;
-
-                if (!active_regions_only || regionPtr->hasKey(TYPE_VISIBILITY))
                     continue;
 
                 terrainString = regionPtr->terrainString();
@@ -699,7 +714,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                                 }
                             }
                         }
-                        // add region only if it has units in it
+                        // add region if it has units in it
                         if (!regionItem) {
                             regionItem = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void *)regionPtr));
                         }
@@ -739,31 +754,33 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                 for (datablock::itor unit = std::next(region); unit != iend && unit->depth() > regionPtr->depth(); ++unit)
                 {
                     const datablock* objectPtr = &*unit;
-                    FXTreeItem* child = nullptr;
-                    if (unit->type() == block_type::TYPE_BUILDING)
-                    {
-                        if (!buildings) {
-                            if (!regionItem) {
-                                regionItem = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void *)regionPtr));
+                    if (regionItem || (!active_regions_only || regionPtr->hasKey(TYPE_VISIBILITY))) {
+                        FXTreeItem* child = nullptr;
+                        if (unit->type() == block_type::TYPE_BUILDING)
+                        {
+                            if (!buildings) {
+                                if (!regionItem) {
+                                    regionItem = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void*)regionPtr));
+                                }
+                                buildings = prependItem(regionItem, L"Geb\u00e4ude");
                             }
-                            buildings = prependItem(regionItem, L"Geb\u00e4ude");
+                            FXString label = objectPtr->getLabel() + ", " + objectPtr->value(TYPE_TYPE) + L" Gr\u00f6\u00dfe " + objectPtr->value(TYPE_SIZE);
+                            child = appendItem(buildings, label);
                         }
-                        FXString label = objectPtr->getLabel() + ", " + objectPtr->value(TYPE_TYPE) + L" Gr\u00f6\u00dfe " + objectPtr->value(TYPE_SIZE);
-                        child = appendItem(buildings, label);
-                    }
-                    else if (unit->type() == block_type::TYPE_SHIP)
-                    {
-                        if (!ships) {
-                            if (!regionItem) {
-                                regionItem = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void *)regionPtr));
+                        else if (unit->type() == block_type::TYPE_SHIP)
+                        {
+                            if (!ships) {
+                                if (!regionItem) {
+                                    regionItem = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void*)regionPtr));
+                                }
+                                ships = prependItem(regionItem, L"Schiffe");
                             }
-                            ships = prependItem(regionItem, L"Schiffe");
+                            FXString label = objectPtr->getLabel() + ", " + objectPtr->value(TYPE_TYPE) + L" Gr\u00f6\u00dfe " + objectPtr->value(TYPE_SIZE);
+                            child = appendItem(ships, label);
                         }
-                        FXString label = objectPtr->getLabel() + ", " + objectPtr->value(TYPE_TYPE) + L" Gr\u00f6\u00dfe " + objectPtr->value(TYPE_SIZE);
-                        child = appendItem(ships, label);
-                    }
-                    if (child) {
-                        child->setData((void*)objectPtr);
+                        if (child) {
+                            child->setData((void*)objectPtr);
+                        }
                     }
                     // display units until next region
                     if (unit->type() != block_type::TYPE_UNIT)

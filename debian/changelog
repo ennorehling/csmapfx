@@ -2,8 +2,9 @@ csmapfx (1.5.0-1) stable; urgency=low
 
   * show buildings and ships in region list.
   * make onToggleOwnFactionGroup not crash.
+  * option to show or hide regions without units.
 
- -- Enno Rehling <enno@eressea.de>  Tue, 10 Jan 2023 10:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Tue, 10 Jan 2023 19:15:00 +0200
 
 csmapfx (1.4.39-1) stable; urgency=low
 

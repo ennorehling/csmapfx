@@ -402,6 +402,7 @@ CSMap::CSMap(FXApp *app) :
     menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tCtrl-B\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
     new FXMenuSeparatorEx(viewmenu, "Liste");
     menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tCtrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
+    menu.activeRegionsOnly = new FXMenuCheck(viewmenu,"Nur &sichtbare Regionen\tCtrl-Shift-V\tNur aktuell sichtbare Regionen auflisten.");
     menu.colorizeUnits = new FXMenuCheck(viewmenu, "Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
     new FXMenuSeparatorEx(viewmenu, "Karte");
     menu.streets = new FXMenuCheck(viewmenu,"&Strassen zeigen\tCtrl-F1\tStrassen auf der Karte anzeigen.");
@@ -505,10 +506,13 @@ CSMap::CSMap(FXApp *app) :
     regions = new FXRegionList(leftframe, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
     menu.ownFactionGroup->setTarget(regions);
-    menu.ownFactionGroup->setSelector(FXRegionList::ID_TOGGLEOWNFACTIONGROUP);
+    menu.ownFactionGroup->setSelector(FXRegionList::ID_TOGGLE_OWNFACTIONGROUP);
+
+    menu.activeRegionsOnly->setTarget(regions);
+    menu.activeRegionsOnly->setSelector(FXRegionList::ID_TOGGLE_INACTIVE_REGIONS);
 
     menu.colorizeUnits->setTarget(regions);
-    menu.colorizeUnits->setSelector(FXRegionList::ID_TOGGLEUNITCOLORS);
+    menu.colorizeUnits->setSelector(FXRegionList::ID_TOGGLE_UNITCOLORS);
 
     // Middle splitter
     middle = new FXVerticalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0,0,0,0,0,0,2);
@@ -814,10 +818,10 @@ void CSMap::create()
         regionPanel->handle(this, FXSEL(SEL_COMMAND, FXRegionPanel::ID_TOGGLEDESCRIPTION), nullptr);
 
     if (reg.readUnsignedEntry("SHOW", "OWNFACTIONGROUP", 1))
-        regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLEOWNFACTIONGROUP), nullptr);
+        regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLE_OWNFACTIONGROUP), nullptr);
 
     if (reg.readUnsignedEntry("SHOW", "COLORIZEUNITS", 1))
-        regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLEUNITCOLORS), nullptr);
+        regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLE_UNITCOLORS), nullptr);
 
     FXint coll_regioninfos = reg.readUnsignedEntry("TABS", "REGIONINFOS", 0);
     if (coll_regioninfos)
@@ -908,6 +912,7 @@ FXbool CSMap::close(FXbool notify)
     reg.writeUnsignedEntry("SHOW", "COLORIZEUNITS", menu.colorizeUnits->getCheck());
     reg.writeUnsignedEntry("SHOW", "REGDESCRIPTION", menu.regdescription->getCheck());
     reg.writeUnsignedEntry("SHOW", "OWNFACTIONGROUP", menu.ownFactionGroup->getCheck());
+    reg.writeUnsignedEntry("SHOW", "ACTIVEREGIONS", menu.activeRegionsOnly->getCheck());
 
     // save ToolBarTab on/off state
     reg.writeUnsignedEntry("TABS", "REGIONINFOS", riTab->isCollapsed());

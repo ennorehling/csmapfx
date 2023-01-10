@@ -29,6 +29,9 @@ public:
 	long onToggleOwnFactionGroup(FXObject*, FXSelector, void*);
 	long onUpdateOwnFactionGroup(FXObject*, FXSelector, void*);
 
+	long onToggleActiveRegions(FXObject*,FXSelector,void*);
+	long onUpdateActiveRegions(FXObject*,FXSelector,void*);
+
 	long onToggleUnitColors(FXObject*,FXSelector,void*);
 	long onUpdateUnitColors(FXObject*,FXSelector,void*);
 
@@ -42,8 +45,9 @@ public:
 	enum
 	{
 		ID_POPUP_CLICKED = FXTreeList::ID_LAST,
-		ID_TOGGLEOWNFACTIONGROUP,
-        ID_TOGGLEUNITCOLORS,
+		ID_TOGGLE_OWNFACTIONGROUP,
+		ID_TOGGLE_INACTIVE_REGIONS,
+        ID_TOGGLE_UNITCOLORS,
         ID_LAST
 	};
 
@@ -69,6 +73,7 @@ private:
 	FXRegionList() {}
     FXRegionList(const FXRegionList&) = delete;
 
+    void rebuildTree();
     static FXColor getUnitColor(const datablock* unitPtr);
 };
 

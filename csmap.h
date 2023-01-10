@@ -318,6 +318,7 @@ private:
         class FXMenuCheck *regdescription = nullptr;	// show description of the region
 
         class FXMenuCheck *ownFactionGroup = nullptr;	// no own faction group in regionlist
+        class FXMenuCheck *activeRegionsOnly = nullptr;	// only currently reported regions in regionlist
 
 		// faction menu items
         class FXMenuTitle	*faction = nullptr;
