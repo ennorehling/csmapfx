@@ -2,6 +2,7 @@ csmapfx (1.5.1-1) stable; urgency=low
 
   * navigate to passing ships and units (Durchreise).
   * create context menu in unit details only where useful.
+  * fix display of group names.
 
  -- Enno Rehling <enno@eressea.de>  Tue, 10 Jan 2023 22:00:00 +0200
 

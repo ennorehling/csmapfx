@@ -246,7 +246,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                 label = "Gruppe: ";
                 datablock::itor match;
                 if (mapFile->getGroup(match, group)) {
-                    label += match->value(key_type::TYPE_NAME);
+                    label += match->value(key_type::TYPE_LOWERCASE_NAME);
                 } else {
                     // TODO: find group name in mapFile
                     label += FXStringVal(group);

@@ -42,9 +42,9 @@ int datakey::parseType(const FXString& type, enum block_type btype)
         return TYPE_EMPTY;
     }
     if (type == "Name") {
-        if (btype == block_type::TYPE_COMBATSPELL)
+        if (btype == block_type::TYPE_COMBATSPELL || btype == block_type::TYPE_GROUP)
         {
-            return TYPE_COMBATSPELL_NAME;
+            return TYPE_LOWERCASE_NAME;
         }
         return TYPE_NAME;
     }
@@ -75,7 +75,7 @@ int datakey::parseType(const FXString& type, enum block_type btype)
             return TYPE_MSG_REGION;
     }
     if (type == "name")
-		return TYPE_COMBATSPELL_NAME;
+		return TYPE_LOWERCASE_NAME;
 	if (type == "Beschr")
 		return TYPE_DESCRIPTION;
 	if (type == "Terrain")
@@ -176,7 +176,7 @@ FXString datakey::key() const
         return "";
     case TYPE_NAME:
         return "Name";
-    case TYPE_COMBATSPELL_NAME:
+    case TYPE_LOWERCASE_NAME:
         return "name";
     case TYPE_DESCRIPTION:
         return "Beschr";
