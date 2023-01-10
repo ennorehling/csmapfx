@@ -921,19 +921,18 @@ FXbool CSMap::close(FXbool notify)
 void CSMap::mapChange()
 {
     // map changed, let selection-function handle this
-    datafile::SelectionState state = selection;
     if (report == nullptr) {
-        state.selected = 0;
+        selection.selected = 0;
     }
-    state.fileChange++;
+    ++selection.fileChange;
 
-    if (!(state.selected & (state.REGION|state.UNKNOWN_REGION)))
+    if (!(selection.selected & (selection.REGION| selection.UNKNOWN_REGION)))
     {
-        state.selected |= state.UNKNOWN_REGION;
-        state.sel_x = 0, state.sel_y = 0, state.sel_plane = 0;
+        selection.selected |= selection.UNKNOWN_REGION;
+        selection.sel_x = 0, selection.sel_y = 0, selection.sel_plane = 0;
     }
 
-    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 
     searchdlg->setMapFile(report);
     minimap->setMapFile(report);
@@ -1623,18 +1622,17 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
         MessageInfo *info = static_cast<MessageInfo *>(list->getItemData(item));
 
         if (info) {
-            datafile::SelectionState state = selection;
             if (info->unit_id) {
-                if (report->getUnit(state.unit, info->unit_id)) {
-                    state.selected = selection.UNIT;
-                    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+                if (report->getUnit(selection.unit, info->unit_id)) {
+                    selection.selected = selection.UNIT;
+                    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
                     return 1;
                 }
             }
             else {
-                if (report->getRegion(state.region, info->region_x, info->region_y, 0)) {
-                    state.selected = selection.REGION;
-                    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+                if (report->getRegion(selection.region, info->region_x, info->region_y, 0)) {
+                    selection.selected = selection.REGION;
+                    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
                     return 1;
                 }
             }
@@ -1652,28 +1650,18 @@ long CSMap::onMapSelectMarked(FXObject*, FXSelector, void*)
     if (!(selection.selected & selection.REGION))
         return 0;
 
-    // select/deselect marked region (toggle selection)
-    datafile::SelectionState state = selection;
-
-    state.selected = selection.REGION;
-    state.region = selection.region;
-
-    if (selection.selected & selection.MULTIPLE_REGIONS)
-        state.regionsSelected = selection.regionsSelected;
-    else
-        state.regionsSelected.clear();        // should be cleared already
-
     // already selected? then deselect the region
-    std::set<datablock*>::iterator itor = state.regionsSelected.find(&*state.region);
-    if (itor == state.regionsSelected.end())
-        state.regionsSelected.insert(&*state.region);
+    datablock* regionPtr = &*selection.region;
+    std::set<datablock*>::iterator itor = selection.regionsSelected.find(regionPtr);
+    if (itor == selection.regionsSelected.end())
+        selection.regionsSelected.insert(regionPtr);
     else
-        state.regionsSelected.erase(itor);
+        selection.regionsSelected.erase(itor);
 
-    if (!state.regionsSelected.empty())
-        state.selected |= state.MULTIPLE_REGIONS;
+    if (!selection.regionsSelected.empty())
+        selection.selected |= selection.MULTIPLE_REGIONS;
 
-    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
 
@@ -1710,24 +1698,23 @@ long CSMap::onMapMoveMarker(FXObject*, FXSelector sel, void*)
         x++, y--;
 
     // set new marked region
-    datafile::SelectionState state = selection;
-    state.sel_x = x, state.sel_y = y, state.sel_plane = plane;
-    if (report->getRegion(state.region, x, y, plane)) {
-        state.selected = state.REGION;
+    selection.sel_x = x, selection.sel_y = y, selection.sel_plane = plane;
+    if (report->getRegion(selection.region, x, y, plane)) {
+        selection.selected = selection.REGION;
     }
     else {
-        state.selected = state.UNKNOWN_REGION;
+        selection.selected = selection.UNKNOWN_REGION;
     }
 
     // dont touch multiregions selected
     if (selection.selected & selection.MULTIPLE_REGIONS)
     {
-        state.regionsSelected = selection.regionsSelected;
-        if (!state.regionsSelected.empty())
-            state.selected |= selection.MULTIPLE_REGIONS;
+        selection.regionsSelected = selection.regionsSelected;
+        if (!selection.regionsSelected.empty())
+            selection.selected |= selection.MULTIPLE_REGIONS;
     }
 
-    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
 
@@ -1791,25 +1778,17 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 {
     datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
 
+    if (!report) return 0;
     getApp()->beginWaitCursor();
 
-    if (report) {
-        updateFileNames();
-    }
-
-    // save new selection state, mark dirty (update selChange)
-    selection.selected = pstate->selected;
-    ++selection.selChange;
+    updateFileNames();
 
     // file change notification
     if (pstate->fileChange != selection.fileChange)
     {
-        selection.fileChange = pstate->fileChange;
         // notify info dialog of new game type
         FXString name_of_game;
-        if (report) {
-            name_of_game = report->blocks().front().value("Spiel");
-        }
+        name_of_game = report->blocks().front().value("Spiel");
         if (name_of_game.empty())
             name_of_game = "default";
 
@@ -2028,56 +2007,61 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
                         break;
                     }
                 }
+                else if (block->type() == block_type::TYPE_SHIP)
+                {
+                    if (pstate->selected & selection.SHIP &&
+                        block->info() == pstate->ship->info())
+                    {
+                        selection.region = region;
+                        selection.selected = pstate->selected;
+                        selection.ship = block;
+                        selection.selected |= selection.SHIP;
+                        break;
+                    }
+                }
+                else if (block->type() == block_type::TYPE_BUILDING)
+                {
+                    if (pstate->selected & selection.BUILDING &&
+                        block->info() == pstate->ship->info())
+                    {
+                        selection.region = region;
+                        selection.selected = pstate->selected;
+                        selection.building = block;
+                        selection.selected |= selection.BUILDING;
+                        break;
+                    }
+                }
             }
         }
+        selection.fileChange = pstate->fileChange;
     }
-    else
-    {
-        if (pstate->selected & selection.MULTIPLE_REGIONS) {
-            selection.regionsSelected = pstate->regionsSelected;
-        }
-        if (pstate->selected & selection.REGION) {
-            selection.region = pstate->region;
-        }
-        if (pstate->selected & selection.UNIT) {
-            selection.unit = pstate->unit;
-            if (isConfirmed(selection.unit)) {
-                selection.selected |= selection.CONFIRMED;
-            }
-            else {
-                selection.selected &= ~selection.CONFIRMED;
-            }
-        }
-        if (pstate->selected & selection.FACTION) {
-            selection.faction = pstate->faction;
-        }
-        if (pstate->selected & selection.UNKNOWN_REGION) {
-            selection.sel_x = pstate->sel_x;
-            selection.sel_y = pstate->sel_y;
-            selection.sel_plane = pstate->sel_plane;
-        }
-    }
+    selection = *pstate;
+    ++selection.selChange;
 
     // make sure that a region is always selected (when something in it is selected)
     if (!(selection.selected & selection.REGION))
     {
+        // start with selected item and search containing region
+        datablock::itor block = report->blocks().begin();
         if (selection.selected & selection.UNIT)
         {
-            // start with selected unit and search containing region
-            datablock::itor end = report->blocks().end();    // begin()-- does a wrap-around to end()
-
-            datablock::itor block = selection.unit;
-            for (; block != end; block--)
-            {
-                if (block->type() == block_type::TYPE_REGION)
-                    break;
-            }
-
-            // found region?
-            if (block != end)
+            block = selection.unit;
+        }
+        else if (selection.selected & selection.SHIP)
+        {
+            block = selection.ship;
+        }
+        else if (selection.selected & selection.BUILDING)
+        {
+            block = selection.building;
+        }
+        while (block != report->blocks().begin()) {
+            --block;
+            if (block->type() == block_type::TYPE_REGION)
             {
                 selection.region = block;
                 selection.selected |= selection.REGION;
+                break;
             }
         }
     }
@@ -2086,7 +2070,6 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     if (selection.selected & selection.REGION)
     {
         selection.selected &= ~selection.UNKNOWN_REGION;
-
         selection.sel_x = selection.region->x();
         selection.sel_y = selection.region->y();
         selection.sel_plane = selection.region->info();
@@ -2289,32 +2272,31 @@ long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)
     report->findSelection(select, block, region);
 
     // propagate selection
-    datafile::SelectionState state = selection;
-    state.selected = 0;
+    int selected = 0;
     if (selection.selected & selection.MULTIPLE_REGIONS)
     {
-        state.selected = state.MULTIPLE_REGIONS;
-        state.regionsSelected = selection.regionsSelected;
+        selected = selection.MULTIPLE_REGIONS;
     }
     if (region != end) {
-        state.region = region;
-        state.selected |= state.REGION;
+        selection.region = region;
+        selected |= selection.REGION;
     }
     if (block != end) {
         if (block->type() == block_type::TYPE_UNIT) {
-            state.unit = block;
-            state.selected |= state.UNIT;
+            selection.unit = block;
+            selected |= selection.UNIT;
         }
         else if (block->type() == block_type::TYPE_BUILDING) {
-            state.building = block;
-            state.selected |= state.BUILDING;
+            selection.building = block;
+            selected |= selection.BUILDING;
         }
         else if (block->type() == block_type::TYPE_SHIP) {
-            state.ship = block;
-            state.selected |= state.SHIP;
+            selection.ship = block;
+            selected |= selection.SHIP;
         }
     }
-    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    selection.selected = selected;
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
 
@@ -2904,28 +2886,28 @@ long CSMap::onRegionSelAll(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
     // alle Regionen markieren
-    datafile::SelectionState state = selection;
-    state.selected |= state.MULTIPLE_REGIONS;
+    selection.selected |= selection.MULTIPLE_REGIONS;
 
-    state.regionsSelected.clear();
+    selection.regionsSelected.clear();
 
     int visiblePlane = map->getVisiblePlane();
 
     datablock::itor end = report->blocks().end();
     for (datablock::itor block = report->blocks().begin(); block != end; block++)
     {
+        datablock* regionPtr = &*block;
         // handle only regions
-        if (block->type() != block_type::TYPE_REGION)
+        if (regionPtr->type() != block_type::TYPE_REGION)
             continue;
 
         // mark only visible plane
-        if (block->info() != visiblePlane)
+        if (regionPtr->info() != visiblePlane)
             continue;
 
-        state.regionsSelected.insert(&*block);
+        selection.regionsSelected.insert(regionPtr);
     }
 
-    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
 
@@ -2944,10 +2926,7 @@ long CSMap::onRegionInvertSel(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
     // Auswahl invertieren
-    datafile::SelectionState state = selection;
-
-    if (!(state.selected & state.MULTIPLE_REGIONS))
-        state.regionsSelected.clear();
+    std::set<datablock*> regionsSelected;
 
     int visiblePlane = map->getVisiblePlane();
 
@@ -2955,27 +2934,28 @@ long CSMap::onRegionInvertSel(FXObject*, FXSelector, void*)
 
     for (datablock::itor block = report->blocks().begin(); block != end; block++)
     {
+        datablock* regionPtr = &*block;
         // handle only regions
-        if (block->type() != block_type::TYPE_REGION)
+        if (regionPtr->type() != block_type::TYPE_REGION)
             continue;
 
         // mark only visible plane
-        if (block->info() != visiblePlane)
+        if (regionPtr->info() != visiblePlane)
             continue;
 
-        std::set<datablock*>::iterator srch = state.regionsSelected.find(&*block);
-        if (srch == state.regionsSelected.end())
-            state.regionsSelected.insert(&*block);
+        std::set<datablock*>::iterator srch = regionsSelected.find(regionPtr);
+        if (srch == regionsSelected.end())
+            regionsSelected.insert(regionPtr);
         else
-            state.regionsSelected.erase(srch);
+            regionsSelected.erase(srch);
     }
 
-    if (state.regionsSelected.empty())
-        state.selected &= ~state.MULTIPLE_REGIONS;
+    if (regionsSelected.empty())
+        selection.selected &= ~selection.MULTIPLE_REGIONS;
     else
-        state.selected |= state.MULTIPLE_REGIONS;
-
-    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+        selection.selected |= selection.MULTIPLE_REGIONS;
+    selection.regionsSelected = regionsSelected;
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
 
@@ -3003,36 +2983,36 @@ long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
     }
 
     // Auswahl erweitern um eine Region
-    datafile::SelectionState state = selection;
-
-    // start without selection
-    state.regionsSelected.clear();
+    std::set<datablock*> regionsSelected;
 
     int visiblePlane = map->getVisiblePlane();
 
     for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
     {
+        datablock* blockPtr = *itor;
         // all previously selected regions are selected here, too
-        state.regionsSelected.insert(*itor);
+        regionsSelected.insert(blockPtr);
 
-        if ((*itor)->info() != visiblePlane)
+        if (blockPtr->info() != visiblePlane)
         {
             // apply other planes without changes
             continue;
         }
 
-        int x = (*itor)->x();
-        int y = (*itor)->y();
+        int x = blockPtr->x();
+        int y = blockPtr->y();
 
         for (int d = 0; d != 6; ++d) {
             datablock::itor region;
             if (report->getRegion(region, x + hex_offset[d][0], y + hex_offset[d][1], visiblePlane)) {
-                state.regionsSelected.insert(&*region);
+                datablock* regionPtr = &*region;
+                regionsSelected.insert(regionPtr);
             }
         }
     }
+    selection.regionsSelected = regionsSelected;
 
-    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
 
@@ -3043,8 +3023,6 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
         return 1;        // nothing to do
 
     // Inseln ausw\u00e4hlen
-    datafile::SelectionState state = selection;
-
     int visiblePlane = map->getVisiblePlane();
     bool changed;
     do
@@ -3052,41 +3030,41 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
         changed = false;
 
         datablock::itor notfound = report->blocks().end();
-        for (std::set<datablock*>::iterator itor = state.regionsSelected.begin(); itor != state.regionsSelected.end(); itor++)
+        for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); ++itor)
         {
-            if ((*itor)->info() != visiblePlane)
+            datablock* blockPtr = *itor;
+            if (blockPtr->info() != visiblePlane)
             {
                 // apply other planes without changes
                 continue;
             }
 
-            if ((*itor)->terrain() == data::TERRAIN_OCEAN || (*itor)->terrain() == data::TERRAIN_FIREWALL)
+            if ((blockPtr->terrain() == data::TERRAIN_OCEAN || blockPtr->terrain() == data::TERRAIN_FIREWALL))
             {
                 // ignore non-land regions and firewalls
                 continue;
             }
 
-            int x = (*itor)->x();
-            int y = (*itor)->y();
-
+            int x = blockPtr->x();
+            int y = blockPtr->y();
 
             // each of the six hex directions
             for (int d = 0; d != 6; ++d) {
                 datablock::itor region;
                 if (report->getRegion(region, x + hex_offset[d][0], y + hex_offset[d][1], visiblePlane)) {
-                    if (region->terrain() != data::TERRAIN_OCEAN
-                        && region->terrain() != data::TERRAIN_FIREWALL)
-                        if (state.regionsSelected.find(&*region) == state.regionsSelected.end()) {
-                            state.regionsSelected.insert(&*region);
+                    datablock* regionPtr = &*region;
+                    if (regionPtr->terrain() != data::TERRAIN_OCEAN
+                        && regionPtr->terrain() != data::TERRAIN_FIREWALL)
+                        if (selection.regionsSelected.find(regionPtr) == selection.regionsSelected.end()) {
+                            selection.regionsSelected.insert(regionPtr);
                             changed = true;
                         }
                 }
             }
         }
-
     } while (changed);
 
-    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
 
@@ -3094,10 +3072,9 @@ long CSMap::onRegionSelVisible(FXObject*, FXSelector, void* ptr)
 {
     if (!report) return 1;
     // alle Regionen markieren
-    datafile::SelectionState state = selection;
-    state.selected |= state.MULTIPLE_REGIONS;
+    selection.selected |= selection.MULTIPLE_REGIONS;
 
-    state.regionsSelected.clear();
+    selection.regionsSelected.clear();
 
     int visiblePlane = map->getVisiblePlane();
 
@@ -3117,10 +3094,10 @@ long CSMap::onRegionSelVisible(FXObject*, FXSelector, void* ptr)
                 continue;
             }
         }
-        state.regionsSelected.insert(&*block);
+        selection.regionsSelected.insert(&*block);
     }
 
-    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
 
@@ -3128,10 +3105,9 @@ long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
     // alle Landregionen markieren (also au\u00dfer Ozean & Feuerwand & Eisberg)
-    datafile::SelectionState state = selection;
-    state.selected |= state.MULTIPLE_REGIONS;
+    selection.selected |= selection.MULTIPLE_REGIONS;
 
-    state.regionsSelected.clear();
+    selection.regionsSelected.clear();
 
     int visiblePlane = map->getVisiblePlane();
 
@@ -3151,10 +3127,10 @@ long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
             || block->terrain() == data::TERRAIN_ICEBERG)
             continue;
 
-        state.regionsSelected.insert(&*block);
+        selection.regionsSelected.insert(&*block);
     }
 
-    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
 
@@ -3203,10 +3179,7 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
     selection.selected &= ~selection.MULTIPLE_REGIONS;
     selection.regionsSelected.clear();
 
-    datafile::SelectionState state = selection;
-    state.selected &= ~state.MULTIPLE_REGIONS;
-    state.fileChange++;
-    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
 

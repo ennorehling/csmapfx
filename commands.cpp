@@ -136,12 +136,10 @@ long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
 			if (unconfirmed)
 			{
 				// send selectionchange, select this unit
-				datafile::SelectionState state = selection;
 	
-				state.selected = selection.UNIT;
-				state.unit = unit;
-	
-				getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+                selection.selected = selection.UNIT;
+                selection.unit = unit;
+                updateSelection();
 				
 				flags |= FLAG_UPDATE;
 				forceRefresh();
@@ -152,7 +150,6 @@ long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
 	}
 
 	// no next unit found: beep
-	datafile::SelectionState state = selection;
 	getApp()->beep();
 	return 1;
 }
@@ -191,13 +188,9 @@ long FXCommands::onNextUnit(FXObject *, FXSelector, void *)
 
 			if (unconfirmed)
 			{
-				// send selectionchange, select this unit
-				datafile::SelectionState state = selection;
-	
-				state.selected = selection.UNIT;
-				state.unit = unit;
-	
-				getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+                selection.selected = selection.UNIT;
+                selection.unit = unit;
+                updateSelection();
 
 				// force update and set focus
 				flags |= FLAG_UPDATE;
@@ -290,8 +283,7 @@ void FXCommands::setConfirmed(bool confirmed)
 	}
 
 	// send selectionchange
-	datafile::SelectionState state = selection;
-	getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+    updateSelection();
 }
 
 int FXCommands::getConfirmed()
@@ -556,9 +548,8 @@ void FXCommands::saveCommands()
                 if (!mapFile->modifiedCmds())
                 {
                     mapFile->modifiedCmds(true);
-
-                    datafile::SelectionState state = selection;
-                    getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &state);
+                    // FIXME: only need to change the modified flag, not the selection!
+                    updateSelection();
                 }
 
                 break;
@@ -613,6 +604,11 @@ void FXCommands::mapShowRoute()
 		
 	map->sendRouteCmds("", 0);
 	routeLength = 0;
+}
+
+void FXCommands::updateSelection()
+{
+    getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 }
 
 void FXCommands::highlightText()

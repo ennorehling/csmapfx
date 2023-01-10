@@ -474,16 +474,30 @@ const FXString datablock::terrainString() const
 
 FXString datablock::getName() const
 {
-    FXString name = value(TYPE_NAME);
-    if (name.empty()) {
-        if (type() == block_type::TYPE_UNIT) {
-            name = "Einheit " + id();
+    FXString name;
+    if (type() == block_type::TYPE_FACTION) {
+        name = value(TYPE_FACTIONNAME);
+        if (name.empty()) {
+            name = "Partei " + id();
         }
-        else {
-            name = value(TYPE_TYPE) + " " + id();
+    }
+    else {
+        name = value(TYPE_NAME);
+        if (name.empty()) {
+            if (type() == block_type::TYPE_UNIT) {
+                name = "Einheit " + id();
+            }
+            else {
+                name = value(TYPE_TYPE) + " " + id();
+            }
         }
     }
     return name;
+}
+
+FXString datablock::getLabel() const
+{
+    return getName() + " (" + id() + ")";
 }
 
 /*static*/ int datablock::parseTerrain(const FXString& terrain)
@@ -579,6 +593,7 @@ bool datablock::parse(const char* str)
 
 	const char* srch = str + 1, *space = NULL;
 
+    // TODO: can we rewrite this using FXString members?
 	for (; *srch; srch++)
 	{
 		if (*srch == ' ' && !space)

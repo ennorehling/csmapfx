@@ -69,7 +69,7 @@ protected:
 	void saveCommands();		// save commands back to unit
 	void highlightText();
 	void mapShowRoute();
-
+    void updateSelection();
 };
 
 #endif //_CSMAP_COMMANDS
