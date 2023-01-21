@@ -1,6 +1,7 @@
 csmapfx (1.5.2-1) stable; urgency=low
 
-  * Show ship speed as Geschwindigkeit
+  * show ship speed as Geschwindigkeit
+  * do not show negative peasant income (bug 2926)
 
  -- Enno Rehling <enno@eressea.de>  Sat, 21 Jan 2023 19:30:00 +0200
 

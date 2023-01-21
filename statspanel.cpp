@@ -172,9 +172,11 @@ void FXStatsPanel::collectData(std::vector<Info>& info, datablock::itor region)
 	if (workstations < 0) workstations = 0;
 
 	int Lohn = region->valueInt("Lohn");
-	if (Lohn) addEntry(info, "Lohn", Lohn, FXString(L"Lohn f\u00fcr Arbeit"));
-
-	int earnings = Lohn * std::min(workstations, peasants) - 10 * peasants;
+    int earnings = std::min(workstations, peasants);
+    if (Lohn) {
+        addEntry(info, "Lohn", Lohn, FXString(L"Lohn f\u00fcr Arbeit"));
+        earnings = Lohn * earnings - 10 * peasants;
+    }
 	if (earnings) addEntry(info, "Bauernertrag", earnings, FXString(L"\u00dcberschuss der Bauerneinnahmen pro Runde. Kann sicher eingetrieben werden."));
 
     if (mapFile) {
