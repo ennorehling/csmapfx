@@ -154,6 +154,8 @@ int datakey::parseType(const FXString& type, enum block_type btype)
         return TYPE_DAMAGE;
     if (type == "Kapitaen")
         return TYPE_CAPTAIN;
+    if (type == "speed")
+        return TYPE_SPEED;
     if (type == "Kueste")
         return TYPE_COAST;
     if (type == "capacity")
@@ -262,6 +264,8 @@ FXString datakey::key() const
         return "Schaden";
     case TYPE_CAPTAIN:
         return "Kapitaen";
+    case TYPE_SPEED:
+        return "speed";
     case TYPE_COAST:
         return "Kueste";
     case TYPE_CAPACITY:
@@ -366,6 +370,17 @@ bool datakey::parse(const char* str, enum block_type btype, bool isUtf8)
         return true;
     }
     return false;
+}
+
+FXString datakey::translatedKey(const char*) const
+{
+    switch (type()) {
+    case TYPE_SPEED:
+        return "Geschwindigkeit";
+    case TYPE_UNKNOWN:
+    default:
+        return key();
+    }
 }
 
 // =============================

@@ -93,6 +93,7 @@ typedef enum key_type
     TYPE_ORDERS_CONFIRMED,		// ejcOrdersConfirmed, special tag
     TYPE_DAMAGE,
     TYPE_CAPTAIN,
+    TYPE_SPEED,
     TYPE_COAST,
     TYPE_CAPACITY,
     TYPE_CARGO,
@@ -139,6 +140,8 @@ public:
 
 	typedef std::vector<datakey> list_type;
 	typedef list_type::iterator itor;
+
+    FXString translatedKey(const char *lang = nullptr) const;
 
 protected:
 	int m_type;

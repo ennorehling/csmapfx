@@ -692,9 +692,10 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                         if (mapFile->getUnit(unit_owner, uid)) {
                             FXint fid = FXIntVal(unit_owner->value(TYPE_FACTION));
                             datablock::itor faction_owner;
+                            FXString key(L"Kapit\u00e4n");
                             if (mapFile->getFaction(faction_owner, fid)) {
                                 label.format("%s: %s (%s), %s (%s)",
-                                    FXString(L"Kapit\u00e4n").text(),
+                                    key.text(),
                                     unit_owner->value(TYPE_NAME).text(),
                                     FXStringValEx(uid, 36).text(),
                                     faction_owner->value(TYPE_FACTIONNAME).text(),
@@ -703,7 +704,7 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                             }
                             else {
                                 label.format("%s: %s (%s), Unbekannt (%s)",
-                                    t->key().text(),
+                                    key.text(),
                                     unit_owner->value(TYPE_NAME).text(),
                                     FXStringValEx(uid, 36).text(),
                                     FXStringValEx(fid, 36).text()
@@ -712,7 +713,8 @@ long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                         }
                     }
                     else {
-                        label.format("%s: %s", t->key().text(), t->value().text());
+                        FXString key = t->translatedKey(nullptr);
+                        label.format("%s: %s", key.text(), t->value().text());
                     }
                     item = appendItem(node, label);
                 }
