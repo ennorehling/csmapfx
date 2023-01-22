@@ -100,8 +100,7 @@ public:
 			FACTION = (1<<3),
 			BUILDING = (1<<4),
 			SHIP = (1<<5),
-			UNIT = (1<<6),
-			BATTLE = (1<<7)
+			UNIT = (1<<6)
 		};
 
         void transfer(datafile* old_cr, datafile* new_cr, int x_offset = 0, int y_offset = 0);

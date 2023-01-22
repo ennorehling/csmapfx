@@ -1844,6 +1844,11 @@ void datafile::SelectionState::transfer(datafile* old_cr, datafile* new_cr, int 
                 selected -= REGION;
             }
         }
+        if (selected & FACTION) {
+            if (!new_cr->getFaction(faction, faction->info())) {
+                selected -= FACTION;
+            }
+        }
         if (selected & UNIT) {
             if (!new_cr->getUnit(unit, unit->info())) {
                 selected -= UNIT;
