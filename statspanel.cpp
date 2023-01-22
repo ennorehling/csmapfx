@@ -57,6 +57,9 @@ FXStatsPanel::~FXStatsPanel()
 
 void FXStatsPanel::setMapFile(datafile *f)
 {
+    if (!f) {
+        selection.selected = 0;
+    }
     mapFile = f;
 }
 

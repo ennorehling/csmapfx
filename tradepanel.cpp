@@ -58,6 +58,7 @@ FXTradePanel::~FXTradePanel()
 
 void FXTradePanel::setMapFile(datafile *f)
 {
+    if (!f) selection.selected = 0;
     mapFile = f;
 }
 

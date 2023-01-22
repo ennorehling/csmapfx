@@ -81,6 +81,9 @@ FXRegionPanel::~FXRegionPanel()
 
 void FXRegionPanel::setMapFile(datafile *f)
 {
+    if (!f) {
+        selection.selected = 0;
+    }
     mapFile = f;
 }
 
@@ -258,9 +261,6 @@ void FXRegionPanel::collectData(std::vector<Info>& info, datablock::itor region)
 
 void FXRegionPanel::updateData()
 {
-	//if (files->empty())
-		//return;
-
 	if (selection.selected & selection.MULTIPLE_REGIONS)
 	{
 		FXString label;
