@@ -1,3 +1,9 @@
+csmapfx (1.5.3-1) stable; urgency=low
+
+  * maintain multi-selection after merge.
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 23 Jan 2023 18:00:00 +0200
+
 csmapfx (1.5.2-1) stable; urgency=low
 
   * show ship speed as Geschwindigkeit
