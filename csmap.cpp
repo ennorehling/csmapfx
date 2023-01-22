@@ -1071,6 +1071,7 @@ datafile* CSMap::mergeFile(const FXString& filename)
     else {
         new_cr->findOffset(report, &x_offset, &y_offset);
         new_cr->merge(report, x_offset, y_offset);
+        // FIXME: update selection!
         new_cr->filename(report->filename());
         new_cr->cmdfilename(report->cmdfilename());
         result = new_cr;
@@ -2684,6 +2685,7 @@ long CSMap::curlUpload()
                 success = curl_easy_perform(ch);
                 if (success == CURLE_OK) {
                     curl_easy_getinfo(ch, CURLINFO_RESPONSE_CODE, &code);
+                    FXString msg(response.response, response.size);
                     if (code == 401) {
                         settings.password.clear();
                         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: Falsches Passwort.", code);
@@ -2692,10 +2694,9 @@ long CSMap::curlUpload()
                         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Serverfehler %ld: Bitte sp\u00e4ter noch einmal versuchen.", code);
                     }
                     else if (code < 200 || code >= 300) {
-                        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: Befehle nicht akzeptiert.", code);
+                        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: %s (Befehle nicht akzeptiert).", code, msg.text());
                     }
                     else {
-                        FXString msg(response.response, response.size);
                         FXMessageBox::information(this, MBOX_OK, CSMAP_APP_TITLE, "%s", msg.text());
                     }
                     free(response.response);

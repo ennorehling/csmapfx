@@ -2,8 +2,10 @@ csmapfx (1.5.2-1) stable; urgency=low
 
   * show ship speed as Geschwindigkeit
   * do not show negative peasant income (bug 2926)
+  * fix crashes when closing files
+  * show error message when upload fails.
 
- -- Enno Rehling <enno@eressea.de>  Sat, 21 Jan 2023 19:30:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 22 Jan 2023 13:00:00 +0200
 
 csmapfx (1.5.1-1) stable; urgency=low
 
