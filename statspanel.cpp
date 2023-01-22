@@ -330,12 +330,10 @@ long FXStatsPanel::onMapChange(FXObject*, FXSelector, void* ptr)
 	// any data changed, so need to update list?
 	if (selection.fileChange != pstate->fileChange)
 	{
-		selection.fileChange = pstate->fileChange;
-
+		selection = *pstate;
 		needUpdate = true;
 	}
-
-	if (selection.selChange != pstate->selChange)
+	else if (selection.selChange != pstate->selChange)
 	{
         if ((selection.selected & selection.MULTIPLE_REGIONS) != (pstate->selected & selection.MULTIPLE_REGIONS)) {
             /* we went from having a selection to not, or vice versa */

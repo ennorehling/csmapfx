@@ -1828,3 +1828,41 @@ void datafile::createHashTables()
 		}
 	}
 }
+
+void datafile::SelectionState::transfer(datafile* old_cr, datafile* new_cr, int x_offset, int y_offset)
+{
+    FXASSERT(old_cr && new_cr);
+    if (selected) {
+        if (selected & UNKNOWN_REGION) {
+            if (sel_plane == 0) {
+                sel_x += x_offset;
+                sel_y += y_offset;
+            }
+        }
+        if (selected & REGION) {
+            if (!new_cr->getRegion(region, region->x(), region->y(), region->info())) {
+                selected -= REGION;
+            }
+        }
+        if (selected & UNIT) {
+            if (!new_cr->getUnit(unit, unit->info())) {
+                selected -= UNIT;
+            }
+        }
+        if (selected & SHIP) {
+            if (!new_cr->getShip(ship, ship->info())) {
+                selected -= SHIP;
+            }
+        }
+        if (selected & BUILDING) {
+            if (!new_cr->getBuilding(building, building->info())) {
+                selected -= BUILDING;
+            }
+        }
+        if (selected & MULTIPLE_REGIONS) {
+            selected -= MULTIPLE_REGIONS;
+            regionsSelected.clear();
+        }
+        ++selChange;
+    }
+}

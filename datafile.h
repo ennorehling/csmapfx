@@ -104,6 +104,8 @@ public:
 			BATTLE = (1<<7)
 		};
 
+        void transfer(datafile* old_cr, datafile* new_cr, int x_offset = 0, int y_offset = 0);
+
 		// mini-c'tor
 		SelectionState() {}
         SelectionState(const SelectionState& state) {

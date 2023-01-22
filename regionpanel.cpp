@@ -376,11 +376,10 @@ long FXRegionPanel::onMapChange(FXObject*, FXSelector, void* ptr)
 	// any data changed, so need to update list?
 	if (selection.fileChange != pstate->fileChange)
 	{
-		selection.fileChange = pstate->fileChange;
+		selection = *pstate;
 		needUpdate = true;
 	}
-
-	if (selection.selChange != pstate->selChange)
+    else if (selection.selChange != pstate->selChange)
 	{
 		if ((selection.selected & selection.REGION) != (pstate->selected & selection.REGION)
 			|| (selection.selected & selection.REGION && selection.region != pstate->region))

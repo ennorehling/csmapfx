@@ -1951,12 +1951,10 @@ long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
 
 	if (selection.fileChange != pstate->fileChange)
 	{
-		selection.fileChange = pstate->fileChange;
-
+		selection = *pstate;
 		datachanged = true;
 	}
-
-	if (sender == this || selection.selChange != pstate->selChange)
+	else if (sender == this || selection.selChange != pstate->selChange)
 	{
         selection = *pstate;
 		selection.regionsSelected = pstate->regionsSelected;

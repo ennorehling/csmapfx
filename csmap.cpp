@@ -1066,23 +1066,25 @@ datafile* CSMap::mergeFile(const FXString& filename)
     if (new_turn < turn || (new_turn == turn && report->hasUnits())) {
         report->findOffset(new_cr, &x_offset, &y_offset);
         report->merge(new_cr, x_offset, y_offset);
+        // adjust selection by offset
+        if (x_offset || y_offset) {
+            if (selection.selected & selection.UNKNOWN_REGION) {
+                if (selection.sel_plane == 0) {
+                    selection.sel_x += x_offset;
+                    selection.sel_y += y_offset;
+                    ++selection.selChange;
+                }
+            }
+        }
         delete new_cr;
     }
     else {
         new_cr->findOffset(report, &x_offset, &y_offset);
         new_cr->merge(report, x_offset, y_offset);
-        // FIXME: update selection!
+        selection.transfer(report, new_cr, x_offset, y_offset);
         new_cr->filename(report->filename());
         new_cr->cmdfilename(report->cmdfilename());
         result = new_cr;
-    }
-    if (x_offset || y_offset) {
-        if (selection.sel_plane == 0) {
-            selection.selected = 0;
-            selection.sel_x += x_offset;
-            selection.sel_y += y_offset;
-            selection.selChange++;
-        }
     }
     return result;
 }
@@ -2350,7 +2352,6 @@ void CSMap::loadFiles(const FXString filenames[])
     datafile* old_cr = report;
     if (filenames) {
         datafile* new_cr = nullptr;
-        getApp()->beginWaitCursor();
 
         for (int i = 0; !filenames[i].empty(); i++) {
             FXString const& filename = filenames[i];
@@ -2369,14 +2370,11 @@ void CSMap::loadFiles(const FXString filenames[])
         }
         ++selection.fileChange;
         // rebuild the resulting report
-        mapChange();
-        updateFileNames();
         checkCommands();
         if (old_cr != report) {
             // TODO: make selection to use the new report instead
             delete old_cr;
         }
-        getApp()->endWaitCursor();
     }
 }
 
@@ -2392,7 +2390,11 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
     if (res)
     {
         FXString* filenames = dlg.getFilenames();
+        getApp()->beginWaitCursor();
         loadFiles(filenames);
+        mapChange();
+        updateFileNames();
+        getApp()->endWaitCursor();
     }
     return 1;
 }
@@ -2513,8 +2515,12 @@ long CSMap::onFileExportMap(FXObject*, FXSelector, void*)
 
 long CSMap::onFileClose(FXObject*, FXSelector, void*)
 {
-    bool res = closeFile();
-    return res ? 1 : 0;
+    if (closeFile()) {
+        mapChange();
+        updateFileNames();
+        return 1;
+    }
+    return 0;
 }
 
 bool CSMap::closeFile()
@@ -2539,8 +2545,6 @@ bool CSMap::closeFile()
     selection.selected = 0;
     delete report;
     report = nullptr;
-    mapChange();
-    updateFileNames();
     return true;
 }
 
@@ -3289,7 +3293,11 @@ void CSMap::ParseCommandLine()
         }
     }
     if (numfiles > 0) {
+        getApp()->beginWaitCursor();
         loadFiles(filenames);
+        mapChange();
+        updateFileNames();
+        getApp()->endWaitCursor();
     }
     LocalFree(argv);
 }

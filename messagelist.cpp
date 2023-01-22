@@ -76,9 +76,8 @@ long FXMessageList::onMapChange(FXObject*target, FXSelector sel, void*ptr)
     // any data changed, so need to update list?
     if (selection.fileChange != pstate->fileChange)
     {
-        selection.fileChange = pstate->fileChange;
+        selection = *pstate;
     }
-    selection = *pstate;
     return 1;
 }
 
