@@ -53,6 +53,7 @@ set (SOURCES
 	messagelist.cpp
   regioninfo.cpp
 	prefsdlg.cpp
+	properties.cpp
 	regionpanel.cpp
 	regionlist.cpp
 	reportinfo.cpp

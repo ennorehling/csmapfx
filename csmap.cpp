@@ -597,16 +597,20 @@ CSMap::CSMap(FXApp *app) :
     frame = new FXVerticalFrame(tabbook, LAYOUT_FILL_X);
     frame->setBorderColor(getApp()->getShadowColor());
     frame->setFrameStyle(FRAME_LINE);
-    unitlist = new FXUnitList(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
+    unitProperties = new FXUnitList(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
         TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
     new FXTabItem(tabbook, "Schiff");
     frame = new FXVerticalFrame(tabbook, LAYOUT_FILL_X);
     frame->setBorderColor(getApp()->getShadowColor());
     frame->setFrameStyle(FRAME_LINE);
+    shipProperties = new FXProperties(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
+        TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
     new FXTabItem(tabbook, L"Geb\u00e4ude");
     frame = new FXVerticalFrame(tabbook, LAYOUT_FILL_X);
     frame->setBorderColor(getApp()->getShadowColor());
     frame->setFrameStyle(FRAME_LINE);
+    buildingProperties = new FXProperties(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
+        TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
     getAccelTable()->addAccel(MKUINT(KEY_1, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_1));
     getAccelTable()->addAccel(MKUINT(KEY_2, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_2));
     getAccelTable()->addAccel(MKUINT(KEY_3, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_3));
@@ -955,7 +959,7 @@ void CSMap::mapChange()
     searchdlg->setMapFile(report);
     minimap->setMapFile(report);
     commands->setMapFile(report);
-    unitlist->setMapFile(report);
+    unitProperties->setMapFile(report);
     tradePanel->setMapFile(report);
     statistics->setMapFile(report);
     statsPanel->setMapFile(report);
