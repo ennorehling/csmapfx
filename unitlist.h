@@ -13,7 +13,7 @@ public:
 	FXUnitList(FXComposite* p, FXObject* tgt = nullptr, FXSelector sel = 0, 
         FXuint opts = 0, FXint x = 0, FXint y = 0, FXint w = 0, FXint h = 0);
 
-	long onMapChange(FXObject*, FXSelector, void*);
+    virtual void makeItems() override;
 
 protected:
 	FXUnitList() {}

@@ -54,6 +54,7 @@ set (SOURCES
   regioninfo.cpp
 	prefsdlg.cpp
 	properties.cpp
+	ship_props.cpp
 	regionpanel.cpp
 	regionlist.cpp
 	reportinfo.cpp

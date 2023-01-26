@@ -1,10 +1,10 @@
 #include "properties.h"
 #include "FXMenuSeparatorEx.h"
 
-class FXPopupTreeItem : public FXTreeItem
+class FXProperty : public FXTreeItem
 {
 public:
-    FXPopupTreeItem(const FXString& text, FXIcon* oi = NULL, FXIcon* ci = NULL, void* ptr = NULL)
+    FXProperty(const FXString& text, FXIcon* oi = NULL, FXIcon* ci = NULL, void* ptr = NULL)
         : FXTreeItem(text, oi, ci, ptr)
     {
     }
@@ -29,9 +29,9 @@ FXProperties::FXProperties(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint
 {
 }
 
-FXTreeItem* FXProperties::makePopupTreeItem(const FXString& label, datablock* block, const FXString* info)
+FXTreeItem* FXProperties::makeItem(const FXString& label, datablock* block, const FXString* info)
 {
-    FXPopupTreeItem* popup = new FXPopupTreeItem(label);
+    FXProperty* popup = new FXProperty(label);
     popup->block = block;
     if (info) {
         popup->info = *info;
@@ -59,6 +59,51 @@ long FXProperties::onQueryHelp(FXObject* /*sender*/, FXSelector, void* /*ptr*/)
 {
     return 0;
 }
+long FXProperties::onMapChange(FXObject*, FXSelector, void* ptr)
+{
+    datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
+
+    // any data changed, so need to update list?
+    if (selection.fileChange != pstate->fileChange)
+    {
+        selection.fileChange = pstate->fileChange;
+
+        // clear list and build a new one from data in this->files
+        //clearItems();
+    }
+
+    if (selection.selChange != pstate->selChange)
+    {
+        selection = *pstate;
+        makeItems();
+    }
+    return 0;
+}
+
+FXString FXProperties::weightToString(int prop)
+{
+    int full = prop / 100;
+    int remain = prop % 100;
+    FXString result = FXStringVal(full);
+    if (remain >= 10) {
+        result += "." + FXStringVal(remain);
+    }
+    else if (remain > 0) {
+        result += ".0" + FXStringVal(remain);
+    }
+    return result;
+}
+
+static const wchar_t* coasts[] = { L"Nordwestk\u00fcste", L"Nordostk\u00fcste", L"Ostk\u00fcste", L"S\u00fcdostk\u00fcste", L"S\u00fcdwestk\u00fcste", L"Westk\u00fcste" };
+
+FXString FXProperties::coastToString(int prop)
+{
+    if (prop >= 0 && prop < 6) {
+        return FXString(coasts[prop]);
+    }
+    return FXString("Unbekannt");
+}
+
 long FXProperties::onShowInfo(FXObject* sender, FXSelector sel, void* ptr)
 {
     if (sender)
@@ -146,7 +191,7 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
 
     void* udata = item->getData();
     if (udata) {
-        FXPopupTreeItem* popup = static_cast<FXPopupTreeItem*>(item);
+        FXProperty* popup = static_cast<FXProperty*>(item);
         if (popup->block) {
             datablock* block = popup->block;
             FXMenuCommand* command = nullptr;

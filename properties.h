@@ -24,9 +24,14 @@ public:
     long onShowInfo(FXObject*, FXSelector, void*);
     long onGotoItem(FXObject*, FXSelector, void*);
     long onQueryHelp(FXObject*, FXSelector, void*);
+    long onMapChange(FXObject*, FXSelector, void*);
+
+    static FXString weightToString(int prop);
+    static FXString coastToString(int prop);
 
 protected:
-    FXTreeItem* makePopupTreeItem(const FXString& label, datablock* block, const FXString* info = nullptr);
+    virtual void makeItems() = 0;
+    FXTreeItem* makeItem(const FXString& label, datablock* block, const FXString* info = nullptr);
     void setClipboard(const FXString& text);
     void showInfo(const FXString& text);
 
