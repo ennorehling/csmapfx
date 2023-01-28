@@ -2347,19 +2347,18 @@ long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
     return 1;
 }
 
-void CSMap::loadFiles(const FXString filenames[])
+void CSMap::loadFiles(const std::vector<FXString> &filenames)
 {
     datafile* old_cr = report;
-    if (filenames) {
+    if (!filenames.empty()) {
         datafile* new_cr = nullptr;
 
-        for (int i = 0; !filenames[i].empty(); i++) {
-            FXString const& filename = filenames[i];
+        for (FXString const& filename : filenames) {
             if (!report) {
                 new_cr = loadFile(filename);    // normal laden, wenn vorher keine Datei geladen ist.
             }
             else {
-                new_cr = mergeFile(filenames[i]);
+                new_cr = mergeFile(filename);
             }
             if (new_cr && (new_cr != report)) {
                 if (old_cr != report) {
@@ -2369,12 +2368,12 @@ void CSMap::loadFiles(const FXString filenames[])
             }
         }
         ++selection.fileChange;
-        // rebuild the resulting report
-        checkCommands();
         if (old_cr != report) {
             // TODO: make selection to use the new report instead
             delete old_cr;
         }
+        mapChange();
+        checkCommands();
     }
 }
 
@@ -2389,11 +2388,14 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
     dialogDirectory = dlg.getDirectory();
     if (res)
     {
-        FXString* filenames = dlg.getFilenames();
+        FXString* choices = dlg.getFilenames();
+        std::vector<FXString> filenames;
+        for (FXString* choice = choices; choice && choice->text(); ++choice)
+        {
+            filenames.push_back(*choice);
+        }
         getApp()->beginWaitCursor();
         loadFiles(filenames);
-        mapChange();
-        updateFileNames();
         getApp()->endWaitCursor();
     }
     return 1;
@@ -3273,36 +3275,25 @@ void CSMap::beginLoading(const FXString& filename)
     status->getStatusLine()->setText(app_title);
 }
 
-#define MAX_FILES 8
-
 #ifdef WIN32
-void CSMap::ParseCommandLine()
+std::vector<FXString> CSMap::ParseCommandLine()
 {
     LPWSTR* argv;
     int argc;
-    int numfiles = 0;
-    FXString filenames[MAX_FILES + 1];
+    std::vector<FXString> filenames;
 
     argv = CommandLineToArgvW(GetCommandLineW(), &argc);
     for (int arg = 1; arg != argc; ++arg)
     {
         if (argv[arg][0] != '-') {
-            if (numfiles < MAX_FILES) {
-                filenames[numfiles++].assign(argv[arg]);
-            }
+            filenames.push_back(argv[arg]);
         }
     }
-    if (numfiles > 0) {
-        getApp()->beginWaitCursor();
-        loadFiles(filenames);
-        mapChange();
-        updateFileNames();
-        getApp()->endWaitCursor();
-    }
     LocalFree(argv);
+    return filenames;
 }
 #else
-void CSMap::ParseCommandLine(int argc, char** argv)
+std::vector<FXString> CSMap::ParseCommandLine(int argc, char** argv)
 {
     int numfiles = 0;
     FXString filenames[MAX_FILES + 1];
@@ -3315,8 +3306,6 @@ void CSMap::ParseCommandLine(int argc, char** argv)
             }
         }
     }
-    if (numfiles > 0) {
-        loadFiles(filenames);
-    }
+    return filenames;
 }
 #endif
