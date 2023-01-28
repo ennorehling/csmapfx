@@ -1,8 +1,8 @@
 csmapfx (1.5.4-1) stable; urgency=low
 
-  * fix loss of map selection (2bug 929)
+  * fix loss of map selection (bug 2929)
 
- -- Enno Rehling <enno@eressea.de>  Sat, 28 Jan 2023 20:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sat, 28 Jan 2023 22:45:00 +0200
 
 csmapfx (1.5.3-1) stable; urgency=low
 

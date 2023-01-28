@@ -1872,12 +1872,7 @@ void datafile::SelectionState::transfer(datafile* old_cr, datafile* new_cr, int 
                     sel.insert(&*match);
                 }
             }
-            if (!sel.empty()) {
-                regionsSelected = sel;
-            }
-            else {
-                selected -= MULTIPLE_REGIONS;
-            }
+            regionsSelected = sel;
         }
         ++selChange;
     }

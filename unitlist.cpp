@@ -772,46 +772,39 @@ long FXUnitList::onGotoItem(FXObject* sender, FXSelector sel, void *ptr)
 {
     FXMenuCommand* command = static_cast<FXMenuCommand*>(sender);
     const datablock * block = static_cast<const datablock*>(command->getUserData());
-    datafile::SelectionState sel_state = selection;
-    sel_state.selChange++;
-    if (sel_state.regionsSelected.empty()) {
-        sel_state.selected = 0;
-    }
-    else {
-        sel_state.regionsSelected = selection.regionsSelected;
-        sel_state.selected = sel_state.MULTIPLE_REGIONS;
-    }
+    ++selection.selChange;
+    selection.selected = 0;
     if (block->type() == block_type::TYPE_UNIT)
     {
-        if (mapFile->getUnit(sel_state.unit, block->info())) {
-            sel_state.selected |= selection.UNIT;
+        if (mapFile->getUnit(selection.unit, block->info())) {
+            selection.selected |= selection.UNIT;
         }
     }
     else if (block->type() == block_type::TYPE_REGION)
     {
-        if (mapFile->getRegion(sel_state.region, block->x(), block->y(), block->info())) {
-            sel_state.selected |= selection.REGION;
+        if (mapFile->getRegion(selection.region, block->x(), block->y(), block->info())) {
+            selection.selected |= selection.REGION;
         }
     }
     else if (block->type() == block_type::TYPE_BUILDING)
     {
-        if (mapFile->getBuilding(sel_state.building, block->info())) {
-            sel_state.selected |= selection.BUILDING;
+        if (mapFile->getBuilding(selection.building, block->info())) {
+            selection.selected |= selection.BUILDING;
         }
     }
     else if (block->type() == block_type::TYPE_SHIP)
     {
-        if (mapFile->getBuilding(sel_state.ship, block->info())) {
-            sel_state.selected |= selection.SHIP;
+        if (mapFile->getBuilding(selection.ship, block->info())) {
+            selection.selected |= selection.SHIP;
         }
     }
     else if (block->type() == block_type::TYPE_FACTION)
     {
-        if (mapFile->getFaction(sel_state.faction, block->info())) {
-            sel_state.selected |= selection.FACTION;
+        if (mapFile->getFaction(selection.faction, block->info())) {
+            selection.selected |= selection.FACTION;
         }
     }
-    return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
+    return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 }
 
 FXTreeItem* FXUnitList::makePopupTreeItem(const FXString& label, datablock* block, const FXString * info)

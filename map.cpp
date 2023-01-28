@@ -839,12 +839,6 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
                 selection.selected &= ~selection.REGION;
 			}
 
-            if (!selection.regionsSelected.empty()) {
-                selection.selected |= selection.MULTIPLE_REGIONS;
-            }
-            else {
-                selection.selected &= ~selection.MULTIPLE_REGIONS;
-            }
             onMapChange(this, 0, &selection);
 			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 		}
@@ -2211,9 +2205,6 @@ long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
             selection.regionsSelected.insert(&*selection.region);
 		else
             selection.regionsSelected.erase(itor);
-
-		if (!selection.regionsSelected.empty())
-            selection.selected |= selection.MULTIPLE_REGIONS;
 
 		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 		return 1;

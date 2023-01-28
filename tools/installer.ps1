@@ -6,4 +6,5 @@ function Get-Version($filePath)
 
 $version = (Get-Version Release\CsMapfx.exe)
 $versionstr = ($version.Major.ToString() + "." + $version.Minor.ToString() + "." + $version.Build.ToString())
+echo "Building installer for version ${versonstr}"
 & "C:\Program Files (x86)\NSIS\makensisw.exe" "/DMUI_VERSION=$versionstr" "csmapfx.nsi"

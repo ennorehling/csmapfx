@@ -429,7 +429,6 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
             }
         }
         if (!selection.regionsSelected.empty()) {
-            selection.selected |= selection.MULTIPLE_REGIONS;
             selection.regionsSelected = selection.regionsSelected;
         }
         getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);

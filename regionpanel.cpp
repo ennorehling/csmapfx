@@ -275,10 +275,10 @@ void FXRegionPanel::updateData()
         std::vector<Info> info;
 
 		// collect infos
-		for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
+		for (datablock* block : selection.regionsSelected)
 		{
             datablock::itor region;
-            if (mapFile->getRegion(region, (*itor)->x(), (*itor)->y(), (*itor)->info()))
+            if (mapFile->getRegion(region, block->x(), block->y(), block->info()))
             {
 				collectData(info, region);
 			}

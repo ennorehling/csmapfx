@@ -1679,9 +1679,6 @@ long CSMap::onMapSelectMarked(FXObject*, FXSelector, void*)
     else
         selection.regionsSelected.erase(itor);
 
-    if (!selection.regionsSelected.empty())
-        selection.selected |= selection.MULTIPLE_REGIONS;
-
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
@@ -1731,8 +1728,6 @@ long CSMap::onMapMoveMarker(FXObject*, FXSelector sel, void*)
     if (!selection.regionsSelected.empty())
     {
         selection.regionsSelected = selection.regionsSelected;
-        if (!selection.regionsSelected.empty())
-            selection.selected |= selection.MULTIPLE_REGIONS;
     }
 
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
@@ -2294,10 +2289,6 @@ long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)
 
     // propagate selection
     int selected = 0;
-    if (!selection.regionsSelected.empty())
-    {
-        selected = selection.MULTIPLE_REGIONS;
-    }
     if (region != end) {
         selection.region = region;
         selected |= selection.REGION;
@@ -2911,7 +2902,6 @@ long CSMap::onRegionSelAll(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
     // alle Regionen markieren
-    selection.selected |= selection.MULTIPLE_REGIONS;
 
     selection.regionsSelected.clear();
 
@@ -2941,7 +2931,6 @@ long CSMap::onRegionUnSel(FXObject*, FXSelector, void*)
     if (!report) return 1;
 
     // alle Regionen demarkieren
-    selection.selected &= ~selection.MULTIPLE_REGIONS;
     selection.regionsSelected.clear();
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
@@ -2975,10 +2964,6 @@ long CSMap::onRegionInvertSel(FXObject*, FXSelector, void*)
             regionsSelected.erase(srch);
     }
 
-    if (regionsSelected.empty())
-        selection.selected &= ~selection.MULTIPLE_REGIONS;
-    else
-        selection.selected |= selection.MULTIPLE_REGIONS;
     selection.regionsSelected = regionsSelected;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
@@ -3005,7 +2990,6 @@ long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
             return 1;
         }
         selection.regionsSelected.insert(&*selection.region);
-        selection.selected |= selection.MULTIPLE_REGIONS;
     }
 
     // Auswahl erweitern um eine Region
@@ -3100,29 +3084,26 @@ long CSMap::onRegionSelVisible(FXObject*, FXSelector, void* ptr)
 {
     if (!report) return 1;
     // alle Regionen markieren
-    selection.selected |= selection.MULTIPLE_REGIONS;
-
     selection.regionsSelected.clear();
 
     int visiblePlane = map->getVisiblePlane();
 
-    datablock::itor end = report->blocks().end();
-    for (datablock::itor block = report->blocks().begin(); block != end; block++)
+    for (datablock &block : report->blocks())
     {
         // handle only regions
-        if (block->type() != block_type::TYPE_REGION)
+        if (block.type() != block_type::TYPE_REGION)
             continue;
         // mark only visible plane
-        if (block->info() != visiblePlane)
+        if (block.info() != visiblePlane)
             continue;
 
-        if (!block->hasKey(TYPE_VISIBILITY)) {
-            att_region* att = static_cast<att_region*>(block->attachment());
+        if (!block.hasKey(TYPE_VISIBILITY)) {
+            const att_region* att = static_cast<const att_region*>(block.attachment());
             if (!att || att->people.empty()) {
                 continue;
             }
         }
-        selection.regionsSelected.insert(&*block);
+        selection.regionsSelected.insert(&block);
     }
 
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
@@ -3133,8 +3114,6 @@ long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
     // alle Landregionen markieren (also au\u00dfer Ozean & Feuerwand & Eisberg)
-    selection.selected |= selection.MULTIPLE_REGIONS;
-
     selection.regionsSelected.clear();
 
     int visiblePlane = map->getVisiblePlane();
@@ -3204,7 +3183,6 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
     report->rebuildRegions();
 
     // Markierung auch loeschen
-    selection.selected &= ~selection.MULTIPLE_REGIONS;
     selection.regionsSelected.clear();
 
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);

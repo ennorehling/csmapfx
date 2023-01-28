@@ -96,11 +96,10 @@ public:
 		{
             REGION = (1<<0),			// region marked, iterator region is valid
 			UNKNOWN_REGION = (1<<1),	// unknown region selected, sel_(x|y|plane) is valid
-            MULTIPLE_REGIONS = (1<<2),	// some regions selected
-			FACTION = (1<<3),
-			BUILDING = (1<<4),
-			SHIP = (1<<5),
-			UNIT = (1<<6)
+			FACTION = (1<<2),
+			BUILDING = (1<<3),
+			SHIP = (1<<4),
+			UNIT = (1<<5)
 		};
 
         void transfer(datafile* old_cr, datafile* new_cr, int x_offset = 0, int y_offset = 0);
