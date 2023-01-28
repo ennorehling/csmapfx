@@ -3295,15 +3295,11 @@ std::vector<FXString> CSMap::ParseCommandLine()
 #else
 std::vector<FXString> CSMap::ParseCommandLine(int argc, char** argv)
 {
-    int numfiles = 0;
-    FXString filenames[MAX_FILES + 1];
-    // load command argument files
+    std::vector<FXString> filenames;
     for (int arg = 0; arg != argc; ++arg)
     {
         if (argv[arg][0] != '-') {
-            if (numfiles < MAX_FILES) {
-                filenames[numfiles++].assign(argv[arg]);
-            }
+            filenames.push_back(argv[arg]);
         }
     }
     return filenames;
