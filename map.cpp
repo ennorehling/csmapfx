@@ -806,7 +806,8 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 		if (mapFile)
 		{
             if (mapFile->getRegion(selection.region, x, y, visiblePlane)) {
-                selection.selected = selection.REGION | (selection.selected & selection.MULTIPLE_REGIONS);
+                selection.selected = selection.REGION;
+                selection.selected &= ~selection.UNKNOWN_REGION;
 
                 if ((event->state & CONTROLMASK) || modus == MODUS_SELECT)
 				{
@@ -834,7 +835,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
             else {
 				// mark unknown region (no region-block in report)
                 selection.sel_x = x, selection.sel_y = y, selection.sel_plane = visiblePlane;
-                selection.selected |= selection.UNKNOWN_REGION;
+                selection.selected = selection.UNKNOWN_REGION;
                 selection.selected &= ~selection.REGION;
 			}
 
@@ -1008,7 +1009,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 
 	if (mapFile)
 	{
-		if (selection.selected & selection.MULTIPLE_REGIONS)
+		if (!selection.regionsSelected.empty())
 		{
 			// Popup-Menu fuer mehrere Regionen
 			FXMenuPane *menu = new FXMenuPane(this);
@@ -1165,8 +1166,9 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 
 		if (cmd == POPUP_GET_TEXT)
 		{
-			if (!(selection.selected & selection.MULTIPLE_REGIONS))
-				getTarget()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void*)item->getText().text());
+            if (!selection.regionsSelected.empty()) {
+                getTarget()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void*)item->getText().text());
+            }
 			return 1;
 		}
 
@@ -1176,13 +1178,10 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 			return 1;
 		}
 
-		if (selection.selected & selection.MULTIPLE_REGIONS)
+		if (!selection.regionsSelected.empty())
 		{
 			if (cmd == POPUP_SETISLAND)
 			{
-				if (selection.regionsSelected.begin() == selection.regionsSelected.end())
-					return 1;
-
 				FXInputDialog input(this, "Insel benennen", "Wie soll die Insel heissen?");
 				input.setText("");
 
@@ -1280,14 +1279,11 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 		return;
 	}
 
-	if (selection.selected & selection.MULTIPLE_REGIONS)
+	if (!selection.regionsSelected.empty())
 	{
 		// del or terraform regions in list
-		std::set<datablock*>::iterator itor;
-		for (itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
+		for (datablock* region : selection.regionsSelected)
 		{
-			datablock* region = *itor;
-
 			// terraform: change terrain of region
 			region->terrain(new_terrain);
 
@@ -1340,7 +1336,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 					if (selection.region == iregion)
 						selection.selected &= ~selection.REGION;
 				}
-				if (selection.selected & selection.MULTIPLE_REGIONS)
+				if (!selection.regionsSelected.empty())
 				{
 					// markierte Regionenen aus der Markierung nehmen
 					std::set<datablock*>::iterator itor;
@@ -1590,13 +1586,13 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
                 }
 
             // draw selection mark if region is in multiple selection
-            if (selection.selected & selection.MULTIPLE_REGIONS)
-                if (selection.regionsSelected.find(&block) != selection.regionsSelected.end())
-                    dc.drawIcon(selectedRegion, scr_x, scr_y);
+            if (selection.regionsSelected.find(&block) != selection.regionsSelected.end())
+                dc.drawIcon(selectedRegion, scr_x, scr_y);
 
             // skip label
-            if (regionSize < 30)
+            if (regionSize < 30) {
                 continue;
+            }
 
             if (show_names)
                 label = block.value(TYPE_NAME);
