@@ -180,10 +180,7 @@ void FXTradePanel::collectData(std::vector<Info>& info, datablock::itor region)
 
 void FXTradePanel::updateData()
 {
-	//if (files->empty())
-		//return;
-
-	if (selection.selected & selection.MULTIPLE_REGIONS)
+    if (!selection.regionsSelected.empty())
 	{
 		tags.matrixsep->hide();
 		tags.matrixframe->hide();
@@ -242,14 +239,10 @@ long FXTradePanel::onMapChange(FXObject*, FXSelector, void* ptr)
 			|| (selection.selected & selection.REGION && selection.region != pstate->region))
 			needUpdate = true;				// ignore changes that don't change selected region
 
-		if ((selection.selected & selection.MULTIPLE_REGIONS) != (pstate->selected & selection.MULTIPLE_REGIONS)
-			|| (selection.selected & selection.MULTIPLE_REGIONS && selection.regionsSelected != pstate->regionsSelected))
+		else if (selection.regionsSelected != pstate->regionsSelected)
 			needUpdate = true;
 
 		selection = *pstate;
-
-		if (needUpdate) // expensive operation
-			selection.regionsSelected = pstate->regionsSelected;
 	}
 
 	if (needUpdate)

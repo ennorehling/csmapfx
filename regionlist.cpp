@@ -428,7 +428,7 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
                 selection.faction = iparent;
             }
         }
-        if (selection.selected & selection.MULTIPLE_REGIONS) {
+        if (!selection.regionsSelected.empty()) {
             selection.selected |= selection.MULTIPLE_REGIONS;
             selection.regionsSelected = selection.regionsSelected;
         }

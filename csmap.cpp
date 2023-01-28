@@ -1728,7 +1728,7 @@ long CSMap::onMapMoveMarker(FXObject*, FXSelector sel, void*)
     }
 
     // dont touch multiregions selected
-    if (selection.selected & selection.MULTIPLE_REGIONS)
+    if (!selection.regionsSelected.empty())
     {
         selection.regionsSelected = selection.regionsSelected;
         if (!selection.regionsSelected.empty())
@@ -2294,7 +2294,7 @@ long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)
 
     // propagate selection
     int selected = 0;
-    if (selection.selected & selection.MULTIPLE_REGIONS)
+    if (!selection.regionsSelected.empty())
     {
         selected = selection.MULTIPLE_REGIONS;
     }
@@ -2998,7 +2998,8 @@ static const int hex_offset[6][2] = {
 long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
-    if (!(selection.selected & selection.MULTIPLE_REGIONS)) {
+    if (selection.regionsSelected.empty())
+    {
         if (!(selection.selected & selection.REGION)) {
             // nothing to do
             return 1;
@@ -3044,8 +3045,10 @@ long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
 long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
-    if (!(selection.selected & selection.MULTIPLE_REGIONS))
+    if (selection.regionsSelected.empty())
+    {
         return 1;        // nothing to do
+    }
 
     // Inseln ausw\u00e4hlen
     int visiblePlane = map->getVisiblePlane();
@@ -3163,7 +3166,7 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
     // markierte Regionen l\u00f6schen
-    if (!(selection.selected & selection.MULTIPLE_REGIONS) || selection.regionsSelected.empty())
+    if (selection.regionsSelected.empty())
     {
         FXString txt = "Keine Region markiert!";
 

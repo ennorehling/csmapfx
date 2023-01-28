@@ -275,7 +275,7 @@ void FXStatsPanel::collectData(std::vector<Info>& info, datablock::itor region)
 
 void FXStatsPanel::updateData()
 {
-	if (selection.selected & selection.MULTIPLE_REGIONS)
+	if (!selection.regionsSelected.empty())
 	{
 		std::vector<Info> info;
 
@@ -335,17 +335,7 @@ long FXStatsPanel::onMapChange(FXObject*, FXSelector, void* ptr)
 	}
 	else if (selection.selChange != pstate->selChange)
 	{
-        if ((selection.selected & selection.MULTIPLE_REGIONS) != (pstate->selected & selection.MULTIPLE_REGIONS)) {
-            /* we went from having a selection to not, or vice versa */
-            needUpdate = true;
-        }
-        else if ((selection.selected & selection.MULTIPLE_REGIONS) || (pstate->selected & selection.MULTIPLE_REGIONS)) {
-            if (selection.regionsSelected.size() != pstate->regionsSelected.size()) {
-                /* the selection has groen or shrunk */
-                needUpdate = true;
-            }
-        }
-        else if ((selection.selected & selection.REGION) != (pstate->selected & selection.REGION)
+        if ((selection.selected & selection.REGION) != (pstate->selected & selection.REGION)
             || (selection.selected & selection.REGION && selection.region != pstate->region)) {
             /* the cursor has moved */
             needUpdate = true;				// ignore changes that don't change selected region
@@ -360,19 +350,20 @@ long FXStatsPanel::onMapChange(FXObject*, FXSelector, void* ptr)
             /* our off-map cursor position has changed. */
             needUpdate = true;				// ignore changes that don't change selected region
         }
+        else if (selection.regionsSelected != pstate->regionsSelected) {
+            /* the selection has groen or shrunk */
+            needUpdate = true;
+        }
 
         selection = *pstate;
-
-		if (needUpdate && (selection.selected & selection.MULTIPLE_REGIONS)) // expensive operation
-			selection.regionsSelected = pstate->regionsSelected;
 	}
 
     if (needUpdate) {
-        if (selection.selected & selection.MULTIPLE_REGIONS) {
+        if (!selection.regionsSelected.empty()) {
             getApp()->beginWaitCursor();
         }
         updateData();
-        if (selection.selected & selection.MULTIPLE_REGIONS) {
+        if (!selection.regionsSelected.empty()) {
             getApp()->endWaitCursor();
         }
     }

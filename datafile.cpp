@@ -1864,7 +1864,7 @@ void datafile::SelectionState::transfer(datafile* old_cr, datafile* new_cr, int 
                 selected -= BUILDING;
             }
         }
-        if (selected & MULTIPLE_REGIONS) {
+        if (!regionsSelected.empty()) {
             std::set<datablock*> sel;
             for (datablock* r : regionsSelected) {
                 datablock::itor match;
