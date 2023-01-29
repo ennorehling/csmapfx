@@ -73,6 +73,7 @@ public:
     bool hasRegion(int x, int y, int plane) const;
     bool deleteRegion(datablock* region);
     FXString regionName(const datablock& block);
+    FXString unitName(const datablock& block, bool verbose = false);
 
     void findSelection(const datablock* select, datablock::itor& out, datablock::itor& region);
 	typedef std::list<datafile>::iterator itor;

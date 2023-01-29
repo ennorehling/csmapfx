@@ -73,8 +73,10 @@ int datafile::turn() const
 int datafile::getFactionIdForUnit(const datablock* unit) const
 {
     FXASSERT(unit->type() == block_type::TYPE_UNIT);
-    bool isTraitor = unit->valueInt(TYPE_TRAITOR, 0) != 0;
-    return isTraitor ? (int)special_faction::TRAITOR : unit->valueInt(TYPE_FACTION, (int)special_faction::ANONYMOUS);
+    if (unit->valueInt(TYPE_TRAITOR, 0) != 0) {
+        return (int)special_faction::TRAITOR;
+    }
+    return unit->valueInt(TYPE_FACTION, (int)special_faction::ANONYMOUS);
 }
 
 FXString datafile::getFactionName(int factionId)
@@ -1332,6 +1334,34 @@ FXString datafile::regionName(const datablock& block)
         }
     }
     return rname;
+}
+
+FXString datafile::unitName(const datablock& unit, bool verbose)
+{
+    FXASSERT(unit.type() == block_type::TYPE_UNIT);
+    if (verbose) {
+        FXString label;
+        int uid = unit.info();
+        int fid = unit.valueInt(TYPE_FACTION);
+        datablock::itor faction_owner;
+        if (getFaction(faction_owner, fid)) {
+            label.format("%s (%s), %s (%s)",
+                unit.value(TYPE_NAME).text(),
+                FXStringValEx(uid, 36).text(),
+                faction_owner->value(TYPE_FACTIONNAME).text(),
+                FXStringValEx(fid, 36).text()
+            );
+        }
+        else {
+            label.format("%s (%s), Unbekannt (%s)",
+                unit.value(TYPE_NAME).text(),
+                FXStringValEx(uid, 36).text(),
+                FXStringValEx(fid, 36).text()
+            );
+        }
+        return label;
+    }
+    return unit.getName();
 }
 
 void datafile::createHierarchy()

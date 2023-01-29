@@ -86,7 +86,7 @@ void FXBuildingProperties::makeItems()
         {
             if (mapFile->getUnit(unit, ownerId)) {
                 label.assign("Besitzer: ");
-                label += unit->getLabel();
+                label += mapFile->unitName(*unit, true);
                 appendItem(root, makeItem(label, &*unit));
             }
         }

@@ -98,7 +98,7 @@ void FXShipProperties::makeItems()
         {
             if (mapFile->getUnit(unit, captainId)) {
                 label.assign(L"Kapit\u00e4n: ");
-                label += unit->getLabel();
+                label += mapFile->unitName(*unit, true);
                 appendItem(root, makeItem(label, &*unit));
             }
         }
