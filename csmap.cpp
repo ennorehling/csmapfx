@@ -2381,9 +2381,9 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
     {
         FXString* choices = dlg.getFilenames();
         std::vector<FXString> filenames;
-        for (FXString* choice = choices; choice && choice->text(); ++choice)
+        for (int i = 0; !choices[i].empty(); ++i)
         {
-            filenames.push_back(*choice);
+            filenames.push_back(choices[i]);
         }
         getApp()->beginWaitCursor();
         loadFiles(filenames);

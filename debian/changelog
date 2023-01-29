@@ -1,8 +1,9 @@
 csmapfx (1.5.5-1) stable; urgency=low
 
   * fix initial map scroll position (bug 2931)
+  * fix crash when merging reports (bug 2932)
 
- -- Enno Rehling <enno@eressea.de>  Sun, 29 Jan 2023 11:30:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 29 Jan 2023 13:30:00 +0200
 
 csmapfx (1.5.4-1) stable; urgency=low
 
