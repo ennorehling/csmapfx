@@ -1,3 +1,9 @@
+csmapfx (1.5.6-1) stable; urgency=low
+
+  * show ship properties
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 29 Jan 2023 17:00:00 +0200
+
 csmapfx (1.5.5-1) stable; urgency=low
 
   * fix initial map scroll position (bug 2931)

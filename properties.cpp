@@ -40,6 +40,43 @@ FXTreeItem* FXProperties::makeItem(const FXString& label, datablock* block, cons
     return popup;
 }
 
+FXTreeItem* FXProperties::makeStringList(FXTreeItem* parent, const FXString& label, const datablock& block)
+{
+    FXTreeItem* node = appendItem(parent, label);
+    node->setExpanded(true);
+
+    for (const datakey& key : block.data()) {
+        appendItem(node, key.value());
+    }
+    return node;
+}
+
+FXTreeItem* FXProperties::makeUnitList(FXTreeItem* parent, const FXString& label, datablock::itor begin, datablock::itor end, key_type key, int value)
+{
+    std::vector<FXTreeItem*> units;
+
+    for (datablock::itor block = begin; block != end && block->type() != block_type::TYPE_REGION; ++block)
+    {
+        if (block->type() == block_type::TYPE_UNIT) {
+            datablock* unitPtr = &*block;
+            int unitId = unitPtr->info();
+            if (unitPtr->valueInt(key) == value) {
+                units.push_back(makeItem(unitPtr->getLabel(), unitPtr));
+            }
+        }
+    }
+    if (!units.empty()) {
+        FXTreeItem* node = appendItem(parent, label);
+        node->setExpanded(true);
+        for (FXTreeItem* item : units) {
+            appendItem(node, item);
+        }
+        return node;
+    }
+
+    return nullptr;
+}
+
 void FXProperties::setMapFile(datafile* f)
 {
     mapFile = f;

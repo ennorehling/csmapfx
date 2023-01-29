@@ -32,6 +32,8 @@ public:
 protected:
     virtual void makeItems() = 0;
     FXTreeItem* makeItem(const FXString& label, datablock* block, const FXString* info = nullptr);
+    FXTreeItem* makeStringList(FXTreeItem* parent, const FXString& label, const datablock& block);
+    FXTreeItem* makeUnitList(FXTreeItem* parent, const FXString& label, datablock::itor begin, datablock::itor end, key_type matchKey, int matchValue);
     void setClipboard(const FXString& text);
     void showInfo(const FXString& text);
 

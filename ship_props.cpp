@@ -33,7 +33,6 @@ void FXShipProperties::makeItems()
 
     if (selection.selected & selection.SHIP)
     {
-        std::vector<FXTreeItem*> units;
         datablock::itor ship = selection.ship;
         datablock::itor end = mapFile->blocks().end();
 
@@ -94,14 +93,13 @@ void FXShipProperties::makeItems()
         FXTreeItem* root = appendItem(nullptr, label);
         root->setExpanded(true);
 
+        datablock::itor unit = std::next(selection.region);
         if (captainId > 0)
         {
-            datablock::itor unit;
             if (mapFile->getUnit(unit, captainId)) {
                 label.assign(L"Kapit\u00e4n: ");
                 label += unit->getLabel();
                 appendItem(root, makeItem(label, &*unit));
-                units.push_back(makeItem(label, &*unit));
             }
         }
 
@@ -137,37 +135,15 @@ void FXShipProperties::makeItems()
         }
 
         // find the EFFECTS block, if it exists
-        datablock::itor effects = end;
         for (datablock::itor block = std::next(ship); block != end && block->depth() > ship->depth(); ++block)
         {
             if (block->type() == block_type::TYPE_EFFECTS) {
-                FXTreeItem* node = appendItem(root, "Effekte");
-                node->setExpanded(true);
-
-                for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
-                    appendItem(node, key->value());
+                FXTreeItem* node = makeStringList(root, "Effekte", *block);
                 break;
             }
         }
-
-        // more units, if any
-        for (datablock::itor block = std::next(ship); block != end && block->type() != block_type::TYPE_REGION; ++block)
-        {
-            if (block->type() == block_type::TYPE_UNIT) {
-                datablock* unitPtr = &*block;
-                int unitId = unitPtr->info();
-                if (unitId != captainId) {
-                    units.push_back(makeItem(unitPtr->getLabel(), unitPtr));
-                }
-            }
-        }
-        if (!units.empty()) {
-            FXTreeItem* node = appendItem(root, "Einheiten");
-            node->setExpanded(true);
-            for (FXTreeItem* item : units) {
-                appendItem(node, item);
-            }
-        }
+        // List units, if any:
+        FXTreeItem* node = makeUnitList(root, "Einheiten", unit, end, TYPE_SHIP, ship->info());
     }
 }
 
