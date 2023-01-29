@@ -234,7 +234,7 @@ private:
 	// Menubar
     class FXMenuBar		*menubar = nullptr;
     class FXMenuPane	*filemenu = nullptr, *recentmenu = nullptr, *viewmenu = nullptr, *regionmenu = nullptr, *factionmenu = nullptr;
-    class FXMenuPane	*mapmenu, *selectionmenu = nullptr, *planemenu = nullptr, *zoommenu = nullptr, *helpmenu = nullptr;
+    class FXMenuPane	*mapmenu = nullptr, *selectionmenu = nullptr, *planemenu = nullptr, *zoommenu = nullptr, *helpmenu = nullptr;
 
 	// Toolbar
     class FXToolBar		*toolbar = nullptr;
@@ -287,7 +287,9 @@ private:
     class FXVerticalFrame *commandframe = nullptr;
 
 	// Im TabBook
-	class FXUnitList *unitlist = nullptr;
+	class FXProperties *unitProperties = nullptr;
+	class FXProperties *shipProperties = nullptr;
+	class FXProperties *buildingProperties = nullptr;
 	class FXStatistics *statistics = nullptr;
 
 	// Floating

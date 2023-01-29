@@ -2,7 +2,6 @@
 #include "main.h"
 #include "fxhelper.h"
 #include "unitlist.h"
-#include "FXMenuSeparatorEx.h"
 
 // *********************************************************************************************************
 // *** FXStatistics implementation
@@ -22,878 +21,651 @@ FXDEFMAP(FXUnitList) MessageMap[]=
 
 FXIMPLEMENT(FXUnitList, FXTreeList, MessageMap, ARRAYNUMBER(MessageMap))
 
-class FXPopupTreeItem : public FXTreeItem
-{
-public:
-    FXPopupTreeItem(const FXString& text, FXIcon* oi = NULL, FXIcon* ci = NULL, void* ptr = NULL)
-        : FXTreeItem(text, oi, ci, ptr)
-    {
-    }
-    datablock* block = nullptr;
-    FXString info;
-};
-
-class FXPopupMenuCommand : public FXMenuCommand
-{
-public:
-    FXPopupMenuCommand(FXComposite* p, const FXString& text, const FXString& info_key, FXIcon* ic = NULL, FXObject* tgt = NULL, FXuint opts = 0)
-        : FXMenuCommand(p, text, ic, tgt, FXUnitList::ID_POPUP_SHOW_INFO, opts), info(info_key) {}
-
-    const FXString& getInfo() const { return info; }
-private:
-    FXString info;
-};
-
 FXUnitList::FXUnitList(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x, FXint y, FXint w, FXint h)
-		: FXTreeList(p, tgt, sel, opts, x, y, w, h)
+		: FXProperties(p, tgt, sel, opts, x, y, w, h)
 {
 }
 
-void FXUnitList::setMapFile(datafile *f)
+void FXUnitList::makeItems()
 {
-    mapFile = f;
-}
+    // clear list and build new
+    clearItems();
 
-long FXUnitList::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
-{
-	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
+    if (selection.selected & selection.UNIT)
+    {
+        datablock::itor end = mapFile->blocks().end();
 
-	// any data changed, so need to update list?
-	if (selection.fileChange != pstate->fileChange)
-	{
-		selection.fileChange = pstate->fileChange;
+        datablock::itor unit = selection.unit;
+        datablock::itor items = end;
+        datablock::itor talents = end;
+        datablock::itor spells = end;
+        datablock::itor effects = end;
+        std::map<int, datablock::itor> combatspells;
 
-		// clear list and build a new one from data in this->files
-		//clearItems();
-	}
+        datablock::itor building = end;
+        datablock::itor ship = end;
 
-	if (selection.selChange != pstate->selChange)
-	{
-        selection = *pstate;
+        datablock::itor block = unit;
+        for (block++; block != end && block->depth() > unit->depth(); block++)
+        {
+            if (block->type() == block_type::TYPE_ITEMS)
+                items = block;
+            else if (block->type() == block_type::TYPE_TALENTS)
+                talents = block;
+            else if (block->type() == block_type::TYPE_SPELLS)
+                spells = block;
+            else if (block->type() == block_type::TYPE_EFFECTS)
+                effects = block;
+            else if (block->type() == block_type::TYPE_COMBATSPELL)
+                combatspells[block->info()] = block;
+        }
 
-		clearItems();		// clear list and build new
+        FXString name, descr, number, prefix, race, weight;
+        FXString aura, auramax, hero;
+        FXString hp, hungry, combatstatus, guards;
+        FXint factionId = -1, familiarMage = -1, group = -1;
+        FXint otherFactionId = -2;
 
-		if (selection.selected & selection.UNIT)
-		{
-			datablock::itor end = mapFile->blocks().end();
-			
-			datablock::itor unit = selection.unit;
-			datablock::itor items = end;
-			datablock::itor talents = end;
-			datablock::itor spells = end;
-			datablock::itor effects = end;
-			std::map<int,datablock::itor> combatspells;
+        std::vector<datakey::list_type::const_iterator> unhandled;
 
-			datablock::itor building = end;
-			datablock::itor ship = end;
+        for (datakey::list_type::const_iterator key = unit->data().begin(); key != unit->data().end(); ++key)
+        {
+            switch (key->type()) {
+            case TYPE_NAME:
+                name = key->value();
+                break;
+            case TYPE_DESCRIPTION:
+                descr = key->value();
+                break;
+            case TYPE_FACTION:
+                factionId = atoi(key->value().text());
+                break;
+            case TYPE_OTHER_FACTION:
+                otherFactionId = atoi(key->value().text());
+                break;
+            case TYPE_NUMBER:
+                number = key->value();
+                break;
+            case TYPE_TYPE:
+                race = key->value();
+                break;
+            case TYPE_AURA:
+                aura = key->value();
+                break;
+            case TYPE_AURAMAX:
+                auramax = key->value();
+                break;
+            case TYPE_BUILDING:
+                mapFile->getBuilding(building, atoi(key->value().text()));
+                break;
+            case TYPE_SHIP:
+                mapFile->getShip(ship, atoi(key->value().text()));
+                break;
+            case TYPE_WEIGHT:
+                weight = key->value();
+                break;
+            case TYPE_GROUP:
+                group = atoi(key->value().text());
+                break;
+            case TYPE_PREFIX:
+                prefix = key->value();
+                break;
+            case TYPE_STATUS:
+                combatstatus = key->value();
+                break;
+            case TYPE_HITPOINTS:
+                hp = key->value();
+                break;
+            case TYPE_FAMILIARMAGE:
+                familiarMage = atoi(key->value().text());
+                break;
+            case TYPE_GUARDING:
+                guards = key->value();
+                break;
+            case TYPE_HUNGER:
+                hungry = key->value();
+                break;
+            case TYPE_HERO:
+                hero = key->value();
+                break;
+            case TYPE_ORDERS_CONFIRMED:
+            case TYPE_FACTIONSTEALTH:
+                // do not show
+                break;
+            default:
+                unhandled.push_back(key);
+                break;
+            }
+        }
 
-			datablock::itor block = unit;
-			for (block++; block != end && block->depth() > unit->depth(); block++)
-			{
-                if (block->type() == block_type::TYPE_ITEMS)
-					items = block;
-				else if (block->type() == block_type::TYPE_TALENTS)
-					talents = block;
-				else if (block->type() == block_type::TYPE_SPELLS)
-					spells = block;
-				else if (block->type() == block_type::TYPE_EFFECTS)
-					effects = block;
-				else if (block->type() == block_type::TYPE_COMBATSPELL)
-					combatspells[block->info()] = block;
-			}
+        /*
+            Phygon (phyg)
+            * 1 Nebelmeermensch
+            * 500 von 700 Aura
+        */
 
-			FXString name, descr, number, prefix, race, weight;
-			FXString aura, auramax, hero;
-			FXString hp, hungry, combatstatus, guards;
-			FXint factionId = -1, familiarMage = -1, group = -1;
-			FXint otherFactionId = -2;
+        FXTreeItem* item;
+        FXString label;
 
-			std::vector<datakey::list_type::const_iterator> unhandled;
+        label.format("%s (%s)", name.text(), unit->id().text());
+        FXTreeItem* unititem = appendItem(nullptr, label);
+        unititem->setExpanded(true);
 
-			for (datakey::list_type::const_iterator key = unit->data().begin(); key != unit->data().end(); ++key)
-			{
-                switch (key->type()) {
-                case TYPE_NAME:
-                    name = key->value();
-                    break;
-                case TYPE_DESCRIPTION:
-                    descr = key->value();
-                    break;
-                case TYPE_FACTION:
-                    factionId = atoi(key->value().text());
-                    break;
-                case TYPE_OTHER_FACTION:
-                    otherFactionId = atoi(key->value().text());
-                    break;
-                case TYPE_NUMBER:
-                    number = key->value();
-                    break;
-                case TYPE_TYPE:
-                    race = key->value();
-                    break;
-                case TYPE_AURA:
-                    aura = key->value();
-                    break;
-                case TYPE_AURAMAX:
-                    auramax = key->value();
-                    break;
-                case TYPE_BUILDING:
-                    mapFile->getBuilding(building, atoi(key->value().text()));
-                    break;
-                case TYPE_SHIP:
-                    mapFile->getShip(ship, atoi(key->value().text()));
-                    break;
-                case TYPE_WEIGHT:
-                    weight = key->value();
-                    break;
-                case TYPE_GROUP:
-                    group = atoi(key->value().text());
-                    break;
-                case TYPE_PREFIX:
-                    prefix = key->value();
-                    break;
-                case TYPE_STATUS:
-                    combatstatus = key->value();
-                    break;
-                case TYPE_HITPOINTS:
-                    hp = key->value();
-                    break;
-                case TYPE_FAMILIARMAGE:
-                    familiarMage = atoi(key->value().text());
-                    break;
-                case TYPE_GUARDING:
-                    guards = key->value();
-                    break;
-                case TYPE_HUNGER:
-                    hungry = key->value();
-                    break;
-                case TYPE_HERO:
-                    hero = key->value();
-                    break;
-                case TYPE_ORDERS_CONFIRMED:
-                case TYPE_FACTIONSTEALTH:
-                    // do not show
-                    break;
-                default:
-                    unhandled.push_back(key);
-                    break;
+        if (factionId < 0 && otherFactionId < 0)
+        {
+            label.assign("Parteigetarnt");
+        }
+        else {
+            datablock::itor faction;
+
+            if (factionId > 0) {
+                if (mapFile->getFaction(faction, factionId)) {
+                    name = faction->value(TYPE_FACTIONNAME);
+                    if (name.empty())
+                        label.assign("Parteigetarnt");
+                    else
+                        label.format("%s (%s)", name.text(), faction->id().text());
                 }
-			}
+                else {
+                    label.format("Unbekannt (%s)", FXStringValEx((FXulong)factionId, 36).text());
+                }
+            }
 
-			/*
-				Phygon (phyg)
-				* 1 Nebelmeermensch
-				* 500 von 700 Aura
-			*/
+            if (otherFactionId > 0) {
+                datablock::itor anotherfaction;
+                if (mapFile->getFaction(anotherfaction, otherFactionId)) {
+                    if (!label.empty())
+                        label += ", ";
 
-			FXTreeItem *item;
-            FXString label;
+                    name = anotherfaction->value(TYPE_FACTIONNAME);
+                    FXString label2;
+                    if (name.empty())
+                        label2.assign("Parteigetarnt");
+                    else
+                        label2.format("%s (%s)", name.text(), FXStringValEx(otherFactionId, 36).text());
 
-			label.format("%s (%s)", name.text(), unit->id().text());
-			FXTreeItem *unititem = appendItem(nullptr, label);
-			unititem->setExpanded(true);
+                    label += label2;
+                }
+                else {
+                    label.format("Unbekannt (%s)", FXStringValEx(otherFactionId, 36).text());
+                }
+            }
+        }
+        item = appendItem(unititem, label);
 
-            if (factionId < 0 && otherFactionId < 0)
-            {
-                label.assign("Parteigetarnt");
+        label = unit->value(TYPE_DESCRIPTION);
+        if (!label.empty()) {
+            item = appendItem(unititem, label);
+        }
+
+
+        if (group > 0)
+        {
+            label = "Gruppe: ";
+            datablock::itor match;
+            if (mapFile->getGroup(match, group)) {
+                label += match->value(key_type::TYPE_LOWERCASE_NAME);
             }
             else {
-                datablock::itor faction;
-
-                if (factionId > 0) {
-                    if (mapFile->getFaction(faction, factionId)) {
-                        name = faction->value(TYPE_FACTIONNAME);
-                        if (name.empty())
-                            label.assign("Parteigetarnt");
-                        else
-                            label.format("%s (%s)", name.text(), faction->id().text());
-                    }
-                    else {
-                        label.format("Unbekannt (%s)", FXStringValEx((FXulong)factionId, 36).text());
-                    }
-                }
-
-                if (otherFactionId > 0) {
-                    datablock::itor anotherfaction;
-                    if (mapFile->getFaction(anotherfaction, otherFactionId)) {
-                        if (!label.empty())
-                            label += ", ";
-
-                        name = anotherfaction->value(TYPE_FACTIONNAME);
-                        FXString label2;
-                        if (name.empty())
-                            label2.assign("Parteigetarnt");
-                        else
-                            label2.format("%s (%s)", name.text(), FXStringValEx(otherFactionId, 36).text());
-
-                        label += label2;
-                    }
-                    else {
-                        label.format("Unbekannt (%s)", FXStringValEx(otherFactionId, 36).text());
-                    }
-                }
+                // TODO: find group name in mapFile
+                label += FXStringVal(group);
             }
             item = appendItem(unititem, label);
+        }
 
-            label = unit->value(TYPE_DESCRIPTION);
-            if (!label.empty()) {
+        if (familiarMage > 0) {
+            datablock::itor mage;
+            if (mapFile->getUnit(mage, familiarMage)) {
+                FXString mage_name = mage->value(TYPE_NAME);
+                label.format("Vertrauter von %s (%s)", mage_name.text(), FXStringValEx(familiarMage, 36).text());
                 item = appendItem(unititem, label);
+                item->setData(&*mage);
             }
+        }
 
+        FXint count = FXIntVal(number);
 
-            if (group > 0)
+        // prefix+race
+        label = number + " ";
+        if (race.empty()) {
+            label += (count == 1) ? "Person" : "Personen";
+        }
+        else if (!prefix.empty()) {
+            label += prefix;
+            label += race.lower();
+        }
+        else {
+            label += race;
+        }
+        if (!hero.empty()) {
+            label += ", ";
+            label += (count == 1) ? "Held" : "Helden";
+        }
+        item = appendItem(unititem, label);
+
+        if (!combatstatus.empty() || !hp.empty() || !hungry.empty() || !guards.empty())
+        {
+            if (combatstatus == "0")
+                label = "aggressiv";
+            else if (combatstatus == "1")
+                label = "vorne";
+            else if (combatstatus == "2")
+                label = "hinten";
+            else if (combatstatus == "3")
+                label = "defensiv";
+            else if (combatstatus == "4")
+                label = FXString(L"k\u00e4mpft nicht");
+            else if (combatstatus == "5")
+                label = "flieht";
+            else if (!combatstatus.empty())
+                label = "Kampfstatus " + combatstatus;
+            else
+                label = "";
+
+            if (!hp.empty() || !hungry.empty())
             {
-                label = "Gruppe: ";
-                datablock::itor match;
-                if (mapFile->getGroup(match, group)) {
-                    label += match->value(key_type::TYPE_LOWERCASE_NAME);
-                } else {
-                    // TODO: find group name in mapFile
-                    label += FXStringVal(group);
+                label += " (";
+
+                if (!hp.empty())
+                {
+                    label += hp;
+
+                    if (!hungry.empty())
+                        label += ", ";
                 }
-                item = appendItem(unititem, label);
+
+                if (!hungry.empty())
+                    label += "hungert";
+
+                label += ")";
             }
 
-            if (familiarMage > 0) {
-                datablock::itor mage;
-                if (mapFile->getUnit(mage, familiarMage)) {
-                    FXString mage_name = mage->value(TYPE_NAME);
-                    label.format("Vertrauter von %s (%s)", mage_name.text(), FXStringValEx(familiarMage, 36).text());
-                    item = appendItem(unititem, label);
-                    item->setData(&*mage);
-                }
-            }
-
-            FXint count = FXIntVal(number);
-
-            // prefix+race
-            label = number + " ";
-            if (race.empty()) {
-                label += (count == 1) ? "Person" : "Personen";
-            }
-            else if (!prefix.empty()) {
-                label += prefix;
-                label += race.lower();
-            }
-            else {
-                label += race;
-            }
-            if (!hero.empty()) {
-                label += ", ";
-                label += (count == 1) ? "Held" : "Helden";
-            }
-			item = appendItem(unititem, label);
-
-			if (!combatstatus.empty() || !hp.empty() || !hungry.empty() || !guards.empty())
-			{
-				if (combatstatus == "0")
-					label = "aggressiv";
-				else if (combatstatus == "1")
-					label = "vorne";
-				else if (combatstatus == "2")
-					label = "hinten";
-				else if (combatstatus == "3")
-					label = "defensiv";
-				else if (combatstatus == "4")
-					label = FXString(L"k\u00e4mpft nicht");
-				else if (combatstatus == "5")
-					label = "flieht";
-				else if (!combatstatus.empty())
-					label = "Kampfstatus " + combatstatus;
-				else
-					label = "";
-
-				if (!hp.empty() || !hungry.empty())
-				{
-					label += " (";
-
-					if (!hp.empty())
-					{
-						label += hp;
-
-						if (!hungry.empty())
-							label += ", ";
-					}
-
-					if (!hungry.empty())
-						label += "hungert";
-
-					label += ")";
-				}
-
-				if (!guards.empty())
-				{
-					if (!label.empty())
-						label += ", ";
-					label += "bewacht";
-				}
-
-				item = appendItem(unititem, label);
-			}
-
-			if (!aura.empty() || !auramax.empty())
-			{
-				label.format("%s von %s Aura", aura.text(), auramax.text());
-				item = appendItem(unititem, label);
-			}
-
-            if (!weight.empty())
+            if (!guards.empty())
             {
-                // fill to 3 numbers
-                while (weight.length() < 3)
-                    weight = "0" + weight;
+                if (!label.empty())
+                    label += ", ";
+                label += "bewacht";
+            }
 
-                // cut up
-                if (weight.right(2) == "00")
-                    weight = weight.left(weight.length() - 2);
+            item = appendItem(unititem, label);
+        }
+
+        if (!aura.empty() || !auramax.empty())
+        {
+            label.format("%s von %s Aura", aura.text(), auramax.text());
+            item = appendItem(unititem, label);
+        }
+
+        if (!weight.empty())
+        {
+            // fill to 3 numbers
+            while (weight.length() < 3)
+                weight = "0" + weight;
+
+            // cut up
+            if (weight.right(2) == "00")
+                weight = weight.left(weight.length() - 2);
+            else
+                weight = weight.left(weight.length() - 2) + "." + weight.right(2);
+
+            item = appendItem(unititem, "Gewicht: " + weight);
+        }
+
+        // list unhandled keys
+        for (std::vector<datakey::list_type::const_iterator>::const_iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
+        {
+            label.format("%s: %s", (*itag)->key().text(), (*itag)->value().text());
+            appendItem(unititem, label);
+        }
+
+        if (spells != end)		// does a SPRUECHE block exist?
+        {
+            FXTreeItem* node = appendItem(unititem, FXString(L"Zauberspr\u00fcche"));
+
+            for (datakey::list_type::const_iterator key = spells->data().begin(); key != spells->data().end(); ++key)
+            {
+                label = key->value();
+                appendItem(node, makeItem(label, nullptr, &label));
+            }
+        }
+
+        if (!combatspells.empty())	// do some KAMPFZAUBER blocks exist?
+        {
+            FXTreeItem* node = appendItem(unititem, "Kampfzauber");
+            //node->setExpanded(true);
+
+            for (std::map<int, datablock::itor>::iterator itor = combatspells.begin(); itor != combatspells.end(); itor++)
+            {
+                FXString type;
+
+                block = itor->second;
+                if (itor->first == 0)
+                    type = FXString(L"Pr\u00e4kampfzauber");
+                else if (itor->first == 1)
+                    type = "Kampfzauber";
+                else if (itor->first == 2)
+                    type = "Postkampfzauber";
                 else
-                    weight = weight.left(weight.length() - 2) + "." + weight.right(2);
+                    type.format("%d. Kampfzauber", itor->first);
 
-                item = appendItem(unititem, "Gewicht: " + weight);
+                FXString spell = block->value("name");
+                FXString level = block->value("level");
+
+                label.format("%s: %s (%s)", type.text(), spell.text(), level.text());
+                appendItem(node, label);
             }
-            
-            // list unhandled keys
-			for (std::vector<datakey::list_type::const_iterator>::const_iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
-			{
-				label.format("%s: %s", (*itag)->key().text(), (*itag)->value().text());
-				appendItem(unititem, label);
-			}
+        }
 
-			if (spells != end)		// does a SPRUECHE block exist?
-			{
-				FXTreeItem *node = appendItem(unititem, FXString(L"Zauberspr\u00fcche"));
+        if (effects != end)		// does a EFFEKTE block exist?
+        {
+            FXTreeItem* node = appendItem(unititem, "Effekte");
+            node->setExpanded(true);
 
-				for (datakey::list_type::const_iterator key = spells->data().begin(); key != spells->data().end(); ++key)
-				{
-                    label = key->value();
-                    appendItem(node, makePopupTreeItem(label, nullptr, &label));
-				}
-			}
+            for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
+                appendItem(node, key->value());
+        }
 
-			if (!combatspells.empty())	// do some KAMPFZAUBER blocks exist?
-			{
-				FXTreeItem *node = appendItem(unititem, "Kampfzauber");
-				//node->setExpanded(true);
+        FXint riding_skill = 0;
+        FXint horses = 0;
+        FXint carts = 0;
+        if (talents != end)		// does a TALENTE block exist?
+        {
+            FXTreeItem* node = appendItem(unititem, "Talente");
+            node->setExpanded(true);
 
-				for (std::map<int,datablock::itor>::iterator itor = combatspells.begin(); itor != combatspells.end(); itor++)
-				{
-					FXString type;
+            for (datakey::list_type::const_iterator key = talents->data().begin(); key != talents->data().end(); ++key)
+            {
+                FXString info = key->key();
+                FXString value = key->value().section(' ', 1);
+                label = key->key() + " " + value;
+                appendItem(node, makeItem(label, nullptr, &info));
 
-                    block = itor->second;
-                    if (itor->first == 0)
-						type = FXString(L"Pr\u00e4kampfzauber");
-					else if (itor->first == 1)
-						type = "Kampfzauber";
-					else if (itor->first == 2)
-						type = "Postkampfzauber";
-					else
-						type.format("%d. Kampfzauber", itor->first);
-
-					FXString spell = block->value("name");
-					FXString level = block->value("level"); 
-
-					label.format("%s: %s (%s)", type.text(), spell.text(), level.text());
-					appendItem(node, label);
-				}
-			}
-
-			if (effects != end)		// does a EFFEKTE block exist?
-			{
-				FXTreeItem *node = appendItem(unititem, "Effekte");
-				node->setExpanded(true);
-
-				for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
-					appendItem(node, key->value());
-			}
-
-            FXint riding_skill = 0;
-            FXint horses = 0;
-            FXint carts = 0;
-			if (talents != end)		// does a TALENTE block exist?
-			{
-				FXTreeItem *node = appendItem(unititem, "Talente");
-				node->setExpanded(true);
-
-				for (datakey::list_type::const_iterator key = talents->data().begin(); key != talents->data().end(); ++key)
-				{
-                    FXString info = key->key();
-                    FXString value = key->value().section(' ', 1);
-                    label = key->key() + " " + value;
-                    appendItem(node, makePopupTreeItem(label, nullptr, &info));
-
-                    // Talent, für Transportkapazität
-                    if (riding_skill == 0) {
-                        if (info == "Reiten") {
-                            riding_skill = FXIntVal(value, 10);
-                        }
+                // Talent, für Transportkapazität
+                if (riding_skill == 0) {
+                    if (info == "Reiten") {
+                        riding_skill = FXIntVal(value, 10);
                     }
                 }
-			}
+            }
+        }
 
-			if (items != end)		// does a GEGENSTAENDE block exist?
-			{
-				FXTreeItem *node = appendItem(unititem, FXString(L"Gegenst\u00e4nde"));
-				node->setExpanded(true);
+        if (items != end)		// does a GEGENSTAENDE block exist?
+        {
+            FXTreeItem* node = appendItem(unititem, FXString(L"Gegenst\u00e4nde"));
+            node->setExpanded(true);
 
-				for (datakey::list_type::const_iterator key = items->data().begin(); key != items->data().end(); ++key)
-				{
-                    const FXString& info = key->key();
-                    const FXString& value = key->value();
-                    label = value + " " + info;
-                    appendItem(node, makePopupTreeItem(label, nullptr, &info));
+            for (datakey::list_type::const_iterator key = items->data().begin(); key != items->data().end(); ++key)
+            {
+                const FXString& info = key->key();
+                const FXString& value = key->value();
+                label = value + " " + info;
+                appendItem(node, makeItem(label, nullptr, &info));
 
-                    // Pferde und Wagen, für Transportkapazität
-                    if (info == "Pferd" || info == "Elfenpferd") {
-                        horses += FXIntVal(value, 10);
-                    }
-                    else if (info == "Wagen") {
-                        carts += FXIntVal(value, 10);
-                    }
+                // Pferde und Wagen, für Transportkapazität
+                if (info == "Pferd" || info == "Elfenpferd") {
+                    horses += FXIntVal(value, 10);
                 }
-			}
+                else if (info == "Wagen") {
+                    carts += FXIntVal(value, 10);
+                }
+            }
+        }
 
-            // Kapazität berechnen
-            FXint carry = 540;
-            FXint self = 10;
-            if (race == "Goblin") {
-                carry = 440;
-                self = 6;
-            }
-            else if (race == "Troll") {
-                carry = 1040;
-                self = 20;
-            }
-            // walking capacity
-            FXint walk_cap = carry * count;
-            FXint max_horses = (riding_skill * 4 + 1) * count;
+        // Kapazität berechnen
+        FXint carry = 540;
+        FXint self = 10;
+        if (race == "Goblin") {
+            carry = 440;
+            self = 6;
+        }
+        else if (race == "Troll") {
+            carry = 1040;
+            self = 20;
+        }
+        // walking capacity
+        FXint walk_cap = carry * count;
+        FXint max_horses = (riding_skill * 4 + 1) * count;
+        if (max_horses > horses) {
+            max_horses = horses;
+        }
+        FXint max_carts = max_horses / 2;
+        if (max_carts > carts) {
+            max_carts = carts;
+        }
+        walk_cap += max_carts * 10000 + max_horses * 2000;
+
+        FXString tail;
+        label = L"Kapazit\u00e4t: ";
+        if (horses > 0) {
+            // riding capacity
+            max_horses = riding_skill * 2 * count;
             if (max_horses > horses) {
                 max_horses = horses;
             }
-            FXint max_carts = max_horses / 2;
+            max_carts = max_horses / 2;
             if (max_carts > carts) {
                 max_carts = carts;
             }
-            walk_cap += max_carts * 10000 + max_horses * 2000;
-
-            FXString tail;
-            label = L"Kapazit\u00e4t: ";
-            if (horses > 0) {
-                // riding capacity
-                max_horses = riding_skill * 2 * count;
-                if (max_horses > horses) {
-                    max_horses = horses;
-                }
-                max_carts = max_horses / 2;
-                if (max_carts > carts) {
-                    max_carts = carts;
-                }
-                FXint ride_cap = max_carts * 100 + max_horses * 20 - count * self;
-                if (ride_cap > 0) {
-                    tail.format("%.2f (%d)", walk_cap / 100.0f, ride_cap);
-                }
+            FXint ride_cap = max_carts * 100 + max_horses * 20 - count * self;
+            if (ride_cap > 0) {
+                tail.format("%.2f (%d)", walk_cap / 100.0f, ride_cap);
             }
-            if (tail.empty()) {
-                tail.format("%.2f", walk_cap / 100.0f);
+        }
+        if (tail.empty()) {
+            tail.format("%.2f", walk_cap / 100.0f);
+        }
+        insertItem(item, unititem, label + tail);
+
+        if (building != end)	// unit in a building?
+        {
+            unhandled.clear();
+
+            FXString size;
+            FXString type = FXString(L"Geb\u00e4ude");
+            factionId = -1;
+
+            for (datakey::list_type::const_iterator key = building->data().begin(); key != building->data().end(); ++key)
+            {
+                if (key->type() == TYPE_NAME)
+                    name = key->value();
+                else if (key->type() == TYPE_DESCRIPTION)
+                    descr = key->value();
+                else if (key->type() == TYPE_FACTION)
+                    factionId = atoi(key->value().text());
+                else if (key->type() == TYPE_TYPE)
+                    type = key->value();
+                else if (key->type() == TYPE_SIZE)
+                    size = key->value();
+                else
+                    unhandled.push_back(key);
             }
-            insertItem(item, unititem, label + tail);
 
-			if (building != end)	// unit in a building?
-			{
-				unhandled.clear();
+            if (name.empty())
+                name = type;
 
-				FXString size;
-				FXString type = FXString(L"Geb\u00e4ude");
-				factionId = -1;
+            label.format("In %s (%s)", name.text(), building->id().text());
+            if (!type.empty())
+                label += ", " + type;
+            if (!size.empty())
+                label += FXString(L", Gr\u00f6\u00dfe ") + size;
 
-				for (datakey::list_type::const_iterator key = building->data().begin(); key != building->data().end(); ++key)
-				{
-					if (key->type() == TYPE_NAME)
-						name = key->value();
-					else if (key->type() == TYPE_DESCRIPTION)
-						descr = key->value();
-					else if (key->type() == TYPE_FACTION)
-						factionId = atoi(key->value().text());
-					else if (key->type() == TYPE_TYPE)
-						type = key->value();
-					else if (key->type() == TYPE_SIZE)
-						size = key->value();
-					else
-						unhandled.push_back(key);
-				}
+            FXTreeItem* node = makeItem(label, &*building, nullptr);
+            prependItem(nullptr, node)->setExpanded(true);
 
-				if (name.empty())
-					name = type;
+            // list unhandled keys
+            for (std::vector<datakey::list_type::const_iterator>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
+            {
+                const datakey::list_type::const_iterator t = *itag;
+                datablock* owner_block = nullptr;
 
-				label.format("In %s (%s)", name.text(), building->id().text());
-				if (!type.empty())
-					label += ", " + type;
-				if (!size.empty())
-					label += FXString(L", Gr\u00f6\u00dfe ") + size;
-
-                FXTreeItem* node = makePopupTreeItem(label, &*building, nullptr);
-                prependItem(nullptr, node)->setExpanded(true);
-
-				// list unhandled keys
-				for (std::vector<datakey::list_type::const_iterator>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
-				{
-                    const datakey::list_type::const_iterator t = *itag;
-                    datablock* owner_block = nullptr;
-
-                    if (t->type() == TYPE_OWNER) {
-                        FXint uid = FXIntVal(t->value());
-                        datablock::itor unit_owner;
-                        if (mapFile->getUnit(unit_owner, uid)) {
-                            FXint fid = FXIntVal(unit_owner->value(TYPE_FACTION));
-                            owner_block = &*unit_owner;
-                            datablock::itor faction_owner;
-                            if (mapFile->getFaction(faction_owner, fid)) {
-                                label.format("%s: %s (%s), %s (%s)",
-                                    t->key().text(),
-                                    unit_owner->value(TYPE_NAME).text(),
-                                    FXStringValEx(uid, 36).text(),
-                                    faction_owner->value(TYPE_FACTIONNAME).text(),
-                                    FXStringValEx(fid, 36).text()
-                                );
-                            }
-                            else {
-                                label.format("%s: %s (%s), Unbekannt (%s)",
-                                    t->key().text(),
-                                    unit_owner->value(TYPE_NAME).text(),
-                                    FXStringValEx(uid, 36).text(),
-                                    FXStringValEx(fid, 36).text()
-                                );
-                            }
+                if (t->type() == TYPE_OWNER) {
+                    FXint uid = FXIntVal(t->value());
+                    datablock::itor unit_owner;
+                    if (mapFile->getUnit(unit_owner, uid)) {
+                        FXint fid = FXIntVal(unit_owner->value(TYPE_FACTION));
+                        owner_block = &*unit_owner;
+                        datablock::itor faction_owner;
+                        if (mapFile->getFaction(faction_owner, fid)) {
+                            label.format("%s: %s (%s), %s (%s)",
+                                t->key().text(),
+                                unit_owner->value(TYPE_NAME).text(),
+                                FXStringValEx(uid, 36).text(),
+                                faction_owner->value(TYPE_FACTIONNAME).text(),
+                                FXStringValEx(fid, 36).text()
+                            );
+                        }
+                        else {
+                            label.format("%s: %s (%s), Unbekannt (%s)",
+                                t->key().text(),
+                                unit_owner->value(TYPE_NAME).text(),
+                                FXStringValEx(uid, 36).text(),
+                                FXStringValEx(fid, 36).text()
+                            );
                         }
                     }
-                    else {
-                        label.format("%s: %s", t->key().text(), t->value().text());
-                    }
-
-                    if (owner_block) {
-                        item = makePopupTreeItem(label, owner_block, nullptr);
-                        item = appendItem(node, item);
-                    }
-                    else {
-                        item = appendItem(node, label);
-                    }
+                }
+                else {
+                    label.format("%s: %s", t->key().text(), t->value().text());
                 }
 
-				effects = end;
-				block = building;
-				for (block++; block != end && block->depth() > unit->depth(); block++)
-				{
-					if (block->type() == block_type::TYPE_EFFECTS)
-						effects = block;
-				}
-
-				if (effects != end)		// does a EFFEKTE block exist?
-				{
-					FXTreeItem *effnode = appendItem(node, "Effekte");
-					effnode->setExpanded(true);
-
-					for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
-						appendItem(effnode, key->value());
-				}
-			}
-
-			if (ship != end)	// unit in a ship?
-			{
-				unhandled.clear();
-
-				FXString size;
-				FXString damage, coast, cargo, capacity;
-				FXString type = "Schiff";
-				factionId = -1;
-
-				for (datakey::list_type::const_iterator key = ship->data().begin(); key != ship->data().end(); ++key)
-				{
-					if (key->type() == TYPE_NAME)
-						name = key->value();
-					else if (key->type() == TYPE_DESCRIPTION)
-						descr = key->value();
-					else if (key->type() == TYPE_FACTION)
-						factionId = atoi(key->value().text());
-					else if (key->type() == TYPE_TYPE)
-						type = key->value();
-                    else if (key->type() == TYPE_SIZE)
-						size = key->value();
-                    else if (key->type() == TYPE_DAMAGE)
-						damage = key->value();
-                    else if (key->type() == TYPE_COAST)
-						coast = key->value();
-                    else if (key->type() == TYPE_CARGO)
-						cargo = key->value();
-                    else if (key->type() == TYPE_CAPACITY)
-						capacity = key->value();
-					else if (key->type() != TYPE_LOAD && key->type() != TYPE_MAXLOAD)
-						unhandled.push_back(key);
-				}
-
-				if (name.empty())
-					name = type;
-
-				label.format("An Bord von %s (%s)", name.text(), ship->id().text());
-				if (!type.empty())
-					label += ", " + type;
-				if (!size.empty())
-					label += FXString(L", Gr\u00f6\u00dfe ") + size;
-
-                FXTreeItem* node = makePopupTreeItem(label, &*ship, nullptr);
-                prependItem(nullptr, node)->setExpanded(true);
-
-                // Schaden
-				if (!damage.empty())
-					appendItem(node, damage + FXString(L"% besch\u00e4digt"));
-
-                // Kueste
-				const wchar_t* coasts[] = { L"Nordwest", L"Nordost", L"Ost", L"S\u00fcdost", L"S\u00fcdwest", L"West", L"-unknown-" };
-
-				if (!coast.empty())
-				{
-					FXint dir = 0;
-					dir = atoi(coast.text());
-
-					if (dir < 0 || dir > 6)
-						dir = 6;
-
-					appendItem(node, FXString(coasts[dir]) + FXString(L"k\u00fcste"));
-				}
-
-				// Beladung (cargo/capacity)
-				if (!cargo.empty() || !capacity.empty())
-				{
-					// fill up to 3 numbers
-					while (cargo.length() < 3)
-						cargo = "0" + cargo;
-					while (capacity.length() < 3)
-						capacity = "0" + capacity;
-
-					// cut up
-					if (cargo.right(2) == "00")
-						cargo = cargo.left(cargo.length() - 2);
-					else
-						cargo = cargo.left(cargo.length() - 2) + "." + cargo.right(2);
-
-					if (capacity.right(2) == "00")
-						capacity = capacity.left(capacity.length() - 2);
-					else
-						capacity = capacity.left(capacity.length() - 2) + "." + capacity.right(2);
-
-					appendItem(node, "Beladung: " + cargo + " von " + capacity + " GE");
-				}
-
-				// list unhandled keys
-				for (std::vector<datakey::list_type::const_iterator>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
-				{
-                    datakey::list_type::const_iterator t = *itag;
-                    if (t->type() == TYPE_CAPTAIN) {
-                        FXint uid = FXIntVal(t->value());
-                        datablock::itor unit_owner;
-                        if (mapFile->getUnit(unit_owner, uid)) {
-                            FXint fid = FXIntVal(unit_owner->value(TYPE_FACTION));
-                            datablock::itor faction_owner;
-                            FXString key(L"Kapit\u00e4n");
-                            if (mapFile->getFaction(faction_owner, fid)) {
-                                label.format("%s: %s (%s), %s (%s)",
-                                    key.text(),
-                                    unit_owner->value(TYPE_NAME).text(),
-                                    FXStringValEx(uid, 36).text(),
-                                    faction_owner->value(TYPE_FACTIONNAME).text(),
-                                    FXStringValEx(fid, 36).text()
-                                );
-                            }
-                            else {
-                                label.format("%s: %s (%s), Unbekannt (%s)",
-                                    key.text(),
-                                    unit_owner->value(TYPE_NAME).text(),
-                                    FXStringValEx(uid, 36).text(),
-                                    FXStringValEx(fid, 36).text()
-                                );
-                            }
-                        }
-                    }
-                    else {
-                        FXString key = t->translatedKey(nullptr);
-                        label.format("%s: %s", key.text(), t->value().text());
-                    }
+                if (owner_block) {
+                    item = makeItem(label, owner_block, nullptr);
+                    item = appendItem(node, item);
+                }
+                else {
                     item = appendItem(node, label);
                 }
-
-				effects = end;
-				block = ship;
-				for (block++; block != end && block->depth() > unit->depth(); block++)
-				{
-					if (block->type() == block_type::TYPE_EFFECTS)
-						effects = block;
-				}
-
-				if (effects != end)		// does a EFFEKTE block exist?
-				{
-					FXTreeItem *effnode = appendItem(node, "Effekte");
-					effnode->setExpanded(true);
-
-					for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
-						appendItem(effnode, key->value());
-				}
-			}
-		}
-	}
-
-	return 1;
-}
-
-long FXUnitList::onCopyText(FXObject* sender, FXSelector sel, void* ptr)
-{
-    if (sender)
-    {
-        FXMenuCommand *cmd = static_cast<FXMenuCommand*>(sender);
-        const datablock* block = static_cast<const datablock*>(cmd->getUserData());
-        if (block) {
-            setClipboard(block->id());
-            return 1;
-        }
-    }
-    return 0;
-}
-
-long FXUnitList::onShowInfo(FXObject* sender, FXSelector sel, void* ptr)
-{
-    if (sender)
-    {
-        FXPopupMenuCommand * command = static_cast<FXPopupMenuCommand*>(sender);
-        showInfo(command->getInfo());
-        setClipboard(command->getText());
-        return 1;
-    }
-    return 0;
-}
-
-long FXUnitList::onGotoItem(FXObject* sender, FXSelector sel, void *ptr)
-{
-    FXMenuCommand* command = static_cast<FXMenuCommand*>(sender);
-    const datablock * block = static_cast<const datablock*>(command->getUserData());
-    ++selection.selChange;
-    selection.selected = 0;
-    if (block->type() == block_type::TYPE_UNIT)
-    {
-        if (mapFile->getUnit(selection.unit, block->info())) {
-            selection.selected |= selection.UNIT;
-        }
-    }
-    else if (block->type() == block_type::TYPE_REGION)
-    {
-        if (mapFile->getRegion(selection.region, block->x(), block->y(), block->info())) {
-            selection.selected |= selection.REGION;
-        }
-    }
-    else if (block->type() == block_type::TYPE_BUILDING)
-    {
-        if (mapFile->getBuilding(selection.building, block->info())) {
-            selection.selected |= selection.BUILDING;
-        }
-    }
-    else if (block->type() == block_type::TYPE_SHIP)
-    {
-        if (mapFile->getBuilding(selection.ship, block->info())) {
-            selection.selected |= selection.SHIP;
-        }
-    }
-    else if (block->type() == block_type::TYPE_FACTION)
-    {
-        if (mapFile->getFaction(selection.faction, block->info())) {
-            selection.selected |= selection.FACTION;
-        }
-    }
-    return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
-}
-
-FXTreeItem* FXUnitList::makePopupTreeItem(const FXString& label, datablock* block, const FXString * info)
-{
-    FXPopupTreeItem * popup = new FXPopupTreeItem(label);
-    popup->block = block;
-    if (info) {
-        popup->info = *info;
-    }
-    popup->setData(popup);	// show "info" popup cmd
-    return popup;
-}
-
-long FXUnitList::onPopup(FXObject* sender, FXSelector sel, void* ptr)
-{ 
-    onRightBtnRelease(sender, sel, ptr);
-
-    // no datafile, no popup
-    if (!mapFile)
-        return 0;
-
-    FXEvent *event = (FXEvent*)ptr;
-
-	// dont't show popup if mouse has moved
-	if (event->last_x != event->click_x || event->last_y != event->click_y)
-		return 0;
-	
-	// find item to create popup for
-	FXTreeItem *item = getItemAt(event->click_x, event->click_y);
-	if (!item)
-		return 0;
-
-	FXMenuPane pane(this);
-	FXMenuPane *menu = &pane;
-    FXMenuSeparatorEx* sep = nullptr;
-
-    FXString title = item->getText();
-	if (title.length() > 20)
-		title = title.left(17) + "...";
-
-    void* udata = item->getData();
-    if (udata) {
-        FXPopupTreeItem* popup = static_cast<FXPopupTreeItem*>(item);
-        if (popup->block) {
-            datablock* block = popup->block;
-            FXMenuCommand* command = nullptr;
-            if (!sep) {
-                sep = new FXMenuSeparatorEx(menu, title);
             }
-            if (block->type() == block_type::TYPE_UNIT) {
-                command = new FXMenuCommand(menu, "Zeige &Einheit", nullptr, this, ID_POPUP_SELECT);
+
+            effects = end;
+            block = building;
+            for (block++; block != end && block->depth() > unit->depth(); block++)
+            {
+                if (block->type() == block_type::TYPE_EFFECTS)
+                    effects = block;
             }
-            else if (block->type() == block_type::TYPE_SHIP) {
-                command = new FXMenuCommand(menu, "Zeige &Schiff", nullptr, this, ID_POPUP_SELECT);
+
+            if (effects != end)		// does a EFFEKTE block exist?
+            {
+                FXTreeItem* effnode = appendItem(node, "Effekte");
+                effnode->setExpanded(true);
+
+                for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
+                    appendItem(effnode, key->value());
             }
-            else if (block->type() == block_type::TYPE_BUILDING) {
-                command = new FXMenuCommand(menu, L"Zeige &Geb\u00e4ude", nullptr, this, ID_POPUP_SELECT);
-            }
-            if (command) {
-                command->setUserData(block);
-            }
-            command = new FXMenuCommand(menu, "&Kopieren", nullptr, this, ID_POPUP_COPY_TEXT);
-            command->setUserData(block);
         }
-        else {
-            new FXPopupMenuCommand(menu, "Zeige Info", popup->info, nullptr, this);
+
+        if (ship != end)	// unit in a ship?
+        {
+            unhandled.clear();
+
+            FXString type;
+            FXint size = -1, damage = -1, factionId = -1, coast = -1, cargo = -1, capacity = -1;
+
+            for (datakey::list_type::const_iterator key = ship->data().begin(); key != ship->data().end(); ++key)
+            {
+                if (key->type() == TYPE_NAME)
+                    name = key->value();
+                else if (key->type() == TYPE_DESCRIPTION)
+                    descr = key->value();
+                else if (key->type() == TYPE_FACTION)
+                    factionId = atoi(key->value().text());
+                else if (key->type() == TYPE_TYPE)
+                    type = key->value();
+                else if (key->type() == TYPE_SIZE)
+                    size = key->getInt();
+                else if (key->type() == TYPE_DAMAGE)
+                    damage = key->getInt();
+                else if (key->type() == TYPE_COAST)
+                    coast = key->getInt();
+                else if (key->type() == TYPE_CARGO)
+                    cargo = key->getInt();
+                else if (key->type() == TYPE_CAPACITY)
+                    capacity = key->getInt();
+                else if (key->type() != TYPE_LOAD && key->type() != TYPE_MAXLOAD)
+                    unhandled.push_back(key);
+            }
+
+            if (name.empty())
+                name = type;
+
+            label.format("%s (%s)", name.text(), ship->id().text());
+            if (!type.empty())
+                label += ", " + type;
+            if (size > 0)
+                label += FXString(L", Gr\u00f6\u00dfe ") + FXStringVal(size);
+
+            FXTreeItem* node = makeItem(label, &*ship, nullptr);
+            prependItem(nullptr, node)->setExpanded(true);
+
+            // Schaden
+            if (damage > 0)
+                appendItem(node, damage + FXString(L"% besch\u00e4digt"));
+
+            // Kueste
+            if (coast > 0 && coast < 6) {
+                appendItem(node, coastToString(coast));
+            }
+
+            // Beladung (cargo/capacity)
+            if (cargo > 0 || capacity > 0)
+            {
+                appendItem(node, "Beladung: " + weightToString(cargo) + " von " + weightToString(capacity) + " GE");
+            }
+
+            // list unhandled keys
+            for (std::vector<datakey::list_type::const_iterator>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
+            {
+                datakey::list_type::const_iterator t = *itag;
+                if (t->type() == TYPE_CAPTAIN) {
+                    FXint uid = FXIntVal(t->value());
+                    datablock::itor unit_owner;
+                    if (mapFile->getUnit(unit_owner, uid)) {
+                        FXint fid = FXIntVal(unit_owner->value(TYPE_FACTION));
+                        datablock::itor faction_owner;
+                        FXString key(L"Kapit\u00e4n");
+                        if (mapFile->getFaction(faction_owner, fid)) {
+                            label.format("%s: %s (%s), %s (%s)",
+                                key.text(),
+                                unit_owner->value(TYPE_NAME).text(),
+                                FXStringValEx(uid, 36).text(),
+                                faction_owner->value(TYPE_FACTIONNAME).text(),
+                                FXStringValEx(fid, 36).text()
+                            );
+                        }
+                        else {
+                            label.format("%s: %s (%s), Unbekannt (%s)",
+                                key.text(),
+                                unit_owner->value(TYPE_NAME).text(),
+                                FXStringValEx(uid, 36).text(),
+                                FXStringValEx(fid, 36).text()
+                            );
+                        }
+                    }
+                }
+                else {
+                    FXString key = t->translatedKey(nullptr);
+                    label.format("%s: %s", key.text(), t->value().text());
+                }
+                item = appendItem(node, label);
+            }
+
+            effects = end;
+            block = ship;
+            for (block++; block != end && block->depth() > unit->depth(); block++)
+            {
+                if (block->type() == block_type::TYPE_EFFECTS)
+                    effects = block;
+            }
+
+            if (effects != end)		// does a EFFEKTE block exist?
+            {
+                FXTreeItem* effnode = appendItem(node, "Effekte");
+                effnode->setExpanded(true);
+
+                for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
+                    appendItem(effnode, key->value());
+            }
         }
     }
-
-	// show popup
-    if (menu->numChildren()) {
-        menu->create();
-        menu->popup(nullptr, event->root_x, event->root_y);
-        getApp()->runModalWhileShown(menu);
-    }
-    return 1;
-}
-
-void FXUnitList::setClipboard(const FXString& text)
-{
-	getShell()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void*)text.text());
-}
-
-void FXUnitList::showInfo(const FXString& text)
-{
-	getShell()->handle(this, FXSEL(SEL_QUERY_HELP, ID_SETSTRINGVALUE), (void*)text.text());
-}
-
-long FXUnitList::onQueryHelp(FXObject* /*sender*/, FXSelector, void* /*ptr*/)
-{ 
-	return 0;
 }

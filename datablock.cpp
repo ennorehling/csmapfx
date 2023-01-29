@@ -294,7 +294,7 @@ FXString datakey::key() const
 
 int datakey::getInt() const
 {
-	return strtol(m_value.text(), NULL, 10);
+	return FXIntVal(m_value, 10);
 }
 
 // parses str and returns created datakey object or NULL pointer
