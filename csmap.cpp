@@ -27,6 +27,7 @@
 #include "tradepanel.h"
 #include "unitlist.h"
 #include "ship_props.h"
+#include "building_props.h"
 #include "statistics.h"
 #include "commands.h"
 #include "calc.h"
@@ -610,7 +611,7 @@ CSMap::CSMap(FXApp *app) :
     frame = new FXVerticalFrame(tabbook, LAYOUT_FILL_X);
     frame->setBorderColor(getApp()->getShadowColor());
     frame->setFrameStyle(FRAME_LINE);
-    buildingProperties = new FXShipProperties(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
+    buildingProperties = new FXBuildingProperties(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
         TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
     getAccelTable()->addAccel(MKUINT(KEY_1, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_1));
     getAccelTable()->addAccel(MKUINT(KEY_2, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_2));

@@ -234,7 +234,7 @@ private:
 	// Menubar
     class FXMenuBar		*menubar = nullptr;
     class FXMenuPane	*filemenu = nullptr, *recentmenu = nullptr, *viewmenu = nullptr, *regionmenu = nullptr, *factionmenu = nullptr;
-    class FXMenuPane	*mapmenu, *selectionmenu = nullptr, *planemenu = nullptr, *zoommenu = nullptr, *helpmenu = nullptr;
+    class FXMenuPane	*mapmenu = nullptr, *selectionmenu = nullptr, *planemenu = nullptr, *zoommenu = nullptr, *helpmenu = nullptr;
 
 	// Toolbar
     class FXToolBar		*toolbar = nullptr;

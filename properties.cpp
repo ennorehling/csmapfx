@@ -61,7 +61,8 @@ FXTreeItem* FXProperties::makeUnitList(FXTreeItem* parent, const FXString& label
             datablock* unitPtr = &*block;
             int unitId = unitPtr->info();
             if (unitPtr->valueInt(key) == value) {
-                units.push_back(makeItem(unitPtr->getLabel(), unitPtr));
+                FXString label = unitPtr->getLabel() + ": " + unitPtr->value(TYPE_NUMBER);
+                units.push_back(makeItem(label, unitPtr));
             }
         }
     }
