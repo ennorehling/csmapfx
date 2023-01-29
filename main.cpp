@@ -202,10 +202,13 @@ int main(int argc, char *argv[])
 
     if (csmap) {
 #ifdef WIN32
-        csmap->ParseCommandLine();
+        std::vector<FXString> filenames = csmap->ParseCommandLine();
 #else
-        csmap->ParseCommandLine(argc, argv);
+        std::vector<FXString> filenames = csmap->ParseCommandLine(argc, argv);
 #endif
+        if (!filenames.empty()) {
+            csmap->loadFiles(filenames);
+        }
     }
     // Run 
 	int exitcode = CSApp.run(); 

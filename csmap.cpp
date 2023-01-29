@@ -524,7 +524,7 @@ CSMap::CSMap(FXApp *app) :
     FXSplitterEx *mapsplit = new FXSplitterEx(middle, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
     // Map window
-    map = new FXCSMap(mapsplit, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    map = new FXCSMap(mapsplit, this, ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
     mapsplit->setStretcher(map);
 
     menu.streets->setTarget(map);
@@ -572,7 +572,7 @@ CSMap::CSMap(FXApp *app) :
     FXHorizontalFrame *riFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
     riTab = new FXToolBarTab(riFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
     riTab->setTipText("Regionsinformationen ein- und ausblenden");
-    regionPanel = new FXRegionPanel(riFrame, this,ID_SELECTION, LAYOUT_FILL_X);
+    regionPanel = new FXRegionPanel(riFrame, this, ID_SELECTION, LAYOUT_FILL_X);
 
     menu.regdescription->setTarget(regionPanel);
     menu.regdescription->setSelector(FXRegionPanel::ID_TOGGLEDESCRIPTION);
@@ -666,7 +666,7 @@ CSMap::CSMap(FXApp *app) :
     minimap_bar->getStatusLine()->setBorderColor(getApp()->getShadowColor());
     minimap_bar->getStatusLine()->setNormalText("");
 
-    minimap = new FXCSMap(minimap_frame, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y, true /*minimap-mode*/);
+    minimap = new FXCSMap(minimap_frame, this, ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y, true /*minimap-mode*/);
     minimap->connectMap(map);
 
     menu.minimap_islands->setTarget(minimap);
@@ -1686,9 +1686,6 @@ long CSMap::onMapSelectMarked(FXObject*, FXSelector, void*)
     else
         selection.regionsSelected.erase(itor);
 
-    if (!selection.regionsSelected.empty())
-        selection.selected |= selection.MULTIPLE_REGIONS;
-
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
@@ -1735,11 +1732,9 @@ long CSMap::onMapMoveMarker(FXObject*, FXSelector sel, void*)
     }
 
     // dont touch multiregions selected
-    if (selection.selected & selection.MULTIPLE_REGIONS)
+    if (!selection.regionsSelected.empty())
     {
         selection.regionsSelected = selection.regionsSelected;
-        if (!selection.regionsSelected.empty())
-            selection.selected |= selection.MULTIPLE_REGIONS;
     }
 
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
@@ -2301,10 +2296,6 @@ long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)
 
     // propagate selection
     int selected = 0;
-    if (selection.selected & selection.MULTIPLE_REGIONS)
-    {
-        selected = selection.MULTIPLE_REGIONS;
-    }
     if (region != end) {
         selection.region = region;
         selected |= selection.REGION;
@@ -2354,19 +2345,18 @@ long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
     return 1;
 }
 
-void CSMap::loadFiles(const FXString filenames[])
+void CSMap::loadFiles(const std::vector<FXString> &filenames)
 {
     datafile* old_cr = report;
-    if (filenames) {
+    if (!filenames.empty()) {
         datafile* new_cr = nullptr;
 
-        for (int i = 0; !filenames[i].empty(); i++) {
-            FXString const& filename = filenames[i];
+        for (FXString const& filename : filenames) {
             if (!report) {
                 new_cr = loadFile(filename);    // normal laden, wenn vorher keine Datei geladen ist.
             }
             else {
-                new_cr = mergeFile(filenames[i]);
+                new_cr = mergeFile(filename);
             }
             if (new_cr && (new_cr != report)) {
                 if (old_cr != report) {
@@ -2376,12 +2366,12 @@ void CSMap::loadFiles(const FXString filenames[])
             }
         }
         ++selection.fileChange;
-        // rebuild the resulting report
-        checkCommands();
         if (old_cr != report) {
             // TODO: make selection to use the new report instead
             delete old_cr;
         }
+        mapChange();
+        checkCommands();
     }
 }
 
@@ -2396,11 +2386,14 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
     dialogDirectory = dlg.getDirectory();
     if (res)
     {
-        FXString* filenames = dlg.getFilenames();
+        FXString* choices = dlg.getFilenames();
+        std::vector<FXString> filenames;
+        for (int i = 0; !choices[i].empty(); ++i)
+        {
+            filenames.push_back(choices[i]);
+        }
         getApp()->beginWaitCursor();
         loadFiles(filenames);
-        mapChange();
-        updateFileNames();
         getApp()->endWaitCursor();
     }
     return 1;
@@ -2523,6 +2516,7 @@ long CSMap::onFileExportMap(FXObject*, FXSelector, void*)
 long CSMap::onFileClose(FXObject*, FXSelector, void*)
 {
     if (closeFile()) {
+        selection.clear();
         mapChange();
         updateFileNames();
         return 1;
@@ -2916,7 +2910,6 @@ long CSMap::onRegionSelAll(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
     // alle Regionen markieren
-    selection.selected |= selection.MULTIPLE_REGIONS;
 
     selection.regionsSelected.clear();
 
@@ -2946,7 +2939,6 @@ long CSMap::onRegionUnSel(FXObject*, FXSelector, void*)
     if (!report) return 1;
 
     // alle Regionen demarkieren
-    selection.selected &= ~selection.MULTIPLE_REGIONS;
     selection.regionsSelected.clear();
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
@@ -2980,10 +2972,6 @@ long CSMap::onRegionInvertSel(FXObject*, FXSelector, void*)
             regionsSelected.erase(srch);
     }
 
-    if (regionsSelected.empty())
-        selection.selected &= ~selection.MULTIPLE_REGIONS;
-    else
-        selection.selected |= selection.MULTIPLE_REGIONS;
     selection.regionsSelected = regionsSelected;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
@@ -3003,13 +2991,13 @@ static const int hex_offset[6][2] = {
 long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
-    if (!(selection.selected & selection.MULTIPLE_REGIONS)) {
+    if (selection.regionsSelected.empty())
+    {
         if (!(selection.selected & selection.REGION)) {
             // nothing to do
             return 1;
         }
         selection.regionsSelected.insert(&*selection.region);
-        selection.selected |= selection.MULTIPLE_REGIONS;
     }
 
     // Auswahl erweitern um eine Region
@@ -3049,8 +3037,10 @@ long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
 long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
-    if (!(selection.selected & selection.MULTIPLE_REGIONS))
+    if (selection.regionsSelected.empty())
+    {
         return 1;        // nothing to do
+    }
 
     // Inseln ausw\u00e4hlen
     int visiblePlane = map->getVisiblePlane();
@@ -3102,29 +3092,26 @@ long CSMap::onRegionSelVisible(FXObject*, FXSelector, void* ptr)
 {
     if (!report) return 1;
     // alle Regionen markieren
-    selection.selected |= selection.MULTIPLE_REGIONS;
-
     selection.regionsSelected.clear();
 
     int visiblePlane = map->getVisiblePlane();
 
-    datablock::itor end = report->blocks().end();
-    for (datablock::itor block = report->blocks().begin(); block != end; block++)
+    for (datablock &block : report->blocks())
     {
         // handle only regions
-        if (block->type() != block_type::TYPE_REGION)
+        if (block.type() != block_type::TYPE_REGION)
             continue;
         // mark only visible plane
-        if (block->info() != visiblePlane)
+        if (block.info() != visiblePlane)
             continue;
 
-        if (!block->hasKey(TYPE_VISIBILITY)) {
-            att_region* att = static_cast<att_region*>(block->attachment());
+        if (!block.hasKey(TYPE_VISIBILITY)) {
+            const att_region* att = static_cast<const att_region*>(block.attachment());
             if (!att || att->people.empty()) {
                 continue;
             }
         }
-        selection.regionsSelected.insert(&*block);
+        selection.regionsSelected.insert(&block);
     }
 
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
@@ -3135,8 +3122,6 @@ long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
     // alle Landregionen markieren (also au\u00dfer Ozean & Feuerwand & Eisberg)
-    selection.selected |= selection.MULTIPLE_REGIONS;
-
     selection.regionsSelected.clear();
 
     int visiblePlane = map->getVisiblePlane();
@@ -3168,7 +3153,7 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 {
     if (!report) return 1;
     // markierte Regionen l\u00f6schen
-    if (!(selection.selected & selection.MULTIPLE_REGIONS) || selection.regionsSelected.empty())
+    if (selection.regionsSelected.empty())
     {
         FXString txt = "Keine Region markiert!";
 
@@ -3206,7 +3191,6 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
     report->rebuildRegions();
 
     // Markierung auch loeschen
-    selection.selected &= ~selection.MULTIPLE_REGIONS;
     selection.regionsSelected.clear();
 
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
@@ -3280,50 +3264,33 @@ void CSMap::beginLoading(const FXString& filename)
     status->getStatusLine()->setText(app_title);
 }
 
-#define MAX_FILES 8
-
 #ifdef WIN32
-void CSMap::ParseCommandLine()
+std::vector<FXString> CSMap::ParseCommandLine()
 {
     LPWSTR* argv;
     int argc;
-    int numfiles = 0;
-    FXString filenames[MAX_FILES + 1];
+    std::vector<FXString> filenames;
 
     argv = CommandLineToArgvW(GetCommandLineW(), &argc);
     for (int arg = 1; arg != argc; ++arg)
     {
         if (argv[arg][0] != '-') {
-            if (numfiles < MAX_FILES) {
-                filenames[numfiles++].assign(argv[arg]);
-            }
+            filenames.push_back(argv[arg]);
         }
     }
-    if (numfiles > 0) {
-        getApp()->beginWaitCursor();
-        loadFiles(filenames);
-        mapChange();
-        updateFileNames();
-        getApp()->endWaitCursor();
-    }
     LocalFree(argv);
+    return filenames;
 }
 #else
-void CSMap::ParseCommandLine(int argc, char** argv)
+std::vector<FXString> CSMap::ParseCommandLine(int argc, char** argv)
 {
-    int numfiles = 0;
-    FXString filenames[MAX_FILES + 1];
-    // load command argument files
+    std::vector<FXString> filenames;
     for (int arg = 0; arg != argc; ++arg)
     {
         if (argv[arg][0] != '-') {
-            if (numfiles < MAX_FILES) {
-                filenames[numfiles++].assign(argv[arg]);
-            }
+            filenames.push_back(argv[arg]);
         }
     }
-    if (numfiles > 0) {
-        loadFiles(filenames);
-    }
+    return filenames;
 }
 #endif

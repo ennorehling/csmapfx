@@ -97,8 +97,6 @@ long FXMessageList::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
     datablock* select = (datablock*)item->getData();
     if (select != nullptr)
 	{
-        selection.selected &= selection.MULTIPLE_REGIONS;
-
         if (select->type() == block_type::TYPE_REGION) {
             if (mapFile->getRegion(selection.region, select->x(), select->y(), select->info())) {
                 selection.selected = selection.REGION;

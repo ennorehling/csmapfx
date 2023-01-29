@@ -261,7 +261,7 @@ void FXRegionPanel::collectData(std::vector<Info>& info, datablock::itor region)
 
 void FXRegionPanel::updateData()
 {
-	if (selection.selected & selection.MULTIPLE_REGIONS)
+	if (!selection.regionsSelected.empty())
 	{
 		FXString label;
 		tags.name->setText(label.format("%zu Regionen", selection.regionsSelected.size()));
@@ -275,10 +275,10 @@ void FXRegionPanel::updateData()
         std::vector<Info> info;
 
 		// collect infos
-		for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
+		for (datablock* block : selection.regionsSelected)
 		{
             datablock::itor region;
-            if (mapFile->getRegion(region, (*itor)->x(), (*itor)->y(), (*itor)->info()))
+            if (mapFile->getRegion(region, block->x(), block->y(), block->info()))
             {
 				collectData(info, region);
 			}
@@ -385,20 +385,18 @@ long FXRegionPanel::onMapChange(FXObject*, FXSelector, void* ptr)
 			|| (selection.selected & selection.REGION && selection.region != pstate->region))
 			needUpdate = true;				// ignore changes that don't change selected region
 
-		if ((selection.selected & selection.UNKNOWN_REGION) != (pstate->selected & selection.UNKNOWN_REGION))
+		else if ((selection.selected & selection.UNKNOWN_REGION) != (pstate->selected & selection.UNKNOWN_REGION))
 			needUpdate = true;				// ignore changes that don't change selected region
 
-		if (selection.selected & selection.UNKNOWN_REGION && (selection.sel_x != pstate->sel_x ||
+		else if (selection.selected & selection.UNKNOWN_REGION && (selection.sel_x != pstate->sel_x ||
 			selection.sel_y != pstate->sel_y || selection.sel_plane != pstate->sel_plane))
 			needUpdate = true;				// ignore changes that don't change selected region
 
-		if ((selection.selected & selection.MULTIPLE_REGIONS) != (pstate->selected & selection.MULTIPLE_REGIONS)
-			|| (selection.selected & selection.MULTIPLE_REGIONS && selection.regionsSelected != pstate->regionsSelected))
-			needUpdate = true;
+        else if (selection.regionsSelected != pstate->regionsSelected) {
+            needUpdate = true;
+        }
 
 		selection = *pstate;
-        if (needUpdate) // expensive operation
-			selection.regionsSelected = pstate->regionsSelected;
 	}
 
 	if (needUpdate)

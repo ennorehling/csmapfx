@@ -127,7 +127,6 @@ long FXProperties::onGotoItem(FXObject* sender, FXSelector sel, void* ptr)
     }
     else {
         sel_state.regionsSelected = selection.regionsSelected;
-        sel_state.selected = sel_state.MULTIPLE_REGIONS;
     }
     if (block->type() == block_type::TYPE_UNIT)
     {

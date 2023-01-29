@@ -29,47 +29,47 @@ FXUnitList::FXUnitList(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opt
 void FXUnitList::makeItems()
 {
     // clear list and build new
-	clearItems();
+    clearItems();
 
-	if (selection.selected & selection.UNIT)
-	{
-		datablock::itor end = mapFile->blocks().end();
-			
-		datablock::itor unit = selection.unit;
-		datablock::itor items = end;
-		datablock::itor talents = end;
-		datablock::itor spells = end;
-		datablock::itor effects = end;
-		std::map<int,datablock::itor> combatspells;
+    if (selection.selected & selection.UNIT)
+    {
+        datablock::itor end = mapFile->blocks().end();
 
-		datablock::itor building = end;
-		datablock::itor ship = end;
+        datablock::itor unit = selection.unit;
+        datablock::itor items = end;
+        datablock::itor talents = end;
+        datablock::itor spells = end;
+        datablock::itor effects = end;
+        std::map<int, datablock::itor> combatspells;
 
-		datablock::itor block = unit;
-		for (block++; block != end && block->depth() > unit->depth(); block++)
-		{
+        datablock::itor building = end;
+        datablock::itor ship = end;
+
+        datablock::itor block = unit;
+        for (block++; block != end && block->depth() > unit->depth(); block++)
+        {
             if (block->type() == block_type::TYPE_ITEMS)
-				items = block;
-			else if (block->type() == block_type::TYPE_TALENTS)
-				talents = block;
-			else if (block->type() == block_type::TYPE_SPELLS)
-				spells = block;
-			else if (block->type() == block_type::TYPE_EFFECTS)
-				effects = block;
-			else if (block->type() == block_type::TYPE_COMBATSPELL)
-				combatspells[block->info()] = block;
-		}
+                items = block;
+            else if (block->type() == block_type::TYPE_TALENTS)
+                talents = block;
+            else if (block->type() == block_type::TYPE_SPELLS)
+                spells = block;
+            else if (block->type() == block_type::TYPE_EFFECTS)
+                effects = block;
+            else if (block->type() == block_type::TYPE_COMBATSPELL)
+                combatspells[block->info()] = block;
+        }
 
-		FXString name, descr, number, prefix, race, weight;
-		FXString aura, auramax, hero;
-		FXString hp, hungry, combatstatus, guards;
-		FXint factionId = -1, familiarMage = -1, group = -1;
-		FXint otherFactionId = -2;
+        FXString name, descr, number, prefix, race, weight;
+        FXString aura, auramax, hero;
+        FXString hp, hungry, combatstatus, guards;
+        FXint factionId = -1, familiarMage = -1, group = -1;
+        FXint otherFactionId = -2;
 
-		std::vector<datakey::list_type::const_iterator> unhandled;
+        std::vector<datakey::list_type::const_iterator> unhandled;
 
-		for (datakey::list_type::const_iterator key = unit->data().begin(); key != unit->data().end(); ++key)
-		{
+        for (datakey::list_type::const_iterator key = unit->data().begin(); key != unit->data().end(); ++key)
+        {
             switch (key->type()) {
             case TYPE_NAME:
                 name = key->value();
@@ -136,20 +136,20 @@ void FXUnitList::makeItems()
                 unhandled.push_back(key);
                 break;
             }
-		}
+        }
 
-		/*
-			Phygon (phyg)
-			* 1 Nebelmeermensch
-			* 500 von 700 Aura
-		*/
+        /*
+            Phygon (phyg)
+            * 1 Nebelmeermensch
+            * 500 von 700 Aura
+        */
 
-		FXTreeItem *item;
+        FXTreeItem* item;
         FXString label;
 
-		label.format("%s (%s)", name.text(), unit->id().text());
-		FXTreeItem *unititem = appendItem(nullptr, label);
-		unititem->setExpanded(true);
+        label.format("%s (%s)", name.text(), unit->id().text());
+        FXTreeItem* unititem = appendItem(nullptr, label);
+        unititem->setExpanded(true);
 
         if (factionId < 0 && otherFactionId < 0)
         {
@@ -205,7 +205,8 @@ void FXUnitList::makeItems()
             datablock::itor match;
             if (mapFile->getGroup(match, group)) {
                 label += match->value(key_type::TYPE_LOWERCASE_NAME);
-            } else {
+            }
+            else {
                 // TODO: find group name in mapFile
                 label += FXStringVal(group);
             }
@@ -240,60 +241,60 @@ void FXUnitList::makeItems()
             label += ", ";
             label += (count == 1) ? "Held" : "Helden";
         }
-		item = appendItem(unititem, label);
+        item = appendItem(unititem, label);
 
-		if (!combatstatus.empty() || !hp.empty() || !hungry.empty() || !guards.empty())
-		{
-			if (combatstatus == "0")
-				label = "aggressiv";
-			else if (combatstatus == "1")
-				label = "vorne";
-			else if (combatstatus == "2")
-				label = "hinten";
-			else if (combatstatus == "3")
-				label = "defensiv";
-			else if (combatstatus == "4")
-				label = FXString(L"k\u00e4mpft nicht");
-			else if (combatstatus == "5")
-				label = "flieht";
-			else if (!combatstatus.empty())
-				label = "Kampfstatus " + combatstatus;
-			else
-				label = "";
+        if (!combatstatus.empty() || !hp.empty() || !hungry.empty() || !guards.empty())
+        {
+            if (combatstatus == "0")
+                label = "aggressiv";
+            else if (combatstatus == "1")
+                label = "vorne";
+            else if (combatstatus == "2")
+                label = "hinten";
+            else if (combatstatus == "3")
+                label = "defensiv";
+            else if (combatstatus == "4")
+                label = FXString(L"k\u00e4mpft nicht");
+            else if (combatstatus == "5")
+                label = "flieht";
+            else if (!combatstatus.empty())
+                label = "Kampfstatus " + combatstatus;
+            else
+                label = "";
 
-			if (!hp.empty() || !hungry.empty())
-			{
-				label += " (";
+            if (!hp.empty() || !hungry.empty())
+            {
+                label += " (";
 
-				if (!hp.empty())
-				{
-					label += hp;
+                if (!hp.empty())
+                {
+                    label += hp;
 
-					if (!hungry.empty())
-						label += ", ";
-				}
+                    if (!hungry.empty())
+                        label += ", ";
+                }
 
-				if (!hungry.empty())
-					label += "hungert";
+                if (!hungry.empty())
+                    label += "hungert";
 
-				label += ")";
-			}
+                label += ")";
+            }
 
-			if (!guards.empty())
-			{
-				if (!label.empty())
-					label += ", ";
-				label += "bewacht";
-			}
+            if (!guards.empty())
+            {
+                if (!label.empty())
+                    label += ", ";
+                label += "bewacht";
+            }
 
-			item = appendItem(unititem, label);
-		}
+            item = appendItem(unititem, label);
+        }
 
-		if (!aura.empty() || !auramax.empty())
-		{
-			label.format("%s von %s Aura", aura.text(), auramax.text());
-			item = appendItem(unititem, label);
-		}
+        if (!aura.empty() || !auramax.empty())
+        {
+            label.format("%s von %s Aura", aura.text(), auramax.text());
+            item = appendItem(unititem, label);
+        }
 
         if (!weight.empty())
         {
@@ -309,71 +310,71 @@ void FXUnitList::makeItems()
 
             item = appendItem(unititem, "Gewicht: " + weight);
         }
-            
+
         // list unhandled keys
-		for (std::vector<datakey::list_type::const_iterator>::const_iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
-		{
-			label.format("%s: %s", (*itag)->key().text(), (*itag)->value().text());
-			appendItem(unititem, label);
-		}
+        for (std::vector<datakey::list_type::const_iterator>::const_iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
+        {
+            label.format("%s: %s", (*itag)->key().text(), (*itag)->value().text());
+            appendItem(unititem, label);
+        }
 
-		if (spells != end)		// does a SPRUECHE block exist?
-		{
-			FXTreeItem *node = appendItem(unititem, FXString(L"Zauberspr\u00fcche"));
+        if (spells != end)		// does a SPRUECHE block exist?
+        {
+            FXTreeItem* node = appendItem(unititem, FXString(L"Zauberspr\u00fcche"));
 
-			for (datakey::list_type::const_iterator key = spells->data().begin(); key != spells->data().end(); ++key)
-			{
+            for (datakey::list_type::const_iterator key = spells->data().begin(); key != spells->data().end(); ++key)
+            {
                 label = key->value();
                 appendItem(node, makeItem(label, nullptr, &label));
-			}
-		}
+            }
+        }
 
-		if (!combatspells.empty())	// do some KAMPFZAUBER blocks exist?
-		{
-			FXTreeItem *node = appendItem(unititem, "Kampfzauber");
-			//node->setExpanded(true);
+        if (!combatspells.empty())	// do some KAMPFZAUBER blocks exist?
+        {
+            FXTreeItem* node = appendItem(unititem, "Kampfzauber");
+            //node->setExpanded(true);
 
-			for (std::map<int,datablock::itor>::iterator itor = combatspells.begin(); itor != combatspells.end(); itor++)
-			{
-				FXString type;
+            for (std::map<int, datablock::itor>::iterator itor = combatspells.begin(); itor != combatspells.end(); itor++)
+            {
+                FXString type;
 
                 block = itor->second;
                 if (itor->first == 0)
-					type = FXString(L"Pr\u00e4kampfzauber");
-				else if (itor->first == 1)
-					type = "Kampfzauber";
-				else if (itor->first == 2)
-					type = "Postkampfzauber";
-				else
-					type.format("%d. Kampfzauber", itor->first);
+                    type = FXString(L"Pr\u00e4kampfzauber");
+                else if (itor->first == 1)
+                    type = "Kampfzauber";
+                else if (itor->first == 2)
+                    type = "Postkampfzauber";
+                else
+                    type.format("%d. Kampfzauber", itor->first);
 
-				FXString spell = block->value("name");
-				FXString level = block->value("level"); 
+                FXString spell = block->value("name");
+                FXString level = block->value("level");
 
-				label.format("%s: %s (%s)", type.text(), spell.text(), level.text());
-				appendItem(node, label);
-			}
-		}
+                label.format("%s: %s (%s)", type.text(), spell.text(), level.text());
+                appendItem(node, label);
+            }
+        }
 
-		if (effects != end)		// does a EFFEKTE block exist?
-		{
-			FXTreeItem *node = appendItem(unititem, "Effekte");
-			node->setExpanded(true);
+        if (effects != end)		// does a EFFEKTE block exist?
+        {
+            FXTreeItem* node = appendItem(unititem, "Effekte");
+            node->setExpanded(true);
 
-			for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
-				appendItem(node, key->value());
-		}
+            for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
+                appendItem(node, key->value());
+        }
 
         FXint riding_skill = 0;
         FXint horses = 0;
         FXint carts = 0;
-		if (talents != end)		// does a TALENTE block exist?
-		{
-			FXTreeItem *node = appendItem(unititem, "Talente");
-			node->setExpanded(true);
+        if (talents != end)		// does a TALENTE block exist?
+        {
+            FXTreeItem* node = appendItem(unititem, "Talente");
+            node->setExpanded(true);
 
-			for (datakey::list_type::const_iterator key = talents->data().begin(); key != talents->data().end(); ++key)
-			{
+            for (datakey::list_type::const_iterator key = talents->data().begin(); key != talents->data().end(); ++key)
+            {
                 FXString info = key->key();
                 FXString value = key->value().section(' ', 1);
                 label = key->key() + " " + value;
@@ -386,15 +387,15 @@ void FXUnitList::makeItems()
                     }
                 }
             }
-		}
+        }
 
-		if (items != end)		// does a GEGENSTAENDE block exist?
-		{
-			FXTreeItem *node = appendItem(unititem, FXString(L"Gegenst\u00e4nde"));
-			node->setExpanded(true);
+        if (items != end)		// does a GEGENSTAENDE block exist?
+        {
+            FXTreeItem* node = appendItem(unititem, FXString(L"Gegenst\u00e4nde"));
+            node->setExpanded(true);
 
-			for (datakey::list_type::const_iterator key = items->data().begin(); key != items->data().end(); ++key)
-			{
+            for (datakey::list_type::const_iterator key = items->data().begin(); key != items->data().end(); ++key)
+            {
                 const FXString& info = key->key();
                 const FXString& value = key->value();
                 label = value + " " + info;
@@ -408,7 +409,7 @@ void FXUnitList::makeItems()
                     carts += FXIntVal(value, 10);
                 }
             }
-		}
+        }
 
         // Kapazität berechnen
         FXint carry = 540;
@@ -455,45 +456,45 @@ void FXUnitList::makeItems()
         }
         insertItem(item, unititem, label + tail);
 
-		if (building != end)	// unit in a building?
-		{
-			unhandled.clear();
+        if (building != end)	// unit in a building?
+        {
+            unhandled.clear();
 
-			FXString size;
-			FXString type = FXString(L"Geb\u00e4ude");
-			factionId = -1;
+            FXString size;
+            FXString type = FXString(L"Geb\u00e4ude");
+            factionId = -1;
 
-			for (datakey::list_type::const_iterator key = building->data().begin(); key != building->data().end(); ++key)
-			{
-				if (key->type() == TYPE_NAME)
-					name = key->value();
-				else if (key->type() == TYPE_DESCRIPTION)
-					descr = key->value();
-				else if (key->type() == TYPE_FACTION)
-					factionId = atoi(key->value().text());
-				else if (key->type() == TYPE_TYPE)
-					type = key->value();
-				else if (key->type() == TYPE_SIZE)
-					size = key->value();
-				else
-					unhandled.push_back(key);
-			}
+            for (datakey::list_type::const_iterator key = building->data().begin(); key != building->data().end(); ++key)
+            {
+                if (key->type() == TYPE_NAME)
+                    name = key->value();
+                else if (key->type() == TYPE_DESCRIPTION)
+                    descr = key->value();
+                else if (key->type() == TYPE_FACTION)
+                    factionId = atoi(key->value().text());
+                else if (key->type() == TYPE_TYPE)
+                    type = key->value();
+                else if (key->type() == TYPE_SIZE)
+                    size = key->value();
+                else
+                    unhandled.push_back(key);
+            }
 
-			if (name.empty())
-				name = type;
+            if (name.empty())
+                name = type;
 
-			label.format("In %s (%s)", name.text(), building->id().text());
-			if (!type.empty())
-				label += ", " + type;
-			if (!size.empty())
-				label += FXString(L", Gr\u00f6\u00dfe ") + size;
+            label.format("In %s (%s)", name.text(), building->id().text());
+            if (!type.empty())
+                label += ", " + type;
+            if (!size.empty())
+                label += FXString(L", Gr\u00f6\u00dfe ") + size;
 
             FXTreeItem* node = makeItem(label, &*building, nullptr);
             prependItem(nullptr, node)->setExpanded(true);
 
-			// list unhandled keys
-			for (std::vector<datakey::list_type::const_iterator>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
-			{
+            // list unhandled keys
+            for (std::vector<datakey::list_type::const_iterator>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
+            {
                 const datakey::list_type::const_iterator t = *itag;
                 datablock* owner_block = nullptr;
 
@@ -536,85 +537,85 @@ void FXUnitList::makeItems()
                 }
             }
 
-			effects = end;
-			block = building;
-			for (block++; block != end && block->depth() > unit->depth(); block++)
-			{
-				if (block->type() == block_type::TYPE_EFFECTS)
-					effects = block;
-			}
+            effects = end;
+            block = building;
+            for (block++; block != end && block->depth() > unit->depth(); block++)
+            {
+                if (block->type() == block_type::TYPE_EFFECTS)
+                    effects = block;
+            }
 
-			if (effects != end)		// does a EFFEKTE block exist?
-			{
-				FXTreeItem *effnode = appendItem(node, "Effekte");
-				effnode->setExpanded(true);
+            if (effects != end)		// does a EFFEKTE block exist?
+            {
+                FXTreeItem* effnode = appendItem(node, "Effekte");
+                effnode->setExpanded(true);
 
-				for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
-					appendItem(effnode, key->value());
-			}
-		}
+                for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
+                    appendItem(effnode, key->value());
+            }
+        }
 
-		if (ship != end)	// unit in a ship?
-		{
-			unhandled.clear();
+        if (ship != end)	// unit in a ship?
+        {
+            unhandled.clear();
 
-			FXString type;
+            FXString type;
             FXint size = -1, damage = -1, factionId = -1, coast = -1, cargo = -1, capacity = -1;
 
-			for (datakey::list_type::const_iterator key = ship->data().begin(); key != ship->data().end(); ++key)
-			{
-				if (key->type() == TYPE_NAME)
-					name = key->value();
-				else if (key->type() == TYPE_DESCRIPTION)
-					descr = key->value();
-				else if (key->type() == TYPE_FACTION)
-					factionId = atoi(key->value().text());
-				else if (key->type() == TYPE_TYPE)
-					type = key->value();
+            for (datakey::list_type::const_iterator key = ship->data().begin(); key != ship->data().end(); ++key)
+            {
+                if (key->type() == TYPE_NAME)
+                    name = key->value();
+                else if (key->type() == TYPE_DESCRIPTION)
+                    descr = key->value();
+                else if (key->type() == TYPE_FACTION)
+                    factionId = atoi(key->value().text());
+                else if (key->type() == TYPE_TYPE)
+                    type = key->value();
                 else if (key->type() == TYPE_SIZE)
-					size = key->getInt();
+                    size = key->getInt();
                 else if (key->type() == TYPE_DAMAGE)
-					damage = key->getInt();
+                    damage = key->getInt();
                 else if (key->type() == TYPE_COAST)
-					coast = key->getInt();
+                    coast = key->getInt();
                 else if (key->type() == TYPE_CARGO)
-					cargo = key->getInt();
+                    cargo = key->getInt();
                 else if (key->type() == TYPE_CAPACITY)
-					capacity = key->getInt();
-				else if (key->type() != TYPE_LOAD && key->type() != TYPE_MAXLOAD)
-					unhandled.push_back(key);
-			}
+                    capacity = key->getInt();
+                else if (key->type() != TYPE_LOAD && key->type() != TYPE_MAXLOAD)
+                    unhandled.push_back(key);
+            }
 
-			if (name.empty())
-				name = type;
+            if (name.empty())
+                name = type;
 
-			label.format("%s (%s)", name.text(), ship->id().text());
-			if (!type.empty())
-				label += ", " + type;
-			if (size > 0)
-				label += FXString(L", Gr\u00f6\u00dfe ") + FXStringVal(size);
+            label.format("%s (%s)", name.text(), ship->id().text());
+            if (!type.empty())
+                label += ", " + type;
+            if (size > 0)
+                label += FXString(L", Gr\u00f6\u00dfe ") + FXStringVal(size);
 
             FXTreeItem* node = makeItem(label, &*ship, nullptr);
             prependItem(nullptr, node)->setExpanded(true);
 
             // Schaden
-			if (damage > 0)
-				appendItem(node, damage + FXString(L"% besch\u00e4digt"));
+            if (damage > 0)
+                appendItem(node, damage + FXString(L"% besch\u00e4digt"));
 
             // Kueste
             if (coast > 0 && coast < 6) {
                 appendItem(node, coastToString(coast));
             }
 
-			// Beladung (cargo/capacity)
-			if (cargo> 0 || capacity > 0)
-			{
-				appendItem(node, "Beladung: " + weightToString(cargo) + " von " + weightToString(capacity) + " GE");
-			}
+            // Beladung (cargo/capacity)
+            if (cargo > 0 || capacity > 0)
+            {
+                appendItem(node, "Beladung: " + weightToString(cargo) + " von " + weightToString(capacity) + " GE");
+            }
 
-			// list unhandled keys
-			for (std::vector<datakey::list_type::const_iterator>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
-			{
+            // list unhandled keys
+            for (std::vector<datakey::list_type::const_iterator>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
+            {
                 datakey::list_type::const_iterator t = *itag;
                 if (t->type() == TYPE_CAPTAIN) {
                     FXint uid = FXIntVal(t->value());
@@ -649,24 +650,22 @@ void FXUnitList::makeItems()
                 item = appendItem(node, label);
             }
 
-			effects = end;
-			block = ship;
-			for (block++; block != end && block->depth() > unit->depth(); block++)
-			{
-				if (block->type() == block_type::TYPE_EFFECTS)
-					effects = block;
-			}
+            effects = end;
+            block = ship;
+            for (block++; block != end && block->depth() > unit->depth(); block++)
+            {
+                if (block->type() == block_type::TYPE_EFFECTS)
+                    effects = block;
+            }
 
-			if (effects != end)		// does a EFFEKTE block exist?
-			{
-				FXTreeItem *effnode = appendItem(node, "Effekte");
-				effnode->setExpanded(true);
+            if (effects != end)		// does a EFFEKTE block exist?
+            {
+                FXTreeItem* effnode = appendItem(node, "Effekte");
+                effnode->setExpanded(true);
 
-				for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
-					appendItem(effnode, key->value());
-			}
-		}
-	}
-
+                for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
+                    appendItem(effnode, key->value());
+            }
+        }
+    }
 }
-

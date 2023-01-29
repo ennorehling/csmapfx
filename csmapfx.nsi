@@ -5,7 +5,13 @@
 Name "CsMapFX"
 
 ; The file to write
+!ifdef MUI_VERSION
+!define MAIN_SECTION "CsMapFX ${MUI_VERSION}"
+OutFile "..\csmapinst-${MUI_VERSION}.exe"
+!else
+!define MAIN_SECTION "CsMapFX"
 OutFile "..\csmapinst.exe"
+!endif
 
 ; Request application privileges for Windows Vista and higher
 RequestExecutionLevel admin
@@ -34,7 +40,7 @@ UninstPage instfiles
 ;--------------------------------
 
 ; The stuff to install
-Section "CsMapFX (required)"
+Section "${MAIN_SECTION} (required)"
 
   SectionIn RO
   

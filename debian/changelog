@@ -1,8 +1,22 @@
+csmapfx (1.5.5-1) stable; urgency=low
+
+  * fix initial map scroll position (bug 2931)
+  * fix crash when merging reports (bug 2932)
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 29 Jan 2023 13:30:00 +0200
+
+csmapfx (1.5.4-1) stable; urgency=low
+
+  * fix loss of map selection (bug 2929)
+
+ -- Enno Rehling <enno@eressea.de>  Sat, 28 Jan 2023 22:45:00 +0200
+
 csmapfx (1.5.3-1) stable; urgency=low
 
   * maintain multi-selection after merge.
+  * fix loading files from command line for non-Windows systems (bug 2930)
 
- -- Enno Rehling <enno@eressea.de>  Mon, 23 Jan 2023 18:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sat, 28 Jan 2023 18:00:00 +0200
 
 csmapfx (1.5.2-1) stable; urgency=low
 

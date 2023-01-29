@@ -6,6 +6,7 @@
 
 #include <fx.h>
 
+#include <vector>
 #include <ctime>
 
 class FXInfoDlg;
@@ -23,9 +24,9 @@ public:
 	virtual FXbool close(FXbool notify=FALSE);
 
 #ifdef WIN32
-    void ParseCommandLine();
+    std::vector<FXString> ParseCommandLine();
 #else
-    void ParseCommandLine(int argc, char** argv);
+    std::vector<FXString> ParseCommandLine(int argc, char** argv);
 #endif
 
 public:		// this functions are slots for menu commands
@@ -114,7 +115,9 @@ public:		// this functions are slots for menu commands
 	
 	long onCalculator(FXObject*, FXSelector, void* ptr);
 
-	enum
+    void loadFiles(const std::vector<FXString>& filenames);
+    
+    enum
 	{
 		ID_REGIONS = FXMainWindow::ID_LAST,
 		ID_SELECTION,
@@ -195,7 +198,6 @@ private:
     bool saveReport(const FXString& filename, map_type mode, bool merge_commands = false);
     void mapChange();
     bool haveActiveFaction() const;
-    void loadFiles(const FXString filenames[]);
     datafile* loadFile(const FXString& filename);
     datafile* mergeFile(const FXString& filename);
     bool closeFile();

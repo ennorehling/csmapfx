@@ -228,13 +228,12 @@ void FXStatistics::updateList()
 	std::map<std::pair<FXString,int>, entry> talents;
 
 	// collect data
-	if (mapFile && selection.selected & selection.MULTIPLE_REGIONS)
+	if (!selection.regionsSelected.empty())
 	{
-		datablock::itor notfound = mapFile->blocks().end();
-		for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
+		for (datablock* block : selection.regionsSelected)
 		{
             datablock::itor region;
-            if (mapFile->getRegion(region, (*itor)->x(), (*itor)->y(), (*itor)->info())) {
+            if (mapFile->getRegion(region, block->x(), block->y(), block->info())) {
 				// collect if selected
 				collectData(persons, items, talents, ships, buildings, region);
 			}
@@ -583,9 +582,6 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
                     selection.faction = iparent;
 				}			
 			}
-            if (!selection.regionsSelected.empty()) {
-                selection.selected |= selection.MULTIPLE_REGIONS;
-            }
             getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
             if (!clipboard.empty()) {
                 getTarget()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void *)clipboard.text());
@@ -667,13 +663,14 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 	}
 	else if (selection.selChange != pstate->selChange)
 	{
-		if ((selection.selected & selection.REGION) != (pstate->selected & selection.REGION)
-			|| (selection.selected & selection.REGION && selection.region != pstate->region))
-			needUpdate = true;				// ignore changes that don't change selected region
-
-		if ((selection.selected & selection.MULTIPLE_REGIONS) != (pstate->selected & selection.MULTIPLE_REGIONS)
-			|| (selection.selected & selection.MULTIPLE_REGIONS && selection.regionsSelected != pstate->regionsSelected))
-			needUpdate = true;
+        if ((selection.selected & selection.REGION) != (pstate->selected & selection.REGION)
+            || (selection.selected & selection.REGION && selection.region != pstate->region))
+        {
+            needUpdate = true;				// ignore changes that don't change selected region
+        }
+        else if (selection.regionsSelected != pstate->regionsSelected) {
+            needUpdate = true;
+        }
 
         selection = *pstate;
 
@@ -683,7 +680,7 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 	if (needUpdate)
 	{
-		if (selection.selected & (selection.REGION|selection.MULTIPLE_REGIONS))
+		if ((selection.selected & selection.REGION) || !selection.regionsSelected.empty())
 		{
 			// clear Box and create new one
 			factionBox->clearItems();
@@ -691,13 +688,12 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 
 			std::set<int> factions;
 
-			if (mapFile && selection.selected & selection.MULTIPLE_REGIONS)
+			if (!selection.regionsSelected.empty())
 			{
-				datablock::itor notfound = mapFile->blocks().end();
-				for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
+				for (datablock* block : selection.regionsSelected)
 				{
                     datablock::itor region;
-                    if (mapFile->getRegion(region, (*itor)->x(), (*itor)->y(), (*itor)->info())) {
+                    if (mapFile->getRegion(region, block->x(), block->y(), block->info())) {
                         collectFactionList(factions, region);
 					}
 				}
