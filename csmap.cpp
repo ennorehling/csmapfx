@@ -132,8 +132,6 @@ FXDEFMAP(CSMap) MessageMap[]=
 
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_TAB_1,                    CSMap::onShowTab),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_TAB_2,                    CSMap::onShowTab),
-    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_TAB_3,                    CSMap::onShowTab),
-    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_TAB_4,                    CSMap::onShowTab),
 
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_ZOOM,                 CSMap::onChangeZoom),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_MAP_ZOOM,                 CSMap::onUpdateZoom),
@@ -594,29 +592,20 @@ CSMap::CSMap(FXApp *app) :
 
     new FXTabItem(tabbook, "Statistik");
     statistics = new FXStatistics(tabbook, this, ID_SELECTION, LAYOUT_FILL_X);
-    new FXTabItem(tabbook, "Einheit");
-    FXVerticalFrame* frame;
-    frame = new FXVerticalFrame(tabbook, LAYOUT_FILL_X);
+    new FXTabItem(tabbook, "Details");
+    FXVerticalFrame *frame = new FXVerticalFrame(tabbook, LAYOUT_FILL_X);
     frame->setBorderColor(getApp()->getShadowColor());
     frame->setFrameStyle(FRAME_LINE);
     unitProperties = new FXUnitList(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
         TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
-    new FXTabItem(tabbook, "Schiff");
-    frame = new FXVerticalFrame(tabbook, LAYOUT_FILL_X);
-    frame->setBorderColor(getApp()->getShadowColor());
-    frame->setFrameStyle(FRAME_LINE);
     shipProperties = new FXShipProperties(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
         TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
-    new FXTabItem(tabbook, L"Geb\u00e4ude");
-    frame = new FXVerticalFrame(tabbook, LAYOUT_FILL_X);
-    frame->setBorderColor(getApp()->getShadowColor());
-    frame->setFrameStyle(FRAME_LINE);
     buildingProperties = new FXBuildingProperties(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
         TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
+
+
     getAccelTable()->addAccel(MKUINT(KEY_1, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_1));
     getAccelTable()->addAccel(MKUINT(KEY_2, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_2));
-    getAccelTable()->addAccel(MKUINT(KEY_3, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_3));
-    getAccelTable()->addAccel(MKUINT(KEY_4, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_4));
 
     // Befehlseditor
     commandframe = new FXVerticalFrame(commandsplitter,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 0,0,0,0);
@@ -2059,34 +2048,36 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         }
         selection.fileChange = pstate->fileChange;
     }
-    selection = *pstate;
-    ++selection.selChange;
 
     // make sure that a region is always selected (when something in it is selected)
-    if (!(selection.selected & selection.REGION))
+    // start with selected item and search containing region
+    datablock::itor block = report->blocks().begin();
+    if (pstate->selected & selection.UNIT)
     {
-        // start with selected item and search containing region
-        datablock::itor block = report->blocks().begin();
-        if (selection.selected & selection.UNIT)
+        block = pstate->unit;
+    }
+    else if (pstate->selected & selection.SHIP)
+    {
+        block = pstate->ship;
+    }
+    else if (pstate->selected & selection.BUILDING)
+    {
+        block = pstate->building;
+    }
+
+    showProperties(unitProperties, pstate->selected& selection.UNIT);
+    showProperties(shipProperties, pstate->selected& selection.SHIP);
+    showProperties(buildingProperties, pstate->selected& selection.BUILDING);
+
+    selection = *pstate;
+    ++selection.selChange;
+    while (block != report->blocks().begin()) {
+        --block;
+        if (block->type() == block_type::TYPE_REGION)
         {
-            block = selection.unit;
-        }
-        else if (selection.selected & selection.SHIP)
-        {
-            block = selection.ship;
-        }
-        else if (selection.selected & selection.BUILDING)
-        {
-            block = selection.building;
-        }
-        while (block != report->blocks().begin()) {
-            --block;
-            if (block->type() == block_type::TYPE_REGION)
-            {
-                selection.region = block;
-                selection.selected |= selection.REGION;
-                break;
-            }
+            selection.region = block;
+            selection.selected |= selection.REGION;
+            break;
         }
     }
 
@@ -3254,6 +3245,15 @@ bool CSMap::isConfirmed(const datablock::itor& unit)
         }
     }
     return true;
+}
+
+void CSMap::showProperties(FXProperties* item, bool visible) {
+    if (visible) {
+        item->show();
+    }
+    else {
+        item->hide();
+    }
 }
 
 void CSMap::beginLoading(const FXString& filename)

@@ -377,6 +377,8 @@ protected:
     void beginLoading(const FXString& filename);
     FXString gameDate(int turn) const;
     bool isConfirmed(const datablock::itor& unit);
+    void showProperties(FXProperties* item, bool visible = true);
+
 };
 
 #endif //_CSMAP
