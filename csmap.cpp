@@ -523,7 +523,7 @@ CSMap::CSMap(FXApp *app) :
     FXSplitterEx *mapsplit = new FXSplitterEx(middle, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
     // Map window
-    map = new FXCSMap(mapsplit, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    map = new FXCSMap(mapsplit, this, ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
     mapsplit->setStretcher(map);
 
     menu.streets->setTarget(map);
@@ -571,7 +571,7 @@ CSMap::CSMap(FXApp *app) :
     FXHorizontalFrame *riFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
     riTab = new FXToolBarTab(riFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
     riTab->setTipText("Regionsinformationen ein- und ausblenden");
-    regionPanel = new FXRegionPanel(riFrame, this,ID_SELECTION, LAYOUT_FILL_X);
+    regionPanel = new FXRegionPanel(riFrame, this, ID_SELECTION, LAYOUT_FILL_X);
 
     menu.regdescription->setTarget(regionPanel);
     menu.regdescription->setSelector(FXRegionPanel::ID_TOGGLEDESCRIPTION);
@@ -661,7 +661,7 @@ CSMap::CSMap(FXApp *app) :
     minimap_bar->getStatusLine()->setBorderColor(getApp()->getShadowColor());
     minimap_bar->getStatusLine()->setNormalText("");
 
-    minimap = new FXCSMap(minimap_frame, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y, true /*minimap-mode*/);
+    minimap = new FXCSMap(minimap_frame, this, ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y, true /*minimap-mode*/);
     minimap->connectMap(map);
 
     menu.minimap_islands->setTarget(minimap);
@@ -2509,6 +2509,7 @@ long CSMap::onFileExportMap(FXObject*, FXSelector, void*)
 long CSMap::onFileClose(FXObject*, FXSelector, void*)
 {
     if (closeFile()) {
+        selection.clear();
         mapChange();
         updateFileNames();
         return 1;

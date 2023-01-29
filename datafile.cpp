@@ -1877,3 +1877,9 @@ void datafile::SelectionState::transfer(datafile* old_cr, datafile* new_cr, int 
         ++selChange;
     }
 }
+
+void datafile::SelectionState::clear()
+{
+    selected = 0;
+    regionsSelected.clear();
+}

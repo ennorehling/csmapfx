@@ -103,6 +103,7 @@ public:
 		};
 
         void transfer(datafile* old_cr, datafile* new_cr, int x_offset = 0, int y_offset = 0);
+        void clear();
 
 		// mini-c'tor
 		SelectionState() {}

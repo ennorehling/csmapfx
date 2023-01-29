@@ -56,7 +56,7 @@ FXDEFMAP(FXCSMap) MessageMap[]=
 FXIMPLEMENT(FXCSMap,FXScrollArea,MessageMap, ARRAYNUMBER(MessageMap))
 
 FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbool minimap, FXint x,FXint y,FXint w,FXint h)
-	: FXScrollArea(p, opts, x, y, w, h), main_map(), minimap(minimap)
+	: FXScrollArea(p, opts, x, y, w, h), minimap(minimap)
 {
     mapFile = nullptr;
 	// set target and selector
@@ -453,6 +453,9 @@ void FXCSMap::moveContents(FXint x,FXint y)
 void FXCSMap::setMapFile(datafile *f)
 {
     mapFile = f;
+    if (!f) {
+        sel_x = sel_y = offset_x = offset_y = 0;
+    }
 }
 
 void FXCSMap::connectMap(FXCSMap* a_map)
@@ -779,7 +782,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 		if (getHeight() > image_h)	cursor_y -= (getHeight() - image_h)/2;
 
 		// minimap: set position to mouse-click coordinates
-		if (minimap && main_map)
+		if (main_map)
 		{
 			// calculate position in main map
 			float fscale = main_map->getScale() / getScale();
@@ -1984,10 +1987,11 @@ long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
 
 void FXCSMap::updateMap()
 {
-    if (!minimap)
+    if (!minimap) {
         layout();
-
-    if (minimap)
+        scrollTo(sel_x, sel_y);
+    }
+    else
     {
         scale = 1.0f;
         calculateContentSize();
