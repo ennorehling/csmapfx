@@ -24,7 +24,6 @@ public:
 	long onSelected(FXObject*,FXSelector,void*);
 
 	long onPopup(FXObject*, FXSelector, void*);
-	long onPopupClicked(FXObject*, FXSelector, void*);
 
 	long onToggleOwnFactionGroup(FXObject*, FXSelector, void*);
 	long onUpdateOwnFactionGroup(FXObject*, FXSelector, void*);
@@ -44,10 +43,9 @@ public:
 public: 
 	enum
 	{
-		ID_POPUP_CLICKED = FXTreeList::ID_LAST,
+        ID_TOGGLE_UNITCOLORS = FXTreeList::ID_LAST,
 		ID_TOGGLE_OWNFACTIONGROUP,
 		ID_TOGGLE_INACTIVE_REGIONS,
-        ID_TOGGLE_UNITCOLORS,
         ID_LAST
 	};
 

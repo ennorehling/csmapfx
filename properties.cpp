@@ -218,8 +218,7 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
     if (!item)
         return 0;
 
-    FXMenuPane pane(this);
-    FXMenuPane* menu = &pane;
+    FXMenuPane* menu = new FXMenuPane(this);
     FXMenuSeparatorEx* sep = nullptr;
 
     FXString title = item->getText();
@@ -254,13 +253,13 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
             new FXPopupMenuCommand(menu, "Zeige Info", popup->info, nullptr, this);
         }
     }
-
     // show popup
     if (menu->numChildren()) {
         menu->create();
         menu->popup(nullptr, event->root_x, event->root_y);
         getApp()->runModalWhileShown(menu);
     }
+    delete menu;
     return 1;
 }
 

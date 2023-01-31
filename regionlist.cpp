@@ -194,7 +194,6 @@ FXDEFMAP(FXRegionList) MessageMap[]=
 	FXMAPFUNC(SEL_CLICKED,			0,									FXRegionList::onSelected), 
 
 	FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	0,								FXRegionList::onPopup), 
-	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_POPUP_CLICKED,		FXRegionList::onPopupClicked), 
 
 	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_TOGGLE_OWNFACTIONGROUP, FXRegionList::onToggleOwnFactionGroup), 
 	FXMAPFUNC(SEL_UPDATE,			FXRegionList::ID_TOGGLE_OWNFACTIONGROUP, FXRegionList::onUpdateOwnFactionGroup),
@@ -353,28 +352,9 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 		return 0;
 
     CSMap * app = static_cast<CSMap *>(getShell());
-    FXMenuPane * menu = app->createPopup(this, item, ID_POPUP_CLICKED);
-    // show popup
-    menu->create();
-    menu->popup(NULL, event->root_x, event->root_y);
-    getApp()->runModalWhileShown(menu);
-    delete menu;
+    app->showPopup(this, item, event->root_x, event->root_y);
 
 	return 1;
-}
-
-long FXRegionList::onPopupClicked(FXObject* sender,FXSelector, void*)
-{
-	if (sender && sender->isMemberOf(&FXMenuCommand::metaClass))
-	{
-		FXMenuCommand *cmd = (FXMenuCommand*)sender;
-
-		// set clipboard to text stored in FXMenuCommands userdata
-		getTarget()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), cmd->getUserData());
-		return 1;
-	}
-
-	return 0;
 }
 
 bool FXRegionList::isConfirmed(const datablock::itor& unit) const

@@ -19,6 +19,7 @@
 #include "reportinfo.h"
 #include "regioninfo.h"
 #include "commands.h"
+#include "contextmenu.h"
 #include "datafile.h"
 #include "symbols.h"
 #include "regionlist.h"
@@ -59,9 +60,9 @@
 FXDEFMAP(CSMap) MessageMap[]=
 {
     //________Message_Type_____________________ID_______________Message_Handler_______
-    FXMAPFUNC(SEL_CLIPBOARD_REQUEST, SEL_NONE,                  CSMap::onClipboardRequest),
-    FXMAPFUNC(SEL_CLIPBOARD_LOST, SEL_NONE,                     CSMap::onClipboardLost),
-    FXMAPFUNC(SEL_CLIPBOARD_REQUEST, CSMap::ID_SETSTRINGVALUE,  CSMap::onSetClipboard),
+    FXMAPFUNC(SEL_CLIPBOARD_REQUEST,    SEL_NONE,                   CSMap::onClipboardRequest),
+    FXMAPFUNC(SEL_CLIPBOARD_LOST,       SEL_NONE,                   CSMap::onClipboardLost),
+    FXMAPFUNC(SEL_CLIPBOARD_REQUEST,    FXWindow::ID_SETSTRINGVALUE,   CSMap::onSetClipboard),
 
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_OPEN,                CSMap::onFileOpen),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_MERGE,               CSMap::onFileMerge),
@@ -2412,12 +2413,12 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames)
     }
 }
 
-FXMenuPane* CSMap::createPopup(FXWindow* owner, const FXTreeItem* item, FXint sel)
+void CSMap::showPopup(FXWindow* owner, const FXTreeItem* item, FXint root_x, FXint root_y)
 {
-	FXMenuPane* menu = new FXMenuPane(owner);
+	FXMenuPane* menu = new FXContextMenu(this);
 	std::vector<FXString> labels, texts;
 
-	datablock* block = (datablock*)item->getData();
+	datablock* block = static_cast<datablock*>(item->getData());
 	if (block)
 	{
 		if (block->type() == block_type::TYPE_REGION)
@@ -2484,11 +2485,15 @@ FXMenuPane* CSMap::createPopup(FXWindow* owner, const FXTreeItem* item, FXint se
 
 	for (unsigned i = 0; i < labels.size() && i < texts.size(); i++)
 	{
-		FXMenuCommand* menuitem = new FXMenuCommand(menu, labels[i], NULL, owner, sel);
-		menuitem->setUserData((void*)texts[i].text());
+		FXMenuCommand* menuitem = new FXMenuCommand(menu, labels[i], NULL, menu, FXContextMenu::ID_POPUP_COPY_TEXT);
+		menuitem->setUserData(const_cast<char *>(texts[i].text()));
 	}
 
-    return menu;
+    // show popup
+    menu->create();
+    menu->popup(NULL, root_x, root_y);
+    getApp()->runModalWhileShown(menu);
+    delete menu;
 }
 
 long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
