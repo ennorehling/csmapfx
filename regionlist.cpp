@@ -1,6 +1,7 @@
 #include <sstream>
 #include <vector>
 
+#include "csmap.h"
 #include "regionlist.h"
 #include "symbols.h"
 
@@ -324,117 +325,12 @@ void FXRegionList::setMapFile(datafile *f)
 
 long FXRegionList::onSelected(FXObject*,FXSelector,void*)
 {
-	// connected to a datafile list?
-	if (!mapFile)
-		return 0;
-
-	if (!getCurrentItem())	// kein Item markiert.
-		return 0;
-
     FXTreeItem* current = getCurrentItem();
-	datablock* datablk = (datablock*)current->getData();
-	datablock* parentdata = nullptr;
-    FXTreeItem* folder = current->getParent();
-    while (folder && !parentdata) {
-        parentdata = (datablock*)folder->getData();
-        folder = folder->getParent();
+    if (current) {
+        datablock* block = static_cast<datablock*>(current->getData());
+        return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_SETVALUE), block);
     }
-
-	datablock::itor main = mapFile->blocks().end();
-	datablock::itor iparent = mapFile->blocks().end();
-
-	for (datablock::itor block = mapFile->blocks().begin(); block != mapFile->blocks().end(); block++)
-	{
-		// nothing to search for
-		if (!datablk && !parentdata)
-			break;
-
-		// handle only regions, factions (+alliances), buildings, ships and units
-		if (block->type() != block_type::TYPE_REGION &&
-			block->type() != block_type::TYPE_ALLIANCE &&
-			block->type() != block_type::TYPE_FACTION &&
-			block->type() != block_type::TYPE_BUILDING &&
-			block->type() != block_type::TYPE_SHIP &&
-			block->type() != block_type::TYPE_UNIT)
-			continue;
-
-		if (datablk && datablk == &*block)
-		{
-			main = block;
-			datablk = nullptr;		// to indicate that block was found.
-		}
-		else if (parentdata && parentdata == &*block)
-		{
-			iparent = block;
-			parentdata = nullptr;	// found
-		}
-	}
-
-    if (main == mapFile->blocks().end())
-    {
-        main = iparent;
-        iparent = mapFile->blocks().end();
-    }
-
-    if (main != mapFile->blocks().end())
-    {
-        // send new selection to main window
-        if (main->type() == block_type::TYPE_REGION)
-        {
-            selection.selected = selection.REGION;
-            selection.region = main;
-        }
-        else if (main->type() == block_type::TYPE_FACTION)
-        {
-            selection.selected = selection.FACTION;
-            selection.faction = main;
-
-            if (iparent != mapFile->blocks().end())
-            {
-                selection.selected |= selection.REGION;
-                selection.region = iparent;
-            }
-        }
-        else if (main->type() == block_type::TYPE_BUILDING)
-        {
-            selection.selected = selection.BUILDING;
-            selection.building = main;
-
-            if (iparent != mapFile->blocks().end())
-            {
-                selection.selected |= selection.REGION;
-                selection.region = iparent;
-            }
-        }
-        else if (main->type() == block_type::TYPE_SHIP)
-        {
-            selection.selected = selection.SHIP;
-            selection.ship = main;
-
-            if (iparent != mapFile->blocks().end())
-            {
-                selection.selected |= selection.REGION;
-                selection.region = iparent;
-            }
-        }
-        else if (main->type() == block_type::TYPE_UNIT)
-        {
-            selection.selected = selection.UNIT;
-            selection.unit = main;
-
-            if (iparent != mapFile->blocks().end())
-            {
-                selection.selected |= selection.FACTION;
-                selection.faction = iparent;
-            }
-        }
-        if (!selection.regionsSelected.empty()) {
-            selection.regionsSelected = selection.regionsSelected;
-        }
-        getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
-        return 1;
-    }
-	return 0;
+    return 0;
 }
 
 long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
@@ -456,89 +352,14 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 	if (!item)
 		return 0;
 
-    // TODO: no dynamic allocation for the menu needed
-	FXMenuPane *menu = new FXMenuPane(this);
-
-	std::vector<FXString> labels, texts;
-
-	datablock* block = (datablock*)item->getData();
-	if (block)
-	{
-		if (block->type() == block_type::TYPE_REGION)
-		{
-			FXString name = block->value(TYPE_NAME);
-			FXString terrain = block->terrainString();
-
-			if (name.length())
-			{
-				labels.push_back("Name: "+name);
-				texts.push_back(name);
-			}
-
-			labels.push_back("Terrain: "+terrain);
-			texts.push_back(terrain);
-		}
-		else if (block->type() == block_type::TYPE_UNIT || block->type() == block_type::TYPE_SHIP || block->type() == block_type::TYPE_BUILDING)
-		{
-			FXString name = block->value(TYPE_NAME);
-			FXString id = block->id();
-
-			if (name.length())
-			{
-				labels.push_back("Name: " + name);
-				texts.push_back(name);
-			}
-
-			labels.push_back("Nummer: " + id);
-			texts.push_back(id);
-		}
-		else if (block->type() == block_type::TYPE_FACTION)
-		{
-			FXString name = block->value(TYPE_FACTIONNAME);
-
-			if (name.length())
-			{
-				labels.push_back("Name: " + name);
-				texts.push_back(name);
-			}
-
-            if (block->info() > 0) {
-                FXString id = block->id();
-				labels.push_back("Nummer: " + id);
-				texts.push_back(id);
-			}
-
-            FXString email = block->value(TYPE_EMAIL);
-            if (email.length())
-			{
-				labels.push_back("eMail: " + email);
-				texts.push_back(email);
-			}
-
-            FXString banner = block->value(TYPE_BANNER);
-            if (banner.length())
-			{
-				labels.push_back("Banner: " + banner);
-				texts.push_back(banner);
-			}
-		}
-	}
-
-	new FXMenuSeparatorEx(menu, item->getText());
-
-	for (unsigned i = 0; i < labels.size() && i < texts.size(); i++)
-	{
-		FXMenuCommand *menuitem = new FXMenuCommand(menu, labels[i], NULL, this,ID_POPUP_CLICKED);
-		menuitem->setUserData((void*)texts[i].text());
-	}
-
-	// show popup
-	menu->create();
-	menu->popup(NULL, event->root_x,event->root_y);
-
+    CSMap * app = static_cast<CSMap *>(getShell());
+    FXMenuPane * menu = app->createPopup(this, item, ID_POPUP_CLICKED);
+    // show popup
+    menu->create();
+    menu->popup(NULL, event->root_x, event->root_y);
     getApp()->runModalWhileShown(menu);
+    delete menu;
 
-	delete menu;
 	return 1;
 }
 

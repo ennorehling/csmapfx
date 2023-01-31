@@ -61,6 +61,7 @@ public:
 	datablock::list_type& blocks() { return m_blocks; }
 
     bool hasUnits() const { return !m_units.empty(); }
+    bool getParent(datablock::itor& out, const datablock::itor& child);
     bool getUnit(datablock::itor& out, int id);
     bool getGroup(datablock::itor& out, int id);
 	bool getBuilding(datablock::itor& out, int id);

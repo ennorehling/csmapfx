@@ -104,6 +104,7 @@ public:		// this functions are slots for menu commands
 
 	long onMapChange(FXObject*, FXSelector, void* ptr);
 	long onQueryMap(FXObject*, FXSelector, void* ptr);
+	long onSetSelection(FXObject*, FXSelector, void* ptr);  // ptr = datablock *, update the selection to it.
 
 	long onClipboardRequest(FXObject*, FXSelector, void* ptr);	// somebody wants data from clipboard
 	long onClipboardLost(FXObject*, FXSelector, void* ptr);		// we lost ownership of clipboard
@@ -117,6 +118,8 @@ public:		// this functions are slots for menu commands
 
     void loadFiles(const std::vector<FXString>& filenames);
     
+    FXMenuPane* createPopup(FXWindow* owner, const FXTreeItem* item, FXint sel);
+
     enum
 	{
 		ID_REGIONS = FXMainWindow::ID_LAST,

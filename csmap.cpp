@@ -152,6 +152,7 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_MAP_SETMODUS,             CSMap::onMapSetModus),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_MAP_SETMODUS,             CSMap::onUpdMapSetModus),
 
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_SETVALUE,                 CSMap::onSetSelection),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_UPDATE,                   CSMap::onMapChange),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_SELECTION,                CSMap::onQueryMap),
 
@@ -2141,6 +2142,50 @@ long CSMap::onQueryMap(FXObject* sender, FXSelector sel, void*)
     return 1;
 }
 
+long CSMap::onSetSelection(FXObject* sender, FXSelector sel, void* ptr)
+{
+    datablock* block = static_cast<datablock*>(ptr);
+    ++selection.selChange;
+    selection.selected = 0;
+    if (block->type() == block_type::TYPE_REGION) {
+        if (report->getRegion(selection.region, block->x(), block->y(), block->info())) {
+            selection.selected = selection.REGION;
+        }
+    }
+    else if (block->type() == block_type::TYPE_FACTION) {
+        if (report->getFaction(selection.faction, block->info())) {
+            selection.selected = selection.FACTION;
+        }
+    }
+    else {
+        if (block->type() == block_type::TYPE_UNIT) {
+            if (report->getUnit(selection.unit, block->info())) {
+                selection.selected = selection.UNIT;
+                if (report->getParent(selection.region, selection.unit)) {
+                    selection.selected |= selection.REGION;
+                }
+            }
+        }
+        else if (block->type() == block_type::TYPE_SHIP) {
+            if (report->getShip(selection.ship, block->info())) {
+                selection.selected = selection.SHIP;
+                if (report->getParent(selection.region, selection.ship)) {
+                    selection.selected |= selection.REGION;
+                }
+            }
+        }
+        else if (block->type() == block_type::TYPE_BUILDING) {
+            if (report->getBuilding(selection.building, block->info())) {
+                selection.selected = selection.BUILDING;
+                if (report->getParent(selection.region, selection.building)) {
+                    selection.selected |= selection.REGION;
+                }
+            }
+        }
+    }
+    return handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
+}
+
 long CSMap::onClipboardRequest(FXObject*, FXSelector, void* ptr)
 {
     // somebody wants our clipboard data
@@ -2365,6 +2410,85 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames)
         mapChange();
         checkCommands();
     }
+}
+
+FXMenuPane* CSMap::createPopup(FXWindow* owner, const FXTreeItem* item, FXint sel)
+{
+	FXMenuPane* menu = new FXMenuPane(owner);
+	std::vector<FXString> labels, texts;
+
+	datablock* block = (datablock*)item->getData();
+	if (block)
+	{
+		if (block->type() == block_type::TYPE_REGION)
+		{
+			FXString name = block->value(TYPE_NAME);
+			FXString terrain = block->terrainString();
+
+			if (name.length())
+			{
+				labels.push_back("Name: " + name);
+				texts.push_back(name);
+			}
+
+			labels.push_back("Terrain: " + terrain);
+			texts.push_back(terrain);
+		}
+		else if (block->type() == block_type::TYPE_UNIT || block->type() == block_type::TYPE_SHIP || block->type() == block_type::TYPE_BUILDING)
+		{
+			FXString name = block->value(TYPE_NAME);
+			FXString id = block->id();
+
+			if (name.length())
+			{
+				labels.push_back("Name: " + name);
+				texts.push_back(name);
+			}
+
+			labels.push_back("Nummer: " + id);
+			texts.push_back(id);
+		}
+		else if (block->type() == block_type::TYPE_FACTION)
+		{
+			FXString name = block->value(TYPE_FACTIONNAME);
+
+			if (name.length())
+			{
+				labels.push_back("Name: " + name);
+				texts.push_back(name);
+			}
+
+			if (block->info() > 0) {
+				FXString id = block->id();
+				labels.push_back("Nummer: " + id);
+				texts.push_back(id);
+			}
+
+			FXString email = block->value(TYPE_EMAIL);
+			if (email.length())
+			{
+				labels.push_back("eMail: " + email);
+				texts.push_back(email);
+			}
+
+			FXString banner = block->value(TYPE_BANNER);
+			if (banner.length())
+			{
+				labels.push_back("Banner: " + banner);
+				texts.push_back(banner);
+			}
+		}
+	}
+
+	new FXMenuSeparatorEx(menu, item->getText());
+
+	for (unsigned i = 0; i < labels.size() && i < texts.size(); i++)
+	{
+		FXMenuCommand* menuitem = new FXMenuCommand(menu, labels[i], NULL, owner, sel);
+		menuitem->setUserData((void*)texts[i].text());
+	}
+
+    return menu;
 }
 
 long CSMap::onFileMerge(FXObject *, FXSelector, void *r)

@@ -1,6 +1,6 @@
 csmapfx (1.6.0-1) stable; urgency=low
 
-  * fix display of owners and stealh units
+  * fix display of owners and stealth units
 
  -- Enno Rehling <enno@eressea.de>  Sun, 29 Jan 2023 21:30:00 +0200
 

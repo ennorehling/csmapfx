@@ -1207,6 +1207,17 @@ datablock::itor datafile::unit(int id)
 	return unit->second;
 }
 
+bool datafile::getParent(datablock::itor& out, const datablock::itor& child)
+{
+    for (datablock::itor parent = child; parent != m_blocks.begin(); --parent) {
+        if (parent->depth() < child->depth()) {
+            out = parent;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool datafile::getUnit(datablock::itor& out, int id)
 {
     datablock::itor block = unit(id);
