@@ -2413,13 +2413,11 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames)
     }
 }
 
-FXMenuPane* CSMap::createPopup(FXWindow* owner, const FXTreeItem* item)
+void CSMap::createPopup(FXContextMenu *menu, const datablock* block, const FXString &label)
 {
-	FXMenuPane* menu = new FXContextMenu(this);
     std::vector<FXString> labels;
     std::vector <const char *> texts;
 
-	datablock* block = static_cast<datablock*>(item->getData());
 	if (block)
 	{
 		if (block->type() == block_type::TYPE_REGION)
@@ -2482,7 +2480,7 @@ FXMenuPane* CSMap::createPopup(FXWindow* owner, const FXTreeItem* item)
 		}
 	}
 
-	new FXMenuSeparatorEx(menu, item->getText());
+	new FXMenuSeparatorEx(menu, label);
 
     FXMenuPane* clipboard = new FXMenuPane(menu);
     new FXMenuCascade(menu, "&Zwischenablage", nullptr, clipboard);
@@ -2491,7 +2489,7 @@ FXMenuPane* CSMap::createPopup(FXWindow* owner, const FXTreeItem* item)
 		FXMenuCommand* menuitem = new FXMenuCommand(clipboard, labels[i], NULL, menu, FXContextMenu::ID_POPUP_COPY_TEXT);
 		menuitem->setUserData(const_cast<char *>(texts[i]));
 	}
-    return menu;
+    menu->create();
 }
 
 long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
