@@ -118,7 +118,7 @@ public:		// this functions are slots for menu commands
 
     void loadFiles(const std::vector<FXString>& filenames);
     
-    void showPopup(FXWindow* owner, const FXTreeItem* item, FXint root_x, FXint root_y);
+    FXMenuPane* createPopup(FXWindow* owner, const FXTreeItem* item);
 
     enum
 	{

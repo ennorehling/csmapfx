@@ -74,9 +74,9 @@ FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbo
 	verticalScrollBar()->setLine(10);
 	horizontalScrollBar()->setLine(10);
 
-	backbuffer.reset(new FXImage(getApp(), NULL, IMAGE_SHMI|IMAGE_SHMP));
+	backbuffer.reset(new FXImage(getApp(), nullptr, IMAGE_SHMI|IMAGE_SHMP));
 	if (minimap)
-		imagebuffer.reset(new FXImage(getApp(), NULL, IMAGE_SHMI|IMAGE_SHMP));
+		imagebuffer.reset(new FXImage(getApp(), nullptr, IMAGE_SHMI|IMAGE_SHMP));
 
 	// button between the scrollbars, toggling shadowed map mode
 	if (!minimap)
@@ -242,7 +242,7 @@ long FXCSMap::onToggleStreets(FXObject* /* sender */, FXSelector, void*)
 
 long FXCSMap::onUpdateStreets(FXObject* sender, FXSelector, void*)
 {
-	sender->handle(this, FXSEL(SEL_COMMAND, show_streets?ID_CHECK:ID_UNCHECK), NULL);
+	sender->handle(this, FXSEL(SEL_COMMAND, show_streets?ID_CHECK:ID_UNCHECK), nullptr);
 	return 1;
 }
 
@@ -256,7 +256,7 @@ long FXCSMap::onToggleVisibility(FXObject* /* sender */, FXSelector, void*)
 
 long FXCSMap::onUpdateVisibility(FXObject* sender, FXSelector, void*)
 {
-	sender->handle(this, FXSEL(SEL_COMMAND, show_visibility_symbol?ID_CHECK:ID_UNCHECK), NULL);
+	sender->handle(this, FXSEL(SEL_COMMAND, show_visibility_symbol?ID_CHECK:ID_UNCHECK), nullptr);
 	return 1;
 }
 
@@ -270,7 +270,7 @@ long FXCSMap::onToggleShipTravel(FXObject* /* sender */, FXSelector, void*)
 
 long FXCSMap::onUpdateShipTravel(FXObject* sender, FXSelector, void*)
 {
-	sender->handle(this, FXSEL(SEL_COMMAND, show_ship_travel?ID_CHECK:ID_UNCHECK), NULL);
+	sender->handle(this, FXSEL(SEL_COMMAND, show_ship_travel?ID_CHECK:ID_UNCHECK), nullptr);
 	return 1;
 }
 
@@ -284,7 +284,7 @@ long FXCSMap::onToggleShadowRegions(FXObject* /* sender */, FXSelector, void*)
 
 long FXCSMap::onUpdateShadowRegions(FXObject* sender, FXSelector, void*)
 {
-	sender->handle(this, FXSEL(SEL_COMMAND, show_shadow_regions?ID_CHECK:ID_UNCHECK), NULL);
+	sender->handle(this, FXSEL(SEL_COMMAND, show_shadow_regions?ID_CHECK:ID_UNCHECK), nullptr);
 	return 1;
 }
 
@@ -301,7 +301,7 @@ long FXCSMap::onToggleIslands(FXObject* /* sender */, FXSelector, void*)
 
 long FXCSMap::onUpdateIslands(FXObject* sender, FXSelector, void*)
 {
-	sender->handle(this, FXSEL(SEL_COMMAND, show_islands?ID_CHECK:ID_UNCHECK), NULL);
+	sender->handle(this, FXSEL(SEL_COMMAND, show_islands?ID_CHECK:ID_UNCHECK), nullptr);
 	return 1;
 }
 
@@ -326,7 +326,7 @@ long FXCSMap::onUpdSetModus(FXObject* sender, FXSelector, void*)
 	FXival udata = (FXival)item->getUserData();
 
 	// check button, if actual modus is button's modus
-	sender->handle(this, FXSEL(SEL_COMMAND, (udata==modus)?ID_CHECK:ID_UNCHECK), NULL);
+	sender->handle(this, FXSEL(SEL_COMMAND, (udata==modus)?ID_CHECK:ID_UNCHECK), nullptr);
 	return 1;
 }
 
@@ -399,7 +399,7 @@ long FXCSMap::onUpdVisiblePlane(FXObject* sender, FXSelector, void*)
 	{
 		FXId *item = (FXId*)sender;
 		FXival plane = (FXival)item->getUserData();
-		sender->handle(this, FXSEL(SEL_COMMAND, (visiblePlane == plane)?ID_CHECK:ID_UNCHECK), NULL);
+		sender->handle(this, FXSEL(SEL_COMMAND, (visiblePlane == plane)?ID_CHECK:ID_UNCHECK), nullptr);
 	}
 
 	return 1;
@@ -1017,7 +1017,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 			new FXMenuSeparatorEx(menu, label);
 			FXMenuCommand *cmd;
 
-			cmd = new FXMenuCommand(menu, "&Insel benennen...", NULL, this,ID_POPUP_CLICKED);
+			cmd = new FXMenuCommand(menu, "&Insel benennen...", nullptr, this,ID_POPUP_CLICKED);
 			cmd->setUserData((void*)POPUP_SETISLAND);
 
 			FXMenuPane* terraform = new FXMenuPane(this);
@@ -1038,7 +1038,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 
 			// show popup
 			menu->create();
-			menu->popup(NULL, event->root_x,event->root_y);
+			menu->popup(nullptr, event->root_x,event->root_y);
 
 			getApp()->runModalWhileShown(menu);
 			delete menu;
@@ -1065,29 +1065,29 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 
 			// clipboard submenu
 			FXMenuPane *clipboard = new FXMenuPane(this);
-			new FXMenuCascade(menu, "&Zwischenablage", NULL, clipboard, 0);
+			new FXMenuCascade(menu, "&Zwischenablage", nullptr, clipboard);
 
 			label.format("%d, %d", region->x(), region->y());
-			cmd = new FXMenuCommand(clipboard, label + "\t\tKoordinaten", NULL, this,ID_POPUP_CLICKED);
+			cmd = new FXMenuCommand(clipboard, label + "\t\tKoordinaten", nullptr, this,ID_POPUP_CLICKED);
 			cmd->setUserData((void*)POPUP_GET_TEXT);
 
 			if (!name.empty())
 			{
-				cmd = new FXMenuCommand(clipboard, name + "\t\tName", NULL, this,ID_POPUP_CLICKED);
+				cmd = new FXMenuCommand(clipboard, name + "\t\tName", nullptr, this,ID_POPUP_CLICKED);
 				cmd->setUserData((void*)POPUP_GET_TEXT);
 			}
 
 			if (!terrainString.empty())
 			{
-				cmd = new FXMenuCommand(clipboard, terrainString + "\t\tTerrain", NULL, this,ID_POPUP_CLICKED);
+				cmd = new FXMenuCommand(clipboard, terrainString + "\t\tTerrain", nullptr, this,ID_POPUP_CLICKED);
 				cmd->setUserData((void*)POPUP_GET_TEXT);
 			}
 
 			// normal menu
-			cmd = new FXMenuCommand(menu, "&Insel benennen...", NULL, this,ID_POPUP_CLICKED);
+			cmd = new FXMenuCommand(menu, "&Insel benennen...", nullptr, this,ID_POPUP_CLICKED);
 			cmd->setUserData((void*)POPUP_SETISLAND);
 
-			cmd = new FXMenuCommand(menu, "Um&benennen...", NULL, this,ID_POPUP_CLICKED);
+			cmd = new FXMenuCommand(menu, "Um&benennen...", nullptr, this,ID_POPUP_CLICKED);
 			cmd->setUserData((void*)POPUP_RENAME);
 
 			FXMenuPane* terraform = new FXMenuPane(this);
@@ -1108,7 +1108,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 
 			// show popup
 			menu->create();
-			menu->popup(NULL, event->root_x,event->root_y);
+			menu->popup(nullptr, event->root_x,event->root_y);
 
 			getApp()->runModalWhileShown(menu);
 			delete terraform;
@@ -1143,7 +1143,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 
 	// show popup
 	menu->create();
-	menu->popup(NULL, event->root_x,event->root_y);
+	menu->popup(nullptr, event->root_x,event->root_y);
 
 	getApp()->runModalWhileShown(menu);
 	delete menu;

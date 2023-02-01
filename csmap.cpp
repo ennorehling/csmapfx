@@ -2413,87 +2413,85 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames)
     }
 }
 
-void CSMap::showPopup(FXWindow* owner, const FXTreeItem* item, FXint root_x, FXint root_y)
+FXMenuPane* CSMap::createPopup(FXWindow* owner, const FXTreeItem* item)
 {
 	FXMenuPane* menu = new FXContextMenu(this);
-	std::vector<FXString> labels, texts;
+    std::vector<FXString> labels;
+    std::vector <const char *> texts;
 
 	datablock* block = static_cast<datablock*>(item->getData());
 	if (block)
 	{
 		if (block->type() == block_type::TYPE_REGION)
 		{
-			FXString name = block->value(TYPE_NAME);
-			FXString terrain = block->terrainString();
+			const FXString &name = block->value(TYPE_NAME);
+			const FXString &terrain = block->terrainString();
 
 			if (name.length())
 			{
-				labels.push_back("Name: " + name);
-				texts.push_back(name);
+				labels.push_back(name + "\t\tName");
+				texts.push_back(name.text());
 			}
 
-			labels.push_back("Terrain: " + terrain);
-			texts.push_back(terrain);
+			labels.push_back(terrain + "\t\tTerrain");
+			texts.push_back(terrain.text());
 		}
 		else if (block->type() == block_type::TYPE_UNIT || block->type() == block_type::TYPE_SHIP || block->type() == block_type::TYPE_BUILDING)
 		{
-			FXString name = block->value(TYPE_NAME);
-			FXString id = block->id();
+            const FXString& name = block->value(TYPE_NAME);
+            const FXString& id = block->id();
 
 			if (name.length())
 			{
-				labels.push_back("Name: " + name);
-				texts.push_back(name);
+				labels.push_back(name + "\t\tName");
+				texts.push_back(name.text());
 			}
 
-			labels.push_back("Nummer: " + id);
-			texts.push_back(id);
+			labels.push_back(id + "\t\tNummer");
+			texts.push_back(id.text());
 		}
 		else if (block->type() == block_type::TYPE_FACTION)
 		{
-			FXString name = block->value(TYPE_FACTIONNAME);
+            const FXString& name = block->value(TYPE_FACTIONNAME);
 
 			if (name.length())
 			{
-				labels.push_back("Name: " + name);
-				texts.push_back(name);
+				labels.push_back(name + "\t\tName");
+				texts.push_back(name.text());
 			}
 
 			if (block->info() > 0) {
-				FXString id = block->id();
-				labels.push_back("Nummer: " + id);
-				texts.push_back(id);
+                const FXString& id = block->id();
+				labels.push_back(id + "\t\tNummer");
+				texts.push_back(id.text());
 			}
 
-			FXString email = block->value(TYPE_EMAIL);
+            const FXString& email = block->value(TYPE_EMAIL);
 			if (email.length())
 			{
-				labels.push_back("eMail: " + email);
-				texts.push_back(email);
+				labels.push_back(email + "\t\tEmail");
+				texts.push_back(email.text());
 			}
 
-			FXString banner = block->value(TYPE_BANNER);
+            const FXString& banner = block->value(TYPE_BANNER);
 			if (banner.length())
 			{
-				labels.push_back("Banner: " + banner);
-				texts.push_back(banner);
+				labels.push_back(banner + "\t\tBanner");
+				texts.push_back(banner.text());
 			}
 		}
 	}
 
 	new FXMenuSeparatorEx(menu, item->getText());
 
-	for (unsigned i = 0; i < labels.size() && i < texts.size(); i++)
+    FXMenuPane* clipboard = new FXMenuPane(menu);
+    new FXMenuCascade(menu, "&Zwischenablage", nullptr, clipboard);
+    for (unsigned i = 0; i < labels.size() && i < texts.size(); i++)
 	{
-		FXMenuCommand* menuitem = new FXMenuCommand(menu, labels[i], NULL, menu, FXContextMenu::ID_POPUP_COPY_TEXT);
-		menuitem->setUserData(const_cast<char *>(texts[i].text()));
+		FXMenuCommand* menuitem = new FXMenuCommand(clipboard, labels[i], NULL, menu, FXContextMenu::ID_POPUP_COPY_TEXT);
+		menuitem->setUserData(const_cast<char *>(texts[i]));
 	}
-
-    // show popup
-    menu->create();
-    menu->popup(NULL, root_x, root_y);
-    getApp()->runModalWhileShown(menu);
-    delete menu;
+    return menu;
 }
 
 long CSMap::onFileMerge(FXObject *, FXSelector, void *r)

@@ -386,6 +386,31 @@ FXString datakey::translatedKey(const char*) const
 // =============================
 // === datablock implementation
 
+FXString datablock::TERRAIN_NAMES[] =
+{
+    FXString("Unbekannt"),
+    FXString("Ozean"),
+    FXString("Sumpf"),
+    FXString("Ebene"),
+    FXString(L"W\u00fcste"),
+    FXString("Wald"),
+    FXString("Hochland"),
+    FXString("Wald"),
+    FXString("Gletscher"),
+    FXString("Vulkan"),
+    FXString("Aktiver Vulkan"),
+    FXString("Packeis"),
+    FXString("Eisberg"),
+    FXString("Eisscholle"),
+    FXString("Gang"),
+    FXString("Wand"),
+    FXString("Halle"),
+    FXString("Nebel"),
+    FXString("Dichter Nebel"),
+    FXString("Feuerwand"),
+    FXString("Mahlstrom")
+};
+
 /*static*/ datablock::blocknames datablock::BLOCKNAMES[] =
 {
 	{ block_type::TYPE_VERSION, "VERSION" },
@@ -436,55 +461,18 @@ FXString datakey::translatedKey(const char*) const
 	return block_type::TYPE_UNKNOWN;
 }
 
-const FXString datablock::terrainString() const
+const FXString& datablock::terrainString() const
 {
-	const FXString type = value(TYPE_TERRAIN);
+	const FXString &type = value(TYPE_TERRAIN);
 	if (!type.empty())
 		return type;
-
-    switch (terrain()) {
-    case data::TERRAIN_OCEAN:
-        return "Ozean";
-    case data::TERRAIN_SWAMP:
-        return "Sumpf";
-    case data::TERRAIN_PLAINS:
-        return "Ebene";
-    case data::TERRAIN_DESERT:
-        return FXString(L"W\u00fcste");
-    case data::TERRAIN_FOREST:
-        return "Wald";
-    case data::TERRAIN_HIGHLAND:
-        return "Hochland";
-    case data::TERRAIN_MOUNTAIN:
-        return "Berge";
-    case data::TERRAIN_GLACIER:
-        return "Gletscher";
-    case data::TERRAIN_VOLCANO:
-        return "Vulkan";
-    case data::TERRAIN_VOLCANO_ACTIVE:
-        return "Aktiver Vulkan";
-    case data::TERRAIN_ICEBERG:
-        return "Eisberg";
-    case data::TERRAIN_ICEFLOE:
-        return "Eisscholle";
-    case data::TERRAIN_CORRIDOR:
-        return "Gang";
-    case data::TERRAIN_WALL:
-        return "Wand";
-    case data::TERRAIN_HALL:
-        return "Halle";
-    case data::TERRAIN_FOG:
-        return "Nebel";
-    case data::TERRAIN_THICKFOG:
-        return "Dichter Nebel";
-    case data::TERRAIN_PACKICE:
-        return "Packeis";
-    case data::TERRAIN_FIREWALL:
-        return "Feuerwand";
-    case data::TERRAIN_MAHLSTROM:
-        return "Mahlstrom";
+ 
+    int t = terrain();
+    if (t >= data::TERRAIN_UNKNOWN && t < data::TERRAIN_LAST) {
+        return TERRAIN_NAMES[t];
     }
-    return "Unbekannt";
+    
+    return TERRAIN_NAMES[data::TERRAIN_UNKNOWN];
 }
 
 FXString datablock::getName() const
@@ -525,7 +513,7 @@ FXString datablock::getLabel() const
 		return data::TERRAIN_SWAMP;
 	if (terrain == "Ebene")
 		return data::TERRAIN_PLAINS;
-	if (terrain == "Wueste" || terrain == "W\u00fcste" || terrain == FXString(L"W\u00fcste"))
+	if (terrain == "Wueste" || terrain == FXString(L"W\u00fcste"))
 		return data::TERRAIN_DESERT;
 	if (terrain == "Wald")
 		return data::TERRAIN_FOREST;

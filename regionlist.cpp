@@ -31,7 +31,7 @@ protected:
 
 public:
 	/// Constructor
-	FXRegionItem(const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL) : FXTreeItem(text, oi, ci, ptr), m_textColor(0) {}
+	FXRegionItem(const FXString& text,FXIcon* oi=nullptr,FXIcon* ci=nullptr,void* ptr=nullptr) : FXTreeItem(text, oi, ci, ptr), m_textColor(0) {}
 
 	bool isBold() const
 	{
@@ -66,7 +66,7 @@ static const int TEXT_SPACING = 4;	// Spacing between icon and text
 static const int SIDE_SPACING = 4;	// Spacing between side and item
 
 // Object implementation
-FXIMPLEMENT(FXRegionItem,FXTreeItem,NULL,0)
+FXIMPLEMENT(FXRegionItem,FXTreeItem,nullptr,0)
 
 // Draw item
 void FXRegionItem::draw(const FXTreeList* list, FXDC& dc, FXint xx, FXint yy, FXint ww, FXint hh) const
@@ -214,7 +214,7 @@ FXRegionList::FXRegionList(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
     FXTreeList(p, tgt,sel, opts, x, y, w, h),
     active_faction_group(false),
     colorized_units(false),
-    mapFile(NULL)
+    mapFile(nullptr)
 {
 	// modify list style
 	setListStyle(getListStyle()|TREELIST_SINGLESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES);
@@ -285,7 +285,7 @@ long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* p
 
 long FXRegionList::onUpdateOwnFactionGroup(FXObject* sender, FXSelector, void* ptr)
 {
-	sender->handle(this, FXSEL(SEL_COMMAND, active_faction_group?ID_CHECK:ID_UNCHECK), NULL);
+	sender->handle(this, FXSEL(SEL_COMMAND, active_faction_group?ID_CHECK:ID_UNCHECK), nullptr);
     return 1;
 }
 
@@ -298,7 +298,7 @@ long FXRegionList::onToggleActiveRegions(FXObject* sender, FXSelector sel, void*
 
 long FXRegionList::onUpdateActiveRegions(FXObject* sender, FXSelector, void* ptr)
 {
-    sender->handle(this, FXSEL(SEL_COMMAND, active_regions_only ? ID_CHECK : ID_UNCHECK), NULL);
+    sender->handle(this, FXSEL(SEL_COMMAND, active_regions_only ? ID_CHECK : ID_UNCHECK), nullptr);
     return 1;
 }
 
@@ -311,7 +311,7 @@ long FXRegionList::onToggleUnitColors(FXObject *sender, FXSelector sel, void *pt
 
 long FXRegionList::onUpdateUnitColors(FXObject* sender, FXSelector, void* ptr)
 {
-    sender->handle(this, FXSEL(SEL_COMMAND, colorized_units ? ID_CHECK : ID_UNCHECK), NULL);
+    sender->handle(this, FXSEL(SEL_COMMAND, colorized_units ? ID_CHECK : ID_UNCHECK), nullptr);
 	return 1;
 }
 
@@ -352,7 +352,13 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 		return 0;
 
     CSMap * app = static_cast<CSMap *>(getShell());
-    app->showPopup(this, item, event->root_x, event->root_y);
+    FXMenuPane * menu = app->createPopup(this, item);
+
+    // FIXME: make the caller show the popup, allow custom entries.
+    menu->create();
+    menu->popup(nullptr, event->root_x, event->root_y);
+    getApp()->runModalWhileShown(menu);
+    delete menu;
 
 	return 1;
 }
@@ -516,7 +522,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                         }
                         // add region if it has units in it
                         if (!regionItem) {
-                            regionItem = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void *)regionPtr));
+                            regionItem = appendItem(nullptr, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void *)regionPtr));
                         }
 
                         entry = new FXRegionItem(label, icon, icon, facPtr);
@@ -560,7 +566,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                         {
                             if (!buildings) {
                                 if (!regionItem) {
-                                    regionItem = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void*)regionPtr));
+                                    regionItem = appendItem(nullptr, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void*)regionPtr));
                                 }
                                 buildings = prependItem(regionItem, L"Geb\u00e4ude");
                             }
@@ -571,7 +577,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                         {
                             if (!ships) {
                                 if (!regionItem) {
-                                    regionItem = appendItem(NULL, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void*)regionPtr));
+                                    regionItem = appendItem(nullptr, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void*)regionPtr));
                                 }
                                 ships = prependItem(regionItem, L"Schiffe");
                             }
