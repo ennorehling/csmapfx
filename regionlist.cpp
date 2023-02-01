@@ -353,11 +353,11 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 		return 0;
 
     CSMap * app = static_cast<CSMap *>(getShell());
-    FXContextMenu menu(this);
+    FXContextMenu * menu = new FXContextMenu(this);
 
-    app->createPopup(&menu, static_cast<const datablock*>(item->getData()), item->getText());
-    menu.popup(nullptr, event->root_x, event->root_y);
-    getApp()->runModalWhileShown(&menu);
+    app->createPopup(menu, static_cast<const datablock*>(item->getData()), item->getText());
+    menu->popup(nullptr, event->root_x, event->root_y);
+    getApp()->runModalWhileShown(menu);
 
 	return 1;
 }

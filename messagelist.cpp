@@ -39,7 +39,7 @@ void FXMessageList::addMessage(FXTreeItem* group, datablock * block)
             FXString name = region->value(key_type::TYPE_NAME);
             FXString label;
             if (name.empty()) name.assign("Unbekannt");
-            FXTreeItem* item = appendItem(group, label.format("In %s (%d, %d) findet ein Kampf statt.", name.text(), block->x(), block->y()));
+            FXTreeItem* item = appendItem(group, label.format("In %s (%d,%d) findet ein Kampf statt.", name.text(), block->x(), block->y()));
             item->setData((void*)&*region);
         }
     }
