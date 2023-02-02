@@ -372,11 +372,17 @@ bool datakey::parse(const char* str, enum block_type btype, bool isUtf8)
     return false;
 }
 
-FXString datakey::translatedKey(const char*) const
+FXString datakey::translatedKey(const char* loc) const
 {
     switch (type()) {
+    case TYPE_BUILDING:
+        return FXString(L"Geb\u00e4ude");
+    case TYPE_OWNER:
+        return FXString("Besitzer");
+    case TYPE_CAPTAIN:
+        return FXString(L"Kapit\u00e4n");
     case TYPE_SPEED:
-        return "Geschwindigkeit";
+        return FXString("Geschwindigkeit");
     case TYPE_UNKNOWN:
     default:
         return key();
