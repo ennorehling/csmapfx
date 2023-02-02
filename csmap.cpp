@@ -19,7 +19,6 @@
 #include "reportinfo.h"
 #include "regioninfo.h"
 #include "commands.h"
-#include "contextmenu.h"
 #include "datafile.h"
 #include "symbols.h"
 #include "regionlist.h"
@@ -161,7 +160,11 @@ FXDEFMAP(CSMap) MessageMap[]=
 
     FXMAPFUNC(SEL_QUERY_HELP, CSMap::ID_SETSTRINGVALUE,         CSMap::onSearchInfo),
 
-    FXMAPFUNC(SEL_TIMEOUT,    CSMap::ID_WATCH_FILES,            CSMap::onWatchFiles),
+
+    FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_SHOW_INFO,           CSMap::onPopupShowInfo),
+    FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_COPY_TEXT,           CSMap::onPopupCopyText),
+    FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_GOTO,                CSMap::onPopupGotoObject),
+    FXMAPFUNC(SEL_TIMEOUT, CSMap::ID_WATCH_FILES,               CSMap::onWatchFiles),
 };
 
 FXIMPLEMENT(CSMap,FXMainWindow,MessageMap,ARRAYNUMBER(MessageMap))
@@ -2304,7 +2307,7 @@ long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
     return 0;
 }
 
-long CSMap::onCalculator(FXObject *, FXSelector, void *)
+long CSMap::onCalculator(FXObject*, FXSelector, void*)
 {
     if (!mathbar->shown())
     {
@@ -2316,6 +2319,32 @@ long CSMap::onCalculator(FXObject *, FXSelector, void *)
         mathbar->setFocus();
 
     return 1;
+}
+
+long CSMap::onPopupCopyText(FXObject* sender, FXSelector sel, void* ptr)
+{
+    FXMenuCommand* menuitem = static_cast<FXMenuCommand*>(sender);
+    const char* text = static_cast<const char*>(menuitem->getUserData());
+    setClipboard(text);
+    return 0;
+}
+
+long CSMap::onPopupShowInfo(FXObject* sender, FXSelector sel, void* ptr)
+{
+    const char* text = static_cast<const char*>(ptr);
+    showInfo(text);
+    setClipboard(text);
+    return 0;
+}
+
+long CSMap::onPopupGotoObject(FXObject* sender, FXSelector sel, void* ptr)
+{
+    FXMenuCommand* command = static_cast<FXMenuCommand*>(sender);
+    datablock* block = static_cast<datablock*>(command->getUserData());
+    if (block) {
+        gotoObject(block);
+    }
+    return 0;
 }
 
 long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)
@@ -2357,32 +2386,6 @@ long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)
     return 1;
 }
 
-long CSMap::onFileOpen(FXObject *, FXSelector, void *r)
-{
-    FXFileDialog dlg(this, FXString(L"\u00d6ffnen..."));
-    dlg.setIcon(icons.open);
-    dlg.setDirectory(dialogDirectory);
-    dlg.setPatternList(FXString(L"Eressea Computer Report (*.cr)\nAlle Dateien (*)"));
-    FXint res = dlg.execute(PLACEMENT_SCREEN);
-    dialogDirectory = dlg.getDirectory();
-    if (res) {
-        getApp()->beginWaitCursor();
-        // vorherige Dateien schliessen, Speicher frei geben
-        if (closeFile()) {
-            FXString filename = dlg.getFilename();
-            beginLoading(filename);
-            if (nullptr != (report = loadFile(filename))) {
-                mapChange();
-                updateFileNames();
-                checkCommands();
-                recentFiles.appendFile(filename);
-            }
-        }
-        getApp()->endWaitCursor();
-    }
-    return 1;
-}
-
 void CSMap::loadFiles(const std::vector<FXString> &filenames)
 {
     datafile* old_cr = report;
@@ -2413,7 +2416,7 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames)
     }
 }
 
-void CSMap::createPopup(FXContextMenu *menu, const datablock* block, const FXString &label)
+void CSMap::createPopup(FXMenuPane *menu, FXObject * target, const datablock* block, const FXString &label)
 {
     std::vector<FXString> labels;
     std::vector <const char *> texts;
@@ -2486,10 +2489,36 @@ void CSMap::createPopup(FXContextMenu *menu, const datablock* block, const FXStr
     new FXMenuCascade(menu, "&Zwischenablage", nullptr, clipboard);
     for (unsigned i = 0; i < labels.size() && i < texts.size(); i++)
 	{
-		FXMenuCommand* menuitem = new FXMenuCommand(clipboard, labels[i], NULL, menu, FXContextMenu::ID_POPUP_COPY_TEXT);
+		FXMenuCommand* menuitem = new FXMenuCommand(clipboard, labels[i], NULL, target, ID_POPUP_COPY_TEXT);
 		menuitem->setUserData(const_cast<char *>(texts[i]));
 	}
     menu->create();
+}
+
+long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
+{
+    FXFileDialog dlg(this, FXString(L"\u00d6ffnen..."));
+    dlg.setIcon(icons.open);
+    dlg.setDirectory(dialogDirectory);
+    dlg.setPatternList(FXString(L"Eressea Computer Report (*.cr)\nAlle Dateien (*)"));
+    FXint res = dlg.execute(PLACEMENT_SCREEN);
+    dialogDirectory = dlg.getDirectory();
+    if (res) {
+        getApp()->beginWaitCursor();
+        // vorherige Dateien schliessen, Speicher frei geben
+        if (closeFile()) {
+            FXString filename = dlg.getFilename();
+            beginLoading(filename);
+            if (nullptr != (report = loadFile(filename))) {
+                mapChange();
+                updateFileNames();
+                checkCommands();
+                recentFiles.appendFile(filename);
+            }
+        }
+        getApp()->endWaitCursor();
+    }
+    return 1;
 }
 
 long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
@@ -2532,6 +2561,21 @@ int CSMap::unlink(const char *pathname) {
 #else
     return ::unlink(pathname);
 #endif
+}
+
+void CSMap::setClipboard(const char* text)
+{
+    handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), const_cast<char*>(text));
+}
+
+void CSMap::showInfo(const char* text)
+{
+    handle(this, FXSEL(SEL_QUERY_HELP, ID_SETSTRINGVALUE), const_cast<char*>(text));
+}
+
+void CSMap::gotoObject(datablock* block)
+{
+    handle(this, FXSEL(SEL_COMMAND, ID_SETVALUE), block);
 }
 
 bool CSMap::saveReport(const FXString& filename, map_type mode, bool merge_commands /*= false*/)

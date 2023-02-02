@@ -30,11 +30,11 @@ public:
 #endif
 
 public:		// this functions are slots for menu commands
-    long onFileOpen(FXObject*, FXSelector, void*);
     long updOpenFile(FXObject *sender, FXSelector, void *);
 	long updActiveFaction(FXObject *sender, FXSelector, void *);
 
-	long onFileMerge(FXObject*, FXSelector, void*);
+    long onFileOpen(FXObject*, FXSelector, void*);
+    long onFileMerge(FXObject*, FXSelector, void*);
 	long onFileSaveMap(FXObject*, FXSelector, void*);
 	long onFileSaveAll(FXObject*, FXSelector, void*);
     long onFileExportMap(FXObject*, FXSelector, void*);
@@ -116,9 +116,12 @@ public:		// this functions are slots for menu commands
 	
 	long onCalculator(FXObject*, FXSelector, void* ptr);
 
+    long onPopupCopyText(FXObject* sender, FXSelector sel, void* ptr);
+    long onPopupShowInfo(FXObject* sender, FXSelector sel, void* ptr);
+    long onPopupGotoObject(FXObject* sender, FXSelector sel, void* ptr);
+
     void loadFiles(const std::vector<FXString>& filenames);
-    
-    void createPopup(class FXContextMenu* menu, const datablock* block, const FXString& label);
+    void createPopup(FXMenuPane* menu, FXObject* target, const datablock* block, const FXString& label);
 
     enum
 	{
@@ -194,10 +197,18 @@ public:		// this functions are slots for menu commands
         // file watch callback
         ID_WATCH_FILES,
 
-		ID_LAST
+        ID_POPUP_GOTO,
+        ID_POPUP_SHOW_INFO,
+        ID_POPUP_COPY_TEXT,
+        
+        ID_LAST
 	};
 
 private:
+    void setClipboard(const char* text);
+    void showInfo(const char* text);
+    void gotoObject(class datablock* block);
+
     bool saveReport(const FXString& filename, map_type mode, bool merge_commands = false);
     void mapChange();
     bool haveActiveFaction() const;

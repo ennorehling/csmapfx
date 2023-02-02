@@ -4,7 +4,6 @@
 #include "csmap.h"
 #include "regionlist.h"
 #include "symbols.h"
-#include "contextmenu.h"
 
 #include "fxhelper.h"
 #include "FXMenuSeparatorEx.h"
@@ -353,11 +352,11 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 		return 0;
 
     CSMap * app = static_cast<CSMap *>(getShell());
-    FXContextMenu * menu = new FXContextMenu(this);
+    FXMenuPane menu(this);
 
-    app->createPopup(menu, static_cast<const datablock*>(item->getData()), item->getText());
-    menu->popup(nullptr, event->root_x, event->root_y);
-    getApp()->runModalWhileShown(menu);
+    app->createPopup(&menu, app, static_cast<const datablock*>(item->getData()), item->getText());
+    menu.popup(nullptr, event->root_x, event->root_y);
+    getApp()->runModalWhileShown(&menu);
 
 	return 1;
 }

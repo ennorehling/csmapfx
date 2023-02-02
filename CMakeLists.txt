@@ -38,7 +38,6 @@ set (SOURCES
   ${CPARSE_SOURCES}
 	calc.cpp
 	commands.cpp
-	contextmenu.cpp
 	csmap.cpp
 	datablock.cpp
 	datafile.cpp
