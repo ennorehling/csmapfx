@@ -478,7 +478,7 @@ const FXString& datablock::terrainString() const
 FXString datablock::getName() const
 {
     FXString name;
-    if (type() == block_type::TYPE_FACTION) {
+    if (type() == block_type::TYPE_FACTION || type() == block_type::TYPE_ALLIANCE) {
         name = value(TYPE_FACTIONNAME);
         if (name.empty()) {
             name = "Partei " + id();

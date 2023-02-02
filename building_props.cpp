@@ -10,12 +10,7 @@ FXDEFMAP(FXBuildingProperties) MessageMap[]=
 { 
 	//________Message_Type_____________________ID_______________Message_Handler_______ 
 	FXMAPFUNC(SEL_COMMAND,			FXBuildingProperties::ID_UPDATE,				FXBuildingProperties::onMapChange), 
-    FXMAPFUNC(SEL_COMMAND,			FXBuildingProperties::ID_POPUP_COPY_TEXT,	    FXBuildingProperties::onCopyText),
-    FXMAPFUNC(SEL_COMMAND,			FXBuildingProperties::ID_POPUP_SHOW_INFO,	    FXBuildingProperties::onShowInfo),
-    FXMAPFUNC(SEL_COMMAND,			FXBuildingProperties::ID_POPUP_SELECT,	    FXBuildingProperties::onGotoItem),
-    
     FXMAPFUNC(SEL_QUERY_HELP,		0,									FXBuildingProperties::onQueryHelp),
-
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	0,								FXBuildingProperties::onPopup),
 };
 

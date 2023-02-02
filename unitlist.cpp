@@ -10,12 +10,7 @@ FXDEFMAP(FXUnitList) MessageMap[]=
 { 
 	//________Message_Type_____________________ID_______________Message_Handler_______ 
 	FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_UPDATE,				FXUnitList::onMapChange), 
-    FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_POPUP_COPY_TEXT,	    FXUnitList::onCopyText),
-    FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_POPUP_SHOW_INFO,	    FXUnitList::onShowInfo),
-    FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_POPUP_SELECT,	    FXUnitList::onGotoItem),
-    
     FXMAPFUNC(SEL_QUERY_HELP,		0,									FXUnitList::onQueryHelp),
-
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	0,								FXUnitList::onPopup),
 };
 

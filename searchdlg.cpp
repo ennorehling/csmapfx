@@ -644,7 +644,7 @@ FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor& buil
             name = "Unbekannt";
 
         if (region->info())
-            region_str.format("%s (%d,%d, %s)", name.text(), region->x(), region->y(), datablock::planeName(region->info()).text());
+            region_str.format("%s (%d,%d,%s)", name.text(), region->x(), region->y(), datablock::planeName(region->info()).text());
         else
             region_str.format("%s (%d,%d)", name.text(), region->x(), region->y());
     }

@@ -1,4 +1,5 @@
 #include "properties.h"
+#include "csmap.h"
 #include "FXMenuSeparatorEx.h"
 
 class FXProperty : public FXTreeItem
@@ -9,17 +10,6 @@ public:
     {
     }
     datablock* block = nullptr;
-    FXString info;
-};
-
-class FXPopupMenuCommand : public FXMenuCommand
-{
-public:
-    FXPopupMenuCommand(FXComposite* p, const FXString& text, const FXString& info_key, FXIcon* ic = NULL, FXObject* tgt = NULL, FXuint opts = 0)
-        : FXMenuCommand(p, text, ic, tgt, FXProperties::ID_POPUP_SHOW_INFO, opts), info(info_key) {}
-
-    const FXString& getInfo() const { return info; }
-private:
     FXString info;
 };
 
@@ -83,20 +73,6 @@ void FXProperties::setMapFile(datafile* f)
     mapFile = f;
 }
 
-void FXProperties::setClipboard(const FXString& text)
-{
-    getShell()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void*)text.text());
-}
-
-void FXProperties::showInfo(const FXString& text)
-{
-    getShell()->handle(this, FXSEL(SEL_QUERY_HELP, ID_SETSTRINGVALUE), (void*)text.text());
-}
-
-long FXProperties::onQueryHelp(FXObject* /*sender*/, FXSelector, void* /*ptr*/)
-{
-    return 0;
-}
 long FXProperties::onMapChange(FXObject*, FXSelector, void* ptr)
 {
     datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
@@ -142,63 +118,6 @@ FXString FXProperties::coastToString(int prop)
     return FXString("Unbekannt");
 }
 
-long FXProperties::onShowInfo(FXObject* sender, FXSelector sel, void* ptr)
-{
-    if (sender)
-    {
-        FXPopupMenuCommand* command = static_cast<FXPopupMenuCommand*>(sender);
-        showInfo(command->getInfo());
-        setClipboard(command->getText());
-        return 1;
-    }
-    return 0;
-}
-
-long FXProperties::onGotoItem(FXObject* sender, FXSelector sel, void* ptr)
-{
-    FXMenuCommand* command = static_cast<FXMenuCommand*>(sender);
-    const datablock* block = static_cast<const datablock*>(command->getUserData());
-    datafile::SelectionState sel_state = selection;
-    sel_state.selChange++;
-    if (sel_state.regionsSelected.empty()) {
-        sel_state.selected = 0;
-    }
-    else {
-        sel_state.regionsSelected = selection.regionsSelected;
-    }
-    if (block->type() == block_type::TYPE_UNIT)
-    {
-        if (mapFile->getUnit(sel_state.unit, block->info())) {
-            sel_state.selected |= selection.UNIT;
-        }
-    }
-    else if (block->type() == block_type::TYPE_REGION)
-    {
-        if (mapFile->getRegion(sel_state.region, block->x(), block->y(), block->info())) {
-            sel_state.selected |= selection.REGION;
-        }
-    }
-    else if (block->type() == block_type::TYPE_BUILDING)
-    {
-        if (mapFile->getBuilding(sel_state.building, block->info())) {
-            sel_state.selected |= selection.BUILDING;
-        }
-    }
-    else if (block->type() == block_type::TYPE_SHIP)
-    {
-        if (mapFile->getBuilding(sel_state.ship, block->info())) {
-            sel_state.selected |= selection.SHIP;
-        }
-    }
-    else if (block->type() == block_type::TYPE_FACTION)
-    {
-        if (mapFile->getFaction(sel_state.faction, block->info())) {
-            sel_state.selected |= selection.FACTION;
-        }
-    }
-    return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &sel_state);
-}
-
 long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
 {
     onRightBtnRelease(sender, sel, ptr);
@@ -215,65 +134,44 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
 
     // find item to create popup for
     FXTreeItem* item = getItemAt(event->click_x, event->click_y);
-    if (!item)
-        return 0;
+    if (item) {
+        void* udata = item->getData();
+        if (udata) {
+            FXProperty* popup = static_cast<FXProperty*>(udata);
+            CSMap* app = static_cast<CSMap*>(getShell());
+            FXMenuPane menu(this);
+            if (popup->block) {
+                datablock* block = popup->block;
+                app->createPopup(&menu, app, static_cast<const datablock*>(block), item->getText());
 
-    FXMenuPane* menu = new FXMenuPane(this);
-    FXMenuSeparatorEx* sep = nullptr;
+                FXString label;
+                if (block->type() == block_type::TYPE_UNIT) {
+                    label.assign("&Zeige Einheit");
+                }
+                else if (block->type() == block_type::TYPE_SHIP) {
+                    label.assign("Zeige &Schiff");
+                }
+                else if (block->type() == block_type::TYPE_BUILDING) {
+                    label.assign(L"&Zeige Geb\u00e4ude");
+                }
+                if (!label.empty()) {
+                    FXMenuCommand* command = new FXMenuCommand(&menu, label, nullptr, app, CSMap::ID_POPUP_GOTO);
+                    command->setUserData(block);
+                }
+            }
+            else {
+                const FXString& label = item->getText();
+                const FXString& info = popup->info;
+                app->createPopup(&menu, app, nullptr, label);
+                FXMenuCommand* command = new FXMenuCommand(&menu, "&Kopieren", nullptr, app, CSMap::ID_POPUP_COPY_TEXT);
+                command->setUserData(const_cast<char*>(label.text()));
+                (new FXMenuCommand(&menu, "Zeige &Info", nullptr, app, CSMap::ID_POPUP_SHOW_INFO))->setUserData(const_cast<char*>(info.text()));
+            }
 
-    FXString title = item->getText();
-    if (title.length() > 20)
-        title = title.left(17) + "...";
-
-    void* udata = item->getData();
-    if (udata) {
-        FXProperty* popup = static_cast<FXProperty*>(item);
-        if (popup->block) {
-            datablock* block = popup->block;
-            FXMenuCommand* command = nullptr;
-            if (!sep) {
-                sep = new FXMenuSeparatorEx(menu, title);
-            }
-            if (block->type() == block_type::TYPE_UNIT) {
-                command = new FXMenuCommand(menu, "Zeige &Einheit", nullptr, this, ID_POPUP_SELECT);
-            }
-            else if (block->type() == block_type::TYPE_SHIP) {
-                command = new FXMenuCommand(menu, "Zeige &Schiff", nullptr, this, ID_POPUP_SELECT);
-            }
-            else if (block->type() == block_type::TYPE_BUILDING) {
-                command = new FXMenuCommand(menu, L"Zeige &Geb\u00e4ude", nullptr, this, ID_POPUP_SELECT);
-            }
-            if (command) {
-                command->setUserData(block);
-            }
-            command = new FXMenuCommand(menu, "&Kopieren", nullptr, this, ID_POPUP_COPY_TEXT);
-            command->setUserData(block);
-        }
-        else {
-            new FXPopupMenuCommand(menu, "Zeige Info", popup->info, nullptr, this);
-        }
-    }
-    // show popup
-    if (menu->numChildren()) {
-        menu->create();
-        menu->popup(nullptr, event->root_x, event->root_y);
-        getApp()->runModalWhileShown(menu);
-    }
-    delete menu;
-    return 1;
-}
-
-long FXProperties::onCopyText(FXObject* sender, FXSelector sel, void* ptr)
-{
-    if (sender)
-    {
-        FXMenuCommand* cmd = static_cast<FXMenuCommand*>(sender);
-        const datablock* block = static_cast<const datablock*>(cmd->getUserData());
-        if (block) {
-            setClipboard(block->id());
-            return 1;
+            menu.create();
+            menu.popup(nullptr, event->root_x, event->root_y);
+            return getApp()->runModalWhileShown(&menu);
         }
     }
     return 0;
 }
-

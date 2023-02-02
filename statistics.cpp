@@ -447,9 +447,9 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 
     FXuval entryType = (FXuval)item->getData();	// 0: unit, 1: building, 2: ship
 
-	FXMenuPane *menu = new FXMenuPane(this);
+	FXMenuPane menu(this);
 
-	new FXMenuSeparatorEx(menu, item->getText());
+	new FXMenuSeparatorEx(&menu, item->getText());
 
 	std::map<int, entry>::iterator en = entries.find(itemIdx);
 	if (en != entries.end())
@@ -480,18 +480,16 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
                 label += FXString(L"Gr\u00f6\u00dfe ");
             }
             label += FXStringVal(itor->second);
-			FXMenuCommand *menuitem = new FXMenuCommand(menu, label, NULL, this, ID_POPUP_CLICKED);
+			FXMenuCommand *menuitem = new FXMenuCommand(&menu, label, NULL, this, ID_POPUP_CLICKED);
 			menuitem->setUserData((void*)&*block);
 		}
 	}
 
 	// show popup
-	menu->create();
-	menu->popup(NULL, event->root_x,event->root_y);
+	menu.create();
+	menu.popup(NULL, event->root_x,event->root_y);
 
-    getApp()->runModalWhileShown(menu);
-
-	delete menu;
+    getApp()->runModalWhileShown(&menu);
 	return 1;
 }
 

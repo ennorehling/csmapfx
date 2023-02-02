@@ -327,7 +327,9 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
     FXTreeItem* current = getCurrentItem();
     if (current) {
         datablock* block = static_cast<datablock*>(current->getData());
-        return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_SETVALUE), block);
+        if (block) {
+            return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_SETVALUE), block);
+        }
     }
     return 0;
 }
@@ -355,10 +357,9 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
     FXMenuPane menu(this);
 
     app->createPopup(&menu, app, static_cast<const datablock*>(item->getData()), item->getText());
+    menu.create();
     menu.popup(nullptr, event->root_x, event->root_y);
-    getApp()->runModalWhileShown(&menu);
-
-	return 1;
+    return getApp()->runModalWhileShown(&menu);
 }
 
 bool FXRegionList::isConfirmed(const datablock::itor& unit) const

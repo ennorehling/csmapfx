@@ -1851,29 +1851,14 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
                 FXString label;
                 FXuval p = (FXuval)*plane;
 
-                if (p == 0)
-                    continue;
-                switch (p) {
-                case 1:
-                    label = "Astralraum";
-                    break;
-                case 1137:
-                    label = "Arena";
-                    break;
-                case 59034966:
-                    label = "Eternath";
-                    break;
-                case 2000:
-                    label = "Weihnachtsinsel";
-                    break;
-                default:
-                    label.format("Ebene %lu", p);
-                }
-                planes->appendItem(label, nullptr, (void*)p);
+                if (p != 0) {
+                    label = datablock::planeName(p);
+                    planes->appendItem(label, nullptr, (void*)p);
 
-                FXMenuRadio* radio = new FXMenuRadio(planemenu, label, this, ID_MAP_VISIBLEPLANE, 0);
-                radio->setUserData((void*)p);
-                radio->create();
+                    FXMenuRadio* radio = new FXMenuRadio(planemenu, label, this, ID_MAP_VISIBLEPLANE, 0);
+                    radio->setUserData((void*)p);
+                    radio->create();
+                }
             }
 
             planes->setNumVisible(planes->getNumItems());
@@ -2331,7 +2316,8 @@ long CSMap::onPopupCopyText(FXObject* sender, FXSelector sel, void* ptr)
 
 long CSMap::onPopupShowInfo(FXObject* sender, FXSelector sel, void* ptr)
 {
-    const char* text = static_cast<const char*>(ptr);
+    FXMenuCommand* menuitem = static_cast<FXMenuCommand*>(sender);
+    const char* text = static_cast<const char*>(menuitem->getUserData());
     showInfo(text);
     setClipboard(text);
     return 0;
@@ -2418,81 +2404,58 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames)
 
 void CSMap::createPopup(FXMenuPane *menu, FXObject * target, const datablock* block, const FXString &label)
 {
-    std::vector<FXString> labels;
-    std::vector <const char *> texts;
+    std::vector<std::pair<FXString, const char *> > clipboard;
 
-	if (block)
-	{
-		if (block->type() == block_type::TYPE_REGION)
-		{
-			const FXString &name = block->value(TYPE_NAME);
-			const FXString &terrain = block->terrainString();
+    FXString title(label);
+    if (title.length() > 20) {
+        title = label.left(17) + "...";
+    }
+    new FXMenuSeparatorEx(menu, title);
 
-			if (name.length())
-			{
-				labels.push_back(name + "\t\tName");
-				texts.push_back(name.text());
-			}
+    if (block)
+    {
+        FXString name = block->getName();
+        if (!name.empty()) {
+            clipboard.push_back(std::make_pair(name + "\t\tName", name.text()));
+        }
 
-			labels.push_back(terrain + "\t\tTerrain");
-			texts.push_back(terrain.text());
-		}
-		else if (block->type() == block_type::TYPE_UNIT || block->type() == block_type::TYPE_SHIP || block->type() == block_type::TYPE_BUILDING)
-		{
-            const FXString& name = block->value(TYPE_NAME);
-            const FXString& id = block->id();
+        if (block->type() != block_type::TYPE_REGION)
+        {
+            FXString id = block->id();
+            clipboard.push_back(std::make_pair(id + "\t\tNummer", id.text()));
+            if (block->type() == block_type::TYPE_FACTION)
+            {
+                const FXString& email = block->value(TYPE_EMAIL);
+                if (!email.empty())
+                {
+                    clipboard.push_back(std::make_pair(email + "\t\tEmail", email.text()));
+                }
 
-			if (name.length())
-			{
-				labels.push_back(name + "\t\tName");
-				texts.push_back(name.text());
-			}
+                const FXString& banner = block->value(TYPE_BANNER);
+                if (!banner.empty())
+                {
+                    clipboard.push_back(std::make_pair(banner + "\t\tBanner", banner.text()));
+                }
+            }
+        }
+        else {
+            FXString coor;
+            coor.format("%d,%d", block->x(), block->y());
+            clipboard.push_back(std::make_pair(coor + "\t\tKoordinaten", coor.text()));
 
-			labels.push_back(id + "\t\tNummer");
-			texts.push_back(id.text());
-		}
-		else if (block->type() == block_type::TYPE_FACTION)
-		{
-            const FXString& name = block->value(TYPE_FACTIONNAME);
-
-			if (name.length())
-			{
-				labels.push_back(name + "\t\tName");
-				texts.push_back(name.text());
-			}
-
-			if (block->info() > 0) {
-                const FXString& id = block->id();
-				labels.push_back(id + "\t\tNummer");
-				texts.push_back(id.text());
-			}
-
-            const FXString& email = block->value(TYPE_EMAIL);
-			if (email.length())
-			{
-				labels.push_back(email + "\t\tEmail");
-				texts.push_back(email.text());
-			}
-
-            const FXString& banner = block->value(TYPE_BANNER);
-			if (banner.length())
-			{
-				labels.push_back(banner + "\t\tBanner");
-				texts.push_back(banner.text());
-			}
-		}
-	}
-
-	new FXMenuSeparatorEx(menu, label);
-
-    FXMenuPane* clipboard = new FXMenuPane(menu);
-    new FXMenuCascade(menu, "&Zwischenablage", nullptr, clipboard);
-    for (unsigned i = 0; i < labels.size() && i < texts.size(); i++)
-	{
-		FXMenuCommand* menuitem = new FXMenuCommand(clipboard, labels[i], NULL, target, ID_POPUP_COPY_TEXT);
-		menuitem->setUserData(const_cast<char *>(texts[i]));
-	}
-    menu->create();
+            const FXString& terrain = block->terrainString();
+            clipboard.push_back(std::make_pair(terrain + "\t\tTerrain", terrain.text()));
+        }
+        if (!clipboard.empty()) {
+            FXMenuPane* clipMenu = new FXMenuPane(menu);
+            new FXMenuCascade(menu, "&Zwischenablage", nullptr, clipMenu);
+            for (const auto& clip : clipboard)
+            {
+                FXMenuCommand* menuitem = new FXMenuCommand(clipMenu, clip.first, NULL, target, ID_POPUP_COPY_TEXT);
+                menuitem->setUserData(const_cast<char*>(clip.second));
+            }
+        }
+    }
 }
 
 long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
