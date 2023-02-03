@@ -2788,6 +2788,23 @@ long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
 }
 
 #ifdef HAVE_CURL
+static size_t write_data(void* data, size_t size, size_t nmemb, void* userp)
+{
+    size_t realsize = size * nmemb;
+    struct memory* mem = (struct memory*)userp;
+
+    char* ptr = (char*)realloc(mem->response, mem->size + realsize + 1);
+    if (ptr == nullptr)
+        return 0;  /* out of memory! */
+
+    mem->response = ptr;
+    memcpy(&(mem->response[mem->size]), data, realsize);
+    mem->size += realsize;
+    mem->response[mem->size] = 0;
+
+    return realsize;
+}
+
 long CSMap::curlUpload()
 {
     char infile[PATH_MAX];
