@@ -199,6 +199,8 @@ public:		// this functions are slots for menu commands
 
         ID_POPUP_GOTO,
         ID_POPUP_SHOW_INFO,
+        ID_POPUP_COPY_ID,
+        ID_POPUP_COPY_NAME,
         ID_POPUP_COPY_TEXT,
         
         ID_LAST

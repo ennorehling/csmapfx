@@ -1347,6 +1347,14 @@ FXString datafile::regionName(const datablock& block)
     return rname;
 }
 
+FXString datafile::regionCoordinates(const datablock& block)
+{
+    FXASSERT(block.type() == block_type::TYPE_REGION);
+    FXString coor;
+    coor.format("%d,%d", block.x(), block.y());
+    return coor;
+}
+
 FXString datafile::unitName(const datablock& unit, bool verbose)
 {
     FXASSERT(unit.type() == block_type::TYPE_UNIT);

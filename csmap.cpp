@@ -163,6 +163,8 @@ FXDEFMAP(CSMap) MessageMap[]=
 
     FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_SHOW_INFO,           CSMap::onPopupShowInfo),
     FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_COPY_TEXT,           CSMap::onPopupCopyText),
+    FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_COPY_NAME,           CSMap::onPopupCopyText),
+    FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_COPY_ID,             CSMap::onPopupCopyText),
     FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_GOTO,                CSMap::onPopupGotoObject),
     FXMAPFUNC(SEL_TIMEOUT, CSMap::ID_WATCH_FILES,               CSMap::onWatchFiles),
 };
@@ -2305,12 +2307,33 @@ long CSMap::onCalculator(FXObject*, FXSelector, void*)
 
     return 1;
 }
-
 long CSMap::onPopupCopyText(FXObject* sender, FXSelector sel, void* ptr)
 {
     FXMenuCommand* menuitem = static_cast<FXMenuCommand*>(sender);
-    const char* text = static_cast<const char*>(menuitem->getUserData());
-    setClipboard(text);
+    if (FXSELID(sel) == ID_POPUP_COPY_TEXT) {
+        const char* text = static_cast<const char*>(menuitem->getUserData());
+        setClipboard(text);
+        return 1;
+    }
+    else 
+    {
+        const datablock* block = static_cast<const datablock*>(menuitem->getUserData());
+        if (block) {
+            if (FXSELID(sel) == ID_POPUP_COPY_NAME) {
+                setClipboard(block->getName().text());
+            }
+            else if (FXSELID(sel) == ID_POPUP_COPY_ID) {
+                if (block->type() == block_type::TYPE_REGION) {
+                    FXString coor = report->regionCoordinates(*block);
+                    setClipboard(coor.text());
+                }
+                else {
+                    setClipboard(block->id().text());
+                }
+            }
+        }
+        return 1;
+    }
     return 0;
 }
 
@@ -2402,9 +2425,15 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames)
     }
 }
 
+struct clip_t {
+    FXint sel_id;
+    FXString label;
+    void* data;
+};
+
 void CSMap::createPopup(FXMenuPane *menu, FXObject * target, const datablock* block, const FXString &label)
 {
-    std::vector<std::pair<FXString, const char *> > clipboard;
+    std::vector<clip_t> clipboard;
 
     FXString title(label);
     if (title.length() > 20) {
@@ -2414,45 +2443,46 @@ void CSMap::createPopup(FXMenuPane *menu, FXObject * target, const datablock* bl
 
     if (block)
     {
-        FXString name = block->getName();
-        if (!name.empty()) {
-            clipboard.push_back(std::make_pair(name + "\t\tName", name.text()));
+        FXString label = block->getName();
+        if (!label.empty()) {
+            clipboard.push_back(clip_t{ ID_POPUP_COPY_NAME, label + "\t\tName", const_cast<datablock *>(block) });
         }
 
-        if (block->type() != block_type::TYPE_REGION)
+        if (block->type() == block_type::TYPE_REGION)
         {
-            FXString id = block->id();
-            clipboard.push_back(std::make_pair(id + "\t\tNummer", id.text()));
+            FXString coor = report->regionCoordinates(*block);
+            clipboard.push_back(clip_t{ ID_POPUP_COPY_ID, coor + "\t\tKoordinaten", const_cast<datablock*>(block) });
+
+            const FXString& terrain = block->terrainString();
+            clipboard.push_back(clip_t{ ID_POPUP_COPY_TEXT, terrain + "\t\tTerrain", const_cast<char*>(terrain.text()) });
+        }
+        else 
+        {
+            label = block->id();
+            clipboard.push_back(clip_t{ ID_POPUP_COPY_ID, label + "\t\tNummer", const_cast<datablock*>(block) });
+
             if (block->type() == block_type::TYPE_FACTION)
             {
                 const FXString& email = block->value(TYPE_EMAIL);
                 if (!email.empty())
                 {
-                    clipboard.push_back(std::make_pair(email + "\t\tEmail", email.text()));
+                    clipboard.push_back(clip_t{ ID_POPUP_COPY_TEXT, email + "\t\tEmail", const_cast<char*>(email.text()) });
                 }
 
                 const FXString& banner = block->value(TYPE_BANNER);
                 if (!banner.empty())
                 {
-                    clipboard.push_back(std::make_pair(banner + "\t\tBanner", banner.text()));
+                    clipboard.push_back(clip_t{ ID_POPUP_COPY_TEXT, banner + "\t\tBanner", const_cast<char*>(banner.text()) });
                 }
             }
-        }
-        else {
-            FXString coor;
-            coor.format("%d,%d", block->x(), block->y());
-            clipboard.push_back(std::make_pair(coor + "\t\tKoordinaten", coor.text()));
-
-            const FXString& terrain = block->terrainString();
-            clipboard.push_back(std::make_pair(terrain + "\t\tTerrain", terrain.text()));
         }
         if (!clipboard.empty()) {
             FXMenuPane* clipMenu = new FXMenuPane(menu);
             new FXMenuCascade(menu, "&Zwischenablage", nullptr, clipMenu);
-            for (const auto& clip : clipboard)
+            for (const clip_t& clip : clipboard)
             {
-                FXMenuCommand* menuitem = new FXMenuCommand(clipMenu, clip.first, NULL, target, ID_POPUP_COPY_TEXT);
-                menuitem->setUserData(const_cast<char*>(clip.second));
+                FXMenuCommand* menuitem = new FXMenuCommand(clipMenu, clip.label, NULL, target, clip.sel_id);
+                menuitem->setUserData(clip.data);
             }
         }
     }
