@@ -163,8 +163,8 @@ FXDEFMAP(CSMap) MessageMap[]=
 
     FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_SHOW_INFO,           CSMap::onPopupShowInfo),
     FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_COPY_TEXT,           CSMap::onPopupCopyText),
-    FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_COPY_NAME,           CSMap::onPopupCopyText),
-    FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_COPY_ID,             CSMap::onPopupCopyText),
+    FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_COPY_NAME,           CSMap::onPopupCopySpecial),
+    FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_COPY_ID,             CSMap::onPopupCopySpecial),
     FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_GOTO,                CSMap::onPopupGotoObject),
     FXMAPFUNC(SEL_TIMEOUT, CSMap::ID_WATCH_FILES,               CSMap::onWatchFiles),
 };
@@ -2307,34 +2307,34 @@ long CSMap::onCalculator(FXObject*, FXSelector, void*)
 
     return 1;
 }
+
 long CSMap::onPopupCopyText(FXObject* sender, FXSelector sel, void* ptr)
 {
     FXMenuCommand* menuitem = static_cast<FXMenuCommand*>(sender);
-    if (FXSELID(sel) == ID_POPUP_COPY_TEXT) {
-        const char* text = static_cast<const char*>(menuitem->getUserData());
-        setClipboard(text);
-        return 1;
-    }
-    else 
-    {
-        const datablock* block = static_cast<const datablock*>(menuitem->getUserData());
-        if (block) {
-            if (FXSELID(sel) == ID_POPUP_COPY_NAME) {
-                setClipboard(block->getName().text());
+    const char* text = static_cast<const char*>(menuitem->getUserData());
+    setClipboard(text);
+    return 1;
+}
+
+long CSMap::onPopupCopySpecial(FXObject* sender, FXSelector sel, void* ptr)
+{
+    FXMenuCommand* menuitem = static_cast<FXMenuCommand*>(sender);
+    const datablock* block = static_cast<const datablock*>(menuitem->getUserData());
+    if (block) {
+        if (FXSELID(sel) == ID_POPUP_COPY_NAME) {
+            setClipboard(block->getName().text());
+        }
+        else if (FXSELID(sel) == ID_POPUP_COPY_ID) {
+            if (block->type() == block_type::TYPE_REGION) {
+                FXString coor = report->regionCoordinates(*block);
+                setClipboard(coor.text());
             }
-            else if (FXSELID(sel) == ID_POPUP_COPY_ID) {
-                if (block->type() == block_type::TYPE_REGION) {
-                    FXString coor = report->regionCoordinates(*block);
-                    setClipboard(coor.text());
-                }
-                else {
-                    setClipboard(block->id().text());
-                }
+            else {
+                setClipboard(block->id().text());
             }
-            return 1;
         }
     }
-    return 0;
+    return 1;
 }
 
 long CSMap::onPopupShowInfo(FXObject* sender, FXSelector sel, void* ptr)

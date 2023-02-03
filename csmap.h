@@ -117,6 +117,7 @@ public:		// this functions are slots for menu commands
 	long onCalculator(FXObject*, FXSelector, void* ptr);
 
     long onPopupCopyText(FXObject* sender, FXSelector sel, void* ptr);
+    long onPopupCopySpecial(FXObject* sender, FXSelector sel, void* ptr);
     long onPopupShowInfo(FXObject* sender, FXSelector sel, void* ptr);
     long onPopupGotoObject(FXObject* sender, FXSelector sel, void* ptr);
 
