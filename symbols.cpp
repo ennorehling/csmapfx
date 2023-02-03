@@ -103,7 +103,6 @@ namespace data
 
         static std::string loadTexture(const char* folder, const char* name)
         {
-            unsigned char* result = nullptr;
             std::string filename(folder);
             filename += '/';
             filename += name;

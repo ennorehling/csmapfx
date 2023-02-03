@@ -2331,8 +2331,8 @@ long CSMap::onPopupCopyText(FXObject* sender, FXSelector sel, void* ptr)
                     setClipboard(block->id().text());
                 }
             }
+            return 1;
         }
-        return 1;
     }
     return 0;
 }
@@ -2431,57 +2431,57 @@ struct clip_t {
     void* data;
 };
 
-void CSMap::createPopup(FXMenuPane *menu, FXObject * target, const datablock* block, const FXString &label)
+void CSMap::createPopup(FXMenuPane *popup, FXObject * tgt, const datablock* block, const FXString &label)
 {
-    std::vector<clip_t> clipboard;
+    std::vector<clip_t> clips;
 
-    FXString title(label);
-    if (title.length() > 20) {
-        title = label.left(17) + "...";
+    FXString str(label);
+    if (str.length() > 20) {
+        str = label.left(17) + "...";
     }
-    new FXMenuSeparatorEx(menu, title);
+    new FXMenuSeparatorEx(popup, str);
 
     if (block)
     {
-        FXString label = block->getName();
-        if (!label.empty()) {
-            clipboard.push_back(clip_t{ ID_POPUP_COPY_NAME, label + "\t\tName", const_cast<datablock *>(block) });
+        str = block->getName();
+        if (!str.empty()) {
+            clips.push_back(clip_t{ ID_POPUP_COPY_NAME, str + "\t\tName", const_cast<datablock *>(block) });
         }
 
         if (block->type() == block_type::TYPE_REGION)
         {
             FXString coor = report->regionCoordinates(*block);
-            clipboard.push_back(clip_t{ ID_POPUP_COPY_ID, coor + "\t\tKoordinaten", const_cast<datablock*>(block) });
+            clips.push_back(clip_t{ ID_POPUP_COPY_ID, coor + "\t\tKoordinaten", const_cast<datablock*>(block) });
 
             const FXString& terrain = block->terrainString();
-            clipboard.push_back(clip_t{ ID_POPUP_COPY_TEXT, terrain + "\t\tTerrain", const_cast<char*>(terrain.text()) });
+            clips.push_back(clip_t{ ID_POPUP_COPY_TEXT, terrain + "\t\tTerrain", const_cast<char*>(terrain.text()) });
         }
         else 
         {
-            label = block->id();
-            clipboard.push_back(clip_t{ ID_POPUP_COPY_ID, label + "\t\tNummer", const_cast<datablock*>(block) });
+            str = block->id();
+            clips.push_back(clip_t{ ID_POPUP_COPY_ID, str + "\t\tNummer", const_cast<datablock*>(block) });
 
             if (block->type() == block_type::TYPE_FACTION)
             {
                 const FXString& email = block->value(TYPE_EMAIL);
                 if (!email.empty())
                 {
-                    clipboard.push_back(clip_t{ ID_POPUP_COPY_TEXT, email + "\t\tEmail", const_cast<char*>(email.text()) });
+                    clips.push_back(clip_t{ ID_POPUP_COPY_TEXT, email + "\t\tEmail", const_cast<char*>(email.text()) });
                 }
 
                 const FXString& banner = block->value(TYPE_BANNER);
                 if (!banner.empty())
                 {
-                    clipboard.push_back(clip_t{ ID_POPUP_COPY_TEXT, banner + "\t\tBanner", const_cast<char*>(banner.text()) });
+                    clips.push_back(clip_t{ ID_POPUP_COPY_TEXT, banner + "\t\tBanner", const_cast<char*>(banner.text()) });
                 }
             }
         }
-        if (!clipboard.empty()) {
-            FXMenuPane* clipMenu = new FXMenuPane(menu);
-            new FXMenuCascade(menu, "&Zwischenablage", nullptr, clipMenu);
-            for (const clip_t& clip : clipboard)
+        if (!clips.empty()) {
+            FXMenuPane* clipMenu = new FXMenuPane(popup);
+            new FXMenuCascade(popup, "&Zwischenablage", nullptr, clipMenu);
+            for (const clip_t& clip : clips)
             {
-                FXMenuCommand* menuitem = new FXMenuCommand(clipMenu, clip.label, NULL, target, clip.sel_id);
+                FXMenuCommand* menuitem = new FXMenuCommand(clipMenu, clip.label, NULL, tgt, clip.sel_id);
                 menuitem->setUserData(clip.data);
             }
         }
@@ -2776,23 +2776,6 @@ struct memory {
     char *response;
     size_t size;
 };
-
-static size_t write_data(void *data, size_t size, size_t nmemb, void *userp)
-{
-    size_t realsize = size * nmemb;
-    struct memory *mem = (struct memory *)userp;
-
-    char *ptr = (char *)realloc(mem->response, mem->size + realsize + 1);
-    if (ptr == nullptr)
-        return 0;  /* out of memory! */
-
-    mem->response = ptr;
-    memcpy(&(mem->response[mem->size]), data, realsize);
-    mem->size += realsize;
-    mem->response[mem->size] = 0;
-
-    return realsize;
-}
 
 long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
 {

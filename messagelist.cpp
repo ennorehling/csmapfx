@@ -69,7 +69,7 @@ void FXMessageList::addMessage(FXTreeItem* group, datablock * block)
     }
 }
 
-long FXMessageList::onMapChange(FXObject*target, FXSelector sel, void*ptr)
+long FXMessageList::onMapChange(FXObject* sender, FXSelector sel, void* ptr)
 {
     datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
 

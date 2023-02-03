@@ -30,9 +30,9 @@ FXTreeItem* FXProperties::makeItem(const FXString& label, datablock* block, cons
     return popup;
 }
 
-FXTreeItem* FXProperties::makeStringList(FXTreeItem* parent, const FXString& label, const datablock& block)
+FXTreeItem* FXProperties::makeStringList(FXTreeItem* p, const FXString& label, const datablock& block)
 {
-    FXTreeItem* node = appendItem(parent, label);
+    FXTreeItem* node = appendItem(p, label);
     node->setExpanded(true);
 
     for (const datakey& key : block.data()) {
@@ -41,7 +41,7 @@ FXTreeItem* FXProperties::makeStringList(FXTreeItem* parent, const FXString& lab
     return node;
 }
 
-FXTreeItem* FXProperties::makeUnitList(FXTreeItem* parent, const FXString& label, datablock::itor begin, datablock::itor end, key_type key, int value)
+FXTreeItem* FXProperties::makeUnitList(FXTreeItem* p, const FXString& label, datablock::itor begin, datablock::itor end, key_type key, int value)
 {
     std::vector<FXTreeItem*> units;
 
@@ -49,15 +49,13 @@ FXTreeItem* FXProperties::makeUnitList(FXTreeItem* parent, const FXString& label
     {
         if (block->type() == block_type::TYPE_UNIT) {
             datablock* unitPtr = &*block;
-            int unitId = unitPtr->info();
             if (unitPtr->valueInt(key) == value) {
-                FXString label = unitPtr->getLabel() + ": " + unitPtr->value(TYPE_NUMBER);
-                units.push_back(makeItem(label, unitPtr));
+                units.push_back(makeItem(unitPtr->getLabel() + ": " + unitPtr->value(TYPE_NUMBER), unitPtr));
             }
         }
     }
     if (!units.empty()) {
-        FXTreeItem* node = appendItem(parent, label);
+        FXTreeItem* node = appendItem(p, label);
         node->setExpanded(true);
         for (FXTreeItem* item : units) {
             appendItem(node, item);
@@ -138,11 +136,11 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
         void* udata = item->getData();
         if (udata) {
             FXProperty* popup = static_cast<FXProperty*>(udata);
-            CSMap* app = static_cast<CSMap*>(getShell());
+            CSMap* csmap = static_cast<CSMap*>(getShell());
             FXMenuPane menu(this);
             if (popup->block) {
                 datablock* block = popup->block;
-                app->createPopup(&menu, app, static_cast<const datablock*>(block), item->getText());
+                csmap->createPopup(&menu, csmap, static_cast<const datablock*>(block), item->getText());
 
                 FXString label;
                 if (block->type() == block_type::TYPE_UNIT) {
@@ -155,17 +153,17 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
                     label.assign(L"&Zeige Geb\u00e4ude");
                 }
                 if (!label.empty()) {
-                    FXMenuCommand* command = new FXMenuCommand(&menu, label, nullptr, app, CSMap::ID_POPUP_GOTO);
+                    FXMenuCommand* command = new FXMenuCommand(&menu, label, nullptr, csmap, CSMap::ID_POPUP_GOTO);
                     command->setUserData(block);
                 }
             }
             else {
                 const FXString& label = item->getText();
                 const FXString& info = popup->info;
-                app->createPopup(&menu, app, nullptr, label);
-                FXMenuCommand* command = new FXMenuCommand(&menu, "&Kopieren", nullptr, app, CSMap::ID_POPUP_COPY_TEXT);
+                csmap->createPopup(&menu, csmap, nullptr, label);
+                FXMenuCommand* command = new FXMenuCommand(&menu, "&Kopieren", nullptr, csmap, CSMap::ID_POPUP_COPY_TEXT);
                 command->setUserData(const_cast<char*>(label.text()));
-                (new FXMenuCommand(&menu, "Zeige &Info", nullptr, app, CSMap::ID_POPUP_SHOW_INFO))->setUserData(const_cast<char*>(info.text()));
+                (new FXMenuCommand(&menu, "Zeige &Info", nullptr, csmap, CSMap::ID_POPUP_SHOW_INFO))->setUserData(const_cast<char*>(info.text()));
             }
 
             menu.create();

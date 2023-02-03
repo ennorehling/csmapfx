@@ -105,12 +105,12 @@ void FXBuildingProperties::makeItems()
         for (datablock::itor block = std::next(building); block != end && block->depth() > building->depth(); ++block)
         {
             if (block->type() == block_type::TYPE_EFFECTS) {
-                FXTreeItem* node = makeStringList(root, "Effekte", *block);
+                makeStringList(root, "Effekte", *block);
                 break;
             }
         }
         // List units, if any:
-        FXTreeItem* node = makeUnitList(root, "Einheiten", unit, end, TYPE_BUILDING, building->info());
+        makeUnitList(root, "Einheiten", unit, end, TYPE_BUILDING, building->info());
     }
 }
 

@@ -28,7 +28,7 @@ FXRegionInfo::FXRegionInfo(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint
     guards = appendItem(nullptr, "Bewacher");
 }
 
-long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
+long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
 {
     datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
 
@@ -160,7 +160,7 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                             prefix = "Die ";	// fuer Schiffe
 
                         for (const datakey& msg : block->data()) {
-                            datablock* data = nullptr;
+                            datablock* udata = nullptr;
                             FXString val = msg.value();
                             FXint right = val.find_last_of(')', val.length());
                             if (right >= 0) {
@@ -171,15 +171,15 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                                 if (block->type() == block_type::TYPE_DURCHSCHIFFUNG)
                                 {
                                     if (mapFile->getShip(match, no)) {
-                                        data = &*match;
+                                        udata = &*match;
                                     }
                                 }
                                 else if (mapFile->getUnit(match, no)) {
-                                    data = &*match;
+                                    udata = &*match;
                                 }
                             }
                             FXTreeItem * item = appendItem(travel, prefix + val);
-                            item->setData(data);
+                            item->setData(udata);
                         }
                     }
                 }
@@ -200,18 +200,18 @@ long FXRegionInfo::onMapChange(FXObject * target, FXSelector sel, void * ptr)
                 while (block != end && block->type() != block_type::TYPE_MESSAGE) ++block;
                 for (; block != end && block->type() == block_type::TYPE_MESSAGE; ++block)
                 {
-                    datablock* message = &*block;
-                    if (unitPtr && message->hasReference(unitPtr)) {
-                        addMessage(unitMessages, message);
+                    datablock* msg = &*block;
+                    if (unitPtr && msg->hasReference(unitPtr)) {
+                        addMessage(unitMessages, msg);
                     }
-                    if (regionPtr && message->hasReference(regionPtr)) {
-                        addMessage(regionMessages, message);
+                    if (regionPtr && msg->hasReference(regionPtr)) {
+                        addMessage(regionMessages, msg);
                     }
                 }
             }
         }
     }
 
-    return FXMessageList::onMapChange(target, sel, ptr);
+    return FXMessageList::onMapChange(sender, sel, ptr);
 
 }

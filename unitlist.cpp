@@ -495,11 +495,11 @@ void FXUnitList::makeItems()
                     FXint uid = FXIntVal(t->value());
                     datablock::itor unit_owner;
                     if (mapFile->getUnit(unit_owner, uid)) {
-                        datablock& owner = *unit_owner;
+                        datablock& owner_blk = *unit_owner;
                         if (unit_owner != unit) {
-                            block = &owner;
+                            block = &owner_blk;
                         }
-                        label = t->translatedKey() + ": " + mapFile->unitName(owner, true);
+                        label = t->translatedKey() + ": " + mapFile->unitName(owner_blk, true);
                     }
                 }
                 else {
@@ -535,7 +535,7 @@ void FXUnitList::makeItems()
             unhandled.clear();
 
             FXString type;
-            FXint size = -1, damage = -1, factionId = -1, coast = -1, cargo = -1, capacity = -1;
+            FXint size = -1, damage = -1, coast = -1, cargo = -1, capacity = -1;
 
             for (datakey::list_type::const_iterator key = ship->data().begin(); key != ship->data().end(); ++key)
             {
@@ -543,8 +543,6 @@ void FXUnitList::makeItems()
                     name = key->value();
                 else if (key->type() == TYPE_DESCRIPTION)
                     descr = key->value();
-                else if (key->type() == TYPE_FACTION)
-                    factionId = atoi(key->value().text());
                 else if (key->type() == TYPE_TYPE)
                     type = key->value();
                 else if (key->type() == TYPE_SIZE)
@@ -557,7 +555,7 @@ void FXUnitList::makeItems()
                     cargo = key->getInt();
                 else if (key->type() == TYPE_CAPACITY)
                     capacity = key->getInt();
-                else if (key->type() != TYPE_LOAD && key->type() != TYPE_MAXLOAD)
+                else if (key->type() != TYPE_LOAD && key->type() != TYPE_MAXLOAD && key->type() != TYPE_FACTION)
                     unhandled.push_back(key);
             }
 
@@ -575,7 +573,7 @@ void FXUnitList::makeItems()
 
             // Schaden
             if (damage > 0)
-                appendItem(node, damage + FXString(L"% besch\u00e4digt"));
+                appendItem(node, FXStringVal(damage) + FXString(L"% besch\u00e4digt"));
 
             // Kueste
             if (coast > 0 && coast < 6) {
@@ -597,11 +595,11 @@ void FXUnitList::makeItems()
                     FXint uid = FXIntVal(t->value());
                     datablock::itor unit_owner;
                     if (mapFile->getUnit(unit_owner, uid)) {
-                        datablock& owner = *unit_owner;
+                        datablock& owner_blk = *unit_owner;
                         if (unit_owner != unit) {
-                            block = &owner;
+                            block = &owner_blk;
                         }
-                        label = t->translatedKey() + ": " + mapFile->unitName(owner, true);
+                        label = t->translatedKey() + ": " + mapFile->unitName(owner_blk, true);
                     }
                 }
                 else {

@@ -353,10 +353,10 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 	if (!item)
 		return 0;
 
-    CSMap * app = static_cast<CSMap *>(getShell());
+    CSMap * csmap = static_cast<CSMap *>(getShell());
     FXMenuPane menu(this);
 
-    app->createPopup(&menu, app, static_cast<const datablock*>(item->getData()), item->getText());
+    csmap->createPopup(&menu, csmap, static_cast<const datablock*>(item->getData()), item->getText());
     menu.create();
     menu.popup(nullptr, event->root_x, event->root_y);
     return getApp()->runModalWhileShown(&menu);
@@ -437,7 +437,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
 		clearItems();
 
         if (mapFile) {
-            FXString label, terrainString;
+            FXString str, terrainString;
 
             for (datablock::itor region = mapFile->blocks().begin(); region != mapFile->blocks().end(); ++region)
             {
@@ -456,16 +456,16 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                     name = "Unbekannt";
 
                 if (regionPtr->info())
-                    label.format("%s (%d,%d,%s)", name.text(), regionPtr->x(), regionPtr->y(), datablock::planeName(regionPtr->info()).text());
+                    str.format("%s (%d,%d,%s)", name.text(), regionPtr->x(), regionPtr->y(), datablock::planeName(regionPtr->info()).text());
                 else
-                    label.format("%s (%d,%d)", name.text(), regionPtr->x(), regionPtr->y());
+                    str.format("%s (%d,%d)", name.text(), regionPtr->x(), regionPtr->y());
 
                 // select terrain image
                 FXint terrain = regionPtr->terrain();
 
                 FXTreeItem *regionItem = nullptr;
 
-                FXString regionlabel = label;
+                FXString regionlabel = str;
                 std::map<FXint, FXRegionItem *> factions;
 
                 datablock::itor iend = mapFile->blocks().end();
@@ -477,7 +477,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
 
                     // get faction id, -1 means unknown faction (or stealth/anonymous)
                     int factionId = mapFile->getFactionIdForUnit(objectPtr);
-                    label = mapFile->getFactionName(factionId);
+                    str = mapFile->getFactionName(factionId);
                     FXRegionItem*&entry = factions[factionId];
                     if (!entry)
                     {
@@ -524,7 +524,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                             regionItem = appendItem(nullptr, new FXRegionItem(regionlabel, terrainIcons[terrain], terrainIcons[terrain], (void *)regionPtr));
                         }
 
-                        entry = new FXRegionItem(label, icon, icon, facPtr);
+                        entry = new FXRegionItem(str, icon, icon, facPtr);
                     }
                 }
 

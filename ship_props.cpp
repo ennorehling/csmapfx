@@ -120,7 +120,7 @@ void FXShipProperties::makeItems()
 
         // Schaden
         if (damage >= 0)
-            appendItem(root, damage + FXString(L"% besch\u00e4digt"));
+            appendItem(root, FXStringVal(damage) + FXString(L"% besch\u00e4digt"));
 
         // list unhandled keys
         for (std::vector<datakey::list_type::const_iterator>::const_iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
@@ -133,12 +133,12 @@ void FXShipProperties::makeItems()
         for (datablock::itor block = std::next(ship); block != end && block->depth() > ship->depth(); ++block)
         {
             if (block->type() == block_type::TYPE_EFFECTS) {
-                FXTreeItem* node = makeStringList(root, "Effekte", *block);
+                makeStringList(root, "Effekte", *block);
                 break;
             }
         }
         // List units, if any:
-        FXTreeItem* node = makeUnitList(root, "Einheiten", unit, end, TYPE_SHIP, ship->info());
+        makeUnitList(root, "Einheiten", unit, end, TYPE_SHIP, ship->info());
     }
 }
 
