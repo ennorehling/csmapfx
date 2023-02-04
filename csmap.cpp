@@ -2183,24 +2183,17 @@ long CSMap::onClipboardRequest(FXObject*, FXSelector, void* ptr)
     FXEvent *event = (FXEvent*)ptr;
 
     // Return clipped text as as UTF-8
-    if (event->target == utf8Type)
+    if(event->target == utf8Type)
     {
-        setDNDData(FROM_CLIPBOARD, event->target, FXString(clipboard));
+        setDNDData(FROM_CLIPBOARD, utf8Type, FXString(clipboard));
         return 1;
     }
 
     if (event->target == stringType || event->target == textType)
     {
-        /*        FXuchar *data;
-                FXuint len = clipboard.length();
-
-        #ifdef _WINDOWS
-                len++;        // windows needs this to be null-terminated, other OSes don't.
-        #endif
-        */
-
         // Give the array to the system!
-        setDNDData(FROM_CLIPBOARD, event->target, clipboard);
+        FXString text = utf2iso(clipboard);
+        setDNDData(FROM_CLIPBOARD, event->target, text);
         return 1;
     }
 
