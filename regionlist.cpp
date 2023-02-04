@@ -454,7 +454,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
         if (mapFile) {
             FXString str, terrainString;
 
-            for (datablock::itor &region = mapFile->blocks().begin(); region != mapFile->blocks().end(); ++region)
+            for (datablock::itor region = mapFile->blocks().begin(); region != mapFile->blocks().end(); ++region)
             {
                 const datablock* regionPtr = &*region;
                 // handle only regions
