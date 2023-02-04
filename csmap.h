@@ -122,7 +122,7 @@ public:		// this functions are slots for menu commands
     long onPopupGotoObject(FXObject* sender, FXSelector sel, void* ptr);
 
     void loadFiles(const std::vector<FXString>& filenames);
-    void createPopup(FXMenuPane* menu, FXObject* target, const datablock* block, const FXString& label);
+    void addClipboardPane(FXMenuPane* pane, datablock* block);
 
     enum
 	{

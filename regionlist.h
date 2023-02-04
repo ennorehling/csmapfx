@@ -23,7 +23,8 @@ public:
 public:
 	long onSelected(FXObject*,FXSelector,void*);
 
-	long onPopup(FXObject*, FXSelector, void*);
+    long onPopup(FXObject*, FXSelector, void*);
+    long showPopup(const FXString& label, datablock* block, FXint root_x, FXint root_y);
 
 	long onToggleOwnFactionGroup(FXObject*, FXSelector, void*);
 	long onUpdateOwnFactionGroup(FXObject*, FXSelector, void*);

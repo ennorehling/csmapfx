@@ -2183,7 +2183,7 @@ long CSMap::onClipboardRequest(FXObject*, FXSelector, void* ptr)
     FXEvent *event = (FXEvent*)ptr;
 
     // Return clipped text as as UTF-8
-    if(event->target == utf8Type)
+    if (event->target == utf8Type)
     {
         setDNDData(FROM_CLIPBOARD, event->target, FXString(clipboard));
         return 1;
@@ -2191,13 +2191,13 @@ long CSMap::onClipboardRequest(FXObject*, FXSelector, void* ptr)
 
     if (event->target == stringType || event->target == textType)
     {
-/*        FXuchar *data;
-        FXuint len = clipboard.length();
+        /*        FXuchar *data;
+                FXuint len = clipboard.length();
 
-#ifdef _WINDOWS
-        len++;        // windows needs this to be null-terminated, other OSes don't.
-#endif
-*/
+        #ifdef _WINDOWS
+                len++;        // windows needs this to be null-terminated, other OSes don't.
+        #endif
+        */
 
         // Give the array to the system!
         setDNDData(FROM_CLIPBOARD, event->target, clipboard);
@@ -2206,6 +2206,7 @@ long CSMap::onClipboardRequest(FXObject*, FXSelector, void* ptr)
 
     return 0; //FXWindow::onClipboardRequest(sender, sel, ptr);
 }
+
 
 long CSMap::onClipboardLost(FXObject*, FXSelector, void*)
 {
@@ -2221,7 +2222,7 @@ long CSMap::onSetClipboard(FXObject*, FXSelector, void* ptr)
 
 if (ptr)
 {
-    clipboard = utf2iso(static_cast<const char *>(ptr));
+    clipboard.assign(static_cast<const char *>(ptr));
     acquireClipboard(&stringType, 1);
 }
 
@@ -2431,19 +2432,12 @@ struct clip_t {
     void* data;
 };
 
-void CSMap::createPopup(FXMenuPane *popup, FXObject * tgt, const datablock* block, const FXString &label)
+void CSMap::addClipboardPane(FXMenuPane *pane, datablock* block)
 {
     std::vector<clip_t> clips;
-
-    FXString str(label);
-    if (str.length() > 20) {
-        str = label.left(17) + "...";
-    }
-    new FXMenuSeparatorEx(popup, str);
-
     if (block)
     {
-        str = block->getName();
+        FXString str = block->getName();
         if (!str.empty()) {
             clips.push_back(clip_t{ ID_POPUP_COPY_NAME, str + "\t\tName", const_cast<datablock *>(block) });
         }
@@ -2477,11 +2471,9 @@ void CSMap::createPopup(FXMenuPane *popup, FXObject * tgt, const datablock* bloc
             }
         }
         if (!clips.empty()) {
-            FXMenuPane* clipMenu = new FXMenuPane(popup);
-            new FXMenuCascade(popup, "&Zwischenablage", nullptr, clipMenu);
             for (const clip_t& clip : clips)
             {
-                FXMenuCommand* menuitem = new FXMenuCommand(clipMenu, clip.label, NULL, tgt, clip.sel_id);
+                FXMenuCommand* menuitem = new FXMenuCommand(pane, clip.label, NULL, this, clip.sel_id);
                 menuitem->setUserData(clip.data);
             }
         }

@@ -137,10 +137,12 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
         if (udata) {
             FXProperty* popup = static_cast<FXProperty*>(udata);
             CSMap* csmap = static_cast<CSMap*>(getShell());
-            FXMenuPane menu(this);
+            FXMenuPane pane(this);
             if (popup->block) {
                 datablock* block = popup->block;
-                csmap->createPopup(&menu, csmap, static_cast<const datablock*>(block), item->getText());
+                FXMenuPane paneCascade(this);
+                new FXMenuCascade(&pane, "&Zwischenablage", NULL, &paneCascade);
+                csmap->addClipboardPane(&paneCascade, block);
 
                 FXString label;
                 if (block->type() == block_type::TYPE_UNIT) {
@@ -153,22 +155,21 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
                     label.assign(L"&Zeige Geb\u00e4ude");
                 }
                 if (!label.empty()) {
-                    FXMenuCommand* command = new FXMenuCommand(&menu, label, nullptr, csmap, CSMap::ID_POPUP_GOTO);
+                    FXMenuCommand* command = new FXMenuCommand(&pane, label, nullptr, csmap, CSMap::ID_POPUP_GOTO);
                     command->setUserData(block);
                 }
             }
             else {
                 const FXString& label = item->getText();
                 const FXString& info = popup->info;
-                csmap->createPopup(&menu, csmap, nullptr, label);
-                FXMenuCommand* command = new FXMenuCommand(&menu, "&Kopieren", nullptr, csmap, CSMap::ID_POPUP_COPY_TEXT);
+                FXMenuCommand* command = new FXMenuCommand(&pane, "&Kopieren", nullptr, csmap, CSMap::ID_POPUP_COPY_TEXT);
                 command->setUserData(const_cast<char*>(label.text()));
-                (new FXMenuCommand(&menu, "Zeige &Info", nullptr, csmap, CSMap::ID_POPUP_SHOW_INFO))->setUserData(const_cast<char*>(info.text()));
+                (new FXMenuCommand(&pane, "Zeige &Info", nullptr, csmap, CSMap::ID_POPUP_SHOW_INFO))->setUserData(const_cast<char*>(info.text()));
             }
 
-            menu.create();
-            menu.popup(nullptr, event->root_x, event->root_y);
-            return getApp()->runModalWhileShown(&menu);
+            pane.create();
+            pane.popup(nullptr, event->root_x, event->root_y);
+            return getApp()->runModalWhileShown(&pane);
         }
     }
     return 0;

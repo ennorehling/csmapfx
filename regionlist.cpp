@@ -353,13 +353,28 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 	if (!item)
 		return 0;
 
-    CSMap * csmap = static_cast<CSMap *>(getShell());
-    FXMenuPane menu(this);
+    return showPopup(item->getText(), static_cast<datablock*>(item->getData()), event->root_x, event->root_y);
+}
 
-    csmap->createPopup(&menu, csmap, static_cast<const datablock*>(item->getData()), item->getText());
-    menu.create();
-    menu.popup(nullptr, event->root_x, event->root_y);
-    return getApp()->runModalWhileShown(&menu);
+long FXRegionList::showPopup(const FXString& label, datablock* block, FXint root_x, FXint root_y)
+{
+    CSMap* csmap = static_cast<CSMap*>(getShell());
+
+    FXMenuPane pane(this);
+    if (label.length() <= 20) {
+        new FXMenuSeparatorEx(&pane, label);
+    }
+    else {
+        FXString str = label.left(17) + "...";
+        new FXMenuSeparatorEx(&pane, str);
+    }
+    FXMenuPane paneCascade(this);
+    new FXMenuCascade(&pane, "&Zwischenablage", NULL, &paneCascade);
+    csmap->addClipboardPane(&paneCascade, block);
+    pane.create();
+    pane.popup(nullptr, root_x, root_y);
+    getApp()->runModalWhileShown(&pane);
+    return 0;
 }
 
 bool FXRegionList::isConfirmed(const datablock::itor& unit) const
@@ -439,7 +454,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
         if (mapFile) {
             FXString str, terrainString;
 
-            for (datablock::itor region = mapFile->blocks().begin(); region != mapFile->blocks().end(); ++region)
+            for (datablock::itor &region = mapFile->blocks().begin(); region != mapFile->blocks().end(); ++region)
             {
                 const datablock* regionPtr = &*region;
                 // handle only regions
