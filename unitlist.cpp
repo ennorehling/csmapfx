@@ -10,12 +10,7 @@ FXDEFMAP(FXUnitList) MessageMap[]=
 { 
 	//________Message_Type_____________________ID_______________Message_Handler_______ 
 	FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_UPDATE,				FXUnitList::onMapChange), 
-    FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_POPUP_COPY_TEXT,	    FXUnitList::onCopyText),
-    FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_POPUP_SHOW_INFO,	    FXUnitList::onShowInfo),
-    FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_POPUP_SELECT,	    FXUnitList::onGotoItem),
-    
     FXMAPFUNC(SEL_QUERY_HELP,		0,									FXUnitList::onQueryHelp),
-
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	0,								FXUnitList::onPopup),
 };
 
@@ -45,8 +40,7 @@ void FXUnitList::makeItems()
         datablock::itor building = end;
         datablock::itor ship = end;
 
-        datablock::itor block = unit;
-        for (block++; block != end && block->depth() > unit->depth(); block++)
+        for (datablock::itor block = std::next(unit); block != end && block->depth() > unit->depth(); block++)
         {
             if (block->type() == block_type::TYPE_ITEMS)
                 items = block;
@@ -144,7 +138,6 @@ void FXUnitList::makeItems()
             * 500 von 700 Aura
         */
 
-        FXTreeItem* item;
         FXString label;
 
         label.format("%s (%s)", name.text(), unit->id().text());
@@ -191,7 +184,7 @@ void FXUnitList::makeItems()
                 }
             }
         }
-        item = appendItem(unititem, label);
+        FXTreeItem* item = appendItem(unititem, label);
 
         label = unit->value(TYPE_DESCRIPTION);
         if (!label.empty()) {
@@ -338,7 +331,7 @@ void FXUnitList::makeItems()
             {
                 FXString type;
 
-                block = itor->second;
+                const datablock::itor &block = itor->second;
                 if (itor->first == 0)
                     type = FXString(L"Pr\u00e4kampfzauber");
                 else if (itor->first == 1)
@@ -496,23 +489,24 @@ void FXUnitList::makeItems()
             for (std::vector<datakey::list_type::const_iterator>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
             {
                 const datakey::list_type::const_iterator t = *itag;
-                datablock* owner_block = nullptr;
+                datablock* block = nullptr;
 
                 if (t->type() == TYPE_OWNER) {
                     FXint uid = FXIntVal(t->value());
                     datablock::itor unit_owner;
                     if (mapFile->getUnit(unit_owner, uid)) {
-                        label = L"Besitzer: ";
-                        label += mapFile->unitName(*unit_owner, true);
+                        datablock& owner_blk = *unit_owner;
+                        if (unit_owner != unit) {
+                            block = &owner_blk;
+                        }
+                        label = t->translatedKey() + ": " + mapFile->unitName(owner_blk, true);
                     }
                 }
                 else {
                     label.format("%s: %s", t->key().text(), t->value().text());
                 }
-
-                if (owner_block) {
-                    item = makeItem(label, owner_block, nullptr);
-                    item = appendItem(node, item);
+                if (block) {
+                    item = appendItem(node, makeItem(label, block, nullptr));
                 }
                 else {
                     item = appendItem(node, label);
@@ -520,8 +514,7 @@ void FXUnitList::makeItems()
             }
 
             effects = end;
-            block = building;
-            for (block++; block != end && block->depth() > unit->depth(); block++)
+            for (datablock::itor block = std::next(building); block != end && block->depth() > unit->depth(); block++)
             {
                 if (block->type() == block_type::TYPE_EFFECTS)
                     effects = block;
@@ -542,7 +535,7 @@ void FXUnitList::makeItems()
             unhandled.clear();
 
             FXString type;
-            FXint size = -1, damage = -1, factionId = -1, coast = -1, cargo = -1, capacity = -1;
+            FXint size = -1, damage = -1, coast = -1, cargo = -1, capacity = -1;
 
             for (datakey::list_type::const_iterator key = ship->data().begin(); key != ship->data().end(); ++key)
             {
@@ -550,8 +543,6 @@ void FXUnitList::makeItems()
                     name = key->value();
                 else if (key->type() == TYPE_DESCRIPTION)
                     descr = key->value();
-                else if (key->type() == TYPE_FACTION)
-                    factionId = atoi(key->value().text());
                 else if (key->type() == TYPE_TYPE)
                     type = key->value();
                 else if (key->type() == TYPE_SIZE)
@@ -564,7 +555,7 @@ void FXUnitList::makeItems()
                     cargo = key->getInt();
                 else if (key->type() == TYPE_CAPACITY)
                     capacity = key->getInt();
-                else if (key->type() != TYPE_LOAD && key->type() != TYPE_MAXLOAD)
+                else if (key->type() != TYPE_LOAD && key->type() != TYPE_MAXLOAD && key->type() != TYPE_FACTION)
                     unhandled.push_back(key);
             }
 
@@ -582,7 +573,7 @@ void FXUnitList::makeItems()
 
             // Schaden
             if (damage > 0)
-                appendItem(node, damage + FXString(L"% besch\u00e4digt"));
+                appendItem(node, FXStringVal(damage) + FXString(L"% besch\u00e4digt"));
 
             // Kueste
             if (coast > 0 && coast < 6) {
@@ -599,23 +590,32 @@ void FXUnitList::makeItems()
             for (std::vector<datakey::list_type::const_iterator>::iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
             {
                 datakey::list_type::const_iterator t = *itag;
+                datablock* block = nullptr;
                 if (t->type() == TYPE_CAPTAIN) {
                     FXint uid = FXIntVal(t->value());
                     datablock::itor unit_owner;
                     if (mapFile->getUnit(unit_owner, uid)) {
-                        label = mapFile->unitName(*unit_owner, true);
+                        datablock& owner_blk = *unit_owner;
+                        if (unit_owner != unit) {
+                            block = &owner_blk;
+                        }
+                        label = t->translatedKey() + ": " + mapFile->unitName(owner_blk, true);
                     }
                 }
                 else {
-                    FXString key = t->translatedKey(nullptr);
+                    FXString key = t->translatedKey();
                     label.format("%s: %s", key.text(), t->value().text());
                 }
-                item = appendItem(node, label);
+                if (block) {
+                    item = appendItem(node, makeItem(label, block, nullptr));
+                }
+                else {
+                    item = appendItem(node, label);
+                }
             }
 
             effects = end;
-            block = ship;
-            for (block++; block != end && block->depth() > unit->depth(); block++)
+            for (datablock::itor block = std::next(ship); block != end && block->depth() > unit->depth(); block++)
             {
                 if (block->type() == block_type::TYPE_EFFECTS)
                     effects = block;

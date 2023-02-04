@@ -10,12 +10,7 @@ FXDEFMAP(FXBuildingProperties) MessageMap[]=
 { 
 	//________Message_Type_____________________ID_______________Message_Handler_______ 
 	FXMAPFUNC(SEL_COMMAND,			FXBuildingProperties::ID_UPDATE,				FXBuildingProperties::onMapChange), 
-    FXMAPFUNC(SEL_COMMAND,			FXBuildingProperties::ID_POPUP_COPY_TEXT,	    FXBuildingProperties::onCopyText),
-    FXMAPFUNC(SEL_COMMAND,			FXBuildingProperties::ID_POPUP_SHOW_INFO,	    FXBuildingProperties::onShowInfo),
-    FXMAPFUNC(SEL_COMMAND,			FXBuildingProperties::ID_POPUP_SELECT,	    FXBuildingProperties::onGotoItem),
-    
     FXMAPFUNC(SEL_QUERY_HELP,		0,									FXBuildingProperties::onQueryHelp),
-
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	0,								FXBuildingProperties::onPopup),
 };
 
@@ -110,12 +105,12 @@ void FXBuildingProperties::makeItems()
         for (datablock::itor block = std::next(building); block != end && block->depth() > building->depth(); ++block)
         {
             if (block->type() == block_type::TYPE_EFFECTS) {
-                FXTreeItem* node = makeStringList(root, "Effekte", *block);
+                makeStringList(root, "Effekte", *block);
                 break;
             }
         }
         // List units, if any:
-        FXTreeItem* node = makeUnitList(root, "Einheiten", unit, end, TYPE_BUILDING, building->info());
+        makeUnitList(root, "Einheiten", unit, end, TYPE_BUILDING, building->info());
     }
 }
 

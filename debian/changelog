@@ -1,8 +1,10 @@
-csmapfx (1.6.0-1) stable; urgency=low
+csmapfx (1.5.7-1) stable; urgency=low
 
-  * fix display of owners and stealh units
+  * fix display of owners and stealth units.
+  * consistent format for coordinates.
+  * fix (most) context menu/clipboard operations.
 
- -- Enno Rehling <enno@eressea.de>  Sun, 29 Jan 2023 21:30:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sat, 04 Feb 2023 23:15:00 +0200
 
 csmapfx (1.5.6-1) stable; urgency=low
 

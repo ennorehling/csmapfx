@@ -61,6 +61,7 @@ public:
 	datablock::list_type& blocks() { return m_blocks; }
 
     bool hasUnits() const { return !m_units.empty(); }
+    bool getParent(datablock::itor& out, const datablock::itor& child);
     bool getUnit(datablock::itor& out, int id);
     bool getGroup(datablock::itor& out, int id);
 	bool getBuilding(datablock::itor& out, int id);
@@ -73,6 +74,7 @@ public:
     bool hasRegion(int x, int y, int plane) const;
     bool deleteRegion(datablock* region);
     FXString regionName(const datablock& block);
+    FXString regionCoordinates(const datablock& block);
     FXString unitName(const datablock& block, bool verbose = false);
 
     void findSelection(const datablock* select, datablock::itor& out, datablock::itor& region);

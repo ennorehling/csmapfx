@@ -28,7 +28,7 @@ static void skip_bom(std::ifstream& file)
 {
     // skip BOM, if any
     for (int i = 0; i != 3; ++i) {
-        char c = file.get();
+        int c = file.get();
         if (c != UTF8BOM[i]) {
             file.seekg(0);
             break;
@@ -1207,6 +1207,17 @@ datablock::itor datafile::unit(int id)
 	return unit->second;
 }
 
+bool datafile::getParent(datablock::itor& out, const datablock::itor& child)
+{
+    for (datablock::itor parent = child; parent != m_blocks.begin(); --parent) {
+        if (parent->depth() < child->depth()) {
+            out = parent;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool datafile::getUnit(datablock::itor& out, int id)
 {
     datablock::itor block = unit(id);
@@ -1334,6 +1345,14 @@ FXString datafile::regionName(const datablock& block)
         }
     }
     return rname;
+}
+
+FXString datafile::regionCoordinates(const datablock& block)
+{
+    FXASSERT(block.type() == block_type::TYPE_REGION);
+    FXString coor;
+    coor.format("%d,%d", block.x(), block.y());
+    return coor;
 }
 
 FXString datafile::unitName(const datablock& unit, bool verbose)

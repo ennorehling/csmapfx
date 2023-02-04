@@ -16,16 +16,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="map.cpp" />
     <ClCompile Include="mapcanvas.cpp" />
-    <ClCompile Include="messages.cpp" />
-    <ClCompile Include="regioninfos.cpp" />
     <ClCompile Include="regionlist.cpp" />
     <ClCompile Include="reportinfo.cpp" />
     <ClCompile Include="searchdlg.cpp" />
     <ClCompile Include="prefsdlg.cpp" />
     <ClCompile Include="statistics.cpp" />
-    <ClCompile Include="statsinfos.cpp" />
     <ClCompile Include="symbols.cpp" />
-    <ClCompile Include="tradeinfos.cpp" />
     <ClCompile Include="unitlist.cpp" />
     <ClCompile Include="cparse\builtin-features.cpp">
       <Filter>cparse</Filter>
@@ -42,6 +38,14 @@
     <ClCompile Include="cparse\shunting-yard.cpp">
       <Filter>cparse</Filter>
     </ClCompile>
+    <ClCompile Include="building_props.cpp" />
+    <ClCompile Include="messagelist.cpp" />
+    <ClCompile Include="properties.cpp" />
+    <ClCompile Include="regioninfo.cpp" />
+    <ClCompile Include="regionpanel.cpp" />
+    <ClCompile Include="ship_props.cpp" />
+    <ClCompile Include="statspanel.cpp" />
+    <ClCompile Include="tradepanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="calc.h" />
@@ -60,16 +64,12 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="map.h" />
     <ClInclude Include="mapcanvas.h" />
-    <ClInclude Include="messages.h" />
-    <ClInclude Include="regioninfos.h" />
     <ClInclude Include="regionlist.h" />
     <ClInclude Include="reportinfo.h" />
     <ClInclude Include="searchdlg.h" />
     <ClInclude Include="prefsdlg.h" />
     <ClInclude Include="statistics.h" />
-    <ClInclude Include="statsinfos.h" />
     <ClInclude Include="symbols.h" />
-    <ClInclude Include="tradeinfos.h" />
     <ClInclude Include="unitlist.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="cparse\containers.h">

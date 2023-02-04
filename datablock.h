@@ -285,7 +285,7 @@ public:
 	::attachment* attachment() const { return m_attachment; }
 	void attachment(::attachment* attach);
 	
-	const FXString terrainString() const;
+    const FXString& terrainString() const;
     FXString getName() const;
     FXString getLabel() const;
 
@@ -390,5 +390,5 @@ protected:
 	};
 	static blocknames BLOCKNAMES[];
     static const char* UNITKEYS[];
-
+    static FXString TERRAIN_NAMES[];
 };
