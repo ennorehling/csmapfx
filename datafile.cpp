@@ -29,7 +29,7 @@ static void skip_bom(std::ifstream& file)
     // skip BOM, if any
     for (int i = 0; i != 3; ++i) {
         int c = file.get();
-        if (c != UTF8BOM[i]) {
+        if ((char)c != UTF8BOM[i]) {
             file.seekg(0);
             break;
         }
