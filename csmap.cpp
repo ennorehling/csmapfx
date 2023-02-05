@@ -3323,14 +3323,13 @@ FXString CSMap::gameDate(int turn) const
 bool CSMap::isConfirmed(const datablock::itor& unit)
 {
     if (unit->type() == block_type::TYPE_UNIT) {
-        datablock::itor block = unit;
-        for (++block; block != report->blocks().end() && block->depth() > unit->depth(); ++block) {
-            if (block->type() == block_type::TYPE_COMMANDS) {
-                att_commands* att = static_cast<att_commands*>(block->attachment());
-                if (att) {
-                    return att->confirmed;
-                }
-                break;
+
+        datablock::itor cmd;
+        if (report->getCommands(cmd, selection.unit))
+        {
+            att_commands* att = static_cast<att_commands*>(cmd->attachment());
+            if (att) {
+                return att->confirmed;
             }
         }
     }

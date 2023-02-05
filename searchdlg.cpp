@@ -379,7 +379,7 @@ namespace
         const compare_func_t& compare = context.compare;
 
 		// search if a command matchs
-		if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
+		if (att_commands* cmds = static_cast<att_commands*>(block->attachment()))
 		{
 			// search in the changed command list
 			att_commands::cmdlist_t::iterator end = cmds->commands.end();
@@ -679,20 +679,12 @@ FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor& buil
         object_str = name + " (" + unitPtr->id() + ")";
         faction_str = mapFile->getFactionName(factionId);
 
-        datablock::itor block = unit;
-        for (block++; block != end && block->depth() > unit->depth(); block++)
+        datablock::itor cmd;
+        if (mapFile->getCommands(cmd, unit))
         {
-            if (block->type() != block_type::TYPE_COMMANDS)
-                continue;
-
-            if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment())) {
+            if (att_commands* cmds = static_cast<att_commands*>(cmd->attachment())) {
                 bold = !cmds->confirmed;
-                break;
             }
-        }
-
-        if (att_commands* cmds = dynamic_cast<att_commands*>(unit->attachment())) {
-            bold = !cmds->confirmed;
         }
     }
 

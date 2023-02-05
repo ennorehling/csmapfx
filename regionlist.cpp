@@ -384,7 +384,7 @@ bool FXRegionList::isConfirmed(const datablock::itor& unit) const
     {
         if (block->type() != block_type::TYPE_COMMANDS)
             continue;
-        if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
+        if (att_commands* cmds = static_cast<att_commands*>(block->attachment()))
             return cmds->confirmed;
         return false;
     }

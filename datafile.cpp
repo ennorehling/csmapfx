@@ -326,18 +326,12 @@ int datafile::save(const char* filename, map_type map_filter)
 		}
 		else if (type == block_type::TYPE_UNIT)
 		{
-			// search for command block of unit
-			datablock::itor cmd = block;
-			for (cmd++; cmd != last_block && cmd->depth() > block->depth(); ++cmd)
-				if (cmd->type() == block_type::TYPE_COMMANDS)
-					break;				// found
-
-			bool confirmed = block->valueInt(TYPE_ORDERS_CONFIRMED) != 0;
-
-			if (cmd != last_block && cmd->type() == block_type::TYPE_COMMANDS)
+            bool confirmed = block->valueInt(TYPE_ORDERS_CONFIRMED) != 0;
+			datablock::itor cmd;
+			if (getCommands(cmd, block))
 			{
 				// att_commands' confirmed attribute overwrites the tag
-				if (att_commands* cmds = dynamic_cast<att_commands*>(cmd->attachment()))
+				if (att_commands* cmds = static_cast<att_commands*>(cmd->attachment()))
 					confirmed = cmds->confirmed;
 			}
 
@@ -787,22 +781,16 @@ int datafile::loadCmds(const FXString& filename)
                 if (unit_order)
                     unit_order->push_back(unitId);
 
-                // search for command block of unit
-                int unitDepth = -1;
                 datablock::itor block;
                 if (!getUnit(block, unitId))
                 {
                     throw std::runtime_error(("Einheit nicht gefunden: " + str).text());
                 }
-                unitDepth = block->depth();
                 cmds_list = nullptr;
                 datablock::itor cmdb;
-                for (cmdb = std::next(block); cmdb != m_blocks.end() && cmdb->depth() > unitDepth; ++cmdb) {
-                    if (cmdb->type() == block_type::TYPE_COMMANDS) {
-                        if (att_commands* cmds = static_cast<att_commands*>(cmdb->attachment())) {
-                            cmds_list = cmds;
-                            break;
-                        }
+                if (getCommands(cmdb, block)) {
+                    if (att_commands* cmds = static_cast<att_commands*>(cmdb->attachment())) {
+                        cmds_list = cmds;
                     }
                 }
 
@@ -1023,22 +1011,16 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 				continue;
 			}
 
-			// search for command block of unit
-			datablock::itor cmdb = unit;
-			for (cmdb++; cmdb != m_blocks.end() && cmdb->depth() > unit->depth(); cmdb++)
-				if (cmdb->type() == block_type::TYPE_COMMANDS)
-					break;				// found
-
-			if (cmdb == m_blocks.end() || cmdb->type() != block_type::TYPE_COMMANDS)
-			{
+            datablock::itor cmdb;
+            if (!getCommands(cmdb, unit))
+            {
 				out << "  ; Einheit " << unit->id() << " hat keinen Befehlsblock!\n";
 				continue;
-			}
-
+            }
 			// unit has command block
 			//  EINHEIT wz5t;  Botschafter des Konzils [1,146245$,Beqwx(1/3)] kaempft nicht
 
-			att_commands* attcmds = dynamic_cast<att_commands*>(cmdb->attachment());
+			att_commands* attcmds = static_cast<att_commands*>(cmdb->attachment());
 			if (attcmds && !attcmds->header.empty())
 				out << attcmds->header.text() << "\n";
 			else
@@ -1434,20 +1416,17 @@ void datafile::setConfirmed(datablock::itor& unit, bool confirmed)
     else {
         unit->removeKey(TYPE_ORDERS_CONFIRMED);
     }
-    // search for command block of unit
-    datablock::itor block;
-
-    // FIXME: remove redundant confirmation info.
-    if (getCommands(block, unit))
+    datablock::itor cmd;
+    if (getCommands(cmd, unit))
     {
-        att_commands* cmds = static_cast<att_commands*>(block->attachment());
+        att_commands* cmds = static_cast<att_commands*>(cmd->attachment());
         if (cmds) {
             cmds->confirmed = confirmed;
         }
         else if (confirmed)			// don't need to add block if it will not be confirmed
         {
             // copy commands of selected unit
-            block->attachment(cmds = new att_commands(*block, true));
+            cmd->attachment(cmds = new att_commands(*cmd, true));
         }
     }
 }
@@ -1729,7 +1708,6 @@ void datafile::createHashTables()
 			// set attachment for unit of active faction
 			else if (factionId == m_factionId)
 			{
-				// search for command block of unit
 				datablock::itor cmd;
                 if (getCommands(cmd, block))
                 {
