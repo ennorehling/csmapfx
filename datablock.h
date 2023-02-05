@@ -232,8 +232,8 @@ public:
 class att_commands : public attachment
 {
 public:
-    att_commands() {}
-    att_commands(const class datablock& source);
+    att_commands(bool confirm = false) : confirmed(confirm) {}
+    att_commands(const class datablock& source, bool confirm = false);
 
     void addCommand(const FXString &line);
 	typedef std::vector<FXString> cmdlist_t;

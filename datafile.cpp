@@ -1426,6 +1426,40 @@ FXString datafile::unitName(const datablock& unit, bool verbose)
     return unit.getName();
 }
 
+void datafile::setConfirmed(datablock::itor& unit, bool confirmed)
+{
+    FXASSERT(unit->type() == block_type::TYPE_UNIT);
+
+    if (confirmed) {
+        unit->setKey(TYPE_ORDERS_CONFIRMED, 1);
+    }
+    else {
+        unit->removeKey(TYPE_ORDERS_CONFIRMED);
+    }
+    // search for command block of unit
+    datablock::itor block;
+
+    // FIXME: remove redundant confirmation info.
+    if (getCommands(block, unit))
+    {
+        att_commands* cmds = static_cast<att_commands*>(block->attachment());
+        if (cmds) {
+            cmds->confirmed = confirmed;
+        }
+        else if (confirmed)			// don't need to add block if it will not be confirmed
+        {
+            // copy commands of selected unit
+            block->attachment(cmds = new att_commands(*block, true));
+        }
+    }
+}
+
+bool datafile::isConfirmed(const datablock::itor& unit) const
+{
+    FXASSERT(unit->type() == block_type::TYPE_UNIT);
+    return unit->valueInt(TYPE_ORDERS_CONFIRMED) != 0;;
+}
+
 void datafile::createHierarchy()
 {
 	typedef std::vector<block_type> stack;
