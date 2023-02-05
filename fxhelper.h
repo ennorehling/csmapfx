@@ -42,7 +42,7 @@ void showError(const std::string& str);
 // -------------------
 inline std::ostream& operator<<(std::ostream& out, const FX::FXString& str)
 {
-    return out << utf2iso(str).text();
+    return out << str.text();
 }
 
 FXString FXStringValEx(FXulong num, unsigned int base = 10);

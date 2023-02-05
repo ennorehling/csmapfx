@@ -1,3 +1,9 @@
+csmapfx (1.5.10-1) stable; urgency=low
+
+  * export orders as utf-8, do not convert. fixes uploads.
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 05 Feb 2023 12:20:00 +0200
+
 csmapfx (1.5.9-1) stable; urgency=low
 
   * fix displaying game-specific information
