@@ -232,7 +232,8 @@ public:
 class att_commands : public attachment
 {
 public:
-	att_commands() : confirmed(false) { }
+    att_commands() {}
+    att_commands(const class datablock& source);
 
     void addCommand(const FXString &line);
 	typedef std::vector<FXString> cmdlist_t;
@@ -297,7 +298,10 @@ public:
     void addKey(const datakey& data) {
         m_data.push_back(data);
     }
-    void setKey(enum key_type type, const FXString& value) {
+    void setKey(enum key_type type, int value) {
+        setKey((int)type | TYPE_INTEGER, FXStringVal(value));
+    }
+    void setKey(int type, const FXString& value) {
         for (datakey::itor tags = m_data.begin(); tags != m_data.end(); ++tags)
         {
             if (tags->type() == type) {

@@ -346,7 +346,7 @@ int datafile::save(const char* filename, map_type map_filter)
 		}
 		else if (type == block_type::TYPE_COMMANDS)
 		{
-			if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
+			if (att_commands* cmds = static_cast<att_commands*>(block->attachment()))
 			{
 				hideKeys = true;		// hide original commands
 
@@ -1207,6 +1207,30 @@ datablock::itor datafile::unit(int id)
 	return unit->second;
 }
 
+bool datafile::getFirst(datablock::itor& out, block_type type)
+{
+    for (datablock::itor it = m_blocks.begin(); it != m_blocks.end(); ++it)
+    {
+        if (it->type() == type) {
+            out = it;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool datafile::getNext(datablock::itor& iter, block_type type)
+{
+    for (datablock::itor it = std::next(iter); it != m_blocks.end(); ++it)
+    {
+        if (type == it->type()) {
+            iter = it;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool datafile::getParent(datablock::itor& out, const datablock::itor& child)
 {
     for (datablock::itor parent = child; parent != m_blocks.begin(); --parent) {
@@ -1216,6 +1240,25 @@ bool datafile::getParent(datablock::itor& out, const datablock::itor& child)
         }
     }
     return false;
+}
+
+bool datafile::getChild(datablock::itor& out, const datablock::itor& parent, block_type type)
+{
+    int depth = parent->depth();
+    for (datablock::itor itor = std::next(parent); itor != m_blocks.end() && itor->depth() > depth; ++itor)
+    {
+        if (itor->type() == type) {
+            out = itor;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool datafile::getCommands(datablock::itor& out, const datablock::itor& unit)
+{
+    FXASSERT(unit->type() == block_type::TYPE_UNIT);
+    return getChild(out, unit, block_type::TYPE_COMMANDS);
 }
 
 bool datafile::getUnit(datablock::itor& out, int id)
@@ -1655,24 +1698,15 @@ void datafile::createHashTables()
 			else if (factionId == m_factionId)
 			{
 				// search for command block of unit
-				datablock::itor cmd = block;
-				for (cmd++; cmd != m_blocks.end() && cmd->depth() > block->depth(); cmd++)
-					if (cmd->type() == block_type::TYPE_COMMANDS)
-						break;				// found
-
-				// add att_commands to command block
-				if (cmd != m_blocks.end() && cmd->type() == block_type::TYPE_COMMANDS && !cmd->attachment())
-				{
-					att_commands* cmds = new att_commands;
-					cmd->attachment(cmds);
-					
-					cmds->confirmed = block->valueInt(TYPE_ORDERS_CONFIRMED) != 0;
-
-					const datakey::list_type &list = cmd->data();
-
-					for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); ++itor)
-						cmds->commands.push_back(itor->value());
-				}
+				datablock::itor cmd;
+                if (getCommands(cmd, block))
+                {
+                    // add att_commands to command block
+                    if (!cmd->attachment())
+                    {
+                        att_commands* cmds = new att_commands(*block, isConfirmed(block));
+                    }
+                }
 			}
 		}
 
@@ -1826,7 +1860,7 @@ void datafile::createHashTables()
 			}
 
             if (!name.empty()) {
-                att_region* stats = dynamic_cast<att_region*>(block->attachment());
+                att_region* stats = static_cast<att_region*>(block->attachment());
                 if (!stats) {
                     stats = new att_region;
                     block->attachment(stats);
@@ -1843,7 +1877,7 @@ void datafile::createHashTables()
 	for (std::list<datablock::itor>::iterator itor = floodislands.begin(); itor != floodislands.end(); itor++)
 	{
 		FXString name;
-		if (att_region* stats = dynamic_cast<att_region*>((*itor)->attachment()))
+		if (att_region* stats = static_cast<att_region*>((*itor)->attachment()))
 			name = stats->island;
 
 		int x = (*itor)->x(), y = (*itor)->y(), z = (*itor)->info();
@@ -1862,7 +1896,7 @@ void datafile::createHashTables()
 					neighbour->terrain() == data::TERRAIN_FIREWALL)
 					continue;
 
-				att_region* stats = dynamic_cast<att_region*>(neighbour->attachment());
+				att_region* stats = static_cast<att_region*>(neighbour->attachment());
 				if (!stats) {
 					stats = new att_region;
 					neighbour->attachment(stats);

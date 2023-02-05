@@ -635,7 +635,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                         item->setUnconfirmed(1);
                         for (FXTreeItem* father = item->getParent(); father; father = father->getParent())
                         {
-                            FXRegionItem* ri = dynamic_cast<FXRegionItem*>(father);
+                            FXRegionItem* ri = static_cast<FXRegionItem*>(father);
                             if (ri) {
                                 int unconfirmed = ri->getUnconfirmed() + 1;
                                 ri->setUnconfirmed(unconfirmed);

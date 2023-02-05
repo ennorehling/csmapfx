@@ -6,6 +6,16 @@
 
 #include <cassert>
 
+att_commands::att_commands(const datablock& source)
+{
+    const datakey::list_type& list = source.data();
+
+    for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); itor++) {
+        commands.push_back((*itor).value());
+    }
+
+}
+
 void att_commands::addCommand(const FXString &line) {
     std::copy(postfix_lines.begin(), postfix_lines.end(),
         std::back_inserter(commands));

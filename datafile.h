@@ -59,9 +59,13 @@ public:
     FXString getPassword() const { return m_password; }
 
 	datablock::list_type& blocks() { return m_blocks; }
+    bool getFirst(datablock::itor& out, block_type type);
+    bool getNext(datablock::itor& iter, block_type type);
 
     bool hasUnits() const { return !m_units.empty(); }
     bool getParent(datablock::itor& out, const datablock::itor& child);
+    bool getChild(datablock::itor& out, const datablock::itor& parent, block_type type);
+    bool getCommands(datablock::itor& out, const datablock::itor& unit);
     bool getUnit(datablock::itor& out, int id);
     bool getGroup(datablock::itor& out, int id);
 	bool getBuilding(datablock::itor& out, int id);
