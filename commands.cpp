@@ -269,15 +269,7 @@ void FXCommands::setConfirmed(bool confirmed)
 			else if (confirmed)			// don't need to add block if it will not be confirmed
 			{
 				// copy commands of selected unit
-				block->attachment(cmds = new att_commands);
-				cmds->confirmed = confirmed;
-
-				const datakey::list_type &list = block->data();
-
-                for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); itor++)
-                {
-                    cmds->commands.push_back((*itor).value());
-                }
+				block->attachment(cmds = new att_commands(*block, confirmed));
 			}
 		}
 	}
@@ -335,8 +327,8 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 
 			// search for command block of unit
 			datablock::itor end = mapFile->blocks().end();
-			datablock::itor block = unit;
-			for (block++; block != end && block->depth() > unit->depth(); block++)
+			datablock::itor block = std::next(unit);
+			for (; block != end && block->depth() > unit->depth(); block++)
 				if (block->type() == block_type::TYPE_COMMANDS)
 					break;				// found
 
@@ -346,13 +338,7 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 				if (!cmds)
 				{
 					// copy commands of selected unit
-					block->attachment(cmds = new att_commands);
-
-					const datakey::list_type &list = block->data();
-
-                    for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); itor++) {
-                        cmds->commands.push_back((*itor).value());
-                    }
+					block->attachment(cmds = new att_commands(*block));
 				}
 
 				// show commands of selected unit

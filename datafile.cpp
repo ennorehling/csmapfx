@@ -789,19 +789,17 @@ int datafile::loadCmds(const FXString& filename)
 
                 // search for command block of unit
                 int unitDepth = -1;
-                datablock::itor block = unit(unitId);
-                if (block != m_blocks.end())
+                datablock::itor block;
+                if (!getUnit(block, unitId))
                 {
-                    unitDepth = block->depth();
-                    block++;
-                }
-                else {
                     throw std::runtime_error(("Einheit nicht gefunden: " + str).text());
                 }
-                for (cmds_list = NULL; block != m_blocks.end() && block->depth() > unitDepth; block++) {
-                    if (block->type() == block_type::TYPE_COMMANDS) {
-                        // TODO: why can't this be a static_cast?
-                        if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment())) {
+                unitDepth = block->depth();
+                cmds_list = nullptr;
+                datablock::itor cmdb;
+                for (cmdb = std::next(block); cmdb != m_blocks.end() && cmdb->depth() > unitDepth; ++cmdb) {
+                    if (cmdb->type() == block_type::TYPE_COMMANDS) {
+                        if (att_commands* cmds = static_cast<att_commands*>(cmdb->attachment())) {
                             cmds_list = cmds;
                             break;
                         }
@@ -1738,7 +1736,7 @@ void datafile::createHashTables()
                     // add att_commands to command block
                     if (!cmd->attachment())
                     {
-                        att_commands* cmds = new att_commands(*block, isConfirmed(block));
+                        cmd->attachment(new att_commands(*cmd, isConfirmed(block)));
                     }
                 }
 			}
