@@ -1,3 +1,12 @@
+csmapfx (1.5.9-1) stable; urgency=low
+
+  * fix displaying game-specific information
+  * fix active plane selection menu
+  * fix faction statistics
+  * speed up selection update after report changes
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 05 Feb 2023 09:00:00 +0200
+
 csmapfx (1.5.8-1) stable; urgency=low
 
   * fix BOM handling

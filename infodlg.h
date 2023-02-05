@@ -60,7 +60,7 @@ protected:
 	std::map<FXString, infoblock>		blocks;
 
 	// name of current game, i.e. "default", "Eressea", "E3"
-	FXString							current_game;
+	FXString							currentGame;
 
 	// parse text to table and create widgets from table
 	bool parseTableData(std::istream& input);

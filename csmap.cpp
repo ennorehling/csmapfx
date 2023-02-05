@@ -688,13 +688,13 @@ CSMap::~CSMap()
     
     // delete menus
     delete filemenu;
-        delete recentmenu;
+    delete recentmenu;
     delete viewmenu;
     delete regionmenu;
-        delete selectionmenu;
+    delete selectionmenu;
     delete mapmenu;
-        delete planemenu;
-        delete zoommenu;
+    delete planemenu;
+    delete zoommenu;
     delete factionmenu;
     delete helpmenu;
 
@@ -940,17 +940,198 @@ FXbool CSMap::close(FXbool notify)
 
 void CSMap::mapChange()
 {
+    // delete all planes except default
+    planes->clearItems();        // clear planes
+
+    searchResults->clearItems();
+    errorList->clearItems();
+
     // map changed, let selection-function handle this
     if (report == nullptr) {
         selection.selected = 0;
     }
-    ++selection.fileChange;
+    else {
+        // notify info dialog of new game type
+        FXString name_of_game;
+        name_of_game = report->blocks().front().value("Spiel");
+        if (name_of_game.empty())
+            name_of_game = "default";
 
-    if (!(selection.selected & (selection.REGION| selection.UNKNOWN_REGION)))
-    {
-        selection.selected |= selection.UNKNOWN_REGION;
-        selection.sel_x = 0, selection.sel_y = 0, selection.sel_plane = 0;
+        infodlg->setGame(name_of_game);
+
+        // get info about active faction
+        if (report->getFactionId() != 0) {
+            datablock::itor block = report->activefaction();
+
+            // enable/disable FACTION menu
+            if (haveActiveFaction())
+            {
+                if (!menu.faction->isEnabled())
+                    menu.faction->enable();
+            }
+            else
+            {
+                if (menu.faction->isEnabled())
+                    menu.faction->disable();
+            }
+            // write faction statistics into faction menu
+            FXString name = block->value(TYPE_FACTIONNAME);
+            FXString id = block->id();
+
+            menu.name->setText(name + " (" + id + ")");
+
+            FXString race_type = block->value(TYPE_TYPE);
+            FXString prefix = block->value("typprefix");
+            if (prefix.length() && race_type.length())
+            {
+                race_type[0] = (char)tolower(race_type[0]);
+                race_type = prefix + race_type;
+            }
+            FXString costs = block->value("Rekrutierungskosten");
+
+            menu.type->setText(race_type + " (Rekruten: " + costs + " Silber)");
+
+            FXString magic = block->value("Magiegebiet");
+            if (magic.length())
+                magic[0] = (char)toupper(magic[0]);
+
+            menu.magic->setText("Magiegebiet: " + magic);
+
+            FXString email = block->value("email");
+
+            menu.email->setText("eMail: " + email);
+
+            FXString fac_number = block->value("Anzahl Personen");
+            FXString fac_heroes = block->value("heroes");
+            FXString fac_maxheroes = block->value("max_heroes");
+
+            if (fac_heroes.length() || fac_maxheroes.length())
+            {
+                if (!fac_heroes.length()) fac_heroes = "0";
+                menu.number->setText(fac_number + " Personen, davon " + fac_heroes + " Helden (max. " + fac_maxheroes + ")");
+            }
+            else
+                menu.number->setText(fac_number + " Personen");
+
+            FXint points = block->valueInt("Punkte");
+            FXint average = block->valueInt("Punktedurchschnitt");
+            if (points || average)
+            {
+                float f_points = (float)points;
+                float f_average = (float)average;
+
+                FXString percent = FXStringVal(FXint(f_points * 100 / f_average));
+
+                menu.points->setText("Punkte: " + FXStringVal(points) + " (" + percent + "% von " + FXStringVal(average) + ")");
+                menu.points->show();
+            }
+            else
+                menu.points->hide();
+
+            FXint age = block->valueInt("age");
+            if (age)
+            {
+                menu.age->setText("Parteialter: " + FXStringVal(age) + " Runden");
+                menu.age->show();
+            }
+            else
+                menu.age->hide();
+
+            // list faction pool
+            bool itemsinpool = false;
+
+            while (menu.poolnoitems->getNext())
+                delete menu.poolnoitems->getNext();
+
+            ++block;
+            if (block->type() == block_type::TYPE_ITEMS)
+            {
+                datakey::list_type itemlist = block->data();
+
+                for (datakey::itor itor = itemlist.begin(); itor != itemlist.end(); itor++)
+                {
+                    FXString label; label.format("%s %s", itor->value().text(), itor->key().text());
+
+                    FXMenuCommand* cmd = new FXMenuCommand(menu.factionpool, label);
+                    cmd->create();
+
+                    itemsinpool = true;
+                }
+            }
+
+            if (itemsinpool)
+                menu.poolnoitems->hide();
+            else
+                menu.poolnoitems->show();
+
+            if (selection.selected) {
+                // iterators may be pointing to blocks the previous report, point to the current report instead.
+                if (selection.selected & selection.REGION) {
+                    selection.sel_x = selection.region->x();
+                    selection.sel_y = selection.region->y();
+                    selection.sel_plane = selection.region->info();
+                    // update iterator to the new report:
+                    if (!report->getRegion(selection.region, selection.sel_x, selection.sel_y, selection.sel_plane)) {
+                        selection.selected |= selection.UNKNOWN_REGION;
+                        selection.selected &= ~selection.REGION;
+                    }
+                }
+                if (selection.selected & selection.UNIT) {
+                    if (!report->getUnit(selection.unit, selection.unit->info())) {
+                        selection.selected &= ~selection.UNIT;
+                    }
+                }
+                if (selection.selected & selection.SHIP) {
+                    if (!report->getShip(selection.ship, selection.ship->info())) {
+                        selection.selected &= ~selection.SHIP;
+                    }
+                }
+                if (selection.selected & selection.BUILDING) {
+                    if (!report->getShip(selection.building, selection.building->info())) {
+                        selection.selected &= ~selection.BUILDING;
+                    }
+                }
+            }
+            selection.regionsSelected.clear();
+        }
+
+        FXWindow* item = planemenu->getFirst();
+        while (item)
+        {
+            FXWindow* nextw = item->getNext();
+            delete item;
+            item = nextw;
+        }
+        planes->appendItem("Standardebene (0)", nullptr, (void*)0);
+        // get all planes in report
+        std::set<int> planeSet;        // what planes are in the report
+        datablock::itor end = report->blocks().end();
+        for (datablock::itor block = report->blocks().begin(); block != end; block++)
+        {
+            // handle only regions
+            if (block->type() != block_type::TYPE_REGION)
+                continue;
+
+            // insert plane into set
+            int p = block->info();
+            if (p != 0 && planeSet.insert(p).second) {
+                FXString label = datablock::planeName(p);
+                planes->appendItem(label, nullptr, reinterpret_cast<void *>(p));
+
+                FXMenuRadio* radio = new FXMenuRadio(planemenu, label, this, ID_MAP_VISIBLEPLANE, 0);
+                radio->setUserData((void*)p);
+                radio->create();
+            }
+        }
+        planes->setNumVisible(planes->getNumItems());
+
+        if (!(selection.selected & (selection.REGION | selection.UNKNOWN_REGION)))
+        {
+            selection.selected |= selection.UNKNOWN_REGION;
+            selection.sel_x = 0, selection.sel_y = 0, selection.sel_plane = 0;
+        }
     }
+    ++selection.fileChange;
 
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 
@@ -1802,244 +1983,6 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     getApp()->beginWaitCursor();
 
     updateFileNames();
-
-    // file change notification
-    if (pstate->fileChange != selection.fileChange)
-    {
-        // notify info dialog of new game type
-        FXString name_of_game;
-        name_of_game = report->blocks().front().value("Spiel");
-        if (name_of_game.empty())
-            name_of_game = "default";
-
-        infodlg->setGame(name_of_game);
-
-        // delete all planes except default
-        planes->clearItems();        // clear planes
-        planes->appendItem("Standardebene (0)", nullptr, (void*)0);
-        
-        searchResults->clearItems(); 
-        errorList->clearItems(); 
-        
-        planes->setNumVisible(planes->getNumItems());
-
-        FXWindow* nextw, * item = planemenu->getFirst();
-        if (item)
-            item = item->getNext();
-        while (item)
-        {
-            nextw = item->getNext();
-            delete item;
-            item = nextw;
-        }
-
-        if (report) {
-            // get all planes in report
-            std::set<int> planeSet;        // what planes are in the report
-
-            datablock::itor end = report->blocks().end();
-            for (datablock::itor block = report->blocks().begin(); block != end; block++)
-            {
-                // handle only regions
-                if (block->type() != block_type::TYPE_REGION)
-                    continue;
-
-                // insert plane into set
-                planeSet.insert(block->info());
-            }
-
-            for (std::set<int>::iterator plane = planeSet.begin(); plane != planeSet.end(); plane++)
-            {
-                FXString label;
-                FXuval p = (FXuval)*plane;
-
-                if (p != 0) {
-                    label = datablock::planeName(p);
-                    planes->appendItem(label, nullptr, (void*)p);
-
-                    FXMenuRadio* radio = new FXMenuRadio(planemenu, label, this, ID_MAP_VISIBLEPLANE, 0);
-                    radio->setUserData((void*)p);
-                    radio->create();
-                }
-            }
-
-            planes->setNumVisible(planes->getNumItems());
-
-            // get info about active faction
-            if (report->getFactionId() != 0) {
-                datablock::itor block = report->activefaction();
-
-                // write faction statistics into faction menu
-                FXString name = block->value(TYPE_FACTIONNAME);
-                FXString id = block->id();
-
-                menu.name->setText(name + " (" + id + ")");
-
-                FXString race_type = block->value(TYPE_TYPE);
-                FXString prefix = block->value("typprefix");
-                if (prefix.length() && race_type.length())
-                {
-                    race_type[0] = (char)tolower(race_type[0]);
-                    race_type = prefix + race_type;
-                }
-                FXString costs = block->value("Rekrutierungskosten");
-
-                menu.type->setText(race_type + " (Rekruten: " + costs + " Silber)");
-
-                FXString magic = block->value("Magiegebiet");
-                if (magic.length())
-                    magic[0] = (char)toupper(magic[0]);
-
-                menu.magic->setText("Magiegebiet: " + magic);
-
-                FXString email = block->value("email");
-
-                menu.email->setText("eMail: " + email);
-
-                FXString fac_number = block->value("Anzahl Personen");
-                FXString fac_heroes = block->value("heroes");
-                FXString fac_maxheroes = block->value("max_heroes");
-
-                if (fac_heroes.length() || fac_maxheroes.length())
-                {
-                    if (!fac_heroes.length()) fac_heroes = "0";
-                    menu.number->setText(fac_number + " Personen, davon " + fac_heroes + " Helden (max. " + fac_maxheroes + ")");
-                }
-                else
-                    menu.number->setText(fac_number + " Personen");
-
-                FXint points = block->valueInt("Punkte");
-                FXint average = block->valueInt("Punktedurchschnitt");
-                if (points || average)
-                {
-                    float f_points = (float)points;
-                    float f_average = (float)average;
-
-                    FXString percent = FXStringVal(FXint(f_points * 100 / f_average));
-
-                    menu.points->setText("Punkte: " + FXStringVal(points) + " (" + percent + "% von " + FXStringVal(average) + ")");
-                    menu.points->show();
-                }
-                else
-                    menu.points->hide();
-
-                FXint age = block->valueInt("age");
-                if (age)
-                {
-                    menu.age->setText("Parteialter: " + FXStringVal(age) + " Runden");
-                    menu.age->show();
-                }
-                else
-                    menu.age->hide();
-
-                // list faction pool
-                bool itemsinpool = false;
-
-                while (menu.poolnoitems->getNext())
-                    delete menu.poolnoitems->getNext();
-
-                ++block;
-                if (block->type() == block_type::TYPE_ITEMS)
-                {
-                    datakey::list_type itemlist = block->data();
-
-                    for (datakey::itor itor = itemlist.begin(); itor != itemlist.end(); itor++)
-                    {
-                        FXString label; label.format("%s %s", itor->value().text(), itor->key().text());
-
-                        FXMenuCommand* cmd = new FXMenuCommand(menu.factionpool, label);
-                        cmd->create();
-
-                        itemsinpool = true;
-                    }
-                }
-
-                if (itemsinpool)
-                    menu.poolnoitems->hide();
-                else
-                    menu.poolnoitems->show();
-            }
-        }
-
-        // enable/disable FACTION menu
-        if (haveActiveFaction())
-        {
-            if (!menu.faction->isEnabled())
-                menu.faction->enable();
-        }
-        else
-        {
-            if (menu.faction->isEnabled())
-                menu.faction->disable();
-        }
-        if (pstate->selected & selection.REGION) {
-            selection.sel_x = pstate->region->x();
-            selection.sel_y = pstate->region->y();
-            selection.sel_plane = pstate->region->info();
-        }
-        else {
-            selection.sel_x = pstate->sel_x;
-            selection.sel_y = pstate->sel_y;
-            selection.sel_plane = pstate->sel_plane;
-        }
-        if (report && pstate->selected) {
-            // pstate may be pointing to blocks in an older report, point to the current report instead.
-            datablock::itor end = report->blocks().end();
-            datablock::itor block, region = end;
-
-            for (block = report->blocks().begin(); block != report->blocks().end(); ++block) {
-                if (block->type() == block_type::TYPE_REGION)
-                {
-                    region = block;
-                    if ((pstate->selected & (selection.REGION | selection.UNKNOWN_REGION)) &&
-                        (block->x() == selection.sel_x) &&
-                        (block->y() == selection.sel_y) &&
-                        (block->info() == selection.sel_plane))
-                    {
-                        selection.region = block;
-                        selection.selected = pstate->selected;
-                    }
-                }
-                else if (block->type() == block_type::TYPE_UNIT)
-                {
-                    if (pstate->selected & selection.UNIT &&
-                        block->info() == pstate->unit->info())
-                    {
-                        selection.region = region;
-                        selection.selected = pstate->selected;
-                        selection.unit = block;
-                        selection.selected |= selection.UNIT;
-                        break;
-                    }
-                }
-                else if (block->type() == block_type::TYPE_SHIP)
-                {
-                    if (pstate->selected & selection.SHIP &&
-                        block->info() == pstate->ship->info())
-                    {
-                        selection.region = region;
-                        selection.selected = pstate->selected;
-                        selection.ship = block;
-                        selection.selected |= selection.SHIP;
-                        break;
-                    }
-                }
-                else if (block->type() == block_type::TYPE_BUILDING)
-                {
-                    if (pstate->selected & selection.BUILDING &&
-                        block->info() == pstate->ship->info())
-                    {
-                        selection.region = region;
-                        selection.selected = pstate->selected;
-                        selection.building = block;
-                        selection.selected |= selection.BUILDING;
-                        break;
-                    }
-                }
-            }
-        }
-        selection.fileChange = pstate->fileChange;
-    }
 
     // make sure that a region is always selected (when something in it is selected)
     // start with selected item and search containing region

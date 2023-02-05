@@ -83,7 +83,7 @@ void FXInfoDlg::saveState(FXRegistry& reg)
 
 void FXInfoDlg::setGame(const FXString& game)
 {
-    if (current_game == game)
+    if (currentGame == game)
         return;
 
     // internal data storage
@@ -101,7 +101,7 @@ void FXInfoDlg::setGame(const FXString& game)
     // clear current data
     blocks.clear();
 
-    if (current_game != "default") {
+    if (currentGame != "default") {
         // load internal data for specific game
         GameInfo* loadInfo = &infoData[0];		// load "default" info by default
         for (GameInfo* info = begin(infoData); info != end(infoData); ++info) {
@@ -116,7 +116,7 @@ void FXInfoDlg::setGame(const FXString& game)
 	    }
     }
 
-    current_game = game;
+    currentGame = game;
     // load additional info from file
 	// try game specific file first ("csmapfx.Eressea.info"),
 	// then try default file name ("csmapfx.info").
