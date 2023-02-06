@@ -198,9 +198,6 @@ FXDEFMAP(FXRegionList) MessageMap[]=
 	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_TOGGLE_OWNFACTIONGROUP, FXRegionList::onToggleOwnFactionGroup), 
 	FXMAPFUNC(SEL_UPDATE,			FXRegionList::ID_TOGGLE_OWNFACTIONGROUP, FXRegionList::onUpdateOwnFactionGroup),
 
-	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_TOGGLE_INACTIVE_REGIONS, FXRegionList::onToggleActiveRegions), 
-	FXMAPFUNC(SEL_UPDATE,			FXRegionList::ID_TOGGLE_INACTIVE_REGIONS, FXRegionList::onUpdateActiveRegions),
-
 	FXMAPFUNC(SEL_COMMAND,			FXRegionList::ID_TOGGLE_UNITCOLORS, FXRegionList::onToggleUnitColors),
 	FXMAPFUNC(SEL_UPDATE,			FXRegionList::ID_TOGGLE_UNITCOLORS, FXRegionList::onUpdateUnitColors),
 
@@ -286,19 +283,6 @@ long FXRegionList::onToggleOwnFactionGroup(FXObject* sender, FXSelector, void* p
 long FXRegionList::onUpdateOwnFactionGroup(FXObject* sender, FXSelector, void* ptr)
 {
 	sender->handle(this, FXSEL(SEL_COMMAND, active_faction_group?ID_CHECK:ID_UNCHECK), nullptr);
-    return 1;
-}
-
-long FXRegionList::onToggleActiveRegions(FXObject* sender, FXSelector sel, void* ptr)
-{
-    active_regions_only = !active_regions_only;
-    rebuildTree();
-    return onUpdateActiveRegions(sender, sel, ptr);
-}
-
-long FXRegionList::onUpdateActiveRegions(FXObject* sender, FXSelector, void* ptr)
-{
-    sender->handle(this, FXSEL(SEL_COMMAND, active_regions_only ? ID_CHECK : ID_UNCHECK), nullptr);
     return 1;
 }
 
@@ -573,7 +557,7 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                 for (datablock::itor unit = std::next(region); unit != iend && unit->depth() > regionPtr->depth(); ++unit)
                 {
                     const datablock* objectPtr = &*unit;
-                    if (regionItem || (!active_regions_only || regionPtr->hasKey(TYPE_VISIBILITY))) {
+                    if (regionItem || regionPtr->hasKey(TYPE_VISIBILITY)) {
                         FXTreeItem* child = nullptr;
                         if (unit->type() == block_type::TYPE_BUILDING)
                         {

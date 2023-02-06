@@ -46,7 +46,6 @@ public:
 	{
         ID_TOGGLE_UNITCOLORS = FXTreeList::ID_LAST,
 		ID_TOGGLE_OWNFACTIONGROUP,
-		ID_TOGGLE_INACTIVE_REGIONS,
         ID_LAST
 	};
 
@@ -65,7 +64,6 @@ protected:
 	FXTreeItem* findTreeItem(FXTreeItem* first, void* data);
 
 	bool active_faction_group = false;
-	bool active_regions_only = true;
 	bool colorized_units = true;
 
 private:

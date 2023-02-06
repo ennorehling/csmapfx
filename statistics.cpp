@@ -499,122 +499,105 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 	if (!mapFile)
 		return 0;
 
-	if (sender && sender->isMemberOf(&FXMenuCommand::metaClass))
-	{
-		FXMenuCommand *cmd = (FXMenuCommand*)sender;
+	FXMenuCommand *cmd = static_cast<FXMenuCommand*>(sender);
 		
-		datablock* dblock = (datablock*)cmd->getUserData();
+	datablock* dblock = (datablock*)cmd->getUserData();
 
-		datablock::itor main = mapFile->blocks().end();
-		datablock::itor iparent = mapFile->blocks().end();
+	datablock::itor main = mapFile->blocks().end();
+	datablock::itor iparent = mapFile->blocks().end();
 
-		for (datablock::itor block = mapFile->blocks().begin(); block != mapFile->blocks().end(); block++)
+	for (datablock::itor block = mapFile->blocks().begin(); block != mapFile->blocks().end(); block++)
+	{
+		// nothing to search for
+		if (!dblock)
+			break;
+
+		// handle only regions, factions (+alliances), buildings, ships and units
+		if (block->type() != block_type::TYPE_REGION &&
+			block->type() != block_type::TYPE_ALLIANCE &&
+			block->type() != block_type::TYPE_FACTION &&
+			block->type() != block_type::TYPE_BUILDING &&
+			block->type() != block_type::TYPE_SHIP &&
+			block->type() != block_type::TYPE_UNIT)
+			continue;
+
+		if (dblock && dblock == &*block)
 		{
-			// nothing to search for
-			if (!dblock)
-				break;
-
-			// handle only regions, factions (+alliances), buildings, ships and units
-			if (block->type() != block_type::TYPE_REGION &&
-				block->type() != block_type::TYPE_ALLIANCE &&
-				block->type() != block_type::TYPE_FACTION &&
-				block->type() != block_type::TYPE_BUILDING &&
-				block->type() != block_type::TYPE_SHIP &&
-				block->type() != block_type::TYPE_UNIT)
-				continue;
-
-			if (dblock && dblock == &*block)
-			{
-				main = block;
-				dblock = NULL;		// to indicate that block was found.
-			}
-			else if (block->type() == block_type::TYPE_REGION)
-			{
-				iparent = block;
-			}
+			main = block;
+			dblock = NULL;		// to indicate that block was found.
 		}
-
-		if (main == mapFile->blocks().end())
+		else if (block->type() == block_type::TYPE_REGION)
 		{
-			main = iparent;
-			iparent = mapFile->blocks().end();
-		}
-
-		if (main != mapFile->blocks().end())
-		{
-			// send new selection to main window
-            selection.selected = 0;
-            FXString clipboard;
-            if (main->type() == block_type::TYPE_REGION)
-			{
-                selection.selected = selection.REGION;
-                selection.region = main;
-			}
-			if (main->type() == block_type::TYPE_FACTION)
-			{
-                selection.selected = selection.FACTION;
-                selection.faction = main;
-
-				if (iparent != mapFile->blocks().end())
-				{
-                    selection.selected |= selection.REGION;
-                    selection.region = iparent;
-				}
-			}
-			if (main->type() == block_type::TYPE_BUILDING)
-			{
-                selection.selected = selection.BUILDING;
-                selection.building = main;
-                clipboard = main->id();
-                if (iparent != mapFile->blocks().end())
-                {
-                    selection.selected |= selection.REGION;
-                    selection.region = iparent;
-                }
-            }
-			if (main->type() == block_type::TYPE_SHIP)
-			{
-                selection.selected = selection.SHIP;
-                selection.ship = main;
-                clipboard = main->id();
-                if (iparent != mapFile->blocks().end())
-                {
-                    selection.selected |= selection.REGION;
-                    selection.region = iparent;
-                }
-            }
-			if (main->type() == block_type::TYPE_UNIT)
-			{
-                selection.selected = selection.UNIT;
-                selection.unit = main;
-
-				if (iparent != mapFile->blocks().end())
-				{
-                    selection.selected |= selection.FACTION;
-                    selection.faction = iparent;
-				}			
-			}
-            getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
-            if (!clipboard.empty()) {
-                getTarget()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void *)clipboard.text());
-            }
-			return 1;
+			iparent = block;
 		}
 	}
 
-	/* -- Removed in rev70.
-	if (sender && sender->isMemberOf(&FXMenuCommand::metaClass))
+	if (main == mapFile->blocks().end())
 	{
-		FXMenuCommand *cmd = (FXMenuCommand*)sender;
+		main = iparent;
+		iparent = mapFile->blocks().end();
+	}
 
-		datablock block;
-		block.infostr(FXStringVal((int)cmd->getUserData()));
+	if (main != mapFile->blocks().end())
+	{
+		// send new selection to main window
+        selection.selected = 0;
+        FXString clipboard;
+        if (main->type() == block_type::TYPE_REGION)
+		{
+            selection.selected = selection.REGION;
+            selection.region = main;
+		}
+		if (main->type() == block_type::TYPE_FACTION)
+		{
+            selection.selected = selection.FACTION;
+            selection.faction = main;
 
-		// set clipboard to text stored in FXMenuCommands userdata
-		getTarget()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void*)block.id().text());
+			if (iparent != mapFile->blocks().end())
+			{
+                selection.selected |= selection.REGION;
+                selection.region = iparent;
+			}
+		}
+		if (main->type() == block_type::TYPE_BUILDING)
+		{
+            selection.selected = selection.BUILDING;
+            selection.building = main;
+            clipboard = main->id();
+            if (iparent != mapFile->blocks().end())
+            {
+                selection.selected |= selection.REGION;
+                selection.region = iparent;
+            }
+        }
+		if (main->type() == block_type::TYPE_SHIP)
+		{
+            selection.selected = selection.SHIP;
+            selection.ship = main;
+            clipboard = main->id();
+            if (iparent != mapFile->blocks().end())
+            {
+                selection.selected |= selection.REGION;
+                selection.region = iparent;
+            }
+        }
+		if (main->type() == block_type::TYPE_UNIT)
+		{
+            selection.selected = selection.UNIT;
+            selection.unit = main;
+
+			if (iparent != mapFile->blocks().end())
+			{
+                selection.selected |= selection.FACTION;
+                selection.faction = iparent;
+			}			
+		}
+        getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
+        if (!clipboard.empty()) {
+            getTarget()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void *)clipboard.text());
+        }
 		return 1;
 	}
-	*/
 
 	return 0;
 }

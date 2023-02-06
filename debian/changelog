@@ -1,3 +1,10 @@
+csmapfx (1.5.12-1) stable; urgency=low
+
+  * remove the extended region list option (bug 2939)
+  * remember auto-reloading option (bug 2936)
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 06 Feb 2023 21:00:00 +0200
+
 csmapfx (1.5.11-1) stable; urgency=low
 
   * fix map popup menu (bug 2935)
