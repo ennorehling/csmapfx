@@ -154,9 +154,9 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
                     FXMenuCommand* command = new FXMenuCommand(&pane, label, nullptr, csmap, CSMap::ID_POPUP_GOTO);
                     command->setUserData(block);
                 }
-                FXMenuPane * paneCascade = new FXMenuPane(this);
-                new FXMenuCascade(&pane, "&Zwischenablage", NULL, paneCascade);
-                csmap->addClipboardPane(paneCascade, block);
+                FXMenuPane paneCascade(this);
+                new FXMenuCascade(&pane, "&Zwischenablage", NULL, &paneCascade);
+                csmap->addClipboardPane(&paneCascade, block);
             }
             else {
                 const FXString& label = item->getText();

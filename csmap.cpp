@@ -1518,9 +1518,10 @@ long CSMap::onViewMapOnly(FXObject*, FXSelector, void*)
     }
     else
     {
-        leftframe->show();
-        if (outputTabs->shown())
+        if (outputTabs->shown()) {
             msgBorder->show();
+        }
+        leftframe->show();
         rightframe->show();
         map->recalc();
     }
