@@ -1117,7 +1117,7 @@ void CSMap::mapChange()
                 planes->appendItem(label, nullptr, reinterpret_cast<void *>(p));
 
                 FXMenuRadio* radio = new FXMenuRadio(planemenu, label, this, ID_MAP_VISIBLEPLANE, 0);
-                radio->setUserData((void*)p);
+                radio->setUserData(reinterpret_cast<void*>((ptrdiff_t)p));
                 radio->create();
             }
         }
