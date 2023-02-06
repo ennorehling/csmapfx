@@ -1,6 +1,7 @@
+#include <cctype>
 #include <iostream>
 #include <string>
-#include <cctype>
+
 #include <fx.h>
 #include <FX88591Codec.h>
 
@@ -9,6 +10,7 @@
 #endif
 
 #ifdef HAVE_PHYSFS
+#include <memory>
 #include <physfs.h>
 #elif defined(WIN32)
 #include <shlobj_core.h>
@@ -142,12 +144,10 @@ std::string loadResourceFile(const char *relpath)
 
         if (filesize > 0) {
             size_t size = (size_t)filesize;
-            char* data = new char[size];
-            if (data) {
-                if (PHYSFS_readBytes(file, data, filesize) == filesize) {
-                    result.assign(data, size);
-                }
-                delete[] data;
+            auto arr = std::make_unique<char[]>(size);
+            char * data = arr.get();
+            if (PHYSFS_readBytes(file, data, filesize) == filesize) {
+                result.assign(data, size);
             }
         }
         PHYSFS_close(file);

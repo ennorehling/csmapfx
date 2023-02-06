@@ -126,7 +126,7 @@ endif (PKG_CONFIG_FOUND)
 endif (WIN32)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-	CXX_STANDARD 11)
+	CXX_STANDARD 14)
 target_link_libraries(${PROJECT_NAME}
   ${FOX_LIBRARIES}
   ${CMAKE_DL_LIBS} 

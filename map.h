@@ -10,6 +10,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <memory>
 #include <functional>
 
 
