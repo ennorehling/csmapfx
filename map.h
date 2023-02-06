@@ -4,7 +4,6 @@
 #include "datafile.h"
 #include "terrain.h"
 #include "mapcanvas.h"
-#include "linked_ptr.h"
 
 #include <fx.h>
 
@@ -148,8 +147,8 @@ protected:
 	
 	FXCanvas	*map = nullptr;			// the bitmap where the image data will be written to
 	
-	linked_ptr<FXImage> backbuffer, imagebuffer;
-	linked_ptr<FXFont> font, islandfont;	// font used for region names, " for island names
+	std::unique_ptr<FXImage> backbuffer, imagebuffer;
+    std::unique_ptr<FXFont> font, islandfont;	// font used for region names, " for island names
 
 	FXButton	*button = nullptr;
 
