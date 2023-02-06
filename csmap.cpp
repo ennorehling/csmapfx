@@ -185,7 +185,6 @@ CSMap::CSMap(FXApp *app) :
     // set "singleton"
     CSMap_instance = this;
 
-    setAutoReload(CSMap::reload_type::RELOAD_ASK);
     // create main window icon
     appIcon = new FXICOIcon(app, data::csmap);
     setMiniIcon(appIcon);
@@ -411,7 +410,6 @@ CSMap::CSMap(FXApp *app) :
     menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tCtrl-B\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
     new FXMenuSeparatorEx(viewmenu, "Liste");
     menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tCtrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
-    menu.activeRegionsOnly = new FXMenuCheck(viewmenu,"Nur &sichtbare Regionen\tCtrl-Shift-V\tNur aktuell sichtbare Regionen auflisten.");
     menu.colorizeUnits = new FXMenuCheck(viewmenu, "Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
     new FXMenuSeparatorEx(viewmenu, "Karte");
     menu.streets = new FXMenuCheck(viewmenu,"&Strassen zeigen\tCtrl-F1\tStrassen auf der Karte anzeigen.");
@@ -516,9 +514,6 @@ CSMap::CSMap(FXApp *app) :
 
     menu.ownFactionGroup->setTarget(regions);
     menu.ownFactionGroup->setSelector(FXRegionList::ID_TOGGLE_OWNFACTIONGROUP);
-
-    menu.activeRegionsOnly->setTarget(regions);
-    menu.activeRegionsOnly->setSelector(FXRegionList::ID_TOGGLE_INACTIVE_REGIONS);
 
     menu.colorizeUnits->setTarget(regions);
     menu.colorizeUnits->setSelector(FXRegionList::ID_TOGGLE_UNITCOLORS);
@@ -838,6 +833,9 @@ void CSMap::create()
     if (reg.readUnsignedEntry("SHOW", "COLORIZEUNITS", 1))
         regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLE_UNITCOLORS), nullptr);
 
+    reload_type check = (reload_type)reg.readUnsignedEntry("SHOW", "RELOAD", (int)reload_type::RELOAD_ASK);
+    setAutoReload(check);
+
     FXint coll_regioninfos = reg.readUnsignedEntry("TABS", "REGIONINFOS", 0);
     if (coll_regioninfos)
         riTab->collapse(true);
@@ -927,7 +925,7 @@ FXbool CSMap::close(FXbool notify)
     reg.writeUnsignedEntry("SHOW", "COLORIZEUNITS", menu.colorizeUnits->getCheck());
     reg.writeUnsignedEntry("SHOW", "REGDESCRIPTION", menu.regdescription->getCheck());
     reg.writeUnsignedEntry("SHOW", "OWNFACTIONGROUP", menu.ownFactionGroup->getCheck());
-    reg.writeUnsignedEntry("SHOW", "ACTIVEREGIONS", menu.activeRegionsOnly->getCheck());
+    reg.writeUnsignedEntry("SHOW", "RELOAD", (FXuint)reload_mode);
 
     // save ToolBarTab on/off state
     reg.writeUnsignedEntry("TABS", "REGIONINFOS", riTab->isCollapsed());
@@ -1718,13 +1716,14 @@ long CSMap::onUpdateZoom(FXObject* sender, FXSelector, void*)
     return 1;
 }
 
-long CSMap::onModifyCheck(FXObject*, FXSelector, void*)
+long CSMap::onModifyCheck(FXObject* sender, FXSelector sel, void*)
 {
-    if (reload_mode != CSMap::reload_type::RELOAD_NEVER) {
-        setAutoReload(CSMap::reload_type::RELOAD_NEVER);
+    FXMenuCheck* check = static_cast<FXMenuCheck*>(sender);
+    if (check->getCheck()) {
+        setAutoReload(CSMap::reload_type::RELOAD_ASK);
     }
     else {
-        setAutoReload(CSMap::reload_type::RELOAD_ASK);
+        setAutoReload(CSMap::reload_type::RELOAD_NEVER);
     }
     return 1;
 }
@@ -2532,11 +2531,12 @@ void CSMap::updateModificationTime()
 
 void CSMap::setAutoReload(CSMap::reload_type mode)
 {
+    menu.modifycheck->setCheck(mode != reload_type::RELOAD_NEVER);
     if (reload_mode != mode) {
-        if (mode != CSMap::reload_type::RELOAD_NEVER) {
+        if (mode != reload_type::RELOAD_NEVER) {
             updateModificationTime();
         }
-        if (reload_mode == CSMap::reload_type::RELOAD_NEVER) {
+        if (reload_mode == reload_type::RELOAD_NEVER) {
             getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, nullptr);
         }
         reload_mode = mode;

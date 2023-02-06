@@ -236,7 +236,7 @@ private:
 #endif
 
     typedef enum class reload_type { RELOAD_NEVER, RELOAD_AUTO, RELOAD_ASK } reload_type;
-    reload_type reload_mode = reload_type::RELOAD_NEVER;
+    reload_type reload_mode = reload_type::RELOAD_ASK;
 
     int unlink(const char *pathname);
     FXString askSaveFileName(const FXString& dlgTitle);
@@ -340,7 +340,6 @@ private:
         class FXMenuCheck *regdescription = nullptr;	// show description of the region
 
         class FXMenuCheck *ownFactionGroup = nullptr;	// no own faction group in regionlist
-        class FXMenuCheck *activeRegionsOnly = nullptr;	// only currently reported regions in regionlist
 
 		// faction menu items
         class FXMenuTitle	*faction = nullptr;
