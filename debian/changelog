@@ -1,6 +1,7 @@
 csmapfx (1.5.11-1) stable; urgency=low
 
-  * fix map popup menu
+  * fix map popup menu (bug 2935)
+  * fix navigation from statistics to ships and buildings (bug 2937)
 
  -- Enno Rehling <enno@eressea.de>  Mon, 06 Feb 2023 17:00:00 +0200
 
