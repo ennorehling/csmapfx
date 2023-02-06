@@ -248,19 +248,17 @@ void FXInfoDlg::createTable()
 		if (block.header.empty() && block.lines.empty())
 			continue;
 
-		linked_ptr<FXTabItem> tab(new FXTabItem(tabbook, itor->first));
-		tab->create();
+		FXTabItem tab(tabbook, itor->first);
+		tab.create();
 
-		linked_ptr<FXHorizontalFrame> frame(new FXHorizontalFrame(tabbook, LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0,0,0,0, 0,0,0,0));
-		frame->setBorderColor(getApp()->getShadowColor());
-		frame->create();
+		FXHorizontalFrame frame(tabbook, LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0,0,0,0, 0,0,0,0);
+		frame.setBorderColor(getApp()->getShadowColor());
+		frame.create();
 
-		FXFoldingList* list = new FXFoldingList(&*frame, this,ID_LIST, FOLDINGLIST_SINGLESELECT|FOLDINGLIST_SHOWS_LINES|FOLDINGLIST_SHOWS_BOXES|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+		FXFoldingList* list = new FXFoldingList(&frame, this,ID_LIST, FOLDINGLIST_SINGLESELECT|FOLDINGLIST_SHOWS_LINES|FOLDINGLIST_SHOWS_BOXES|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 		list->getHeader()->setHeaderStyle(HEADER_RESIZE|HEADER_TRACKING);
 		list->create();
 
-		block.tab = tab;
-		block.frame = frame;
 		block.list = list;
 
 		FXFont* font = list->getHeader()->getFont();		// font for width calculation
