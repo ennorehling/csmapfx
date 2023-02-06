@@ -563,11 +563,25 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 			}
 			if (main->type() == block_type::TYPE_BUILDING)
 			{
+                selection.selected = selection.BUILDING;
+                selection.building = main;
                 clipboard = main->id();
-			}
+                if (iparent != mapFile->blocks().end())
+                {
+                    selection.selected |= selection.REGION;
+                    selection.region = iparent;
+                }
+            }
 			if (main->type() == block_type::TYPE_SHIP)
 			{
+                selection.selected = selection.SHIP;
+                selection.ship = main;
                 clipboard = main->id();
+                if (iparent != mapFile->blocks().end())
+                {
+                    selection.selected |= selection.REGION;
+                    selection.region = iparent;
+                }
             }
 			if (main->type() == block_type::TYPE_UNIT)
 			{
