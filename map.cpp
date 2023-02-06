@@ -11,6 +11,8 @@
 #include <fxkeys.h>
 #include <functional>
 #include "FXMenuSeparatorEx.h"
+#include "csmap.h"
+#include "datablock.h"
 
 using namespace std::placeholders;
 
@@ -984,7 +986,6 @@ enum
 	POPUP_TERRAFORM,
 	POPUP_SETISLAND,
 
-	POPUP_GET_TEXT,
 	POPUP_LAST
 };
 
@@ -1006,18 +1007,17 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 
 	if (mapFile)
 	{
+        FXMenuPane pane(this);
 		if (!selection.regionsSelected.empty())
 		{
 			// Popup-Menu fuer mehrere Regionen
-			FXMenuPane *menu = new FXMenuPane(this);
-
 			FXString label;
 			label.format("%zu Regionen", selection.regionsSelected.size());
 
-			new FXMenuSeparatorEx(menu, label);
+			new FXMenuSeparatorEx(&pane, label);
 			FXMenuCommand *cmd;
 
-			cmd = new FXMenuCommand(menu, "&Insel benennen...", nullptr, this,ID_POPUP_CLICKED);
+			cmd = new FXMenuCommand(&pane, "&Insel benennen...", nullptr, this, ID_POPUP_CLICKED);
 			cmd->setUserData((void*)POPUP_SETISLAND);
 
 			FXMenuPane* terraform = new FXMenuPane(this);
@@ -1034,14 +1034,13 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 			//cmd = new FXMenuCommand(terraform, FXString("L\u00f6schen"), terrainIcons[0], this,ID_POPUP_CLICKED);
 			//cmd->setUserData((void*)MKUINT(POPUP_TERRAFORM, 0));
 
-			new FXMenuCascade(menu, "&Terraformen", terrainIcons[0], terraform);
+			new FXMenuCascade(&pane, "&Terraformen", terrainIcons[0], terraform);
 
 			// show popup
-			menu->create();
-			menu->popup(nullptr, event->root_x,event->root_y);
+			pane.create();
+            pane.popup(nullptr, event->root_x,event->root_y);
 
-			getApp()->runModalWhileShown(menu);
-			delete menu;
+			getApp()->runModalWhileShown(&pane);
 
 			return 1;
 		}
@@ -1049,8 +1048,6 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
         datablock::itor region;
         if (mapFile->getRegion(region, popup_x, popup_y, visiblePlane)) {
             // create popup
-			FXMenuPane *menu = new FXMenuPane(this);
-
 			FXString label, name, terrainString = region->terrainString();
 
 			name = region->value(TYPE_NAME);
@@ -1059,61 +1056,45 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 			else
 				label.format("%s (%d,%d)", name.text(), popup_x,popup_y);
 
-			new FXMenuSeparatorEx(menu, label);
+			new FXMenuSeparatorEx(&pane, label);
 
 			FXMenuCommand *cmd;
 
 			// clipboard submenu
-			FXMenuPane *clipboard = new FXMenuPane(this);
-			new FXMenuCascade(menu, "&Zwischenablage", nullptr, clipboard);
 
-			label.format("%d,%d", region->x(), region->y());
-			cmd = new FXMenuCommand(clipboard, label + "\t\tKoordinaten", nullptr, this,ID_POPUP_CLICKED);
-			cmd->setUserData((void*)POPUP_GET_TEXT);
-
-			if (!name.empty())
-			{
-				cmd = new FXMenuCommand(clipboard, name + "\t\tName", nullptr, this,ID_POPUP_CLICKED);
-				cmd->setUserData((void*)POPUP_GET_TEXT);
-			}
-
-			if (!terrainString.empty())
-			{
-				cmd = new FXMenuCommand(clipboard, terrainString + "\t\tTerrain", nullptr, this,ID_POPUP_CLICKED);
-				cmd->setUserData((void*)POPUP_GET_TEXT);
-			}
+            FXMenuPane cascadePane(this);
+            new FXMenuCascade(&pane, "&Zwischenablage", NULL, &cascadePane);
+            CSMap* csmap = static_cast<CSMap*>(getShell());
+            csmap->addClipboardPane(&cascadePane, &*region);
 
 			// normal menu
-			cmd = new FXMenuCommand(menu, "&Insel benennen...", nullptr, this,ID_POPUP_CLICKED);
+			cmd = new FXMenuCommand(&pane, "&Insel benennen...", nullptr, this,ID_POPUP_CLICKED);
 			cmd->setUserData((void*)POPUP_SETISLAND);
 
-			cmd = new FXMenuCommand(menu, "Um&benennen...", nullptr, this,ID_POPUP_CLICKED);
+			cmd = new FXMenuCommand(&pane, "Um&benennen...", nullptr, this,ID_POPUP_CLICKED);
 			cmd->setUserData((void*)POPUP_RENAME);
 
-			FXMenuPane* terraform = new FXMenuPane(this);
+			FXMenuPane terraformPane(this);
 
 			datablock terrainRegion;
 			for (FXuval i = 1; i <  data::TERRAIN_LASTPUBLIC+1; i++)
 			{
 				terrainRegion.terrain(i);
-				cmd = new FXMenuCommand(terraform, terrainRegion.terrainString(), terrainIcons[i], this,ID_POPUP_CLICKED);
+				cmd = new FXMenuCommand(&terraformPane, terrainRegion.terrainString(), terrainIcons[i], this,ID_POPUP_CLICKED);
 				cmd->setUserData((void*)(FXuval)MKUINT(POPUP_TERRAFORM, i));
 			}
 
-			new FXMenuSeparatorEx(terraform);
-			cmd = new FXMenuCommand(terraform, FXString(L"L\u00f6schen"), terrainIcons[0], this,ID_POPUP_CLICKED);
+			new FXMenuSeparatorEx(&terraformPane);
+			cmd = new FXMenuCommand(&terraformPane, FXString(L"L\u00f6schen"), terrainIcons[0], this,ID_POPUP_CLICKED);
 			cmd->setUserData((void*)(FXuval)MKUINT(POPUP_TERRAFORM, 0));
 
-			new FXMenuCascade(menu, "&Terraformen", terrainIcons[region->terrain()], terraform);
+			new FXMenuCascade(&pane, "&Terraformen", terrainIcons[region->terrain()], &terraformPane);
 
 			// show popup
-			menu->create();
-			menu->popup(nullptr, event->root_x,event->root_y);
+            pane.create();
+            pane.popup(nullptr, event->root_x,event->root_y);
 
-			getApp()->runModalWhileShown(menu);
-			delete terraform;
-			delete clipboard;
-			delete menu;
+			getApp()->runModalWhileShown(&pane);
 
 			return 1;
 		}
@@ -1160,14 +1141,6 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 		// extract popup cmd
         FXival cmd = 0xffff & (FXival)item->getUserData();
 		FXival param = 0xffff & (FXival)item->getUserData() >> 16;
-
-		if (cmd == POPUP_GET_TEXT)
-		{
-            if (!selection.regionsSelected.empty()) {
-                getTarget()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void*)item->getText().text());
-            }
-			return 1;
-		}
 
 		if (cmd == POPUP_TERRAFORM)
 		{
