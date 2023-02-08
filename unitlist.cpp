@@ -141,9 +141,10 @@ void FXUnitList::makeItems()
         FXString label;
 
         label.format("%s (%s)", name.text(), unit->id().text());
-        FXTreeItem* unititem = appendItem(nullptr, label);
+        FXTreeItem* unititem = appendItem(nullptr, makeItem(label, &*unit));
         unititem->setExpanded(true);
 
+        datablock* factionPtr = nullptr;
         if (factionId < 0 && otherFactionId < 0)
         {
             label.assign("Parteigetarnt");
@@ -153,11 +154,12 @@ void FXUnitList::makeItems()
 
             if (factionId > 0) {
                 if (mapFile->getFaction(faction, factionId)) {
-                    name = faction->value(TYPE_FACTIONNAME);
+                    factionPtr = &*faction;
+                    name = factionPtr->value(TYPE_FACTIONNAME);
                     if (name.empty())
                         label.assign("Parteigetarnt");
                     else
-                        label.format("%s (%s)", name.text(), faction->id().text());
+                        label.format("%s (%s)", name.text(), factionPtr->id().text());
                 }
                 else {
                     label.format("Unbekannt (%s)", FXStringValEx((FXulong)factionId, 36).text());
@@ -167,8 +169,8 @@ void FXUnitList::makeItems()
             if (otherFactionId > 0) {
                 datablock::itor anotherfaction;
                 if (mapFile->getFaction(anotherfaction, otherFactionId)) {
-
-                    name = anotherfaction->value(TYPE_FACTIONNAME);
+                    factionPtr = &*anotherfaction;
+                    name = factionPtr->value(TYPE_FACTIONNAME);
                     FXString label2;
                     if (name.empty()) {
                         label2.assign(", parteigetarnt");
@@ -184,7 +186,7 @@ void FXUnitList::makeItems()
                 }
             }
         }
-        FXTreeItem* item = appendItem(unititem, label);
+        FXTreeItem* item = appendItem(unititem, makeItem(label, factionPtr));
 
         label = unit->value(TYPE_DESCRIPTION);
         if (!label.empty()) {

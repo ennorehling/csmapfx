@@ -1,3 +1,10 @@
+csmapfx (1.5.13-1) stable; urgency=low
+
+  * more clipboard actions for unit properties (bug 2941)
+  * fix another crash in clipboard popups.
+
+ -- Enno Rehling <enno@eressea.de>  Tue, 07 Feb 2023 19:45:00 +0200
+
 csmapfx (1.5.12-1) stable; urgency=low
 
   * remove the extended region list option (bug 2939)
