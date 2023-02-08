@@ -343,6 +343,7 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 long FXRegionList::showPopup(const FXString& label, datablock* block, FXint root_x, FXint root_y)
 {
     FXMenuPane pane(this);
+    FXMenuPane paneCascade(this);
     if (label.length() <= 20) {
         new FXMenuSeparatorEx(&pane, label);
     }
@@ -350,7 +351,6 @@ long FXRegionList::showPopup(const FXString& label, datablock* block, FXint root
         FXString str = label.left(17) + "...";
         new FXMenuSeparatorEx(&pane, str);
     }
-    FXMenuPane paneCascade(this);
     new FXMenuCascade(&pane, "&Zwischenablage", NULL, &paneCascade);
     CSMap* csmap = static_cast<CSMap*>(getShell());
     csmap->addClipboardPane(&paneCascade, block);
