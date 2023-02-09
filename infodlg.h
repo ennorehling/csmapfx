@@ -6,6 +6,7 @@
 #include <list>
 #include <vector>
 #include <istream>
+#include <memory>
 #include "datafile.h"
 
 class FXInfoDlg : public FXDialogBox
@@ -51,7 +52,9 @@ protected:
 		row								header;
 		std::list<row>					lines;
 
-		FXFoldingList*					list;
+		std::unique_ptr<FXTabItem>         tab;
+        std::unique_ptr<FXHorizontalFrame> frame;
+        std::unique_ptr <FXFoldingList>    list;
 	};
 
 	std::map<FXString, infoblock>		blocks;
