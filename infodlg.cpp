@@ -176,7 +176,7 @@ long FXInfoDlg::onSearch(FXObject*, FXSelector, void* ptr)
 				FXint pos = flatten(*entry).find(str);
 				if (pos > -1 && (!found_length || pos < found_start || (pos == found_start && entry->length() < found_length)))
 				{
-					found_list = block.list;
+					found_list = block.list.get();
 					found_tab = tab;
 					found_line = line;
 					found_start = pos;
@@ -248,28 +248,27 @@ void FXInfoDlg::createTable()
 		if (block.header.empty() && block.lines.empty())
 			continue;
 
-		FXTabItem tab(tabbook, itor->first);
-		tab.create();
+        block.tab = std::make_unique<FXTabItem>(tabbook, itor->first);
+        block.tab->create();
 
-		FXHorizontalFrame frame(tabbook, LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0,0,0,0, 0,0,0,0);
-		frame.setBorderColor(getApp()->getShadowColor());
-		frame.create();
+        block.frame = std::make_unique<FXHorizontalFrame>(tabbook, LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0,0,0,0, 0,0,0,0);
+        block.frame->setBorderColor(getApp()->getShadowColor());
+        block.frame->create();
 
-		FXFoldingList* list = new FXFoldingList(&frame, this,ID_LIST, FOLDINGLIST_SINGLESELECT|FOLDINGLIST_SHOWS_LINES|FOLDINGLIST_SHOWS_BOXES|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-		list->getHeader()->setHeaderStyle(HEADER_RESIZE|HEADER_TRACKING);
-		list->create();
+        block.list = std::make_unique<FXFoldingList>(block.frame.get(), this,ID_LIST, FOLDINGLIST_SINGLESELECT|FOLDINGLIST_SHOWS_LINES|FOLDINGLIST_SHOWS_BOXES|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+        block.list->getHeader()->setHeaderStyle(HEADER_RESIZE|HEADER_TRACKING);
+        block.list->create();
 
-		block.list = list;
-
-		FXFont* font = list->getHeader()->getFont();		// font for width calculation
-		FXint indent = 2 + list->getIndent() + font->getTextHeight("A")/2;	// parent to child indent
+		
+		FXFont* font = block.list->getHeader()->getFont();		// font for width calculation
+		FXint indent = 2 + block.list->getIndent() + font->getTextHeight("A")/2;	// parent to child indent
 
 		// create header
 		std::vector<FXint> widths;
 
 		for (infoblock::row::iterator header = block.header.begin(); header != block.header.end(); header++)
 		{
-			list->appendHeader(*header, NULL);
+            block.list->appendHeader(*header, NULL);
 			widths.push_back(font->getTextWidth(*header));
 		}
 
@@ -309,13 +308,13 @@ void FXInfoDlg::createTable()
 			if (father)
 				father->setExpanded(true);
 
-			FXFoldingItem *item = list->appendItem(father, text, NULL, NULL, (void*)line);
+			FXFoldingItem *item = block.list->appendItem(father, text, NULL, NULL, (void*)line);
 			fathers.push_back(item);
 			line++;
 		}
 
-		for (FXint col = 0; col < list->getNumHeaders(); col++)
-			list->setHeaderSize(col, 10+widths[col]);
+		for (FXint col = 0; col < block.list->getNumHeaders(); col++)
+            block.list->setHeaderSize(col, 10+widths[col]);
 	}
 }
 
