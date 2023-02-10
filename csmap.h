@@ -304,10 +304,11 @@ private:
     class FXVerticalFrame *commandframe = nullptr;
 
 	// Im TabBook
-	class FXProperties *unitProperties = nullptr;
-	class FXProperties *shipProperties = nullptr;
-	class FXProperties *buildingProperties = nullptr;
-	class FXStatistics *statistics = nullptr;
+    class FXText * descriptionText = nullptr;
+	class FXProperties * unitProperties = nullptr;
+	class FXProperties * shipProperties = nullptr;
+	class FXProperties * buildingProperties = nullptr;
+	class FXStatistics * statistics = nullptr;
 
 	// Floating
     class FXCSMap* minimap = nullptr;

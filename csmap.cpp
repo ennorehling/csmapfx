@@ -598,6 +598,13 @@ CSMap::CSMap(FXApp *app) :
     FXVerticalFrame *frame = new FXVerticalFrame(tabbook, LAYOUT_FILL_X);
     frame->setBorderColor(getApp()->getShadowColor());
     frame->setFrameStyle(FRAME_LINE);
+
+    FXHorizontalFrame* hFrame = new FXHorizontalFrame(frame, LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    FXToolBarTab * dTab = new FXToolBarTab(hFrame, nullptr, 0, TOOLBARTAB_HORIZONTAL, 0, 0, 0, 0);
+    dTab->setTipText("Handelsinformationen ein- und ausblenden");
+    descriptionText = new FXText(hFrame, this, ID_SELECTION, LAYOUT_FILL_X);
+    descriptionText->setText("Hier noch keine Beschreibung");
+
     unitProperties = new FXUnitList(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
         TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
     unitProperties->hide();
@@ -673,7 +680,7 @@ CSMap::CSMap(FXApp *app) :
 
     // search dialog
     searchdlg = new FXSearchDlg(this, this, ID_SELECTION, searchResults, "Suchen...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));
-    searchdlg->getAccelTable()->addAccel(MKUINT(KEY_F,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_SEARCHDLG));
+    searchdlg->getAccelTable()->addAccel(MKUINT(KEY_F, CONTROLMASK), this, FXSEL(SEL_COMMAND, ID_VIEW_SEARCHDLG));
 }
 
 CSMap::~CSMap()
