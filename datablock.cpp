@@ -401,7 +401,7 @@ FXString datablock::TERRAIN_NAMES[] =
     FXString(L"W\u00fcste"),
     FXString("Wald"),
     FXString("Hochland"),
-    FXString("Wald"),
+    FXString("Berge"),
     FXString("Gletscher"),
     FXString("Vulkan"),
     FXString("Aktiver Vulkan"),
