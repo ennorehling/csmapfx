@@ -1,3 +1,9 @@
+csmapfx (1.5.14-1) stable; urgency=low
+
+  * fix save bug that was turning mountains into forests.
+
+ -- Enno Rehling <enno@eressea.de>  Fri, 10 Feb 2023 16:45:00 +0200
+
 csmapfx (1.5.13-1) stable; urgency=low
 
   * more clipboard actions for unit properties (bug 2941)
