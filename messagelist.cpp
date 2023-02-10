@@ -31,7 +31,7 @@ void FXMessageList::setMapFile(datafile *f)
     }
 }
 
-void FXMessageList::addMessage(FXTreeItem* group, datablock * block)
+void FXMessageList::addMessage(FXTreeItem* group, datablock* block)
 {
     if (block->type() == block_type::TYPE_BATTLE) {
         datablock::itor region;
@@ -52,23 +52,34 @@ void FXMessageList::addMessage(FXTreeItem* group, datablock * block)
             item->setData((void*)&*select);
         }
         else {
-            FXString loc = block->value("region");
-            if (loc.empty()) {
-                item->setData(nullptr);
+            FXival b_id = block->getReference(block_type::TYPE_BUILDING);
+            if (b_id > 0 && mapFile->getBuilding(select, b_id)) {
+                item->setData((void*)&*select);
             }
             else {
-                int x, y, plane;
-                x = FXIntVal(loc.section(' ', 0));
-                y = FXIntVal(loc.section(' ', 1));
-                plane = FXIntVal(loc.section(' ', 2));
-                if (mapFile->getRegion(select, x, y, plane)) {
+                FXival s_id = block->getReference(block_type::TYPE_SHIP);
+                if (s_id > 0 && mapFile->getShip(select, s_id)) {
                     item->setData((void*)&*select);
+                }
+                else {
+                    FXString loc = block->value("region");
+                    if (loc.empty()) {
+                        item->setData(nullptr);
+                    }
+                    else {
+                        int x, y, plane;
+                        x = FXIntVal(loc.section(' ', 0));
+                        y = FXIntVal(loc.section(' ', 1));
+                        plane = FXIntVal(loc.section(' ', 2));
+                        if (mapFile->getRegion(select, x, y, plane)) {
+                            item->setData((void*)&*select);
+                        }
+                    }
                 }
             }
         }
     }
 }
-
 long FXMessageList::onMapChange(FXObject* sender, FXSelector sel, void* ptr)
 {
     datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;

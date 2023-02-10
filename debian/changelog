@@ -1,3 +1,9 @@
+csmapfx (1.5.15-1) stable; urgency=low
+
+  * double-click on messages can also navigate to ships and buildings.
+
+ -- Enno Rehling <enno@eressea.de>  Fri, 10 Feb 2023 19:45:00 +0200
+
 csmapfx (1.5.14-1) stable; urgency=low
 
   * fix save bug that was turning mountains into forests.

@@ -743,6 +743,16 @@ bool datablock::hasReference(datablock* target) const
             if (key.value() == match) return true;
         }
     }
+    else if (target->type() == block_type::TYPE_SHIP) {
+        int id = target->info();
+        int uid = valueInt("ship");
+        if (uid == id) return true;
+    }
+    else if (target->type() == block_type::TYPE_BUILDING) {
+        int id = target->info();
+        int uid = valueInt("building");
+        if (uid == id) return true;
+    }
     else if (target->type() == block_type::TYPE_UNIT) {
         int id = target->info();
         for (int i = 0; UNITKEYS[i]; ++i)
@@ -756,7 +766,19 @@ bool datablock::hasReference(datablock* target) const
 
 int datablock::getReference(block_type type) const
 {
-    if (type == block_type::TYPE_UNIT) {
+    if (type == block_type::TYPE_SHIP) {
+        int uid = valueInt("ship");
+        if (uid > 0) {
+            return uid;
+        }
+    }
+    else if (type == block_type::TYPE_BUILDING) {
+        int uid = valueInt("building");
+        if (uid > 0) {
+            return uid;
+        }
+    }
+    else if (type == block_type::TYPE_UNIT) {
         for (int i = 0; UNITKEYS[i]; ++i) {
             int uid = valueInt(UNITKEYS[i]);
             if (uid > 0) {
