@@ -1,3 +1,9 @@
+csmapfx (1.5.16-1) stable; urgency=low
+
+  * clicking on search results was not showing correct details.
+
+ -- Enno Rehling <enno@eressea.de>  Fri, 10 Feb 2023 22:40:00 +0200
+
 csmapfx (1.5.15-1) stable; urgency=low
 
   * double-click on messages can also navigate to ships and buildings.

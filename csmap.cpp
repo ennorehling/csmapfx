@@ -600,11 +600,13 @@ CSMap::CSMap(FXApp *app) :
     frame->setFrameStyle(FRAME_LINE);
     unitProperties = new FXUnitList(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
         TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
+    unitProperties->hide();
     shipProperties = new FXShipProperties(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
         TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
+    shipProperties->hide();
     buildingProperties = new FXBuildingProperties(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
         TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
-
+    buildingProperties->hide();
 
     getAccelTable()->addAccel(MKUINT(KEY_1, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_1));
     getAccelTable()->addAccel(MKUINT(KEY_2, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_2));
