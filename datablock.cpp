@@ -6,8 +6,7 @@
 
 #include <cassert>
 
-att_commands::att_commands(const datablock& source, bool confirm)
-    : confirmed(confirm)
+att_commands::att_commands(const datablock& source)
 {
     const datakey::list_type& list = source.data();
 

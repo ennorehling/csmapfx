@@ -326,16 +326,7 @@ int datafile::save(const char* filename, map_type map_filter)
 		}
 		else if (type == block_type::TYPE_UNIT)
 		{
-            bool confirmed = block->valueInt(TYPE_ORDERS_CONFIRMED) != 0;
-			datablock::itor cmd;
-			if (getCommands(cmd, block))
-			{
-				// att_commands' confirmed attribute overwrites the tag
-				if (att_commands* cmds = static_cast<att_commands*>(cmd->attachment()))
-					confirmed = cmds->confirmed;
-			}
-
-			if (confirmed)	// TYPE_ORDERS_CONFIRMED
+			if (isConfirmed(block))	// TYPE_ORDERS_CONFIRMED
 				file << "1;ejcOrdersConfirmed" << std::endl;
 		}
 		else if (type == block_type::TYPE_COMMANDS)
@@ -786,6 +777,7 @@ int datafile::loadCmds(const FXString& filename)
                 {
                     throw std::runtime_error(("Einheit nicht gefunden: " + str).text());
                 }
+                setConfirmed(block, false); // TODO: cumbersome, but reading orders without a ; bestaetigt comment must do this.
                 cmds_list = nullptr;
                 datablock::itor cmdb;
                 if (getCommands(cmdb, block)) {
@@ -800,7 +792,6 @@ int datafile::loadCmds(const FXString& filename)
             }
 
             if (cmds_list) {
-                cmds_list->confirmed = false;
                 cmds_list->prefix_lines.clear();
                 cmds_list->commands.clear();
                 cmds_list->postfix_lines.clear();
@@ -1049,7 +1040,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 			// output attachment (changed) or default commands
 			if (attcmds)
 			{
-				if (attcmds->confirmed)
+				if (isConfirmed(unit))
 					out << "; bestaetigt\n";
 
 				// output prefix lines
@@ -1416,19 +1407,6 @@ void datafile::setConfirmed(datablock::itor& unit, bool confirmed)
     else {
         unit->removeKey(TYPE_ORDERS_CONFIRMED);
     }
-    datablock::itor cmd;
-    if (getCommands(cmd, unit))
-    {
-        att_commands* cmds = static_cast<att_commands*>(cmd->attachment());
-        if (cmds) {
-            cmds->confirmed = confirmed;
-        }
-        else if (confirmed)			// don't need to add block if it will not be confirmed
-        {
-            // copy commands of selected unit
-            cmd->attachment(cmds = new att_commands(*cmd, true));
-        }
-    }
 }
 
 bool datafile::isConfirmed(const datablock::itor& unit) const
@@ -1717,7 +1695,7 @@ void datafile::createHashTables()
                     // add att_commands to command block
                     if (!cmd->attachment())
                     {
-                        cmd->attachment(new att_commands(*cmd, isConfirmed(block)));
+                        cmd->attachment(new att_commands(*cmd));
                     }
                 }
 			}

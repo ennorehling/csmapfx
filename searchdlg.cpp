@@ -680,13 +680,7 @@ FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor& buil
         object_str = name + " (" + unitPtr->id() + ")";
         faction_str = mapFile->getFactionName(factionId);
 
-        datablock::itor cmd;
-        if (mapFile->getCommands(cmd, unit))
-        {
-            if (att_commands* cmds = static_cast<att_commands*>(cmd->attachment())) {
-                bold = !cmds->confirmed;
-            }
-        }
+        bold = !mapFile->isConfirmed(unit);
     }
 
     // add to list

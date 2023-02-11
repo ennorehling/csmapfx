@@ -362,16 +362,7 @@ long FXRegionList::showPopup(const FXString& label, datablock* block, FXint root
 
 bool FXRegionList::isConfirmed(const datablock::itor& unit) const
 {
-
-    for (datablock::itor block = std::next(unit); block != mapFile->blocks().end() && block->depth() > unit->depth(); ++block)
-    {
-        if (block->type() != block_type::TYPE_COMMANDS)
-            continue;
-        if (att_commands* cmds = static_cast<att_commands*>(block->attachment()))
-            return cmds->confirmed;
-        return false;
-    }
-    return true;
+    return mapFile->isConfirmed(unit);
 }
 
 // rekursivly searches item with userdata=data in treeitem list

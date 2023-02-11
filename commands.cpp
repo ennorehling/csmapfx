@@ -225,19 +225,7 @@ void FXCommands::setConfirmed(bool confirmed)
 
 	if (selection.selected & selection.UNIT)
 	{
-		datablock::itor cmd;
         mapFile->setConfirmed(selection.unit, confirmed);
-		if (mapFile->getCommands(cmd, selection.unit))
-		{
-			att_commands* cmds = static_cast<att_commands*>(cmd->attachment());
-			if (cmds)
-                cmds->confirmed = confirmed;
-			else if (confirmed)			// don't need to add block if it will not be confirmed
-			{
-				// copy commands of selected unit
-				cmd->attachment(cmds = new att_commands(*cmd, confirmed));
-			}
-		}
 	}
 
 	// send selectionchange
@@ -251,17 +239,7 @@ int FXCommands::getConfirmed()
 
 	if (selection.selected & selection.UNIT)
 	{
-		datablock::itor unit = selection.unit;
-
-		datablock::itor cmd;
-        if (mapFile->getCommands(cmd, selection.unit))
-        {
-			if (att_commands* cmds = static_cast<att_commands*>(cmd->attachment()))
-				return cmds->confirmed;
-
-			return 0;	// no changed commands, so not confirmed
-		}
-        return 1;
+        return mapFile->isConfirmed(selection.unit);
 	}
 
 	return -1;	// no unit with command block
