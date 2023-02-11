@@ -1,7 +1,7 @@
 csmapfx (1.5.16-1) stable; urgency=low
 
   * clicking on search results was not showing correct details.
-  * dhsow descriptions for units, buildings, and ships.
+  * show descriptions for units, buildings, and ships.
 
  -- Enno Rehling <enno@eressea.de>  Sat, 11 Feb 2023 15:45:00 +0200
 

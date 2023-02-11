@@ -120,28 +120,18 @@ long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
 		if (unit->type() != block_type::TYPE_UNIT)
 			continue;
 
-		// search command block
-        datablock::itor cmd;
-        if (mapFile->getCommands(cmd, unit))
-		{
-			bool unconfirmed = true;
-
-			if (att_commands* cmds = static_cast<att_commands*>(cmd->attachment()))
-				unconfirmed = !cmds->confirmed;
-
-			if (unconfirmed)
-			{
-				// send selectionchange, select this unit
+        if (!mapFile->isConfirmed(unit))
+        {
+			// send selectionchange, select this unit
 	
-                selection.selected = selection.UNIT;
-                selection.unit = unit;
-                updateSelection();
+            selection.selected = selection.UNIT;
+            selection.unit = unit;
+            updateSelection();
 				
-				flags |= FLAG_UPDATE;
-				forceRefresh();
-				setFocus();
-				return 1;
-			}
+			flags |= FLAG_UPDATE;
+			forceRefresh();
+			setFocus();
+			return 1;
 		}
 	}
 
@@ -170,26 +160,17 @@ long FXCommands::onNextUnit(FXObject *, FXSelector, void *)
 			continue;
 
 		// search command block
-        datablock::itor cmd;
-        if (mapFile->getCommands(cmd, unit))
+        if (!mapFile->isConfirmed(unit))
 		{
-			bool unconfirmed = true;
+            selection.selected = selection.UNIT;
+            selection.unit = unit;
+            updateSelection();
 
-			if (att_commands* cmds = static_cast<att_commands*>(cmd->attachment()))
-				unconfirmed = !cmds->confirmed;
-
-			if (unconfirmed)
-			{
-                selection.selected = selection.UNIT;
-                selection.unit = unit;
-                updateSelection();
-
-				// force update and set focus
-				flags |= FLAG_UPDATE;
-				forceRefresh();
-				setFocus();
-				return 1;
-			}
+			// force update and set focus
+			flags |= FLAG_UPDATE;
+			forceRefresh();
+			setFocus();
+			return 1;
 		}
 	}
 
@@ -245,6 +226,7 @@ void FXCommands::setConfirmed(bool confirmed)
 	if (selection.selected & selection.UNIT)
 	{
 		datablock::itor cmd;
+        mapFile->setConfirmed(selection.unit, confirmed);
 		if (mapFile->getCommands(cmd, selection.unit))
 		{
 			att_commands* cmds = static_cast<att_commands*>(cmd->attachment());

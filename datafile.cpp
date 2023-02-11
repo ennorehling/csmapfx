@@ -744,6 +744,7 @@ int datafile::loadCmds(const FXString& filename)
 
 	att_commands* cmds_list = NULL;
 	std::vector<int> *unit_order = NULL;
+    datablock::itor block;
 
     while (file.good())
     {
@@ -781,7 +782,6 @@ int datafile::loadCmds(const FXString& filename)
                 if (unit_order)
                     unit_order->push_back(unitId);
 
-                datablock::itor block;
                 if (!getUnit(block, unitId))
                 {
                     throw std::runtime_error(("Einheit nicht gefunden: " + str).text());
@@ -815,7 +815,7 @@ int datafile::loadCmds(const FXString& filename)
                     cmd.trim().lower();
                     if (flatten(cmd) == "bestaetigt") {
                         // don't add "; bestaetigt" comment, just set confirmed flag
-                        cmds_list->confirmed = true;
+                        setConfirmed(block, true);
                     }
                     else if (indent > headerindent) {
                         cmds_list->addCommand(str);
@@ -1434,7 +1434,10 @@ void datafile::setConfirmed(datablock::itor& unit, bool confirmed)
 bool datafile::isConfirmed(const datablock::itor& unit) const
 {
     FXASSERT(unit->type() == block_type::TYPE_UNIT);
-    return unit->valueInt(TYPE_ORDERS_CONFIRMED) != 0;;
+    if (unit->valueInt(TYPE_FACTION) != m_factionId) {
+        return true;
+    }
+    return unit->valueInt(TYPE_ORDERS_CONFIRMED) != 0;
 }
 
 void datafile::createHierarchy()
