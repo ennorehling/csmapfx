@@ -54,7 +54,7 @@ void FXUnitList::makeItems()
                 combatspells[block->info()] = block;
         }
 
-        FXString name, descr, number, prefix, race, weight;
+        FXString name, number, prefix, race, weight;
         FXString aura, auramax, hero;
         FXString hp, hungry, combatstatus, guards;
         FXint factionId = -1, familiarMage = -1, group = -1;
@@ -67,9 +67,6 @@ void FXUnitList::makeItems()
             switch (key->type()) {
             case TYPE_NAME:
                 name = key->value();
-                break;
-            case TYPE_DESCRIPTION:
-                descr = key->value();
                 break;
             case TYPE_FACTION:
                 factionId = atoi(key->value().text());
@@ -124,6 +121,7 @@ void FXUnitList::makeItems()
                 break;
             case TYPE_ORDERS_CONFIRMED:
             case TYPE_FACTIONSTEALTH:
+            case TYPE_DESCRIPTION:
                 // do not show
                 break;
             default:
@@ -187,12 +185,6 @@ void FXUnitList::makeItems()
             }
         }
         FXTreeItem* item = appendItem(unititem, makeItem(label, factionPtr));
-
-        label = unit->value(TYPE_DESCRIPTION);
-        if (!label.empty()) {
-            item = appendItem(unititem, label);
-        }
-
 
         if (group > 0)
         {
@@ -463,8 +455,6 @@ void FXUnitList::makeItems()
             {
                 if (key->type() == TYPE_NAME)
                     name = key->value();
-                else if (key->type() == TYPE_DESCRIPTION)
-                    descr = key->value();
                 else if (key->type() == TYPE_FACTION)
                     factionId = atoi(key->value().text());
                 else if (key->type() == TYPE_TYPE)
@@ -543,8 +533,6 @@ void FXUnitList::makeItems()
             {
                 if (key->type() == TYPE_NAME)
                     name = key->value();
-                else if (key->type() == TYPE_DESCRIPTION)
-                    descr = key->value();
                 else if (key->type() == TYPE_TYPE)
                     type = key->value();
                 else if (key->type() == TYPE_SIZE)

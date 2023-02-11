@@ -602,8 +602,8 @@ CSMap::CSMap(FXApp *app) :
     FXHorizontalFrame* hFrame = new FXHorizontalFrame(frame, LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     FXToolBarTab * dTab = new FXToolBarTab(hFrame, nullptr, 0, TOOLBARTAB_HORIZONTAL, 0, 0, 0, 0);
     dTab->setTipText("Handelsinformationen ein- und ausblenden");
-    descriptionText = new FXText(hFrame, this, ID_SELECTION, LAYOUT_FILL_X);
-    descriptionText->setText("Hier noch keine Beschreibung");
+    descriptionText = new FXText(hFrame, this, ID_SELECTION, LAYOUT_FILL_X|TEXT_READONLY|TEXT_WORDWRAP|HSCROLLER_NEVER);
+    descriptionText->disable();
 
     unitProperties = new FXUnitList(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
         TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
@@ -1999,16 +1999,21 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     if (pstate->selected & selection.UNIT)
     {
         block = pstate->unit;
+        descriptionText->setText(block->value(TYPE_DESCRIPTION));
     }
     else if (pstate->selected & selection.SHIP)
     {
         block = pstate->ship;
+        descriptionText->setText(block->value(TYPE_DESCRIPTION));
     }
     else if (pstate->selected & selection.BUILDING)
     {
         block = pstate->building;
+        descriptionText->setText(block->value(TYPE_DESCRIPTION));
     }
-
+    else {
+        descriptionText->setText("");
+    }
     showProperties(unitProperties, pstate->selected& selection.UNIT);
     showProperties(shipProperties, pstate->selected& selection.SHIP);
     showProperties(buildingProperties, pstate->selected& selection.BUILDING);
