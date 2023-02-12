@@ -1,5 +1,4 @@
-#ifndef _CSMAP_SEARCHDLG
-#define _CSMAP_SEARCHDLG
+#pragma once
 
 #include "datafile.h"
 
@@ -8,15 +7,36 @@
 #include <map>
 #include <vector>
 
+class FXSearchResults : public FXFoldingList
+{
+    FXDECLARE(FXSearchResults)
+public:
+    FXSearchResults(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts = DECOR_TITLE | DECOR_BORDER, FXint x = 0, FXint y = 0, FXint w = 0, FXint h = 0);
+    virtual ~FXSearchResults();
+
+    virtual void create();
+
+    class FXFont* getBoldFont() const { return boldFont; }
+
+    void setActiveFactionId(FXint id);
+    FXint getActiveFactionId() const { return activeFaction;  }
+
+private:
+    FXSearchResults() {};
+
+    class FXFont* boldFont = nullptr;
+    FXint activeFaction = 0;
+
+};
+
 class FXSearchDlg : public FXDialogBox
 {
 	FXDECLARE(FXSearchDlg)
 
 public:
-	FXSearchDlg(FXWindow* owner, FXObject* tgt, FXSelector sel, FXFoldingList* resultList, const FXString& name, FXIcon* icon, FXuint opts=DECOR_TITLE|DECOR_BORDER, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
+	FXSearchDlg(FXWindow* owner, FXObject* tgt, FXSelector sel, FXSearchResults* resultList, const FXString& name, FXIcon* icon, FXuint opts=DECOR_TITLE|DECOR_BORDER, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
-	void create();
-	virtual ~FXSearchDlg();
+	virtual void create();
 
     void setMapFile(datafile *f);
 
@@ -43,6 +63,7 @@ public:
 		ID_LAST
 	};
 
+
 protected:
 	datafile::SelectionState selection;
     datafile *mapFile = nullptr;
@@ -52,8 +73,8 @@ protected:
 	FXButton		*btnTransfer = nullptr;		    // transfer to global search list
 	bool			modifiedText = false;
 
-	FXFoldingList	*matches = nullptr;				// list of results
-	FXFoldingList	*results = nullptr;				// list of results
+    FXSearchResults *matches = nullptr;				// list of results
+    FXSearchResults *results = nullptr;				// list of results
 	FXLabel			*info_text = nullptr;			// info about search
 
 	struct
@@ -73,8 +94,4 @@ protected:
 
     class FXFoldingItem *addMatch(const datablock::itor &region, const datablock::itor& building, const datablock::itor& ship, const datablock::itor& unit);
 
-private:
-    class FXFont* boldFont = nullptr;
 };
-
-#endif //_CSMAP_SEARCHDLG

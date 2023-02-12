@@ -45,6 +45,7 @@ public:
 
     datablock::itor activefaction() { return m_activefaction; }
     bool hasActiveFaction() const { return m_factionId > 0; }
+    int getActiveFactionId() const { return m_factionId; }
 
 	bool load(const FXString& filename, FXString & outError);
 	int save(const char* filename, map_type map_filter);

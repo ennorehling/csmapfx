@@ -555,7 +555,7 @@ CSMap::CSMap(FXApp *app) :
     new FXTabItem(outputTabs, "&Fehler");
     errorList = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
     new FXTabItem(outputTabs, "&Suchergebnisse");
-    searchResults = new FXFoldingList(outputTabs, this, ID_RESULT_SELECTED, FOLDINGLIST_SINGLESELECT | LAYOUT_FILL_X | LAYOUT_FILL_Y);
+    searchResults = new FXSearchResults(outputTabs, this, ID_RESULT_SELECTED, FOLDINGLIST_SINGLESELECT | LAYOUT_FILL_X | LAYOUT_FILL_Y);
     searchResults->getHeader()->setHeaderStyle(HEADER_RESIZE | HEADER_TRACKING);
     searchResults->appendHeader("Region");
     searchResults->appendHeader(FXString(L"Einheit/Geb\u00e4ude/Schiff"));
@@ -1988,6 +1988,9 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 {
     datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
 
+    if (pstate->fileChange != selection.fileChange) {
+        searchResults->setActiveFactionId(report ? report->getActiveFactionId() : 0);
+    }
     if (!report) return 0;
     getApp()->beginWaitCursor();
 
@@ -2428,6 +2431,14 @@ void CSMap::addClipboardPane(FXMenuPane *pane, datablock* block)
             }
         }
     }
+}
+
+int CSMap::getActiveFactionId() const
+{
+    if (report) {
+        return report->getActiveFactionId();
+    }
+    return 0;
 }
 
 long CSMap::onFileOpen(FXObject*, FXSelector, void* r)

@@ -124,6 +124,8 @@ public:		// this functions are slots for menu commands
     void loadFiles(const std::vector<FXString>& filenames);
     void addClipboardPane(FXMenuPane* pane, datablock* block);
 
+    int getActiveFactionId() const;
+
     enum
 	{
 		ID_REGIONS = FXMainWindow::ID_LAST,
@@ -315,7 +317,7 @@ private:
     class FXInfoDlg* infodlg = nullptr;
     class FXSearchDlg* searchdlg = nullptr;
     class FXDialogBox* minimap_frame = nullptr;
-    class FXFoldingList* searchResults = nullptr;
+    class FXSearchResults* searchResults = nullptr;
     
     time_t last_save_time = 0;
 

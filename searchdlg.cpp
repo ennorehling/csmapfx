@@ -1,5 +1,6 @@
 #include "version.h"
 #include "main.h"
+#include "csmap.h"
 #include "fxhelper.h"
 #include "searchdlg.h"
 #include "symbols.h"
@@ -36,21 +37,18 @@ FXDEFMAP(FXSearchDlg) MessageMap[]=
 };
 
 FXIMPLEMENT(FXSearchDlg, FXDialogBox, MessageMap, ARRAYNUMBER(MessageMap))
+FXIMPLEMENT(FXSearchResults, FXFoldingList, NULL, 0)
 
 class FXSearchItem : public FXFoldingItem {
 public:
     FXSearchItem(const FXString& text, FXIcon* oi = NULL, FXIcon* ci = nullptr, void* ptr = nullptr)
-        : FXFoldingItem(text, oi, ci, ptr), m_font(nullptr) {}
+        : FXFoldingItem(text, oi, ci, ptr) {}
 
-    void setFont(FXFont* font) { m_font = font; }
     virtual void draw(const FXFoldingList* list, FXDC& dc, FXint x, FXint y, FXint w, FXint h) const override;
-
-protected:
-    FXFont* m_font;
 };
 
-FXSearchDlg::FXSearchDlg(FXWindow* owner, FXObject* tgt, FXSelector sel, FXFoldingList* resultList, const FXString& name, FXIcon* icon, FXuint opts, FXint x, FXint y, FXint w, FXint h)
-		: FXDialogBox(owner, name, opts, x, y, w, h, 10, 10, 10, 10, 10, 10), results(resultList), matches(nullptr), modifiedText(false), boldFont(nullptr), mapFile(nullptr)
+FXSearchDlg::FXSearchDlg(FXWindow* owner, FXObject* tgt, FXSelector sel, FXSearchResults* resultList, const FXString& name, FXIcon* icon, FXuint opts, FXint x, FXint y, FXint w, FXint h)
+		: FXDialogBox(owner, name, opts, x, y, w, h, 10, 10, 10, 10, 10, 10), results(resultList), matches(nullptr), modifiedText(false), mapFile(nullptr)
 {
 	setIcon(icon);
     setTarget(tgt);
@@ -103,7 +101,7 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, FXObject* tgt, FXSelector sel, FXFoldi
 	FXHorizontalFrame *list_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
 	list_frame->setBorderColor(getApp()->getShadowColor());
 
-    matches = new FXFoldingList(list_frame, this, ID_RESULTS, FOLDINGLIST_SINGLESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    matches = new FXSearchResults(list_frame, this, ID_RESULTS, FOLDINGLIST_SINGLESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     matches->getHeader()->setHeaderStyle(HEADER_RESIZE|HEADER_TRACKING);
 	
     matches->appendHeader("Region");
@@ -115,28 +113,22 @@ void FXSearchDlg::create()
 {
 	FXDialogBox::create();
 
-    FXFontDesc fontdesc;
-    matches->getFont()->getFontDesc(fontdesc);
-    fontdesc.weight = FXFont::Bold;
-    boldFont = new FXFont(getApp(), fontdesc);
-    boldFont->create();
-
 	// resize table headers
 	int w = (getWidth() - getPadLeft() - getPadRight() - 20) / matches->getNumHeaders();
 	for (int i = 0; i < matches->getNumHeaders(); i++)
         matches->setHeaderSize(i, w);
 }
 
-FXSearchDlg::~FXSearchDlg()
-{
-    delete boldFont;
-}
-
 void FXSearchDlg::setMapFile(datafile *f)
 {
-    mapFile = f;
-    matches->clearItems();
-    info_text->setText("");
+    if (mapFile != f) {
+        FXint factionId = f ? f->getActiveFactionId() : 0;
+        mapFile = f;
+        matches->clearItems();
+        matches->setActiveFactionId(factionId);
+        results->setActiveFactionId(factionId);
+        info_text->setText("");
+    }
 }
 
 void FXSearchDlg::loadState(FXRegistry& reg)
@@ -611,7 +603,7 @@ long FXSearchDlg::onCopyResults(FXObject* sender, FXSelector sel, void* ptr)
     FXFoldingItem* item;
     results->clearItems();
     for (item = matches->getFirstItem(); item; item = item->getNext()) {
-        FXFoldingItem* copy = new FXFoldingItem(item->getText(), item->getOpenIcon(), item->getClosedIcon(), item->getData());
+        FXFoldingItem* copy = new FXSearchItem(item->getText(), item->getOpenIcon(), item->getClosedIcon(), item->getData());
         results->appendItem(NULL, copy);
     }
     FXTabBook* outputTabs = (FXTabBook*)results->getParent();
@@ -623,6 +615,11 @@ long FXSearchDlg::onCopyResults(FXObject* sender, FXSelector sel, void* ptr)
 long FXSearchDlg::onMapChange(FXObject* sender, FXSelector sel, void* ptr)
 {
     datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
+    if (selection.selChange != pstate->selChange)
+    {
+        matches->update();
+        results->update();
+    }
     selection = *pstate;
     return 1;
 }
@@ -632,7 +629,6 @@ FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor& buil
 {
     const datablock::itor end = mapFile->blocks().end();
     FXString region_str, object_str, faction_str;
-    bool bold = false;
     // add region to results-list in first column
     if (region != end)
     {
@@ -679,8 +675,6 @@ FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor& buil
         FXString name = unitPtr->getName();
         object_str = name + " (" + unitPtr->id() + ")";
         faction_str = mapFile->getFactionName(factionId);
-
-        bold = !mapFile->isConfirmed(unit);
     }
 
     // add to list
@@ -693,7 +687,6 @@ FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor& buil
         link = ship;
 
     FXSearchItem* item = new FXSearchItem(region_str + "\t" + object_str + "\t" + faction_str, nullptr, nullptr, (void*)&*link);
-    if (bold) item->setFont(boldFont);
     return item;
 }
 
@@ -701,13 +694,60 @@ static const int ICON_SPACING = 4;	// Spacing between parent and child in x dire
 static const int TEXT_SPACING = 4;	// Spacing between icon and text
 static const int SIDE_SPACING = 4;	// Spacing between side and item
 
-void FXSearchItem::draw(const FXFoldingList* list, FXDC& dc, FXint xx, FXint yy, FXint ww, FXint hh) const
+void FXSearchItem::draw(const FXFoldingList* l, FXDC& dc, FXint xx, FXint yy, FXint ww, FXint hh) const
 {
+    const FXSearchResults* list = static_cast<const FXSearchResults*>(l);
     FXFont* dcfont = dc.getFont();
-    FXFont* font = dcfont;
-    if (m_font) {
-        dc.setFont(font = m_font);
+    datablock* block = static_cast<datablock*>(getData());
+    bool bold = false;
+    if (block) {
+        if (block->type() == block_type::TYPE_UNIT)
+        {
+            int factionId = list->getActiveFactionId();
+            if (factionId > 0 && (factionId == block->valueInt(TYPE_FACTION)))
+            {
+                bold = (block->valueInt(TYPE_ORDERS_CONFIRMED) == 0);
+            }
+        }
+        else if (block->type() == block_type::TYPE_REGION)
+        {
+
+        }
+    }
+
+    if (bold) {
+        FXFont* font = static_cast<const FXSearchResults*>(list)->getBoldFont();
+        dc.setFont(font);
     }
     FXFoldingItem::draw(list, dc, xx, yy, ww, hh);
-    if (m_font) dc.setFont(dcfont);
+    if (bold) dc.setFont(dcfont);
+}
+
+FXSearchResults::FXSearchResults(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x, FXint y, FXint w, FXint h)
+    : FXFoldingList(p, tgt, sel, opts, x, y, w, h)
+{
+}
+
+FXSearchResults::~FXSearchResults()
+{
+    delete boldFont;
+}
+
+void FXSearchResults::create()
+{
+    FXFontDesc fontdesc;
+    getFont()->getFontDesc(fontdesc);
+    fontdesc.weight = FXFont::Bold;
+    boldFont = new FXFont(getApp(), fontdesc);
+    boldFont->create();
+
+    FXFoldingList::create();
+}
+
+void FXSearchResults::setActiveFactionId(FXint id) 
+{
+    if (activeFaction != id) {
+        activeFaction = id;
+        update();
+    }
 }
