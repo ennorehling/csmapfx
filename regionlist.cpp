@@ -35,6 +35,17 @@ public:
 
 	bool isBold() const
 	{
+        const datablock* block = static_cast<const datablock *>(getData());
+        if (block) {
+            if (block->type() == block_type::TYPE_REGION) {
+                if (att_region* stats = static_cast<att_region*>(block->attachment())) {
+                    return stats->unconfirmed > 0;
+                }
+            }
+            else if (block->type() == block_type::TYPE_UNIT) {
+                return block->valueInt(TYPE_ORDERS_CONFIRMED) == 0;
+            }
+        }
 		return unconfirmed != 0;
 	}
 

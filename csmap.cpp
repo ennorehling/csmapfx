@@ -2082,7 +2082,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         status_lfaction->hide();
         status->recalc();
     }
-
+    regions->update();
     getApp()->endWaitCursor();
     return 1;
 }
