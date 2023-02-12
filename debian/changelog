@@ -1,3 +1,9 @@
+csmapfx (1.5.18-1) stable; urgency=low
+
+  * do not display other factions' units as unconfirmed.
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 12 Feb 2023 17:45:00 +0200
+
 csmapfx (1.5.17-1) stable; urgency=low
 
   * dynamically update confirmation status of search results (bold list entries).

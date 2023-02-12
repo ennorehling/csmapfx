@@ -1,5 +1,4 @@
-#ifndef VERSION_H_
-#define VERSION_H_
+#pragma once
 
 #define MACROTOSTR(STR) MACROTOSTRINGx(STR)
 #define MACROTOSTRINGx(STR) #STR
@@ -8,10 +7,10 @@
 #define CSMAP_APP_TITLE      "Coast'n'Sea Mapper"
 
 // current application version
-#define CSMAP_APP_VERSION    1, 5, 17
+#define CSMAP_APP_VERSION    1, 5, 18
 
 // application version string
-#define CSMAP_APP_VERSIONSTR "v1.5.17"
+#define CSMAP_APP_VERSIONSTR "v1.5.18"
 
 // application title with full version string
 #define CSMAP_APP_TITLE_VERSION CSMAP_APP_TITLE " " CSMAP_APP_VERSIONSTR
@@ -20,6 +19,3 @@
 #define CSMAP_APP_COPYRIGHT  "Copyright (c) 2004-2010 Thomas J. Gritzan\nCopyright (c) 2021-2023 Enno Rehling"
 // used as company name (version.rc) and in the About Box (csmap.cpp)
 #define CSMAP_APP_URL        "https://github.com/ennorehling/csmapfx"
-
-#endif // VERSION_H_
-

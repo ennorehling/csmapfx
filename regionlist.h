@@ -41,6 +41,8 @@ public:
     bool colorized() const {
         return colorized_units;
     }
+
+    bool isBold(const FXTreeItem* item) const;
 public: 
 	enum
 	{

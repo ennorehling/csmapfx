@@ -32,22 +32,6 @@ public:
 	/// Constructor
 	FXRegionItem(const FXString& text,FXIcon* oi=nullptr,FXIcon* ci=nullptr,void* ptr=nullptr) : FXTreeItem(text, oi, ci, ptr), m_textColor(0) {}
 
-	bool isBold() const
-	{
-        const datablock* block = static_cast<const datablock *>(getData());
-        if (block) {
-            if (block->type() == block_type::TYPE_REGION) {
-                if (att_region* stats = static_cast<att_region*>(block->attachment())) {
-                    return stats->unconfirmed > 0;
-                }
-            }
-            else if (block->type() == block_type::TYPE_UNIT) {
-                return block->valueInt(TYPE_ORDERS_CONFIRMED) == 0;
-            }
-        }
-        return false;
-	}
-
 	// ----------------------------------
 	static void setBoldFont(FXFont* font)
 	{
@@ -73,11 +57,14 @@ static const int SIDE_SPACING = 4;	// Spacing between side and item
 FXIMPLEMENT(FXRegionItem,FXTreeItem,nullptr,0)
 
 // Draw item
-void FXRegionItem::draw(const FXTreeList* list, FXDC& dc, FXint xx, FXint yy, FXint ww, FXint hh) const
+void FXRegionItem::draw(const FXTreeList* l, FXDC& dc, FXint xx, FXint yy, FXint ww, FXint hh) const
 {
+    const FXRegionList* list = static_cast<const FXRegionList*>(l);
+    bool is_bold = boldfont && list->isBold(this);
     FXIcon *icon = (state & OPENED) ? openIcon : closedIcon;
     FXFont *font = list->getFont();
-    if (isBold() && boldfont) {
+
+    if (is_bold) {
         dc.setFont(font = boldfont);
     }
     FXint th = 0, tw = 0, ih = 0, iw = 0;
@@ -114,80 +101,85 @@ void FXRegionItem::draw(const FXTreeList* list, FXDC& dc, FXint xx, FXint yy, FX
         dc.drawText(xx + 2, yy + font->getFontAscent() + 2, label);
     }
 
-    if (isBold())
+    if (is_bold)
         dc.setFont(list->getFont());
 }
 
 // See if item got hit, and where:- 1 is icon, 2 is text
-FXint FXRegionItem::hitItem(const FXTreeList* list,FXint xx,FXint yy) const
+FXint FXRegionItem::hitItem(const FXTreeList* l,FXint xx,FXint yy) const
 {
-  FXint oiw=0,ciw=0,oih=0,cih=0,tw=0,th=0,iw,ih,ix,iy,tx,ty,h;
-  FXFont *font=list->getFont();
-  if (isBold() && boldfont)
-		font = boldfont;
+    const FXRegionList* list = static_cast<const FXRegionList*>(l);
+    FXint oiw = 0, ciw = 0, oih = 0, cih = 0, tw = 0, th = 0, iw, ih, ix, iy, tx, ty, h;
+    FXFont* font = list->getFont();
+    bool is_bold = boldfont && list->isBold(this);
+    if (is_bold) font = boldfont;
 
-  if(openIcon){
-    oiw=openIcon->getWidth();
-    oih=openIcon->getHeight();
+    if (openIcon) {
+        oiw = openIcon->getWidth();
+        oih = openIcon->getHeight();
     }
-  if(closedIcon){
-    ciw=closedIcon->getWidth();
-    cih=closedIcon->getHeight();
+    if (closedIcon) {
+        ciw = closedIcon->getWidth();
+        cih = closedIcon->getHeight();
     }
-  if(!label.empty()){
-    tw=4+font->getTextWidth(label.text(),label.length());
-    th=4+font->getFontHeight();
+    if (!label.empty()) {
+        tw = 4 + font->getTextWidth(label.text(), label.length());
+        th = 4 + font->getFontHeight();
     }
-  iw=FXMAX(oiw,ciw);
-  ih=FXMAX(oih,cih);
-  h=FXMAX(th,ih);
-  ix=SIDE_SPACING/2;
-  tx=SIDE_SPACING/2;
-  if(iw) tx+=iw+ICON_SPACING;
-  iy=(h-ih)/2;
-  ty=(h-th)/2;
+    iw = FXMAX(oiw, ciw);
+    ih = FXMAX(oih, cih);
+    h = FXMAX(th, ih);
+    ix = SIDE_SPACING / 2;
+    tx = SIDE_SPACING / 2;
+    if (iw) tx += iw + ICON_SPACING;
+    iy = (h - ih) / 2;
+    ty = (h - th) / 2;
 
-  // In icon?
-  if(ix<=xx && iy<=yy && xx<ix+iw && yy<iy+ih) return 1;
+    // In icon?
+    if (ix <= xx && iy <= yy && xx < ix + iw && yy < iy + ih) return 1;
 
-  // In text?
-  if(tx<=xx && ty<=yy && xx<tx+tw && yy<ty+th) return 2;
+    // In text?
+    if (tx <= xx && ty <= yy && xx < tx + tw && yy < ty + th) return 2;
 
-  // Outside
-  return 0;
-  }
+    // Outside
+    return 0;
+}
 
 // Get item width
-FXint FXRegionItem::getWidth(const FXTreeList* list) const
+FXint FXRegionItem::getWidth(const FXTreeList* l) const
 {
-  FXint w=0,oiw=0,ciw=0;
-  FXFont *font=list->getFont();
-  if (isBold() && boldfont)
-		font = boldfont;
+    const FXRegionList* list = static_cast<const FXRegionList*>(l);
+    bool is_bold = boldfont && list->isBold(this);
+    FXint w = 0, oiw = 0, ciw = 0;
+    FXFont *font=list->getFont();
+    if (is_bold)
+        font = boldfont;
 
-  if(openIcon) oiw=openIcon->getWidth();
-  if(closedIcon) ciw=closedIcon->getWidth();
-  w=FXMAX(oiw,ciw);
-  if(!label.empty()){
-    if(w) w+=ICON_SPACING;
-    w+=4+font->getTextWidth(label.text(),label.length());
+    if (openIcon) oiw = openIcon->getWidth();
+    if (closedIcon) ciw = closedIcon->getWidth();
+    w = FXMAX(oiw, ciw);
+    if (!label.empty()) {
+        if (w) w += ICON_SPACING;
+        w += 4 + font->getTextWidth(label.text(), label.length());
     }
-  return SIDE_SPACING+w;
-  }
+    return SIDE_SPACING + w;
+}
 
 // Get item height
-FXint FXRegionItem::getHeight(const FXTreeList* list) const
+FXint FXRegionItem::getHeight(const FXTreeList* l) const
 {
-  FXint th=0,oih=0,cih=0;
-  FXFont *font=list->getFont();
-  if (isBold() && boldfont)
-		font = boldfont;
+    const FXRegionList* list = static_cast<const FXRegionList*>(l);
+    bool is_bold = boldfont && list->isBold(this);
+    FXFont* font = list->getFont();
+    FXint th = 0, oih = 0, cih = 0;
+    if (is_bold)
+        font = boldfont;
 
-  if(openIcon) oih=openIcon->getHeight();
-  if(closedIcon) cih=closedIcon->getHeight();
-  if(!label.empty()) th=4+font->getFontHeight();
-  return FXMAX3(th,oih,cih);
-  }
+    if (openIcon) oih = openIcon->getHeight();
+    if (closedIcon) cih = closedIcon->getHeight();
+    if (!label.empty()) th = 4 + font->getFontHeight();
+    return FXMAX3(th, oih, cih);
+}
 
 // *********************************************************************************************************
 // *** FXRegionList implementation
@@ -654,4 +646,24 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
 long FXRegionList::onQueryHelp(FXObject* /*sender*/, FXSelector, void* /*ptr*/)
 { 
 	return 0;
+}
+
+bool FXRegionList::isBold(const FXTreeItem* item) const
+{
+    const datablock* block = static_cast<const datablock*>(item->getData());
+    if (block) {
+        if (block->type() == block_type::TYPE_REGION) {
+            if (att_region* stats = static_cast<att_region*>(block->attachment())) {
+                return stats->unconfirmed > 0;
+            }
+        }
+        else if (block->type() == block_type::TYPE_UNIT) {
+            const CSMap* csmap = static_cast<const CSMap*>(getTarget());
+            FXint factionId = csmap->getActiveFactionId();
+            if (block->valueInt(TYPE_FACTION) == factionId) {
+                return block->valueInt(TYPE_ORDERS_CONFIRMED) == 0;
+            }
+        }
+    }
+    return false;
 }
