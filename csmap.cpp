@@ -2082,6 +2082,7 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         status_lfaction->hide();
         status->recalc();
     }
+    // TODO: only need to update the regionlist when confirmation stauts was changed.
     regions->update();
     getApp()->endWaitCursor();
     return 1;
