@@ -202,7 +202,7 @@ public:
 	};
 	int				streets;		// street symbols
 
-	enum	// not yet used!!!
+	enum
 	{
 		FLAG_CASTLE	   = (1 << 0),	// there is a building/tower/castle in this region
 		FLAG_SHIP	   = (1 << 2),	// there are ships in this region
@@ -226,7 +226,8 @@ public:
 		FLAG_GUARDED_ENEMY= (1 << 14),		// unit guard the region
 	};
 	int				symbols;		// other symbols
-
+    
+    FXint unconfirmed = 0; // number of unconfirmed units
 };
 
 class att_commands : public attachment

@@ -1401,11 +1401,24 @@ void datafile::setConfirmed(datablock::itor& unit, bool confirmed)
 {
     FXASSERT(unit->type() == block_type::TYPE_UNIT);
 
-    if (confirmed) {
-        unit->setKey(TYPE_ORDERS_CONFIRMED, 1);
-    }
-    else {
-        unit->removeKey(TYPE_ORDERS_CONFIRMED);
+    // TODO: two key-searches, possible optimization
+    if (confirmed != isConfirmed(unit))
+    {
+        att_region* stats = nullptr;
+        datablock::itor region;
+        if (getParent(region, unit)) {
+            stats = static_cast<att_region*>(region->attachment());
+        }
+        if (confirmed) {
+            unit->setKey(TYPE_ORDERS_CONFIRMED, 1);
+            if (stats) --stats->unconfirmed;
+        }
+        else {
+            unit->removeKey(TYPE_ORDERS_CONFIRMED);
+            if (stats) ++stats->unconfirmed;
+        }
+        if (getParent(region, unit)) {
+        }
     }
 }
 
@@ -1517,6 +1530,7 @@ void datafile::createHashTables()
 	m_turn = 0;
 
 	datablock* region = NULL;
+    int unconfirmed = 0;
 	int region_own = 0;
 	int region_ally = 0;
 	int region_enemy = 0;
@@ -1587,11 +1601,11 @@ void datafile::createHashTables()
                 int enemy_log = barHeight2(region_enemy);
 				
                 // generate new style flag information. log_2(people) = 1 to 13
-				if (own_log || ally_log || enemy_log)
+				if (own_log || ally_log || enemy_log || unconfirmed)
 				{
 					att_region* stats = new att_region;
 					region->attachment(stats);
-
+                    stats->unconfirmed = unconfirmed;
                     stats->people.reserve(enemy_log ? 3 : 2);
 					stats->people.push_back(own_log / 13.0f);
 					stats->people.push_back(ally_log / 13.0f);
@@ -1602,7 +1616,7 @@ void datafile::createHashTables()
 
 			region = &*block;
 			region->flags(region->flags() & (datablock::FLAG_BLOCKID_BIT0|datablock::FLAG_BLOCKID_BIT1));	// unset all flags except BLOCKID flags
-			region_own = region_ally = region_enemy = 0;
+			unconfirmed = region_own = region_ally = region_enemy = 0;
 
 			if (block->value(TYPE_VISIBILITY) == "lighthouse")
 				region->setFlags(datablock::FLAG_LIGHTHOUSE);		// region is seen by lighthouse
@@ -1743,6 +1757,9 @@ void datafile::createHashTables()
                             region_own += number;
                             number = 0;
                             owner = owner_t::UNIT_OWN;
+                            if (!isConfirmed(block)) {
+                                ++unconfirmed;
+                            }
                         }
                         else if (allied_status[factionId] != 0)
                         {

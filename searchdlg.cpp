@@ -711,7 +711,10 @@ void FXSearchItem::draw(const FXFoldingList* l, FXDC& dc, FXint xx, FXint yy, FX
         }
         else if (block->type() == block_type::TYPE_REGION)
         {
-
+            att_region* stats = static_cast<att_region * >(block->attachment());
+            if (stats) {
+                bold = (stats->unconfirmed > 0);
+            }
         }
     }
 
