@@ -202,7 +202,7 @@ void FXCommands::makeTemp()
 
 FXString FXCommands::getFreeTemp()
 {
-    static int i = 1;			// TODO: Check if tempnumber is free
+    static int i = 1;			// FIXME: Check if tempnumber is free
 	return FXStringVal(i++);
 }
 
@@ -229,6 +229,7 @@ void FXCommands::setConfirmed(bool confirmed)
 	}
 
 	// send selectionchange
+    selection.selected |= selection.CONFIRMATION;
     updateSelection();
 }
 

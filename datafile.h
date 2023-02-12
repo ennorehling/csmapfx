@@ -109,7 +109,8 @@ public:
 			FACTION = (1<<2),
 			BUILDING = (1<<3),
 			SHIP = (1<<4),
-			UNIT = (1<<5)
+			UNIT = (1<<5),
+            CONFIRMATION = (1 << 6)     // confirmation status of yhe current unit has changed, update widgets that care
 		};
 
         void transfer(datafile* old_cr, datafile* new_cr, int x_offset = 0, int y_offset = 0);

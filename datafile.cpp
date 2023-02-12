@@ -777,7 +777,7 @@ int datafile::loadCmds(const FXString& filename)
                 {
                     throw std::runtime_error(("Einheit nicht gefunden: " + str).text());
                 }
-                setConfirmed(block, false); // TODO: cumbersome, but reading orders without a ; bestaetigt comment must do this.
+                setConfirmed(block, false); // TODO: cumbersome, but reading orders without a `; bestaetigt` comment must do this.
                 cmds_list = nullptr;
                 datablock::itor cmdb;
                 if (getCommands(cmdb, block)) {

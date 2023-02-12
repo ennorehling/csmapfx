@@ -2082,8 +2082,11 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         status_lfaction->hide();
         status->recalc();
     }
-    // TODO: only need to update the regionlist when confirmation stauts was changed.
-    regions->update();
+    // only need to update the regionlist when confirmation stauts was changed.
+    if (selection.selected & selection.CONFIRMATION) {
+        regions->update();
+        selection.selected &= ~selection.CONFIRMATION;
+    }
     getApp()->endWaitCursor();
     return 1;
 }
@@ -2372,7 +2375,7 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames)
         }
         ++selection.fileChange;
         if (old_cr != report) {
-            // TODO: make selection to use the new report instead
+            // TODO: make selection to use the new report instead (enno:?)
             delete old_cr;
         }
         mapChange();
