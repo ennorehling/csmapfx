@@ -202,7 +202,7 @@ public:
 	};
 	int				streets;		// street symbols
 
-	enum	// not yet used!!!
+	enum
 	{
 		FLAG_CASTLE	   = (1 << 0),	// there is a building/tower/castle in this region
 		FLAG_SHIP	   = (1 << 2),	// there are ships in this region
@@ -226,13 +226,15 @@ public:
 		FLAG_GUARDED_ENEMY= (1 << 14),		// unit guard the region
 	};
 	int				symbols;		// other symbols
-
+    
+    FXint unconfirmed = 0; // number of unconfirmed units
 };
 
 class att_commands : public attachment
 {
 public:
-	att_commands() : confirmed(false) { }
+    att_commands() {}
+    att_commands(const class datablock& source);
 
     void addCommand(const FXString &line);
 	typedef std::vector<FXString> cmdlist_t;
@@ -241,7 +243,6 @@ public:
 	cmdlist_t	prefix_lines;
 	cmdlist_t	commands;
 	cmdlist_t	postfix_lines;
-	bool		confirmed;
 };
 
 // ====================
@@ -297,7 +298,10 @@ public:
     void addKey(const datakey& data) {
         m_data.push_back(data);
     }
-    void setKey(enum key_type type, const FXString& value) {
+    void setKey(enum key_type type, int value) {
+        setKey((int)type | TYPE_INTEGER, FXStringVal(value));
+    }
+    void setKey(int type, const FXString& value) {
         for (datakey::itor tags = m_data.begin(); tags != m_data.end(); ++tags)
         {
             if (tags->type() == type) {

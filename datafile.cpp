@@ -326,27 +326,12 @@ int datafile::save(const char* filename, map_type map_filter)
 		}
 		else if (type == block_type::TYPE_UNIT)
 		{
-			// search for command block of unit
-			datablock::itor cmd = block;
-			for (cmd++; cmd != last_block && cmd->depth() > block->depth(); ++cmd)
-				if (cmd->type() == block_type::TYPE_COMMANDS)
-					break;				// found
-
-			bool confirmed = block->valueInt(TYPE_ORDERS_CONFIRMED) != 0;
-
-			if (cmd != last_block && cmd->type() == block_type::TYPE_COMMANDS)
-			{
-				// att_commands' confirmed attribute overwrites the tag
-				if (att_commands* cmds = dynamic_cast<att_commands*>(cmd->attachment()))
-					confirmed = cmds->confirmed;
-			}
-
-			if (confirmed)	// TYPE_ORDERS_CONFIRMED
+			if (isConfirmed(block))	// TYPE_ORDERS_CONFIRMED
 				file << "1;ejcOrdersConfirmed" << std::endl;
 		}
 		else if (type == block_type::TYPE_COMMANDS)
 		{
-			if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
+			if (att_commands* cmds = static_cast<att_commands*>(block->attachment()))
 			{
 				hideKeys = true;		// hide original commands
 
@@ -750,6 +735,7 @@ int datafile::loadCmds(const FXString& filename)
 
 	att_commands* cmds_list = NULL;
 	std::vector<int> *unit_order = NULL;
+    datablock::itor block;
 
     while (file.good())
     {
@@ -787,24 +773,16 @@ int datafile::loadCmds(const FXString& filename)
                 if (unit_order)
                     unit_order->push_back(unitId);
 
-                // search for command block of unit
-                int unitDepth = -1;
-                datablock::itor block = unit(unitId);
-                if (block != m_blocks.end())
+                if (!getUnit(block, unitId))
                 {
-                    unitDepth = block->depth();
-                    block++;
-                }
-                else {
                     throw std::runtime_error(("Einheit nicht gefunden: " + str).text());
                 }
-                for (cmds_list = NULL; block != m_blocks.end() && block->depth() > unitDepth; block++) {
-                    if (block->type() == block_type::TYPE_COMMANDS) {
-                        // TODO: why can't this be a static_cast?
-                        if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment())) {
-                            cmds_list = cmds;
-                            break;
-                        }
+                setConfirmed(block, false); // TODO: cumbersome, but reading orders without a ; bestaetigt comment must do this.
+                cmds_list = nullptr;
+                datablock::itor cmdb;
+                if (getCommands(cmdb, block)) {
+                    if (att_commands* cmds = static_cast<att_commands*>(cmdb->attachment())) {
+                        cmds_list = cmds;
                     }
                 }
 
@@ -814,7 +792,6 @@ int datafile::loadCmds(const FXString& filename)
             }
 
             if (cmds_list) {
-                cmds_list->confirmed = false;
                 cmds_list->prefix_lines.clear();
                 cmds_list->commands.clear();
                 cmds_list->postfix_lines.clear();
@@ -829,7 +806,7 @@ int datafile::loadCmds(const FXString& filename)
                     cmd.trim().lower();
                     if (flatten(cmd) == "bestaetigt") {
                         // don't add "; bestaetigt" comment, just set confirmed flag
-                        cmds_list->confirmed = true;
+                        setConfirmed(block, true);
                     }
                     else if (indent > headerindent) {
                         cmds_list->addCommand(str);
@@ -1025,22 +1002,16 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 				continue;
 			}
 
-			// search for command block of unit
-			datablock::itor cmdb = unit;
-			for (cmdb++; cmdb != m_blocks.end() && cmdb->depth() > unit->depth(); cmdb++)
-				if (cmdb->type() == block_type::TYPE_COMMANDS)
-					break;				// found
-
-			if (cmdb == m_blocks.end() || cmdb->type() != block_type::TYPE_COMMANDS)
-			{
+            datablock::itor cmdb;
+            if (!getCommands(cmdb, unit))
+            {
 				out << "  ; Einheit " << unit->id() << " hat keinen Befehlsblock!\n";
 				continue;
-			}
-
+            }
 			// unit has command block
 			//  EINHEIT wz5t;  Botschafter des Konzils [1,146245$,Beqwx(1/3)] kaempft nicht
 
-			att_commands* attcmds = dynamic_cast<att_commands*>(cmdb->attachment());
+			att_commands* attcmds = static_cast<att_commands*>(cmdb->attachment());
 			if (attcmds && !attcmds->header.empty())
 				out << attcmds->header.text() << "\n";
 			else
@@ -1069,7 +1040,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 			// output attachment (changed) or default commands
 			if (attcmds)
 			{
-				if (attcmds->confirmed)
+				if (isConfirmed(unit))
 					out << "; bestaetigt\n";
 
 				// output prefix lines
@@ -1207,6 +1178,30 @@ datablock::itor datafile::unit(int id)
 	return unit->second;
 }
 
+bool datafile::getFirst(datablock::itor& out, block_type type)
+{
+    for (datablock::itor it = m_blocks.begin(); it != m_blocks.end(); ++it)
+    {
+        if (it->type() == type) {
+            out = it;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool datafile::getNext(datablock::itor& iter, block_type type)
+{
+    for (datablock::itor it = std::next(iter); it != m_blocks.end(); ++it)
+    {
+        if (type == it->type()) {
+            iter = it;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool datafile::getParent(datablock::itor& out, const datablock::itor& child)
 {
     for (datablock::itor parent = child; parent != m_blocks.begin(); --parent) {
@@ -1216,6 +1211,25 @@ bool datafile::getParent(datablock::itor& out, const datablock::itor& child)
         }
     }
     return false;
+}
+
+bool datafile::getChild(datablock::itor& out, const datablock::itor& parent, block_type type)
+{
+    int depth = parent->depth();
+    for (datablock::itor itor = std::next(parent); itor != m_blocks.end() && itor->depth() > depth; ++itor)
+    {
+        if (itor->type() == type) {
+            out = itor;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool datafile::getCommands(datablock::itor& out, const datablock::itor& unit)
+{
+    FXASSERT(unit->type() == block_type::TYPE_UNIT);
+    return getChild(out, unit, block_type::TYPE_COMMANDS);
 }
 
 bool datafile::getUnit(datablock::itor& out, int id)
@@ -1383,6 +1397,40 @@ FXString datafile::unitName(const datablock& unit, bool verbose)
     return unit.getName();
 }
 
+void datafile::setConfirmed(datablock::itor& unit, bool confirmed)
+{
+    FXASSERT(unit->type() == block_type::TYPE_UNIT);
+
+    // TODO: two key-searches, possible optimization
+    if (confirmed != isConfirmed(unit))
+    {
+        att_region* stats = nullptr;
+        datablock::itor region;
+        if (getParent(region, unit)) {
+            stats = static_cast<att_region*>(region->attachment());
+        }
+        if (confirmed) {
+            unit->setKey(TYPE_ORDERS_CONFIRMED, 1);
+            if (stats) --stats->unconfirmed;
+        }
+        else {
+            unit->removeKey(TYPE_ORDERS_CONFIRMED);
+            if (stats) ++stats->unconfirmed;
+        }
+        if (getParent(region, unit)) {
+        }
+    }
+}
+
+bool datafile::isConfirmed(const datablock::itor& unit) const
+{
+    FXASSERT(unit->type() == block_type::TYPE_UNIT);
+    if (unit->valueInt(TYPE_FACTION) != m_factionId) {
+        return true;
+    }
+    return unit->valueInt(TYPE_ORDERS_CONFIRMED) != 0;
+}
+
 void datafile::createHierarchy()
 {
 	typedef std::vector<block_type> stack;
@@ -1482,6 +1530,7 @@ void datafile::createHashTables()
 	m_turn = 0;
 
 	datablock* region = NULL;
+    int unconfirmed = 0;
 	int region_own = 0;
 	int region_ally = 0;
 	int region_enemy = 0;
@@ -1552,11 +1601,11 @@ void datafile::createHashTables()
                 int enemy_log = barHeight2(region_enemy);
 				
                 // generate new style flag information. log_2(people) = 1 to 13
-				if (own_log || ally_log || enemy_log)
+				if (own_log || ally_log || enemy_log || unconfirmed)
 				{
 					att_region* stats = new att_region;
 					region->attachment(stats);
-
+                    stats->unconfirmed = unconfirmed;
                     stats->people.reserve(enemy_log ? 3 : 2);
 					stats->people.push_back(own_log / 13.0f);
 					stats->people.push_back(ally_log / 13.0f);
@@ -1567,7 +1616,7 @@ void datafile::createHashTables()
 
 			region = &*block;
 			region->flags(region->flags() & (datablock::FLAG_BLOCKID_BIT0|datablock::FLAG_BLOCKID_BIT1));	// unset all flags except BLOCKID flags
-			region_own = region_ally = region_enemy = 0;
+			unconfirmed = region_own = region_ally = region_enemy = 0;
 
 			if (block->value(TYPE_VISIBILITY) == "lighthouse")
 				region->setFlags(datablock::FLAG_LIGHTHOUSE);		// region is seen by lighthouse
@@ -1654,25 +1703,15 @@ void datafile::createHashTables()
 			// set attachment for unit of active faction
 			else if (factionId == m_factionId)
 			{
-				// search for command block of unit
-				datablock::itor cmd = block;
-				for (cmd++; cmd != m_blocks.end() && cmd->depth() > block->depth(); cmd++)
-					if (cmd->type() == block_type::TYPE_COMMANDS)
-						break;				// found
-
-				// add att_commands to command block
-				if (cmd != m_blocks.end() && cmd->type() == block_type::TYPE_COMMANDS && !cmd->attachment())
-				{
-					att_commands* cmds = new att_commands;
-					cmd->attachment(cmds);
-					
-					cmds->confirmed = block->valueInt(TYPE_ORDERS_CONFIRMED) != 0;
-
-					const datakey::list_type &list = cmd->data();
-
-					for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); ++itor)
-						cmds->commands.push_back(itor->value());
-				}
+				datablock::itor cmd;
+                if (getCommands(cmd, block))
+                {
+                    // add att_commands to command block
+                    if (!cmd->attachment())
+                    {
+                        cmd->attachment(new att_commands(*cmd));
+                    }
+                }
 			}
 		}
 
@@ -1718,6 +1757,9 @@ void datafile::createHashTables()
                             region_own += number;
                             number = 0;
                             owner = owner_t::UNIT_OWN;
+                            if (!isConfirmed(block)) {
+                                ++unconfirmed;
+                            }
                         }
                         else if (allied_status[factionId] != 0)
                         {
@@ -1826,7 +1868,7 @@ void datafile::createHashTables()
 			}
 
             if (!name.empty()) {
-                att_region* stats = dynamic_cast<att_region*>(block->attachment());
+                att_region* stats = static_cast<att_region*>(block->attachment());
                 if (!stats) {
                     stats = new att_region;
                     block->attachment(stats);
@@ -1843,7 +1885,7 @@ void datafile::createHashTables()
 	for (std::list<datablock::itor>::iterator itor = floodislands.begin(); itor != floodislands.end(); itor++)
 	{
 		FXString name;
-		if (att_region* stats = dynamic_cast<att_region*>((*itor)->attachment()))
+		if (att_region* stats = static_cast<att_region*>((*itor)->attachment()))
 			name = stats->island;
 
 		int x = (*itor)->x(), y = (*itor)->y(), z = (*itor)->info();
@@ -1862,7 +1904,7 @@ void datafile::createHashTables()
 					neighbour->terrain() == data::TERRAIN_FIREWALL)
 					continue;
 
-				att_region* stats = dynamic_cast<att_region*>(neighbour->attachment());
+				att_region* stats = static_cast<att_region*>(neighbour->attachment());
 				if (!stats) {
 					stats = new att_region;
 					neighbour->attachment(stats);

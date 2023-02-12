@@ -19,7 +19,6 @@ class FXAPI FXRegionItem : public FXTreeItem
 protected:
 	static FXFont *boldfont;
 
-	int unconfirmed = 0;
     FXColor m_textColor = 0;
 
 	FXRegionItem() : FXTreeItem(), m_textColor(0) {}
@@ -35,13 +34,18 @@ public:
 
 	bool isBold() const
 	{
-		return unconfirmed != 0;
-	}
-
-    int getUnconfirmed() const { return unconfirmed;  }
-	void setUnconfirmed(int u)
-	{
-        unconfirmed = u;
+        const datablock* block = static_cast<const datablock *>(getData());
+        if (block) {
+            if (block->type() == block_type::TYPE_REGION) {
+                if (att_region* stats = static_cast<att_region*>(block->attachment())) {
+                    return stats->unconfirmed > 0;
+                }
+            }
+            else if (block->type() == block_type::TYPE_UNIT) {
+                return block->valueInt(TYPE_ORDERS_CONFIRMED) == 0;
+            }
+        }
+        return false;
 	}
 
 	// ----------------------------------
@@ -362,16 +366,7 @@ long FXRegionList::showPopup(const FXString& label, datablock* block, FXint root
 
 bool FXRegionList::isConfirmed(const datablock::itor& unit) const
 {
-
-    for (datablock::itor block = std::next(unit); block != mapFile->blocks().end() && block->depth() > unit->depth(); ++block)
-    {
-        if (block->type() != block_type::TYPE_COMMANDS)
-            continue;
-        if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
-            return cmds->confirmed;
-        return false;
-    }
-    return true;
+    return mapFile->isConfirmed(unit);
 }
 
 // rekursivly searches item with userdata=data in treeitem list
@@ -613,18 +608,6 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                     if (color) {
                         item->setTextColor(color);
                     }
-
-                    if (!isConfirmed(unit)) {
-                        item->setUnconfirmed(1);
-                        for (FXTreeItem* father = item->getParent(); father; father = father->getParent())
-                        {
-                            FXRegionItem* ri = dynamic_cast<FXRegionItem*>(father);
-                            if (ri) {
-                                int unconfirmed = ri->getUnconfirmed() + 1;
-                                ri->setUnconfirmed(unconfirmed);
-                            }
-                        }
-                    }
                 }
 
                 // with active_faction_group not set, remove node of own faction
@@ -646,24 +629,6 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
                 FXTreeItem* item = nullptr;
                 if (selection.selected & selection.UNIT) {
                     item = findTreeItem(region ? region : top, &*selection.unit);
-                    FXASSERT(item);
-                    FXRegionItem* ri = static_cast<FXRegionItem *>(item);
-                    if (isConfirmed(selection.unit) == ri->isBold()) {
-                        int unconfirmed = ri->isBold() ? 0 : 1;
-                        ri->setUnconfirmed(unconfirmed);
-                        FXRegionItem* pi = static_cast<FXRegionItem*>(ri->getParent());
-                        while (pi) {
-                            int value = pi->getUnconfirmed();
-                            if (unconfirmed) {
-                                pi->setUnconfirmed(value + 1);
-                            }
-                            else {
-                                pi->setUnconfirmed(value - 1);
-                            }
-                            pi = static_cast<FXRegionItem*>(pi->getParent());
-                        }
-                        update();
-                    }
                 }
                 else if (selection.selected & selection.SHIP) {
                     item = findTreeItem(region, &*selection.ship);

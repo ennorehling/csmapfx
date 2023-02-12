@@ -45,6 +45,7 @@ public:
 
     datablock::itor activefaction() { return m_activefaction; }
     bool hasActiveFaction() const { return m_factionId > 0; }
+    int getActiveFactionId() const { return m_factionId; }
 
 	bool load(const FXString& filename, FXString & outError);
 	int save(const char* filename, map_type map_filter);
@@ -59,9 +60,13 @@ public:
     FXString getPassword() const { return m_password; }
 
 	datablock::list_type& blocks() { return m_blocks; }
+    bool getFirst(datablock::itor& out, block_type type);
+    bool getNext(datablock::itor& iter, block_type type);
 
     bool hasUnits() const { return !m_units.empty(); }
     bool getParent(datablock::itor& out, const datablock::itor& child);
+    bool getChild(datablock::itor& out, const datablock::itor& parent, block_type type);
+    bool getCommands(datablock::itor& out, const datablock::itor& unit);
     bool getUnit(datablock::itor& out, int id);
     bool getGroup(datablock::itor& out, int id);
 	bool getBuilding(datablock::itor& out, int id);
@@ -76,6 +81,8 @@ public:
     FXString regionName(const datablock& block);
     FXString regionCoordinates(const datablock& block);
     FXString unitName(const datablock& block, bool verbose = false);
+    void setConfirmed(datablock::itor& unit, bool value = true);
+    bool isConfirmed(const datablock::itor& unit) const;
 
     void findSelection(const datablock* select, datablock::itor& out, datablock::itor& region);
 	typedef std::list<datafile>::iterator itor;

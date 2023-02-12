@@ -1408,7 +1408,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
             // island names
             if (show_islands)
             {
-                if (att_region *stats = dynamic_cast<att_region *>(block.attachment()))
+                if (att_region *stats = static_cast<att_region *>(block.attachment()))
                 {
                     if (!stats->island.empty())
                     {
@@ -1454,7 +1454,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
             // draw diagramm
             if (block.flags() & datablock::FLAG_TROOPS && block.attachment())
             {
-                if (att_region *stats = dynamic_cast<att_region *>(block.attachment()))
+                if (att_region *stats = static_cast<att_region *>(block.attachment()))
                 {
                     static FXColor colors[] = { FXRGB(64,64,255), FXRGB(64,255,64), FXRGB(255,64,64), FXRGB(255,255,64), FXRGB(64,255,255), FXRGB(255,255,255), FXRGB(0,0,0) };
 
@@ -1789,7 +1789,7 @@ std::map<FXString, IslandPos> FXCSMap::collectIslandNames()
 		FXint scr_y = GetScreenFromHexY(block.x(), block.y());
 
 		//  calculate island rect
-		if (att_region* stats = dynamic_cast<att_region*>(block.attachment()))
+		if (att_region* stats = static_cast<att_region*>(block.attachment()))
 		{
 			if (!stats->island.empty())
 			{
@@ -2240,7 +2240,7 @@ long FXCSMap::onQueryHelp(FXObject* sender, FXSelector, void*)
 			help.format("%s von %s (%d,%d)", terrainString.text(), name.text(), x,y);
 
 		// Inselname
-		if (att_region* stats = dynamic_cast<att_region*>((*block).attachment()))
+		if (att_region* stats = static_cast<att_region*>((*block).attachment()))
 			if (!stats->island.empty())
 				help.append(" auf ").append(stats->island);
 	}

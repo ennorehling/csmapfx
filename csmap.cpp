@@ -555,7 +555,7 @@ CSMap::CSMap(FXApp *app) :
     new FXTabItem(outputTabs, "&Fehler");
     errorList = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
     new FXTabItem(outputTabs, "&Suchergebnisse");
-    searchResults = new FXFoldingList(outputTabs, this, ID_RESULT_SELECTED, FOLDINGLIST_SINGLESELECT | LAYOUT_FILL_X | LAYOUT_FILL_Y);
+    searchResults = new FXSearchResults(outputTabs, this, ID_RESULT_SELECTED, FOLDINGLIST_SINGLESELECT | LAYOUT_FILL_X | LAYOUT_FILL_Y);
     searchResults->getHeader()->setHeaderStyle(HEADER_RESIZE | HEADER_TRACKING);
     searchResults->appendHeader("Region");
     searchResults->appendHeader(FXString(L"Einheit/Geb\u00e4ude/Schiff"));
@@ -1988,6 +1988,9 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 {
     datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
 
+    if (pstate->fileChange != selection.fileChange) {
+        searchResults->setActiveFactionId(report ? report->getActiveFactionId() : 0);
+    }
     if (!report) return 0;
     getApp()->beginWaitCursor();
 
@@ -2079,7 +2082,8 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         status_lfaction->hide();
         status->recalc();
     }
-
+    // TODO: only need to update the regionlist when confirmation stauts was changed.
+    regions->update();
     getApp()->endWaitCursor();
     return 1;
 }
@@ -2428,6 +2432,14 @@ void CSMap::addClipboardPane(FXMenuPane *pane, datablock* block)
             }
         }
     }
+}
+
+int CSMap::getActiveFactionId() const
+{
+    if (report) {
+        return report->getActiveFactionId();
+    }
+    return 0;
 }
 
 long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
@@ -3338,16 +3350,7 @@ FXString CSMap::gameDate(int turn) const
 bool CSMap::isConfirmed(const datablock::itor& unit)
 {
     if (unit->type() == block_type::TYPE_UNIT) {
-        datablock::itor block = unit;
-        for (++block; block != report->blocks().end() && block->depth() > unit->depth(); ++block) {
-            if (block->type() == block_type::TYPE_COMMANDS) {
-                att_commands* att = static_cast<att_commands*>(block->attachment());
-                if (att) {
-                    return att->confirmed;
-                }
-                break;
-            }
-        }
+        return report->isConfirmed(selection.unit);
     }
     return true;
 }

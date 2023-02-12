@@ -120,32 +120,18 @@ long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
 		if (unit->type() != block_type::TYPE_UNIT)
 			continue;
 
-		// search command block
-		datablock::itor block = unit;
-		for (block++; block != end && block->depth() > unit->depth(); block++)
-			if (block->type() == block_type::TYPE_COMMANDS)
-				break;				// found
-
-		if (block != end && block->type() == block_type::TYPE_COMMANDS)
-		{
-			bool unconfirmed = true;
-
-			if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
-				unconfirmed = !cmds->confirmed;
-
-			if (unconfirmed)
-			{
-				// send selectionchange, select this unit
+        if (!mapFile->isConfirmed(unit))
+        {
+			// send selectionchange, select this unit
 	
-                selection.selected = selection.UNIT;
-                selection.unit = unit;
-                updateSelection();
+            selection.selected = selection.UNIT;
+            selection.unit = unit;
+            updateSelection();
 				
-				flags |= FLAG_UPDATE;
-				forceRefresh();
-				setFocus();
-				return 1;
-			}
+			flags |= FLAG_UPDATE;
+			forceRefresh();
+			setFocus();
+			return 1;
 		}
 	}
 
@@ -174,30 +160,17 @@ long FXCommands::onNextUnit(FXObject *, FXSelector, void *)
 			continue;
 
 		// search command block
-		datablock::citor block = unit;
-		for (block++; block != end && block->depth() > unit->depth(); block++)
-			if (block->type() == block_type::TYPE_COMMANDS)
-				break;				// found
-
-		if (block != end && block->type() == block_type::TYPE_COMMANDS)
+        if (!mapFile->isConfirmed(unit))
 		{
-			bool unconfirmed = true;
+            selection.selected = selection.UNIT;
+            selection.unit = unit;
+            updateSelection();
 
-			if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
-				unconfirmed = !cmds->confirmed;
-
-			if (unconfirmed)
-			{
-                selection.selected = selection.UNIT;
-                selection.unit = unit;
-                updateSelection();
-
-				// force update and set focus
-				flags |= FLAG_UPDATE;
-				forceRefresh();
-				setFocus();
-				return 1;
-			}
+			// force update and set focus
+			flags |= FLAG_UPDATE;
+			forceRefresh();
+			setFocus();
+			return 1;
 		}
 	}
 
@@ -252,34 +225,7 @@ void FXCommands::setConfirmed(bool confirmed)
 
 	if (selection.selected & selection.UNIT)
 	{
-		datablock::itor unit = selection.unit;
-
-		// search for command block of unit
-		datablock::itor end = mapFile->blocks().end();
-		datablock::itor block = unit;
-		for (block++; block != end && block->depth() > unit->depth(); block++)
-			if (block->type() == block_type::TYPE_COMMANDS)
-				break;				// found
-
-		if (block != end && block->type() == block_type::TYPE_COMMANDS)
-		{
-			att_commands* cmds = dynamic_cast<att_commands*>(block->attachment());
-			if (cmds)
-                cmds->confirmed = confirmed;
-			else if (confirmed)			// don't need to add block if it will not be confirmed
-			{
-				// copy commands of selected unit
-				block->attachment(cmds = new att_commands);
-				cmds->confirmed = confirmed;
-
-				const datakey::list_type &list = block->data();
-
-                for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); itor++)
-                {
-                    cmds->commands.push_back((*itor).value());
-                }
-			}
-		}
+        mapFile->setConfirmed(selection.unit, confirmed);
 	}
 
 	// send selectionchange
@@ -293,23 +239,7 @@ int FXCommands::getConfirmed()
 
 	if (selection.selected & selection.UNIT)
 	{
-		datablock::itor unit = selection.unit;
-
-		// search for command block of unit
-		datablock::itor end = mapFile->blocks().end();
-		datablock::itor block = unit;
-		for (block++; block != end && block->depth() > unit->depth(); block++)
-			if (block->type() == block_type::TYPE_COMMANDS)
-				break;				// found
-
-		if (block != end && block->type() == block_type::TYPE_COMMANDS)
-		{
-			if (att_commands* cmds = dynamic_cast<att_commands*>(block->attachment()))
-				return cmds->confirmed;
-
-			return 0;	// no changed commands, so not confirmed
-		}
-        return 1;
+        return mapFile->isConfirmed(selection.unit);
 	}
 
 	return -1;	// no unit with command block
@@ -333,26 +263,14 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
             getApp()->beginWaitCursor();
             datablock::itor unit = selection.unit;
 
-			// search for command block of unit
-			datablock::itor end = mapFile->blocks().end();
-			datablock::itor block = unit;
-			for (block++; block != end && block->depth() > unit->depth(); block++)
-				if (block->type() == block_type::TYPE_COMMANDS)
-					break;				// found
-
-			if (block != end && block->type() == block_type::TYPE_COMMANDS)
+            datablock::itor cmd;
+            if (mapFile->getCommands(cmd, selection.unit))
 			{
-				att_commands* cmds = dynamic_cast<att_commands*>(block->attachment());
+				att_commands* cmds = static_cast<att_commands*>(cmd->attachment());
 				if (!cmds)
 				{
 					// copy commands of selected unit
-					block->attachment(cmds = new att_commands);
-
-					const datakey::list_type &list = block->data();
-
-                    for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); itor++) {
-                        cmds->commands.push_back((*itor).value());
-                    }
+					cmd->attachment(cmds = new att_commands(*cmd));
 				}
 
 				// show commands of selected unit
@@ -513,46 +431,41 @@ void FXCommands::saveCommands()
 {
     if (selection.selected & selection.UNIT)
     {
-        // search for command block of unit
-        datablock::itor iend = mapFile->blocks().end();
-        datablock::itor iblock = selection.unit;
-        for (iblock++; iblock != iend && iblock->depth() > selection.unit->depth(); iblock++) {
-            if (iblock->type() == block_type::TYPE_COMMANDS) {
-                if (att_commands* cmds = dynamic_cast<att_commands*>(iblock->attachment()))
+        datablock::itor cmd;
+        if (mapFile->getCommands(cmd, selection.unit))
+        {
+            if (att_commands* cmds = static_cast<att_commands*>(cmd->attachment()))
+            {
+                cmds->commands.clear();
+
+                int begin = 0, end;
+                do
                 {
-                    cmds->commands.clear();
+                    end = lineEnd(begin);
 
-                    int begin = 0, end;
-                    do
-                    {
-                        end = lineEnd(begin);
+                    FXString str;
+                    extractText(str, begin, end - begin);
+                    cmds->commands.push_back(str);
 
-                        FXString str;
-                        extractText(str, begin, end - begin);
-                        cmds->commands.push_back(str);
+                    begin = nextLine(end);
+                } while (begin != end);
 
-                        begin = nextLine(end);
-                    } while (begin != end);
-
-                    // remove trailing empty lines
-                    while (!cmds->commands.empty())
-                    {
-                        FXString line = cmds->commands.back();
-                        if (line.simplify().length())
-                            break;
-                        cmds->commands.pop_back();
-                    }
-                }
-                setModified(false);
-                // notify application that commands were modified
-                if (!mapFile->modifiedCmds())
+                // remove trailing empty lines
+                while (!cmds->commands.empty())
                 {
-                    mapFile->modifiedCmds(true);
-                    // FIXME: only need to change the modified flag, not the selection!
-                    updateSelection();
+                    FXString line = cmds->commands.back();
+                    if (line.simplify().length())
+                        break;
+                    cmds->commands.pop_back();
                 }
-
-                break;
+            }
+            setModified(false);
+            // notify application that commands were modified
+            if (!mapFile->modifiedCmds())
+            {
+                mapFile->modifiedCmds(true);
+                // FIXME: only need to change the modified flag, not the selection!
+                updateSelection();
             }
         }
     }
