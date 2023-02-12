@@ -17,7 +17,6 @@ class FXAPI FXRegionItem : public FXTreeItem
 	friend class FXTreeList;
 	friend class FXDirList;
 protected:
-	static FXFont *boldfont;
 
     FXColor m_textColor = 0;
 
@@ -33,11 +32,6 @@ public:
 	FXRegionItem(const FXString& text,FXIcon* oi=nullptr,FXIcon* ci=nullptr,void* ptr=nullptr) : FXTreeItem(text, oi, ci, ptr), m_textColor(0) {}
 
 	// ----------------------------------
-	static void setBoldFont(FXFont* font)
-	{
-		boldfont = font;
-	}
-
     FXColor getTextColor() const {
         return m_textColor;
     }
@@ -46,8 +40,6 @@ public:
     }
 
 };
-
-/*static */ FXFont* FXRegionItem::boldfont;
 
 static const int ICON_SPACING = 4;	// Spacing between parent and child in x direction
 static const int TEXT_SPACING = 4;	// Spacing between icon and text
@@ -60,6 +52,7 @@ FXIMPLEMENT(FXRegionItem,FXTreeItem,nullptr,0)
 void FXRegionItem::draw(const FXTreeList* l, FXDC& dc, FXint xx, FXint yy, FXint ww, FXint hh) const
 {
     const FXRegionList* list = static_cast<const FXRegionList*>(l);
+    FXFont* boldfont = list->getBoldFont();
     bool is_bold = boldfont && list->isBold(this);
     FXIcon *icon = (state & OPENED) ? openIcon : closedIcon;
     FXFont *font = list->getFont();
@@ -109,6 +102,7 @@ void FXRegionItem::draw(const FXTreeList* l, FXDC& dc, FXint xx, FXint yy, FXint
 FXint FXRegionItem::hitItem(const FXTreeList* l,FXint xx,FXint yy) const
 {
     const FXRegionList* list = static_cast<const FXRegionList*>(l);
+    FXFont* boldfont = list->getBoldFont();
     FXint oiw = 0, ciw = 0, oih = 0, cih = 0, tw = 0, th = 0, iw, ih, ix, iy, tx, ty, h;
     FXFont* font = list->getFont();
     bool is_bold = boldfont && list->isBold(this);
@@ -149,6 +143,7 @@ FXint FXRegionItem::hitItem(const FXTreeList* l,FXint xx,FXint yy) const
 FXint FXRegionItem::getWidth(const FXTreeList* l) const
 {
     const FXRegionList* list = static_cast<const FXRegionList*>(l);
+    FXFont* boldfont = list->getBoldFont();
     bool is_bold = boldfont && list->isBold(this);
     FXint w = 0, oiw = 0, ciw = 0;
     FXFont *font=list->getFont();
@@ -169,6 +164,7 @@ FXint FXRegionItem::getWidth(const FXTreeList* l) const
 FXint FXRegionItem::getHeight(const FXTreeList* l) const
 {
     const FXRegionList* list = static_cast<const FXRegionList*>(l);
+    FXFont* boldfont = list->getBoldFont();
     bool is_bold = boldfont && list->isBold(this);
     FXFont* font = list->getFont();
     FXint th = 0, oih = 0, cih = 0;
@@ -235,8 +231,6 @@ void FXRegionList::create()
 	fontdesc.weight = FXFont::Bold;
 	boldfont = new FXFont(getApp(), fontdesc);
 	boldfont->create();
-
-	FXRegionItem::setBoldFont(boldfont);
 
 	// create icons for region list
 	for (int i = 0; i <  data::TERRAIN_LAST; i++)

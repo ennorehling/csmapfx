@@ -43,6 +43,7 @@ public:
     }
 
     bool isBold(const FXTreeItem* item) const;
+    FXFont* getBoldFont() const { return boldfont; }
 public: 
 	enum
 	{
