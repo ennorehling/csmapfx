@@ -12,10 +12,6 @@ FXDEFMAP(FXRegionPanel) MessageMap[]=
 {
 	//________Message_Type_____________________ID_______________Message_Handler_______
 	FXMAPFUNC(SEL_COMMAND,		FXRegionPanel::ID_UPDATE,				FXRegionPanel::onMapChange),
-
-	FXMAPFUNC(SEL_COMMAND,		FXRegionPanel::ID_TOGGLEDESCRIPTION,	FXRegionPanel::onToggleDescription),
-	FXMAPFUNC(SEL_UPDATE,		FXRegionPanel::ID_TOGGLEDESCRIPTION,	FXRegionPanel::onUpdateToggleDescription),
-
 	FXMAPFUNC(SEL_UPDATE,		FXRegionPanel::ID_DESCRIPTION,			FXRegionPanel::onUpdateDescription),
 };
 
@@ -39,7 +35,6 @@ FXRegionPanel::FXRegionPanel(FXComposite* p, FXObject* tgt,FXSelector sel, FXuin
 
 	// init variables
 	mapFile = nullptr;
-	show_description = false;
 
 	// create layout
 	tags.name = new FXLabel(this, "", terrainIcons[ data::TERRAIN_UNKNOWN], ICON_BEFORE_TEXT|LAYOUT_FILL_X);
@@ -317,10 +312,7 @@ void FXRegionPanel::updateData()
 		tags.name->setHelpText(label);
 
 		// Beschreibung ins Beschreibungsfeld
-		if (show_description)
-			tags.desc->setText(description);
-		else
-			tags.desc->setText("");
+		tags.desc->setText(description);
 
 		// Beschreibung als Tooltip
 		for (label.clear(); description.length();)
@@ -402,19 +394,6 @@ long FXRegionPanel::onMapChange(FXObject*, FXSelector, void* ptr)
 	if (needUpdate)
 		updateData();
 
-	return 1;
-}
-
-long FXRegionPanel::onToggleDescription(FXObject*,FXSelector,void*)
-{
-	show_description = !show_description;
-	updateData();
-	return 1;
-}
-
-long FXRegionPanel::onUpdateToggleDescription(FXObject* sender,FXSelector,void*)
-{
-	sender->handle(this, FXSEL(SEL_COMMAND, show_description?ID_CHECK:ID_UNCHECK), NULL);
 	return 1;
 }
 

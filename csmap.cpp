@@ -442,7 +442,6 @@ CSMap::CSMap(FXApp *app) :
     new FXMenuCommand(regionmenu, "&Suchen...\tCtrl-F\tEine Region, Einheit, Schiff, etc. suchen.", nullptr, this, ID_VIEW_SEARCHDLG);
     new FXMenuCommand(regionmenu, "&Ursprung setzen\t\tDen Kartenursprung (0/0) auf die markierte Region setzen.", nullptr, this, ID_MAP_SETORIGIN, 0);
     new FXMenuSeparatorEx(regionmenu, "Regionen");
-    menu.regdescription = new FXMenuCheck(regionmenu,"&Beschreibung zeigen\t\tRegionsbeschreibung anzeigen.");
     new FXMenuCommand(regionmenu,FXString(L"&Alle markieren\tCtrl-Shift-A\tAlle Regionen ausw\u00e4hlen."),nullptr,this,ID_REGION_SELALL);
     new FXMenuCommand(regionmenu,FXString(L"Alle &Inseln ausw\u00e4hlen\t\tAlle Landregionen ausw\u00e4hlen (Ozean, Feuerwand und Eisberg z\u00e4hlen nicht als Land)."),nullptr,this,ID_REGION_SELALLISLANDS);
     new FXMenuCommand(regionmenu, FXString(L"&Sichtbare markieren\t\tSichtbare Regionen ausw\u00e4hlen."), nullptr, this, ID_REGION_SELVISIBLE);
@@ -574,9 +573,6 @@ CSMap::CSMap(FXApp *app) :
     riTab = new FXToolBarTab(riFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
     riTab->setTipText("Regionsinformationen ein- und ausblenden");
     regionPanel = new FXRegionPanel(riFrame, this, ID_SELECTION, LAYOUT_FILL_X);
-
-    menu.regdescription->setTarget(regionPanel);
-    menu.regdescription->setSelector(FXRegionPanel::ID_TOGGLEDESCRIPTION);
 
     FXHorizontalFrame *siFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
     siTab = new FXToolBarTab(siFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
@@ -833,9 +829,6 @@ void CSMap::create()
     if (reg.readUnsignedEntry("SHOW", "SHADOWREGIONS", 1))
         map->handle(this, FXSEL(SEL_COMMAND, FXCSMap::ID_TOGGLESHADOWREGIONS), nullptr);
 
-    if (reg.readUnsignedEntry("SHOW", "REGDESCRIPTION", 1))
-        regionPanel->handle(this, FXSEL(SEL_COMMAND, FXRegionPanel::ID_TOGGLEDESCRIPTION), nullptr);
-
     if (reg.readUnsignedEntry("SHOW", "OWNFACTIONGROUP", 1))
         regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLE_OWNFACTIONGROUP), nullptr);
 
@@ -932,7 +925,6 @@ FXbool CSMap::close(FXbool notify)
     reg.writeUnsignedEntry("SHOW", "SHIPTRAVEL", menu.shiptravel->getCheck());
     reg.writeUnsignedEntry("SHOW", "SHADOWREGIONS", menu.shadowRegions->getCheck());
     reg.writeUnsignedEntry("SHOW", "COLORIZEUNITS", menu.colorizeUnits->getCheck());
-    reg.writeUnsignedEntry("SHOW", "REGDESCRIPTION", menu.regdescription->getCheck());
     reg.writeUnsignedEntry("SHOW", "OWNFACTIONGROUP", menu.ownFactionGroup->getCheck());
     reg.writeUnsignedEntry("SHOW", "RELOAD", (FXuint)reload_mode);
 

@@ -21,16 +21,13 @@ public:
 
 public:
 	long onMapChange(FXObject*,FXSelector,void*);
-	long onToggleDescription(FXObject*,FXSelector,void*);
-	long onUpdateToggleDescription(FXObject*,FXSelector,void*);
 	long onUpdateDescription(FXObject*,FXSelector,void*);
 
 public:
 
 	enum
 	{
-		ID_TOGGLEDESCRIPTION = FXVerticalFrame::ID_LAST,
-		ID_DESCRIPTION,
+		ID_DESCRIPTION = FXVerticalFrame::ID_LAST,
 		ID_LAST
 	};
 
@@ -40,8 +37,6 @@ protected:
     datafile *mapFile = nullptr;
 
     FXIcon* terrainIcons[data::TERRAIN_LAST] = { 0 };
-
-	bool show_description = false;
 
 	// Regionsinfos
 	struct

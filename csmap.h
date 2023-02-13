@@ -340,8 +340,6 @@ private:
         class FXMenuCheck *islands = nullptr;		// show island names
         class FXMenuCheck *minimap_islands = nullptr;	// show island names on mini map
 
-        class FXMenuCheck *regdescription = nullptr;	// show description of the region
-
         class FXMenuCheck *ownFactionGroup = nullptr;	// no own faction group in regionlist
 
 		// faction menu items
