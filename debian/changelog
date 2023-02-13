@@ -1,3 +1,9 @@
+csmapfx (1.5.19-dev) stable; urgency=low
+
+  * only show descriptions in the text box, not as a property.
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 13 Feb 2023 10:00:00 +0200
+
 csmapfx (1.5.18-1) stable; urgency=low
 
   * do not display other factions' units as unconfirmed.

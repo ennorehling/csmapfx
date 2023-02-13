@@ -31,7 +31,7 @@ void FXBuildingProperties::makeItems()
         datablock::itor building = selection.building;
         datablock::itor end = mapFile->blocks().end();
 
-        FXString name, descr, type;
+        FXString name, type;
         FXString aura, auramax, hero;
         FXint ownerId = -1, size = -1;
 
@@ -43,9 +43,6 @@ void FXBuildingProperties::makeItems()
             case TYPE_NAME:
                 name = key->value();
                 break;
-            case TYPE_DESCRIPTION:
-                descr = key->value();
-                break;
             case TYPE_OWNER:
                 ownerId = atoi(key->value().text());
                 break;
@@ -56,6 +53,7 @@ void FXBuildingProperties::makeItems()
                 size = key->getInt();
                 break;
             case TYPE_FACTION:
+            case TYPE_DESCRIPTION:
                 /* ignore */
                 break;
             default:
@@ -84,11 +82,6 @@ void FXBuildingProperties::makeItems()
                 label += mapFile->unitName(*unit, true);
                 appendItem(root, makeItem(label, &*unit));
             }
-        }
-
-        label = building->value(TYPE_DESCRIPTION);
-        if (!label.empty()) {
-            appendItem(root, label);
         }
 
         // Kueste

@@ -31,7 +31,7 @@ void FXShipProperties::makeItems()
         datablock::itor ship = selection.ship;
         datablock::itor end = mapFile->blocks().end();
 
-        FXString name, descr, type;
+        FXString name, type;
         FXString aura, auramax, hero;
         FXint captainId = -1, coast = -1, size = -1, cargo = -1, damage = -1, capacity = -1;
 
@@ -42,9 +42,6 @@ void FXShipProperties::makeItems()
             switch (key->type()) {
             case TYPE_NAME:
                 name = key->value();
-                break;
-            case TYPE_DESCRIPTION:
-                descr = key->value();
                 break;
             case TYPE_CAPTAIN:
                 captainId = atoi(key->value().text());
@@ -68,6 +65,7 @@ void FXShipProperties::makeItems()
                 capacity = key->getInt();
                 break;
             case TYPE_FACTION:
+            case TYPE_DESCRIPTION:
                 /* ignore */
                 break;
             default:
@@ -96,11 +94,6 @@ void FXShipProperties::makeItems()
                 label += mapFile->unitName(*unit, true);
                 appendItem(root, makeItem(label, &*unit));
             }
-        }
-
-        label = ship->value(TYPE_DESCRIPTION);
-        if (!label.empty()) {
-            appendItem(root, label);
         }
 
         // Kueste
