@@ -141,7 +141,15 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
             FXMenuPane paneCascade(this);
             if (popup->block) {
                 datablock* block = popup->block;
-                FXString label;
+                FXString label = block->getName();
+                csmap->addClipboardPane(&pane, block);
+                if (label.length() <= 20) {
+                    new FXMenuSeparatorEx(&pane, label);
+                }
+                else {
+                    FXString str = label.left(17) + "...";
+                    new FXMenuSeparatorEx(&pane, str);
+                }
                 if (block->type() == block_type::TYPE_UNIT) {
                     label.assign("&Zeige Einheit");
                 }
@@ -155,8 +163,6 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
                     FXMenuCommand* command = new FXMenuCommand(&pane, label, nullptr, csmap, CSMap::ID_POPUP_GOTO);
                     command->setUserData(block);
                 }
-                new FXMenuCascade(&pane, "&Zwischenablage", NULL, &paneCascade);
-                csmap->addClipboardPane(&paneCascade, block);
             }
             else {
                 const FXString& label = item->getText();

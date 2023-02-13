@@ -2386,6 +2386,7 @@ void CSMap::addClipboardPane(FXMenuPane *pane, datablock* block)
     std::vector<clip_t> clips;
     if (block)
     {
+        new FXMenuSeparatorEx(pane, "Zwischenablage");
         FXString str = block->getName();
         if (!str.empty()) {
             clips.push_back(clip_t{ ID_POPUP_COPY_NAME, str + "\t\tName", const_cast<datablock *>(block) });
