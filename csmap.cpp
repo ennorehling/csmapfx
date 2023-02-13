@@ -2411,12 +2411,6 @@ void CSMap::addClipboardPane(FXMenuPane *pane, datablock* block)
                 {
                     clips.push_back(clip_t{ ID_POPUP_COPY_TEXT, email + "\t\tEmail", const_cast<char*>(email.text()) });
                 }
-
-                const FXString& banner = block->value(TYPE_BANNER);
-                if (!banner.empty())
-                {
-                    clips.push_back(clip_t{ ID_POPUP_COPY_TEXT, banner + "\t\tBanner", const_cast<char*>(banner.text()) });
-                }
             }
         }
         if (!clips.empty()) {
