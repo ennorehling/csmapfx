@@ -2033,6 +2033,14 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         selection.sel_y = selection.region->y();
         selection.sel_plane = selection.region->info();
     }
+    else if (selection.selected & selection.UNKNOWN_REGION)
+    {
+        if (report->getRegion(selection.region, selection.sel_x, selection.sel_y, selection.sel_plane))
+        {
+            selection.selected &= ~selection.UNKNOWN_REGION;
+            selection.selected |= selection.REGION;
+        }
+    }
 
     int factionId = 0;
     if (report) {
