@@ -167,18 +167,35 @@ void FXStatsPanel::collectData(std::vector<Info>& info, datablock::itor region)
 		0	//TERRAIN_LAST
 	};
 
-    int peasants = region->valueInt("Bauern");
+    int peasants = region->valueInt(TYPE_PEASANTS);
+    int trees = region->valueInt(TYPE_TREES);
+    int saplings = region->valueInt(TYPE_SAPLINGS);
+    int salary = region->valueInt(TYPE_SALARY);
+
+    datablock::itor res = region;
+    while (mapFile->getNext(res, block_type::TYPE_RESOURCE)) {
+        const FXString& value = res->value(TYPE_RESOURCE_TYPE);
+        key_type type = static_cast<key_type>(datakey::parseType(value, block_type::TYPE_RESOURCE) & TYPE_MASK);
+        if (type == TYPE_PEASANTS) {
+            peasants = res->valueInt(TYPE_RESOURCE_COUNT);
+        }
+        else if (type == TYPE_TREES) {
+            trees = res->valueInt(TYPE_RESOURCE_COUNT);
+        }
+        else if (type == TYPE_SAPLINGS) {
+            saplings = res->valueInt(TYPE_RESOURCE_COUNT);
+        }
+    }
 
 	int workstations = WorkPerRegion[region->terrain()];
-	workstations -= 8 * region->valueInt("Baeume");
-	workstations -= 4 * region->valueInt("Schoesslinge");
+	workstations -= 8 * trees;
+	workstations -= 4 * saplings;
 	if (workstations < 0) workstations = 0;
 
-	int Lohn = region->valueInt("Lohn");
     int earnings = std::min(workstations, peasants);
-    if (Lohn) {
-        addEntry(info, "Lohn", Lohn, FXString(L"Lohn f\u00fcr Arbeit"));
-        earnings = Lohn * earnings - 10 * peasants;
+    if (salary) {
+        addEntry(info, "Lohn", salary, FXString(L"Lohn f\u00fcr Arbeit"));
+        earnings = salary * earnings - 10 * peasants;
     }
 	if (earnings) addEntry(info, "Bauernertrag", earnings, FXString(L"\u00dcberschuss der Bauerneinnahmen pro Runde. Kann sicher eingetrieben werden."));
 

@@ -83,11 +83,19 @@ int datakey::parseType(const FXString& type, enum block_type btype)
         if (type == "region")
             return TYPE_MSG_REGION;
     }
+    if (type == "Bauern")
+        return TYPE_PEASANTS;
     if (type == "name")
 		return TYPE_LOWERCASE_NAME;
 	if (type == "Beschr")
 		return TYPE_DESCRIPTION;
-	if (type == "Terrain")
+    if (type == "Baeume" || type == L"B\u00e4ume")
+        return TYPE_TREES;
+    if (type == "Schoesslinge" || type == L"Sch\u00f6\u00dflinge")
+        return TYPE_SAPLINGS;
+    if (type == "Lohn")
+        return TYPE_SALARY;
+    if (type == "Terrain")
 		return TYPE_TERRAIN;
 	if (type == "Insel")
 		return TYPE_ISLAND;
@@ -191,6 +199,14 @@ FXString datakey::key() const
         return "name";
     case TYPE_DESCRIPTION:
         return "Beschr";
+    case TYPE_SAPLINGS:
+        return "Schoesslinge";
+    case TYPE_SALARY:
+        return "Lohn";
+    case TYPE_TREES:
+        return "Baeume";
+    case TYPE_PEASANTS:
+        return "Bauern";
     case TYPE_TERRAIN:
         return "Terrain";
     case TYPE_ISLAND:
