@@ -419,6 +419,7 @@ CSMap::CSMap(FXApp *app) :
     menu.islands = new FXMenuCheck(viewmenu,"&Inselnamen zeigen\tCtrl-F5\tInselnamen auf der Karte zeigen.");
     menu.minimap_islands = new FXMenuCheck(viewmenu,"&Inseln auf Minikarte\t\tInselnamen auf der Minikarte zeigen.");
     planemenu = new FXMenuPane(this);
+    planemenu->disable();
     FXMenuRadio* radio = new FXMenuRadio(planemenu, "Standardebene (0)", this, ID_MAP_VISIBLEPLANE, 0);
     radio->setCheck();
     new FXMenuCascade(viewmenu, "&Ebene", nullptr, planemenu, 0);
@@ -940,7 +941,7 @@ FXbool CSMap::close(FXbool notify)
 void CSMap::mapChange()
 {
     // delete all planes except default
-    planes->clearItems();        // clear planes
+    resetPlanes();
 
     searchResults->clearItems();
     errorList->clearItems();
@@ -1094,14 +1095,6 @@ void CSMap::mapChange()
             selection.regionsSelected.clear();
         }
 
-        FXWindow* item = planemenu->getFirst();
-        while (item)
-        {
-            FXWindow* nextw = item->getNext();
-            delete item;
-            item = nextw;
-        }
-        planes->appendItem("Standardebene (0)", nullptr, (void*)0);
         // get all planes in report
         std::set<int> planeSet;        // what planes are in the report
         datablock::itor end = report->blocks().end();
@@ -1114,12 +1107,7 @@ void CSMap::mapChange()
             // insert plane into set
             int p = block->info();
             if (p != 0 && planeSet.insert(p).second) {
-                FXString label = datablock::planeName(p);
-                planes->appendItem(label, nullptr, reinterpret_cast<void *>(p));
-
-                FXMenuRadio* radio = new FXMenuRadio(planemenu, label, this, ID_MAP_VISIBLEPLANE, 0);
-                radio->setUserData(reinterpret_cast<void*>((ptrdiff_t)p));
-                radio->create();
+                addPlane(p);
             }
         }
         planes->setNumVisible(planes->getNumItems());
@@ -2430,6 +2418,30 @@ void CSMap::addClipboardPane(FXMenuPane *pane, datablock* block)
             }
         }
     }
+}
+
+void CSMap::addPlane(int planeId)
+{
+    FXString label = datablock::planeName(planeId);
+    void* data = reinterpret_cast<void*>((ptrdiff_t)planeId);
+    planes->appendItem(label, nullptr, data);
+    FXMenuRadio* radio = new FXMenuRadio(planemenu, label, this, ID_MAP_VISIBLEPLANE, 0);
+    radio->setUserData(data);
+    radio->create();
+}
+
+void CSMap::resetPlanes()
+{
+    planes->clearItems();
+    FXWindow* item = planemenu->getFirst();
+    while (item)
+    {
+        FXWindow* nextw = item->getNext();
+        delete item;
+        item = nextw;
+    }
+
+    addPlane(0);
 }
 
 int CSMap::getActiveFactionId() const

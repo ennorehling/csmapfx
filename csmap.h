@@ -123,6 +123,8 @@ public:		// this functions are slots for menu commands
 
     void loadFiles(const std::vector<FXString>& filenames);
     void addClipboardPane(FXMenuPane* pane, datablock* block);
+    void addPlane(int planeId);
+    void resetPlanes();
 
     int getActiveFactionId() const;
 

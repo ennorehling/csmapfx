@@ -582,7 +582,7 @@ FXString datablock::getLabel() const
 /*static*/ FXString datablock::planeName(int plane)
 {
 	if (plane == 0)
-		return "Eressea";
+		return "Standardebene";
 	if (plane == 1)
 		return "Astralraum";
 	if (plane == 1137)
