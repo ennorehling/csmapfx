@@ -2821,7 +2821,7 @@ long CSMap::curlUpload()
                         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: %s (Befehle nicht akzeptiert).", code, msg.text());
                     }
                     else {
-                        FXMessageBox::information(this, MBOX_OK, CSMAP_APP_TITLE, "%s", msg.text());
+                        FXMessageBox::information(this, MBOX_OK, CSMAP_APP_TITLE, "Die Befehle wurden empfangen.");
                     }
                     free(response.response);
                 }

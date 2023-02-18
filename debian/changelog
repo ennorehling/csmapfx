@@ -3,6 +3,7 @@ csmapfx (1.5.20-1) stable; urgency=low
   * update current region directly after loading.
   * fix plane menu and dropdown display.
   * prefer values from RESOURCE blocks over those in REGION.
+  * no-nonsense success message for upload.
 
  -- Enno Rehling <enno@eressea.de>  Sat, 18 Feb 2023 14:15:00 +0200
 
