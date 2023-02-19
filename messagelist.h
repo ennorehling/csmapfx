@@ -7,6 +7,7 @@
 #include <fx.h>
 
 #include <list>
+#include <memory>
 #include <vector>
 
 class FXMessageList : public FXTreeList

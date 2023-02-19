@@ -4,6 +4,8 @@
 
 #include <fx.h>
 
+#include <memory>
+
 class FXProperties : public FXTreeList
 {
 public:

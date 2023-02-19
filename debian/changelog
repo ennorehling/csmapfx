@@ -1,3 +1,9 @@
+csmapfx (1.5.21-2) stable; urgency=low
+
+  * smart pointers need an include
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 19 Feb 2023 12:50:00 +0200
+
 csmapfx (1.5.21-1) stable; urgency=low
 
   * fix crash after merge and close file.

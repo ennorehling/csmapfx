@@ -5,6 +5,7 @@
 
 #include <fx.h>
 
+#include <memory>
 #include <vector>
 
 class FXTradePanel : public FXVerticalFrame

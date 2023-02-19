@@ -47,12 +47,15 @@
 #include <FXRex.h>
 #include <FXICOIcon.h>
 #include <FXSocket.h>
-#include <stdexcept>
-#include <fstream>
-#include <string>
+
 #include <climits>
 #include <cstdio>
 #include <cstring>
+#include <fstream>
+#include <memory>
+#include <stdexcept>
+#include <string>
+
 #ifdef HAVE_CURL
 #include <curl/curl.h>
 #endif

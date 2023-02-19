@@ -6,8 +6,9 @@
 
 #include <fx.h>
 
-#include <vector>
 #include <ctime>
+#include <memory>
+#include <vector>
 
 class FXInfoDlg;
 class FXSearchDlg;

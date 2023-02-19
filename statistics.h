@@ -1,12 +1,15 @@
 #ifndef _CSMAP_STATISTICS
 #define _CSMAP_STATISTICS
 
+#include "datafile.h"
+
 #include <fx.h>
 
-#include <vector>
+#include <memory>
 #include <map>
 #include <set>
-#include "datafile.h"
+#include <vector>
+
 
 class FXStatistics : public FXVerticalFrame
 {
