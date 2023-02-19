@@ -29,9 +29,6 @@ public:
 	long onToggleOwnFactionGroup(FXObject*, FXSelector, void*);
 	long onUpdateOwnFactionGroup(FXObject*, FXSelector, void*);
 
-	long onToggleActiveRegions(FXObject*,FXSelector,void*);
-	long onUpdateActiveRegions(FXObject*,FXSelector,void*);
-
 	long onToggleUnitColors(FXObject*,FXSelector,void*);
 	long onUpdateUnitColors(FXObject*,FXSelector,void*);
 
