@@ -13,6 +13,10 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
   add_compile_options(-Wno-psabi)
 endif()
 
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL AppleClang)
+  add_compile_options(-Wno-inconsistent-missing-override)
+endif()
+
 include (CheckIncludeFile)
 check_include_file(unistd.h UNISTD_H_FOUND)
 if (UNISTD_H_FOUND)
@@ -51,7 +55,7 @@ set (SOURCES
 	mapcanvas.cpp
 	map.cpp
 	messagelist.cpp
-  regioninfo.cpp
+	regioninfo.cpp
 	prefsdlg.cpp
 	properties.cpp
 	building_props.cpp
