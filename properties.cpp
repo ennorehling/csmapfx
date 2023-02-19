@@ -66,7 +66,7 @@ FXTreeItem* FXProperties::makeUnitList(FXTreeItem* p, const FXString& label, dat
     return nullptr;
 }
 
-void FXProperties::setMapFile(datafile* f)
+void FXProperties::setMapFile(std::shared_ptr<datafile>& f)
 {
     mapFile = f;
 }

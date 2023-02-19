@@ -90,7 +90,7 @@ FXCommands::~FXCommands()
 {
 }
 
-void FXCommands::setMapFile(datafile *f)
+void FXCommands::setMapFile(std::shared_ptr<datafile>& f)
 {
     mapFile = f;
 }

@@ -33,9 +33,6 @@ FXRegionPanel::FXRegionPanel(FXComposite* p, FXObject* tgt,FXSelector sel, FXuin
 	setBorderColor(getApp()->getShadowColor());
 	setFrameStyle(FRAME_LINE);
 
-	// init variables
-	mapFile = nullptr;
-
 	// create layout
 	tags.name = new FXLabel(this, "", terrainIcons[ data::TERRAIN_UNKNOWN], ICON_BEFORE_TEXT|LAYOUT_FILL_X);
 
@@ -74,7 +71,7 @@ FXRegionPanel::~FXRegionPanel()
 		delete terrainIcons[i];
 }
 
-void FXRegionPanel::setMapFile(datafile *f)
+void FXRegionPanel::setMapFile(std::shared_ptr<datafile>& f)
 {
     if (!f) {
         selection.selected = 0;

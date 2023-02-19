@@ -25,9 +25,6 @@ FXTradePanel::FXTradePanel(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint
 	setBorderColor(getApp()->getShadowColor());
 	setFrameStyle(FRAME_LINE);
 
-	// init variables
-	mapFile = nullptr;
-
 	// create layout
 	tags.topmatrix = new FXMatrix(this, 2, MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0);
 
@@ -56,7 +53,7 @@ FXTradePanel::~FXTradePanel()
     clearLabels();
 }
 
-void FXTradePanel::setMapFile(datafile *f)
+void FXTradePanel::setMapFile(std::shared_ptr<datafile>& f)
 {
     if (!f) selection.selected = 0;
     mapFile = f;

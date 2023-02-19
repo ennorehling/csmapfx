@@ -18,7 +18,7 @@ public:
 	void create();
 	virtual ~FXCalculator();
 
-    void setMapFile(datafile *f);
+    void setMapFile(std::shared_ptr<datafile>& f);
 
 	void connectMap(FXCSMap* map);
 
@@ -43,7 +43,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-	datafile *mapFile = nullptr;
+    std::shared_ptr<datafile> mapFile;
 
 	FXHorizontalFrame	*firstline = nullptr;
 	FXHorizontalFrame	*secondline = nullptr;

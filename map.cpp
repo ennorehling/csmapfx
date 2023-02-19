@@ -60,7 +60,6 @@ FXIMPLEMENT(FXCSMap,FXScrollArea,MessageMap, ARRAYNUMBER(MessageMap))
 FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbool minimap, FXint x,FXint y,FXint w,FXint h)
 	: FXScrollArea(p, opts, x, y, w, h), minimap(minimap)
 {
-    mapFile = nullptr;
 	// set target and selector
 	setTarget(tgt);
 	setSelector(sel);
@@ -113,7 +112,6 @@ FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbo
 
 	// selected region
 	sel_x = sel_y = sel_plane = 0;
-	mapFile = nullptr;
 }
 
 // helper function
@@ -452,7 +450,7 @@ void FXCSMap::moveContents(FXint x,FXint y)
 	map->update();
 }
 
-void FXCSMap::setMapFile(datafile *f)
+void FXCSMap::setMapFile(std::shared_ptr<datafile>& f)
 {
     mapFile = f;
     if (!f) {

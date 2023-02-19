@@ -7,9 +7,6 @@
 FXMessageList::FXMessageList(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h) :
     FXTreeList(p, tgt,sel, opts|TREELIST_SINGLESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES, x,y,w,h)
 {
-	// init variables
-	mapFile = nullptr;
-
 	// set styles...
 	setNumVisible(7);
 
@@ -23,7 +20,7 @@ void FXMessageList::create()
 	FXTreeList::create();
 }
 
-void FXMessageList::setMapFile(datafile *f)
+void FXMessageList::setMapFile(std::shared_ptr<datafile>& f)
 {
     if (f != mapFile) {
         datablock::itor block, end;

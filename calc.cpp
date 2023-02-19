@@ -91,7 +91,7 @@ FXCalculator::~FXCalculator()
     delete closeIcon;
 }
 
-void FXCalculator::setMapFile(datafile *f) {
+void FXCalculator::setMapFile(std::shared_ptr<datafile>& f) {
     mapFile = f;
 }
 

@@ -220,7 +220,7 @@ private:
     void mapChange();
     bool haveActiveFaction() const;
     datafile* loadFile(const FXString& filename);
-    datafile* mergeFile(const FXString& filename);
+    bool mergeFile(const FXString& filename);
     bool closeFile();
     void saveCommandsDlg(bool stripped, bool replace);
     FXString askFileName(const FXString& title, const FXString& patterns);
@@ -386,7 +386,7 @@ private:
 	} icons;
 
     // some data
-	class datafile *report = nullptr;
+	std::shared_ptr<datafile> report;
     std::list<MessageInfo *> output;
     datafile::SelectionState selection;			// selected region,faction,unit...
 

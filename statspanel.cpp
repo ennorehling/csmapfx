@@ -31,9 +31,6 @@ FXStatsPanel::FXStatsPanel(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	setBorderColor(getApp()->getShadowColor());
 	setFrameStyle(FRAME_LINE);
 
-	// init variables
-	mapFile = nullptr;
-
 	// create layout
 	tags.matrixframe = new FXHorizontalFrame(this, LAYOUT_SIDE_TOP|LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
 
@@ -55,7 +52,7 @@ FXStatsPanel::~FXStatsPanel()
 {
 }
 
-void FXStatsPanel::setMapFile(datafile *f)
+void FXStatsPanel::setMapFile(std::shared_ptr<datafile>& f)
 {
     if (!f) {
         selection.selected = 0;

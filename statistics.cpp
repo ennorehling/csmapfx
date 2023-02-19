@@ -35,9 +35,6 @@ FXStatistics::FXStatistics(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	setBorderColor(getApp()->getShadowColor());
 	setFrameStyle(FRAME_LINE);
 
-	// init variables
-	mapFile = nullptr;
-
 	select.faction = -2;		// no faction selected
 	select.filter = select.FILTER_PERSONS|select.FILTER_ITEMS|select.FILTER_TALENTS;
 
@@ -79,7 +76,7 @@ FXStatistics::~FXStatistics()
 {
 }
 
-void FXStatistics::setMapFile(datafile *f)
+void FXStatistics::setMapFile(std::shared_ptr<datafile>& f)
 {
     mapFile = f;
 }

@@ -119,7 +119,7 @@ void FXSearchDlg::create()
         matches->setHeaderSize(i, w);
 }
 
-void FXSearchDlg::setMapFile(datafile *f)
+void FXSearchDlg::setMapFile(std::shared_ptr<datafile>& f)
 {
     if (mapFile != f) {
         FXint factionId = f ? f->getActiveFactionId() : 0;
@@ -259,7 +259,7 @@ namespace
 	// search functions
 	typedef const datablock::itor& itor_ref;
     struct block_context {
-        datafile* report;
+        std::shared_ptr<datafile> report;
         itor_ref region;
         itor_ref building;
         itor_ref ship;
@@ -269,7 +269,7 @@ namespace
         bool searchDescriptions;
         bool searchFactions;
 
-        block_context(datafile* report, itor_ref region, itor_ref building, itor_ref ship, itor_ref unit,
+        block_context(std::shared_ptr<datafile>& report, itor_ref region, itor_ref building, itor_ref ship, itor_ref unit,
             const compare_func_t& compare, const compare_func_t& compare_icase, bool searchDescriptions, bool searchFactions)
             : report(report), region(region), building(building), ship(ship), unit(unit), compare(compare), compare_icase(compare_icase),
             searchDescriptions(searchDescriptions), searchFactions(searchFactions) {}

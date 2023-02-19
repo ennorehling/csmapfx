@@ -38,7 +38,7 @@ public:
 
 	virtual void create();
 
-    void setMapFile(datafile *f);
+    void setMapFile(std::shared_ptr<datafile>& f);
 
 	void loadState(FXRegistry& reg);
 	void saveState(FXRegistry& reg);
@@ -66,7 +66,7 @@ public:
 
 protected:
 	datafile::SelectionState selection;
-    datafile *mapFile = nullptr;
+    std::shared_ptr<datafile> mapFile;
 
 	FXTextField		*txtSearch = nullptr;			// textfield for search
 	FXButton		*btnSearch = nullptr;		    // do the search

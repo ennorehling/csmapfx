@@ -9,7 +9,7 @@ class FXProperties : public FXTreeList
 public:
     FXProperties(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x = 0, FXint y = 0, FXint w = 0, FXint h = 0);
 
-    void setMapFile(datafile* f);
+    void setMapFile(std::shared_ptr<datafile>& f);
 
     long onPopup(FXObject*, FXSelector, void*);
     long onMapChange(FXObject*, FXSelector, void*);
@@ -27,5 +27,5 @@ protected:
 	FXProperties(const FXProperties&) {}
 
     datafile::SelectionState selection;
-    datafile* mapFile = nullptr;
+    std::shared_ptr<datafile> mapFile;
 };

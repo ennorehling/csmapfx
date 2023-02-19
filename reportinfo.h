@@ -20,7 +20,7 @@ public:
     virtual ~FXReportInfo();
 
 
-    virtual void setMapFile(datafile *f);
+    virtual void setMapFile(std::shared_ptr<datafile>& f);
 
 public:
     virtual long onMapChange(FXObject*, FXSelector, void*);

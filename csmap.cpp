@@ -1192,52 +1192,49 @@ datafile* CSMap::loadFile(const FXString& filename)
     return cr;
 }
 
-datafile* CSMap::mergeFile(const FXString& filename)
+bool CSMap::mergeFile(const FXString& filename)
 {
     // zuerst: Datei normal laden
-    datafile* new_cr = new datafile;
+    std::shared_ptr<datafile> new_cr = std::make_shared<datafile>();
     beginLoading(filename);
 
     FXString errorMessage;
     try
     {
         if (!new_cr->load(filename, errorMessage)) {
-            delete new_cr;
-            new_cr = nullptr;
+            new_cr.reset();
         }
     }
     catch(const std::runtime_error& err)
     {
         recentFiles.removeFile(filename);
         errorMessage = FXString(filename) + ": " + FXString(err.what());
-        delete new_cr;
-        new_cr = nullptr;
+        new_cr.reset();
     }
-
     if (!errorMessage.empty())
     {
         recentFiles.removeFile(filename);
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", errorMessage.text());
     }
-
-    if (new_cr == nullptr) {
-        return nullptr;
+    if (!new_cr) {
+        return false;
     }
 
     int turn = report->turn();
     int new_turn = new_cr->turn();
 
     int x_offset = 0, y_offset = 0;
-    datafile* result = report;
     if (new_turn < turn) {
         new_cr->removeTemporary();
     }
     else if (turn < new_turn) {
         report->removeTemporary();
     }
+
     if (new_turn < turn || (new_turn == turn && report->hasUnits())) {
-        report->findOffset(new_cr, &x_offset, &y_offset);
-        report->merge(new_cr, x_offset, y_offset);
+        datafile* input = new_cr.get();
+        report->findOffset(input, &x_offset, &y_offset);
+        report->merge(input, x_offset, y_offset);
         // adjust selection by offset
         if (x_offset || y_offset) {
             if (selection.selected & selection.UNKNOWN_REGION) {
@@ -1248,17 +1245,17 @@ datafile* CSMap::mergeFile(const FXString& filename)
                 }
             }
         }
-        delete new_cr;
     }
     else {
-        new_cr->findOffset(report, &x_offset, &y_offset);
-        new_cr->merge(report, x_offset, y_offset);
-        selection.transfer(report, new_cr, x_offset, y_offset);
+        datafile* input = report.get();
+        new_cr->findOffset(input, &x_offset, &y_offset);
+        new_cr->merge(input, x_offset, y_offset);
+        selection.transfer(input, new_cr.get(), x_offset, y_offset);
         new_cr->filename(report->filename());
         new_cr->cmdfilename(report->cmdfilename());
-        result = new_cr;
+        report.swap(new_cr);
     }
-    return result;
+    return true;
 }
 
 bool CSMap::loadCommands(const FXString& filename)
@@ -2343,29 +2340,17 @@ long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)
 
 void CSMap::loadFiles(const std::vector<FXString> &filenames)
 {
-    datafile* old_cr = report;
     if (!filenames.empty()) {
-        datafile* new_cr = nullptr;
 
         for (FXString const& filename : filenames) {
             if (!report) {
-                new_cr = loadFile(filename);    // normal laden, wenn vorher keine Datei geladen ist.
+                report.reset(loadFile(filename));    // normal laden, wenn vorher keine Datei geladen ist.
             }
             else {
-                new_cr = mergeFile(filename);
-            }
-            if (new_cr && (new_cr != report)) {
-                if (old_cr != report) {
-                    delete report;
-                }
-                report = new_cr;
+                mergeFile(filename); // updates report in case of success
             }
         }
         ++selection.fileChange;
-        if (old_cr != report) {
-            // TODO: make selection to use the new report instead (enno:?)
-            delete old_cr;
-        }
         mapChange();
         checkCommands();
     }
@@ -2466,12 +2451,13 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
         if (closeFile()) {
             FXString filename = dlg.getFilename();
             beginLoading(filename);
-            if (nullptr != (report = loadFile(filename))) {
-                mapChange();
-                updateFileNames();
-                checkCommands();
+            report.reset(loadFile(filename));
+            if (report.get()) {
                 recentFiles.appendFile(filename);
             }
+            mapChange();
+            updateFileNames();
+            checkCommands();
         }
         getApp()->endWaitCursor();
     }
@@ -2663,7 +2649,6 @@ bool CSMap::closeFile()
         }
     }
     selection.selected = 0;
-    delete report;
     report = nullptr;
     return true;
 }
@@ -3000,10 +2985,11 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
     beginLoading(filename);
     if (loadReport) {
         if (closeFile()) {
-            if (nullptr != (report = loadFile(filename))) {
+            report.reset(loadFile(filename));
+            mapChange();
+            updateFileNames();
+            if (report.get()) {
                 recentFiles.appendFile(filename);
-                mapChange();
-                updateFileNames();
                 checkCommands();
             }
         }
@@ -3011,9 +2997,9 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
     else {
         if (loadCommands(filename)) {
             recentFiles.appendFile(filename);
-            updateFileNames();
             checkCommands();
         }
+        updateFileNames();
     }
     getApp()->endWaitCursor();
     return 1;

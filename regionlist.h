@@ -18,7 +18,7 @@ public:
 	void create();
 	virtual ~FXRegionList();
 
-	void setMapFile(datafile *f);
+	void setMapFile(std::shared_ptr<datafile>& f);
 
 public:
 	long onSelected(FXObject*,FXSelector,void*);
@@ -52,7 +52,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-    datafile *mapFile = nullptr;
+    std::shared_ptr<datafile> mapFile;
 
     FXIcon* terrainIcons[data::TERRAIN_LAST] = {};
 	FXIcon *green = nullptr, *red = nullptr, *blue = nullptr, *cyan = nullptr, *yellow = nullptr, *orange = nullptr, *gray = nullptr, *black = nullptr;

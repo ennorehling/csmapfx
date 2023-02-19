@@ -42,7 +42,7 @@ public:
 	virtual void moveContents(FXint x,FXint y);
 
 	FXbool paintMap(FXDrawable* buffer /*, FXRectangle& rect*/);
-	void setMapFile(datafile *f);
+	void setMapFile(std::shared_ptr<datafile>& f);
 	void connectMap(FXCSMap* map);
 
 	void scrollTo(FXint x, FXint y);
@@ -203,7 +203,7 @@ protected:
 	std::vector<arrow> arrows;
 	std::vector<arrow> routeArrows[2];		// saved
     
-    datafile *mapFile = nullptr;
+    std::shared_ptr<datafile> mapFile;
 
 	// Return default width / height
 	virtual FXint getDefaultWidth();

@@ -18,7 +18,7 @@ public:
 	void create();
 	virtual ~FXCommands();
 
-	void setMapFile(datafile *f);
+	void setMapFile(std::shared_ptr<datafile>& f);
 
 	void connectMap(FXCSMap* map);
 
@@ -55,7 +55,7 @@ public:
    
 protected:
 	datafile::SelectionState selection;
-    datafile *mapFile = nullptr;
+    std::shared_ptr<datafile> mapFile;
 
 	FXCSMap				*map = nullptr;				// map to send ROUTE commands to
 	int					routeLength = 0;		// length of ROUTE

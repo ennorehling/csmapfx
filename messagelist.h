@@ -17,7 +17,7 @@ public:
 	void create();
     virtual ~FXMessageList() {}
 
-    virtual void setMapFile(datafile *f);
+    virtual void setMapFile(std::shared_ptr<datafile>& f);
 
 public:
     virtual long onMapChange(FXObject*, FXSelector, void*);
@@ -26,7 +26,7 @@ public:
 protected:
     datafile::SelectionState selection;
 
-    datafile *mapFile = nullptr;
+    std::shared_ptr<datafile> mapFile;
 
     void addMessage(FXTreeItem*, datablock * block);
 

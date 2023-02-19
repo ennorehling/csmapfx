@@ -18,7 +18,7 @@ public:
 	void create();
 	virtual ~FXStatistics();
 
-    void setMapFile(datafile *f);
+    void setMapFile(std::shared_ptr<datafile>& f);
 
 	void loadState(FXRegistry& reg);
 	void saveState(FXRegistry& reg);
@@ -48,7 +48,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-    datafile *mapFile;
+    std::shared_ptr<datafile> mapFile;
 
 	// control box
 	FXComboBox		*factionBox;

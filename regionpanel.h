@@ -17,7 +17,7 @@ public:
 	void create();
 	virtual ~FXRegionPanel();
 
-    void setMapFile(datafile *f);
+    void setMapFile(std::shared_ptr<datafile>& f);
 
 public:
 	long onMapChange(FXObject*,FXSelector,void*);
@@ -34,7 +34,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-    datafile *mapFile = nullptr;
+    std::shared_ptr<datafile> mapFile;
 
     FXIcon* terrainIcons[data::TERRAIN_LAST] = { 0 };
 
