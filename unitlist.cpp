@@ -566,7 +566,7 @@ void FXUnitList::makeItems()
                 appendItem(node, FXStringVal(damage) + FXString(L"% besch\u00e4digt"));
 
             // Kueste
-            if (coast > 0 && coast < 6) {
+            if (coast >= 0 && coast < 6) {
                 appendItem(node, coastToString(coast));
             }
 
