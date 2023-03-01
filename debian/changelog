@@ -1,3 +1,9 @@
+csmapfx (1.6.0-1) stable; urgency=low
+
+  * auto-reload stopped working after declining it
+
+ -- Enno Rehling <enno@eressea.de>  Wed, 01 Mar 2023 18:00:00 +0200
+
 csmapfx (1.5.22-1) stable; urgency=low
 
   * fix display of coast in unit details

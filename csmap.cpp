@@ -2200,7 +2200,7 @@ bool CSMap::updateCommands(const FXString &filename) {
         if (res != MBOX_CLICKED_NO) {
             return true;
         }
-        setAutoReload(CSMap::reload_type::RELOAD_NEVER);
+        // setAutoReload(CSMap::reload_type::RELOAD_NEVER);
     }
     else if (reload_mode == CSMap::reload_type::RELOAD_AUTO) {
         return true;
