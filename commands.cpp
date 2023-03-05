@@ -105,19 +105,27 @@ long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
 	if (!mapFile)
 		return 0;
 
-	datablock::citor end = mapFile->blocks().end();
-	datablock::citor begin = mapFile->blocks().begin();
-	datablock::itor unit;
-	if (selection.selected & selection.UNIT)
-		unit = std::prev(selection.unit);
+    datablock::itor begin;
+    if (selection.selected & selection.UNIT)
+        begin = selection.unit;
 	else if (selection.selected & selection.REGION)
-		unit = std::prev(selection.region);
+        begin = selection.region;
     else
 		return 0;
-
-	for (; unit != begin; --unit)
+    bool wrap = true;
+    datablock::itor unit = begin;
+    for(;;)
 	{
-		if (unit->type() != block_type::TYPE_UNIT)
+        if (unit == mapFile->blocks().begin()) {
+            unit = mapFile->blocks().end();
+        }
+        --unit;
+        if (unit == begin) {
+            if (!wrap) break;
+            wrap = false;
+            unit = mapFile->blocks().end();
+        }
+        if (unit->type() != block_type::TYPE_UNIT)
 			continue;
 
         if (!mapFile->isConfirmed(*unit))
@@ -133,7 +141,7 @@ long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
 			setFocus();
 			return 1;
 		}
-	}
+    }
 
 	// no next unit found: beep
 	getApp()->beep();
@@ -154,8 +162,13 @@ long FXCommands::onNextUnit(FXObject *, FXSelector, void *)
     else
         return 0;
 
-	for (; unit != end; ++unit)
+    bool wrap = true;
+	for (; wrap || unit != end; ++unit)
 	{
+        if (unit == end) {
+            wrap = false;
+            unit = mapFile->blocks().begin();
+        }
 		if (unit->type() != block_type::TYPE_UNIT)
 			continue;
 
