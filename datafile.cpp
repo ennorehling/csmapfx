@@ -326,7 +326,7 @@ int datafile::save(const char* filename, map_type map_filter)
 		}
 		else if (type == block_type::TYPE_UNIT)
 		{
-			if (isConfirmed(block))	// TYPE_ORDERS_CONFIRMED
+			if (isConfirmed(*block))	// TYPE_ORDERS_CONFIRMED
 				file << "1;ejcOrdersConfirmed" << std::endl;
 		}
 		else if (type == block_type::TYPE_COMMANDS)
@@ -1040,7 +1040,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 			// output attachment (changed) or default commands
 			if (attcmds)
 			{
-				if (isConfirmed(unit))
+				if (isConfirmed(*unit))
 					out << "; bestaetigt\n";
 
 				// output prefix lines
@@ -1402,7 +1402,7 @@ void datafile::setConfirmed(datablock::itor& unit, bool confirmed)
     FXASSERT(unit->type() == block_type::TYPE_UNIT);
 
     // TODO: two key-searches, possible optimization
-    if (confirmed != isConfirmed(unit))
+    if (confirmed != isConfirmed(*unit))
     {
         att_region* stats = nullptr;
         datablock::itor region;
@@ -1422,13 +1422,19 @@ void datafile::setConfirmed(datablock::itor& unit, bool confirmed)
     }
 }
 
-bool datafile::isConfirmed(const datablock::itor& unit) const
+bool datafile::isConfirmed(const datablock& block) const
 {
-    FXASSERT(unit->type() == block_type::TYPE_UNIT);
-    if (unit->valueInt(TYPE_FACTION) != m_factionId) {
-        return true;
+    if (block.type() == block_type::TYPE_REGION) {
+        if (att_region* stats = static_cast<att_region*>(block.attachment())) {
+            return stats->unconfirmed == 0;
+        }
     }
-    return unit->valueInt(TYPE_ORDERS_CONFIRMED) != 0;
+    else if (block.type() == block_type::TYPE_UNIT) {
+        if (block.valueInt(TYPE_FACTION) == getActiveFactionId()) {
+            return block.valueInt(TYPE_ORDERS_CONFIRMED) != 0;
+        }
+    }
+    return true;
 }
 
 void datafile::createHierarchy()
@@ -1757,7 +1763,7 @@ void datafile::createHashTables()
                             region_own += number;
                             number = 0;
                             owner = owner_t::UNIT_OWN;
-                            if (!isConfirmed(block)) {
+                            if (!isConfirmed(*block)) {
                                 ++unconfirmed;
                             }
                         }

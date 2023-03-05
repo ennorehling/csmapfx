@@ -1,6 +1,7 @@
 csmapfx (1.6.1-1) stable; urgency=low
 
   * redefining some hotkeys
+  * only enable the confirmation checkbox on own units
 
  -- Enno Rehling <enno@eressea.de>  Wed, 01 Mar 2023 18:00:00 +0200
 

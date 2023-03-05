@@ -120,7 +120,7 @@ long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
 		if (unit->type() != block_type::TYPE_UNIT)
 			continue;
 
-        if (!mapFile->isConfirmed(unit))
+        if (!mapFile->isConfirmed(*unit))
         {
 			// send selectionchange, select this unit
 	
@@ -160,7 +160,7 @@ long FXCommands::onNextUnit(FXObject *, FXSelector, void *)
 			continue;
 
 		// search command block
-        if (!mapFile->isConfirmed(unit))
+        if (!mapFile->isConfirmed(*unit))
 		{
             selection.selected = selection.UNIT;
             selection.unit = unit;
@@ -208,7 +208,10 @@ FXString FXCommands::getFreeTemp()
 
 long FXCommands::onConfirmUnit(FXObject*, FXSelector, void*)
 {
-    setConfirmed(!getConfirmed());
+    int c = getConfirmed();
+    if (c >= 0) {
+        setConfirmed(c == 0);
+    }
     return 1;
 }
 
@@ -240,10 +243,20 @@ int FXCommands::getConfirmed()
 
 	if (selection.selected & selection.UNIT)
 	{
-        return mapFile->isConfirmed(selection.unit);
+        const datablock& block = *selection.unit;
+        if (block.valueInt(TYPE_FACTION) == mapFile->getActiveFactionId()) {
+            return block.valueInt(TYPE_ORDERS_CONFIRMED);
+        }
+        return -1;
 	}
-
-	return -1;	// no unit with command block
+    else if (selection.selected & selection.REGION)
+    {
+        const datablock& block = *selection.region;
+        if (att_region* stats = static_cast<att_region*>(block.attachment())) {
+            return stats->unconfirmed;
+        }
+    }
+    return -1;	// no unit with command block
 }
 
 long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)

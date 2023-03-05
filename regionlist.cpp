@@ -53,7 +53,8 @@ void FXRegionItem::draw(const FXTreeList* l, FXDC& dc, FXint xx, FXint yy, FXint
 {
     const FXRegionList* list = static_cast<const FXRegionList*>(l);
     FXFont* boldfont = list->getBoldFont();
-    bool is_bold = boldfont && list->isBold(this);
+    const datablock* block = static_cast<const datablock*>(getData());
+    bool is_bold = boldfont && block && !list->isConfirmed(*block);
     FXIcon *icon = (state & OPENED) ? openIcon : closedIcon;
     FXFont *font = list->getFont();
 
@@ -105,7 +106,8 @@ FXint FXRegionItem::hitItem(const FXTreeList* l,FXint xx,FXint yy) const
     FXFont* boldfont = list->getBoldFont();
     FXint oiw = 0, ciw = 0, oih = 0, cih = 0, tw = 0, th = 0, iw, ih, ix, iy, tx, ty, h;
     FXFont* font = list->getFont();
-    bool is_bold = boldfont && list->isBold(this);
+    const datablock* block = static_cast<const datablock*>(getData());
+    bool is_bold = boldfont && block && !list->isConfirmed(*block);
     if (is_bold) font = boldfont;
 
     if (openIcon) {
@@ -144,7 +146,8 @@ FXint FXRegionItem::getWidth(const FXTreeList* l) const
 {
     const FXRegionList* list = static_cast<const FXRegionList*>(l);
     FXFont* boldfont = list->getBoldFont();
-    bool is_bold = boldfont && list->isBold(this);
+    const datablock* block = static_cast<const datablock*>(getData());
+    bool is_bold = boldfont && block && !list->isConfirmed(*block);
     FXint w = 0, oiw = 0, ciw = 0;
     FXFont *font=list->getFont();
     if (is_bold)
@@ -165,7 +168,8 @@ FXint FXRegionItem::getHeight(const FXTreeList* l) const
 {
     const FXRegionList* list = static_cast<const FXRegionList*>(l);
     FXFont* boldfont = list->getBoldFont();
-    bool is_bold = boldfont && list->isBold(this);
+    const datablock* block = static_cast<const datablock*>(getData());
+    bool is_bold = boldfont && block && !list->isConfirmed(*block);
     FXFont* font = list->getFont();
     FXint th = 0, oih = 0, cih = 0;
     if (is_bold)
@@ -342,11 +346,6 @@ long FXRegionList::showPopup(const FXString& label, datablock* block, FXint root
     pane.popup(nullptr, root_x, root_y);
     getApp()->runModalWhileShown(&pane);
     return 0;
-}
-
-bool FXRegionList::isConfirmed(const datablock::itor& unit) const
-{
-    return mapFile->isConfirmed(unit);
 }
 
 // rekursivly searches item with userdata=data in treeitem list
@@ -642,22 +641,7 @@ long FXRegionList::onQueryHelp(FXObject* /*sender*/, FXSelector, void* /*ptr*/)
 	return 0;
 }
 
-bool FXRegionList::isBold(const FXTreeItem* item) const
+bool FXRegionList::isConfirmed(const datablock& block) const
 {
-    const datablock* block = static_cast<const datablock*>(item->getData());
-    if (block) {
-        if (block->type() == block_type::TYPE_REGION) {
-            if (att_region* stats = static_cast<att_region*>(block->attachment())) {
-                return stats->unconfirmed > 0;
-            }
-        }
-        else if (block->type() == block_type::TYPE_UNIT) {
-            const CSMap* csmap = static_cast<const CSMap*>(getTarget());
-            FXint factionId = csmap->getActiveFactionId();
-            if (block->valueInt(TYPE_FACTION) == factionId) {
-                return block->valueInt(TYPE_ORDERS_CONFIRMED) == 0;
-            }
-        }
-    }
-    return false;
+    return mapFile->isConfirmed(block);
 }

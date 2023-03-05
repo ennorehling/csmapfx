@@ -3352,7 +3352,7 @@ FXString CSMap::gameDate(int turn) const
 bool CSMap::isConfirmed(const datablock::itor& unit)
 {
     if (unit->type() == block_type::TYPE_UNIT) {
-        return report->isConfirmed(selection.unit);
+        return report->isConfirmed(*selection.unit);
     }
     return true;
 }

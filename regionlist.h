@@ -39,7 +39,7 @@ public:
         return colorized_units;
     }
 
-    bool isBold(const FXTreeItem* item) const;
+    bool isConfirmed(const datablock* block) const;
     FXFont* getBoldFont() const { return boldfont; }
 public: 
 	enum
@@ -59,7 +59,7 @@ protected:
 
 	FXFont *boldfont = nullptr;
 
-    bool isConfirmed(const datablock::itor& unit) const;
+    bool isConfirmed(const datablock& unit) const;
 	// rekursivly searches item with userdata=data in treeitem list
 	FXTreeItem* findTreeItem(FXTreeItem* first, void* data);
 
@@ -72,6 +72,7 @@ private:
 
     void rebuildTree();
     static FXColor getUnitColor(const datablock* unitPtr);
+    friend class FXRegionItem;
 };
 
 #endif //_CSMAP_REGIONLIST
