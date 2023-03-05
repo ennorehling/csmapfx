@@ -71,7 +71,7 @@ private:
     FXRegionList(const FXRegionList&) = delete;
 
     void rebuildTree();
-    static FXColor getUnitColor(const datablock* unitPtr);
+    FXColor getItemColor(const datablock& unit) const;
     friend class FXRegionItem;
 };
 

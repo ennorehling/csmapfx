@@ -494,12 +494,12 @@ void FXRegionList::rebuildTree()
 
             FXTreeItem* ships = nullptr;
             FXTreeItem* buildings = nullptr;
-            for (datablock::itor unit = std::next(region); unit != iend && unit->depth() > regionPtr->depth(); ++unit)
+            for (datablock::itor block = std::next(region); block != iend && block->depth() > regionPtr->depth(); ++block)
             {
-                const datablock* objectPtr = &*unit;
+                const datablock* objectPtr = &*block;
                 if (regionItem || regionPtr->hasKey(TYPE_VISIBILITY)) {
-                    FXTreeItem* child = nullptr;
-                    if (unit->type() == block_type::TYPE_BUILDING)
+                    FXRegionItem* child = nullptr;
+                    if (block->type() == block_type::TYPE_BUILDING)
                     {
                         if (!buildings) {
                             if (!regionItem) {
@@ -508,9 +508,10 @@ void FXRegionList::rebuildTree()
                             buildings = prependItem(regionItem, L"Geb\u00e4ude");
                         }
                         FXString label = objectPtr->getLabel() + ", " + objectPtr->value(TYPE_TYPE) + L" Gr\u00f6\u00dfe " + objectPtr->value(TYPE_SIZE);
-                        child = appendItem(buildings, label);
+                        child = new FXRegionItem(label);
+                        appendItem(buildings, child);
                     }
-                    else if (unit->type() == block_type::TYPE_SHIP)
+                    else if (block->type() == block_type::TYPE_SHIP)
                     {
                         if (!ships) {
                             if (!regionItem) {
@@ -519,14 +520,19 @@ void FXRegionList::rebuildTree()
                             ships = prependItem(regionItem, L"Schiffe");
                         }
                         FXString label = objectPtr->getLabel() + ", " + objectPtr->value(TYPE_TYPE) + L" Gr\u00f6\u00dfe " + objectPtr->value(TYPE_SIZE);
-                        child = appendItem(ships, label);
+                        child = new FXRegionItem(label);
+                        appendItem(ships, child);
                     }
                     if (child) {
+                        FXColor color = getItemColor(*block);
+                        if (color) {
+                            child->setTextColor(color);
+                        }
                         child->setData((void*)objectPtr);
                     }
                 }
                 // display units until next region
-                if (unit->type() != block_type::TYPE_UNIT)
+                if (block->type() != block_type::TYPE_UNIT)
                     continue;
 
                 // get treeitem node from faction
@@ -549,7 +555,7 @@ void FXRegionList::rebuildTree()
                 else
                     appendItem(faction, item = new FXRegionItem(label, 0, 0, (void*)unitPtr));
 
-                FXColor color = getUnitColor(unitPtr);
+                FXColor color = getItemColor(*unitPtr);
                 if (color) {
                     item->setTextColor(color);
                 }
@@ -562,13 +568,21 @@ void FXRegionList::rebuildTree()
     }
 }
 
-FXColor FXRegionList::getUnitColor(const datablock* unitPtr)
+FXColor FXRegionList::getItemColor(const datablock& block) const
 {
-    if (unitPtr->hasKey(TYPE_BUILDING)) {
-       return FXRGB(0, 127, 0);
+    if (block.type() == block_type::TYPE_UNIT) {
+        if (block.hasKey(TYPE_BUILDING)) {
+            return FXRGB(0, 127, 0);
+        }
+        if (block.hasKey(TYPE_SHIP)) {
+            return FXRGB(0, 0, 255);
+        }
     }
-    if (unitPtr->hasKey(TYPE_SHIP)) {
-        return FXRGB(0, 0, 255);
+    else if (block.type() == block_type::TYPE_SHIP || block.type() == block_type::TYPE_BUILDING) {
+        int factionId = block.valueInt(key_type::TYPE_FACTION);
+        if (factionId != mapFile->getActiveFactionId()) {
+            return FXRGB(127, 127, 127);
+        }
     }
     return 0;
 }
