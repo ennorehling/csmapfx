@@ -409,8 +409,8 @@ CSMap::CSMap(FXApp *app) :
     menu.show_left = new FXMenuCheck(viewmenu,"&Regionsliste\tCtrl-Shift-R\tRegionsliste ein- bzw. ausblenden.", this, ID_VIEW_REGIONLIST);
     menu.show_right = new FXMenuCheck(viewmenu,"&Eigenschaften\tCtrl-Shift-E\tEinheiten- und Regionsdetails ein- bzw. ausblenden.", this, ID_VIEW_PROPERTIES);
     menu.calc = new FXMenuCheck(viewmenu,"&Taschenrechner\tCtrl-Shift-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
-    menu.minimap = new FXMenuCheck(viewmenu,FXString(L"\u00dcbersichts&karte\tCtrl-N\t\u00dcbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
-    menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tCtrl-B\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
+    menu.minimap = new FXMenuCheck(viewmenu,FXString(L"\u00dcbersichts&karte\tF2\t\u00dcbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
+    menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tF1\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
     new FXMenuSeparatorEx(viewmenu, "Liste");
     menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tCtrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
     menu.colorizeUnits = new FXMenuCheck(viewmenu, "Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
@@ -454,8 +454,8 @@ CSMap::CSMap(FXApp *app) :
 
     selectionmenu = new FXMenuPane(this);
     new FXMenuCascade(regionmenu, "&Erweitern", nullptr, selectionmenu);
-    new FXMenuCommand(selectionmenu,"Auswahl &erweitern\tCtrl-Shift-F7\tAuswahl mit dem Radius von einer Region erweitern.",nullptr,this,ID_REGION_EXTENDSEL);
-    new FXMenuCommand(selectionmenu,FXString(L"&Inseln ausw\u00e4hlen\tCtrl-Shift-F9\tAuswahl auf komplette Inseln erweitern."),nullptr,this,ID_REGION_SELISLANDS);
+    new FXMenuCommand(selectionmenu,"Auswahl &erweitern\tCtrl-F7\tAuswahl mit dem Radius von einer Region erweitern.",nullptr,this,ID_REGION_EXTENDSEL);
+    new FXMenuCommand(selectionmenu,FXString(L"&Inseln ausw\u00e4hlen\tCtrl-F9\tAuswahl auf komplette Inseln erweitern."),nullptr,this,ID_REGION_SELISLANDS);
 
     new FXMenuCommand(regionmenu, L"Markierte &ausw\u00e4hlen\tCtrl-Space\tMarkierte Region ausw\u00e4hlen.", nullptr, this, ID_MAP_SELECTMARKED, 0);
     new FXMenuCommand(regionmenu, FXString(L"Markierte &l\u00f6schen\t\t"), nullptr, this, ID_REGION_REMOVESEL);
@@ -634,18 +634,21 @@ CSMap::CSMap(FXApp *app) :
 
     FXHorizontalFrame *cmdOptFrame = new FXHorizontalFrame(cmdBottomFrame,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 3,3,1,1);
     cmdOptFrame->setBorderColor(getApp()->getShadowColor());
-    new FXCheckButton(cmdOptFrame,
+    FXCheckButton *chk = new FXCheckButton(cmdOptFrame,
         FXString(L"&best\u00e4tigt\tBefehle best\u00e4tigen\tBefehle f\u00fcr diese Einheit best\u00e4tigen"),
         commands, FXCommands::ID_UNIT_CONFIRM, CHECKBUTTON_NORMAL);
-    FXButton * btn;
+    chk->addHotKey(FXHotKey(MKUINT(KEY_b, CONTROLMASK)));
+    FXButton* btn;
     btn = new FXButton(cmdOptFrame,
         FXString(L"<\tVorherige Einheit\tZur vorhergehenden unbest\u00e4tigten Einheit"), nullptr,
         commands, FXCommands::ID_UNIT_PREV, BUTTON_TOOLBAR);
     btn->addHotKey(FXHotKey(MKUINT(KEY_comma, CONTROLMASK)));
+    btn->addHotKey(FXHotKey(MKUINT(KEY_p, CONTROLMASK)));
     btn = new FXButton(cmdOptFrame,
         FXString(L">\tN\u00e4chste Einheit\tZur n\u00e4chsten unbest\u00e4tigten Einheit"), nullptr,
         commands, FXCommands::ID_UNIT_NEXT, BUTTON_TOOLBAR);
     btn->addHotKey(FXHotKey(MKUINT(KEY_period, CONTROLMASK)));
+    btn->addHotKey(FXHotKey(MKUINT(KEY_n, CONTROLMASK)));
 
     new FXButton(cmdOptFrame,
         "+&temp\tNeue Temp-Einheit\tTemp-Einheit erstellen", nullptr,
