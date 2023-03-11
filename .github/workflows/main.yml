@@ -16,9 +16,7 @@ jobs:
         with:
           submodules: true
       - name: Build and Test
-        uses: ashutoshvarma/action-cmake-build@master
+        uses: threeal/cmake-action@v1.1.0
         with:
-          build-dir: ${{ runner.workspace }}/build
-          build-type: Release
+          args: "-DCMAKE_BUILD_TYPE=Debug"
           run-test: false
-          ctest-options: --output-on-failure
