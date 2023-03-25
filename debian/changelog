@@ -1,3 +1,9 @@
+csmapfx (1.6.2-1) stable; urgency=low
+
+  * make "select island" work on cursor if nothing selected
+
+ -- Enno Rehling <enno@eressea.de>  Wed, 25 Mar 2023 10:20:00 +0200
+
 csmapfx (1.6.1-1) stable; urgency=low
 
   * redefining some hotkeys

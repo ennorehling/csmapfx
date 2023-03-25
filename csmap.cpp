@@ -3150,7 +3150,11 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
     if (!report) return 1;
     if (selection.regionsSelected.empty())
     {
-        return 1;        // nothing to do
+        if (!(selection.selected & selection.REGION)) {
+            // nothing to do
+            return 1;
+        }
+        selection.regionsSelected.insert(&*selection.region);
     }
 
     // Inseln ausw\u00e4hlen
@@ -3185,11 +3189,12 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
                 if (report->getRegion(region, x + hex_offset[d][0], y + hex_offset[d][1], visiblePlane)) {
                     datablock* regionPtr = &*region;
                     if (regionPtr->terrain() != data::TERRAIN_OCEAN
-                        && regionPtr->terrain() != data::TERRAIN_FIREWALL)
+                        && regionPtr->terrain() != data::TERRAIN_FIREWALL) {
                         if (selection.regionsSelected.find(regionPtr) == selection.regionsSelected.end()) {
                             selection.regionsSelected.insert(regionPtr);
                             changed = true;
                         }
+                    }
                 }
             }
         }
