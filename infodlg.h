@@ -19,6 +19,8 @@ public:
 	void create();
 	virtual ~FXInfoDlg();
 
+    virtual void show(FXuint placement) override;
+
 	void loadState(FXRegistry& reg);
 	void saveState(FXRegistry& reg);
 

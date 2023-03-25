@@ -39,7 +39,8 @@ FXInfoDlg::FXInfoDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint
 	new FXVerticalSeparator(buttons, SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_Y|LAYOUT_RIGHT);
 	search = new FXTextField(buttons, 17, this,ID_SEARCH, FRAME_LINE|TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_Y|LAYOUT_RIGHT);
 	search->setBorderColor(getApp()->getShadowColor());
-	new FXLabel(buttons, "Suche:", NULL, LAYOUT_FILL_Y|LAYOUT_RIGHT);
+    search->setFocus();
+	new FXLabel(buttons, "&Suche:", NULL, LAYOUT_FILL_Y|LAYOUT_RIGHT);
 
 	new FXHorizontalSeparator(this, SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
 
@@ -57,6 +58,12 @@ void FXInfoDlg::create()
 
 FXInfoDlg::~FXInfoDlg()
 {
+}
+
+void FXInfoDlg::show(FXuint placement)
+{
+    FXDialogBox::show(placement);
+    search->setFocus();
 }
 
 void FXInfoDlg::loadState(FXRegistry& reg)
@@ -141,7 +148,8 @@ void FXInfoDlg::setGame(const FXString& game)
 void FXInfoDlg::setSearchText(const FXString& text)
 {
 	search->setText(text);
-	onSearch(this, 0, (void*)search->getText().text());
+    search->setFocus();
+    onSearch(this, 0, (void*)search->getText().text());
 }
 
 void FXInfoDlg::setClipboard(const FXString& text)

@@ -1621,11 +1621,12 @@ long CSMap::updViewMiniMap(FXObject* sender, FXSelector, void*)
 
 long CSMap::onViewInfoDlg(FXObject*, FXSelector, void*)
 {
-    if (infodlg->shown())
+    if (infodlg->shown()) {
         infodlg->hide();
-    else
+    }
+    else {
         infodlg->show(PLACEMENT_OWNER);
-
+    }
     return 1;
 }
 
