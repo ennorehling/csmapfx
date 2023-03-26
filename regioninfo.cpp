@@ -34,13 +34,13 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
 
     if (selection.selChange != pstate->selChange)
     {
-        clearSiblings(effects);
-        clearSiblings(streets);
-        clearSiblings(travel);
-        clearSiblings(guards);
-        clearSiblings(regionMessages);
-        clearSiblings(unitMessages);
-        clearSiblings(battle);
+        clearChildren(effects);
+        clearChildren(streets);
+        clearChildren(travel);
+        clearChildren(guards);
+        clearChildren(regionMessages);
+        clearChildren(unitMessages);
+        clearChildren(battle);
 
         if (mapFile && mapFile->hasActiveFaction()) {
             datablock *unitPtr = nullptr, *regionPtr = nullptr;
@@ -213,5 +213,4 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
     }
 
     return FXMessageList::onMapChange(sender, sel, ptr);
-
 }

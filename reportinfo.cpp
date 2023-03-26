@@ -44,8 +44,8 @@ void FXReportInfo::setMapFile(std::shared_ptr<datafile>& f)
     if (f != mapFile) {
         datablock::itor it, end;
         mapFile = f;
-        clearSiblings(messages);
-        clearSiblings(battles);
+        clearChildren(messages);
+        clearChildren(battles);
         if (mapFile) {
             end = mapFile->blocks().end();
             for (it = mapFile->blocks().begin(); it != end;) {
@@ -162,12 +162,4 @@ void FXReportInfo::addBattle(datablock::itor& block)
 void FXReportInfo::addFaction(datablock::itor& block)
 {
     ++block;
-}
-
-long FXReportInfo::onMapChange(FXObject*, FXSelector, void* ptr)
-{
-	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
-
-    selection = *pstate;
-	return 1;
 }

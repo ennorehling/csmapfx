@@ -31,7 +31,7 @@ protected:
 
     void addMessage(FXTreeItem*, datablock * block);
 
-	void clearSiblings(FXTreeItem* parent);
+	void clearChildren(FXTreeItem* parent);
 
 protected:
 	FXMessageList() {}

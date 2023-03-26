@@ -2,8 +2,9 @@ csmapfx (1.6.2-1) stable; urgency=low
 
   * make "select island" work on cursor if nothing selected
   * set info dialog focus to search field on opening.
+  * current selection in messagte lists didn't stick.
 
- -- Enno Rehling <enno@eressea.de>  Wed, 25 Mar 2023 14:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 26 Mar 2023 14:00:00 +0200
 
 csmapfx (1.6.1-1) stable; urgency=low
 

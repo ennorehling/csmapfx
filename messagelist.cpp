@@ -81,11 +81,7 @@ long FXMessageList::onMapChange(FXObject* sender, FXSelector sel, void* ptr)
 {
     datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
 
-    // any data changed, so need to update list?
-    if (selection.fileChange != pstate->fileChange)
-    {
-        selection = *pstate;
-    }
+    selection = *pstate;
     return 1;
 }
 
@@ -139,7 +135,7 @@ long FXMessageList::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
 	return FXTreeList::onDoubleClicked(this, sel, ptr);
 }
 
-void FXMessageList::clearSiblings(FXTreeItem* parent_item)
+void FXMessageList::clearChildren(FXTreeItem* parent_item)
 {
     if (parent_item) {
         FXTreeItem* item = parent_item->getFirst();

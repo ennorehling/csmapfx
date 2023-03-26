@@ -513,7 +513,7 @@ CSMap::CSMap(FXApp *app) :
     leftframe = new FXVerticalFrame(content,LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 3,0,0,0);
 
     // Region list window
-    regions = new FXRegionList(leftframe, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    regions = new FXRegionList(leftframe, this, ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
     menu.ownFactionGroup->setTarget(regions);
     menu.ownFactionGroup->setSelector(FXRegionList::ID_TOGGLE_OWNFACTIONGROUP);
@@ -565,7 +565,7 @@ CSMap::CSMap(FXApp *app) :
     searchResults->appendHeader("Partei");
 
     // Calculator bar
-    mathbar = new FXCalculator(middle, this,ID_SELECTION, LAYOUT_FILL_X);
+    mathbar = new FXCalculator(middle, this, ID_SELECTION, LAYOUT_FILL_X);
     mathbar->connectMap(map);
     menu.calc->setTarget(mathbar);
     menu.calc->setSelector(FXCalculator::ID_TOGGLESHOWN);

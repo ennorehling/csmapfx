@@ -20,11 +20,7 @@ public:
 	FXReportInfo(FXComposite* p, FXObject* tgt = nullptr, FXSelector sel = 0, FXuint opts = 0, FXint x = 0, FXint y = 0, FXint w = 0, FXint h = 0);
     virtual ~FXReportInfo();
 
-
     virtual void setMapFile(std::shared_ptr<datafile>& f);
-
-public:
-    virtual long onMapChange(FXObject*, FXSelector, void*);
 
 protected:
     void addMessage(FXTreeItem* group, class datablock * msg);
@@ -38,8 +34,8 @@ protected:
 private:
     static const char *messageSection(const FXString& section);
 
-    FXTreeItem* messages;
-    FXTreeItem* battles;
+    FXTreeItem* messages = nullptr;
+    FXTreeItem* battles = nullptr;
 };
 
 #endif //_CSMAP_MESSAGES
