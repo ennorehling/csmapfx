@@ -32,40 +32,46 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
 {
     datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
 
-    if (selection.selChange != pstate->selChange)
-    {
+    if (selection.fileChange != pstate->fileChange) {
         clearChildren(effects);
         clearChildren(streets);
         clearChildren(travel);
         clearChildren(guards);
         clearChildren(regionMessages);
-        clearChildren(unitMessages);
         clearChildren(battle);
+        clearChildren(unitMessages);
+    } else if (selection.selChange != pstate->selChange) {
 
         if (mapFile && mapFile->hasActiveFaction()) {
-            datablock *unitPtr = nullptr, *regionPtr = nullptr;
+            datablock* regionPtr = nullptr;
+            datablock* unitPtr = nullptr;
+
             if (pstate->selected & selection.UNIT)
             {
-                unitPtr = &*pstate->unit;
-                FXString name = unitPtr->getLabel();
-                if (!unitMessages) {
-                    unitMessages = insertItem(battle, nullptr, name);
-                }
-                else {
-                    unitMessages->setText(name);
+                if ((selection.selected & selection.UNIT) == 0 || selection.unit != pstate->unit)
+                {
+                    unitPtr = &*pstate->unit;
+                    clearChildren(unitMessages);
                 }
             }
-            else if (unitMessages) {
-                removeItem(unitMessages);
-                unitMessages = nullptr;
-            }
-
             if (pstate->selected & selection.REGION)
             {
-                datablock::itor end = mapFile->blocks().end();
+                if ((selection.selected & selection.REGION) == 0 || selection.region != pstate->region)
+                {
+                    regionPtr = &*pstate->region;
+                    clearChildren(effects);
+                    clearChildren(streets);
+                    clearChildren(travel);
+                    clearChildren(guards);
+                    clearChildren(regionMessages);
+                    clearChildren(battle);
+                }
+            }
+
+            if (regionPtr) {
                 datablock::itor block;
+                datablock::itor end = mapFile->blocks().end();
                 std::set<FXint> guard_ids;
-                regionPtr = &*pstate->region;
                 if (mapFile->getBattle(block, pstate->sel_x, pstate->sel_y, pstate->sel_plane)) {
                     int depth = block->depth();
                     if (!battle) {
@@ -178,7 +184,7 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
                                     udata = &*match;
                                 }
                             }
-                            FXTreeItem * item = appendItem(travel, prefix + val);
+                            FXTreeItem* item = appendItem(travel, prefix + val);
                             item->setData(udata);
                         }
                     }
@@ -193,6 +199,20 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
                     }
                 }
             }
+            if (unitPtr) {
+                FXString name = unitPtr->getLabel();
+                if (!unitMessages) {
+                    unitMessages = insertItem(battle, nullptr, name);
+                }
+                else {
+                    unitMessages->setText(name);
+                }
+            }
+            else if (unitMessages) {
+                removeItem(unitMessages);
+                unitMessages = nullptr;
+            }
+
             if (unitPtr || regionPtr)
             {
                 datablock::citor end = mapFile->blocks().end();
@@ -211,6 +231,5 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
             }
         }
     }
-
     return FXMessageList::onMapChange(sender, sel, ptr);
 }

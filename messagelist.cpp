@@ -101,35 +101,7 @@ long FXMessageList::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
     datablock* select = (datablock*)item->getData();
     if (select != nullptr)
 	{
-        if (select->type() == block_type::TYPE_REGION) {
-            if (mapFile->getRegion(selection.region, select->x(), select->y(), select->info())) {
-                selection.selected = selection.REGION;
-            }
-        }
-        else {
-            datablock::itor block;
-            datablock::itor region, end = mapFile->blocks().end();
-            mapFile->findSelection(select, block, region);
-            if (region != end) {
-                selection.region = region;
-                selection.selected |= selection.REGION;
-            }
-            if (select->type() == block_type::TYPE_UNIT) {
-                selection.unit = block;
-                selection.selected |= selection.UNIT;
-            }
-            else if (select->type() == block_type::TYPE_BUILDING) {
-                selection.building = block;
-                selection.selected |= selection.BUILDING;
-            }
-            else if (select->type() == block_type::TYPE_SHIP) {
-                selection.ship = block;
-                selection.selected |= selection.SHIP;
-            }
-        }
-
-		getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
-		return 1;
+        return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_SETVALUE), select);
 	}
 
 	return FXTreeList::onDoubleClicked(this, sel, ptr);
