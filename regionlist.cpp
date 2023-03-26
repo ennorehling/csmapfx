@@ -625,23 +625,28 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
             FXTreeItem* top = getFirstItem();
             if (top) {
                 FXTreeItem* region = findTreeItem(top, &*selection.region);
-                FXTreeItem* item = nullptr;
-                if (selection.selected & selection.UNIT) {
-                    item = findTreeItem(region ? region : top, &*selection.unit);
-                }
-                else if (selection.selected & selection.SHIP) {
-                    item = findTreeItem(region, &*selection.ship);
-                }
-                else if (selection.selected & selection.BUILDING) {
-                    item = findTreeItem(region, &*selection.building);
-                }
-                else if (selection.selected & selection.FACTION)
-                    item = findTreeItem(region, &*selection.faction);
+                if (region) {
+                    FXTreeItem* item = nullptr;
+                    if (selection.selected & selection.UNIT) {
+                        item = findTreeItem(region ? region : top, &*selection.unit);
+                    }
+                    else if (selection.selected & selection.SHIP) {
+                        item = findTreeItem(region, &*selection.ship);
+                    }
+                    else if (selection.selected & selection.BUILDING) {
+                        item = findTreeItem(region, &*selection.building);
+                    }
+                    else if (selection.selected & selection.FACTION)
+                        item = findTreeItem(region, &*selection.faction);
 
-                if (!item) item = region;
-                if (item) {
-                    selectItem(item);
-                    makeItemVisible(item);
+                    if (!item) item = region;
+                    if (item) {
+                        selectItem(item);
+                        makeItemVisible(item);
+                    }
+                }
+                else {
+                    killSelection();
                 }
             }
         }
