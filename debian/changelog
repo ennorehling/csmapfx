@@ -1,3 +1,9 @@
+csmapfx (1.6.3-1) stable; urgency=low
+
+  * calling setFocus in the info dialog constructor caused a crash.
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 27 Mar 2023 16:45:00 +0200
+
 csmapfx (1.6.2-2) stable; urgency=low
 
   * when selecting an unlisted region, kill selection in region list.

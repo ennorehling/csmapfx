@@ -39,7 +39,6 @@ FXInfoDlg::FXInfoDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint
 	new FXVerticalSeparator(buttons, SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_Y|LAYOUT_RIGHT);
 	search = new FXTextField(buttons, 17, this,ID_SEARCH, FRAME_LINE|TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_Y|LAYOUT_RIGHT);
 	search->setBorderColor(getApp()->getShadowColor());
-    search->setFocus();
 	new FXLabel(buttons, "&Suche:", NULL, LAYOUT_FILL_Y|LAYOUT_RIGHT);
 
 	new FXHorizontalSeparator(this, SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
