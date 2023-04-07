@@ -1521,15 +1521,6 @@ static int barHeight2(int people) {
 
 void datafile::createHashTables()
 {
-	m_battles.clear();
-	m_regions.clear();
-	m_units.clear();
-    m_groups.clear();
-	m_factions.clear();
-	m_buildings.clear();
-	m_ships.clear();
-	m_islands.clear();
-
 	m_activefaction = m_blocks.end();
     m_factionId = 0;
 	m_recruitment = 0;

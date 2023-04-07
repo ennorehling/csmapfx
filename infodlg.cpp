@@ -46,7 +46,7 @@ FXInfoDlg::FXInfoDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint
 	// tabbook
 	tabbook = new FXTabBook(this, NULL,0, TABBOOK_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
 
-	//bindings::register_module_method("Info", "load", boost::bind(&infodlg_parseTableFile, this, _1) );
+    setGame("default");
 }
 
 void FXInfoDlg::create()
@@ -183,7 +183,7 @@ long FXInfoDlg::onSearch(FXObject*, FXSelector, void* ptr)
 				FXint pos = flatten(*entry).find(str);
 				if (pos > -1 && (!found_length || pos < found_start || (pos == found_start && entry->length() < found_length)))
 				{
-					found_list = block.list.get();
+					found_list = block.list;
 					found_tab = tab;
 					found_line = line;
 					found_start = pos;
@@ -255,14 +255,22 @@ void FXInfoDlg::createTable()
 		if (block.header.empty() && block.lines.empty())
 			continue;
 
-        block.tab = std::make_unique<FXTabItem>(tabbook, itor->first);
-        block.tab->create();
+        FXTabItem* tab = new FXTabItem(tabbook, itor->first);
+        FXHorizontalFrame* frame = new FXHorizontalFrame(tabbook, LAYOUT_FILL_X | LAYOUT_FILL_Y | FRAME_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
+        FXFoldingList* list = new FXFoldingList(frame, this, FXInfoDlg::ID_LIST, FOLDINGLIST_SINGLESELECT | FOLDINGLIST_SHOWS_LINES | FOLDINGLIST_SHOWS_BOXES | LAYOUT_FILL_X | LAYOUT_FILL_Y);
 
-        block.frame = std::make_unique<FXHorizontalFrame>(tabbook, LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0,0,0,0, 0,0,0,0);
+        delete block.list;
+        delete block.frame;
+        delete block.tab;
+
+        block.tab = tab;
+        tab->create();
+
+        block.frame = frame;
         block.frame->setBorderColor(getApp()->getShadowColor());
         block.frame->create();
 
-        block.list = std::make_unique<FXFoldingList>(block.frame.get(), this,ID_LIST, FOLDINGLIST_SINGLESELECT|FOLDINGLIST_SHOWS_LINES|FOLDINGLIST_SHOWS_BOXES|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+        block.list = list;
         block.list->getHeader()->setHeaderStyle(HEADER_RESIZE|HEADER_TRACKING);
         block.list->create();
 

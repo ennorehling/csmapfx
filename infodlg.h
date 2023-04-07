@@ -54,9 +54,15 @@ protected:
 		row								header;
 		std::list<row>					lines;
 
-		std::unique_ptr<FXTabItem>         tab;
-        std::unique_ptr<FXHorizontalFrame> frame;
-        std::unique_ptr <FXFoldingList>    list;
+		FXTabItem * tab = nullptr;
+        FXHorizontalFrame * frame = nullptr;
+        FXFoldingList * list = nullptr;
+
+        ~infoblock() {
+            delete list;
+            delete frame;
+            delete tab;
+        }
 	};
 
 	std::map<FXString, infoblock>		blocks;

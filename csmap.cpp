@@ -679,7 +679,6 @@ CSMap::CSMap(FXApp *app) :
     // info dialog
     infodlg = new FXInfoDlg(this, "Informationen", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));
     infodlg->getAccelTable()->addAccel(MKUINT(KEY_B,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_INFODLG));
-    infodlg->setGame("default");
 
     // search dialog
     searchdlg = new FXSearchDlg(this, this, ID_SELECTION, searchResults, "Suchen...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));

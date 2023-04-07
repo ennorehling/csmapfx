@@ -97,7 +97,6 @@ public:
 		int sel_x = 0, sel_y = 0, sel_plane = 0;
 
 		std::set<datablock*> regionsSelected;
-        //Selection regionsSelected;
 
         int selChange = 0, fileChange = 0;	// incremented on changes to any datafile (loaded, closed or changed)
 
