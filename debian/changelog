@@ -1,3 +1,9 @@
+csmapfx (1.6.4-1) stable; urgency=low
+
+  * quick exit, don't call datafile.close()
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 07 Apr 2023 19:00:00 +0200
+
 csmapfx (1.6.3-1) stable; urgency=low
 
   * calling setFocus in the info dialog constructor caused a crash.

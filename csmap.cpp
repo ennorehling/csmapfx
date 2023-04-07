@@ -871,12 +871,6 @@ void CSMap::create()
 
 FXbool CSMap::close(FXbool notify)
 {
-    // Dateien schliessen, Speicher frei geben
-    if (!closeFile()) {
-        return false;
-    }
-    mapChange();
-
     FXRegistry &reg = getApp()->reg();
 
     if (!settings.echeck_dir.empty()) {
@@ -940,8 +934,9 @@ FXbool CSMap::close(FXbool notify)
     reg.writeUnsignedEntry("TABS", "STATSINFOS", siTab->isCollapsed());
     reg.writeUnsignedEntry("TABS", "TRADEINFOS", tiTab->isCollapsed());
 
-    // quit application
-    return FXMainWindow::close(notify);
+    // quit application, quickly
+    exit(0);
+    // return FXMainWindow::close(notify);
 }
 
 void CSMap::mapChange()
