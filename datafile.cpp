@@ -1529,6 +1529,89 @@ static int barHeight2(int people) {
     return log;
 }
 
+void datafile::floodIslandNames()
+{
+    // islands
+    std::list<datablock::itor> floodislands;		// regions whose island names flood the island
+
+    for (datablock::itor block = m_blocks.begin(); block != m_blocks.end(); block++)
+    {
+        if (block->type() != block_type::TYPE_REGION)
+            continue;
+
+        // get regions name
+        if (const datakey* islandkey = block->valueKey(TYPE_ISLAND))
+        {
+            FXString name;
+            FXint islandId = FXIntVal(islandkey->value());
+
+            if (islandId > 0)		// Magellan-style: integer-Island-tags and ISLAND blocks with names
+            {
+                datablock::itor island = this->island(islandId);
+                if (island != m_blocks.end()) {
+                    name = island->value(TYPE_NAME);
+                }
+            }
+            else						// Vorlage-style: string-Island-tags that flood the island
+            {
+                name = islandkey->value();
+
+                floodislands.push_back(block);		// Vorlage-style floods the islands
+            }
+
+            if (!name.empty()) {
+                att_region* stats = static_cast<att_region*>(block->attachment());
+                if (!stats) {
+                    stats = new att_region;
+                    block->attachment(stats);
+                }
+
+                stats->island = name;
+            }
+        }
+    }
+
+    // flood island names. add regions that get a name to list so that they also flood.
+    int offsets[][2] = { {0,1}, {0,-1}, {1,0}, {-1,0}, {1,-1}, {-1,1} };
+
+    for (std::list<datablock::itor>::iterator itor = floodislands.begin(); itor != floodislands.end(); itor++)
+    {
+        FXString name;
+        if (att_region* stats = static_cast<att_region*>((*itor)->attachment()))
+            name = stats->island;
+
+        int x = (*itor)->x(), y = (*itor)->y(), z = (*itor)->info();
+
+        // get neighbours
+        for (int i = 0; i < 6; i++)
+        {
+            int nx = x + offsets[i][0], ny = y + offsets[i][1];
+
+            datablock::itor neighbour = this->region(nx, ny, z);
+            if (neighbour != m_blocks.end())
+            {
+                // only flood to "Festland"
+                if (neighbour->terrain() == data::TERRAIN_OCEAN ||
+                    neighbour->terrain() == data::TERRAIN_MAHLSTROM ||
+                    neighbour->terrain() == data::TERRAIN_FIREWALL)
+                    continue;
+
+                att_region* stats = static_cast<att_region*>(neighbour->attachment());
+                if (!stats) {
+                    stats = new att_region;
+                    neighbour->attachment(stats);
+                }
+
+                if (stats->island.empty()) {
+                    stats->island = name;
+
+                    floodislands.push_back(neighbour);
+                }
+            }
+        }
+    }
+}
+
 void datafile::createIslands()
 {
     m_islands.clear();
@@ -1537,6 +1620,7 @@ void datafile::createIslands()
             m_islands[block->info()] = block;
         }
     }
+    floodIslandNames();
 }
 
 void datafile::createHashTables()
@@ -1841,86 +1925,7 @@ void datafile::createHashTables()
 			}
 		}
 	}
-
-	// islands
-	std::list<datablock::itor> floodislands;		// regions whose island names flood the island
-
-	for (block = m_blocks.begin(); block != m_blocks.end(); block++)
-	{
-        if (block->type() != block_type::TYPE_REGION)
-			continue;
-        
-		// get regions name
-		if (const datakey* islandkey = block->valueKey(TYPE_ISLAND))
-		{
-			FXString name;
-            FXint islandId = FXIntVal(islandkey->value());
-
-			if (islandId > 0)		// Magellan-style: integer-Island-tags and ISLAND blocks with names
-			{
-				datablock::itor island = this->island(islandId);
-                if (island != m_blocks.end()) {
-                    name = island->value(TYPE_NAME);
-                }
-			}
-			else						// Vorlage-style: string-Island-tags that flood the island
-			{
-				name = islandkey->value();
-
-				floodislands.push_back(block);		// Vorlage-style floods the islands
-			}
-
-            if (!name.empty()) {
-                att_region* stats = static_cast<att_region*>(block->attachment());
-                if (!stats) {
-                    stats = new att_region;
-                    block->attachment(stats);
-                }
-
-                stats->island = name;
-            }
-		}
-	}
-
-	// flood island names. add regions that get a name to list so that they also flood.
-	int offsets[][2] = { {0,1}, {0,-1}, {1,0}, {-1,0}, {1,-1}, {-1,1} };
-
-	for (std::list<datablock::itor>::iterator itor = floodislands.begin(); itor != floodislands.end(); itor++)
-	{
-		FXString name;
-		if (att_region* stats = static_cast<att_region*>((*itor)->attachment()))
-			name = stats->island;
-
-		int x = (*itor)->x(), y = (*itor)->y(), z = (*itor)->info();
-
-		// get neighbours
-		for (int i = 0; i < 6; i++)
-		{
-			int nx = x + offsets[i][0], ny = y + offsets[i][1];
-
-			datablock::itor neighbour = this->region(nx, ny, z);
-			if (neighbour != m_blocks.end())
-			{
-				// only flood to "Festland"
-				if (neighbour->terrain() == data::TERRAIN_OCEAN ||
-					neighbour->terrain() == data::TERRAIN_MAHLSTROM ||
-					neighbour->terrain() == data::TERRAIN_FIREWALL)
-					continue;
-
-				att_region* stats = static_cast<att_region*>(neighbour->attachment());
-				if (!stats) {
-					stats = new att_region;
-					neighbour->attachment(stats);
-				}
-
-				if (stats->island.empty()) {
-					stats->island = name;
-				
-					floodislands.push_back(neighbour);
-				}
-			}
-		}
-	}
+    floodIslandNames();
 }
 
 void datafile::SelectionState::transfer(datafile* old_cr, datafile* new_cr, int x_offset, int y_offset)
