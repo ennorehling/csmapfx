@@ -1620,21 +1620,7 @@ void datafile::createHashTables()
 			else if (block->value(TYPE_VISIBILITY) == "travel")
 				region->setFlags(datablock::FLAG_TRAVEL);			// region is seen by traveling throu
 
-			// put newest region into map
-			if (m_regions.find(koordinates(block->x(), block->y(), block->info())) !=
-					m_regions.end())
-			{
-				int region_turn = block->valueInt(TYPE_TURN, m_turn);
-
-				datablock::itor oldregion = m_regions[koordinates(block->x(),block->y(), block->info())];
-
-				int old_region_turn = oldregion->valueInt(TYPE_TURN, m_turn);
-
-				if (region_turn >= old_region_turn)
-					m_regions[koordinates(block->x(), block->y(), block->info())] = block;
-			}
-			else
-				m_regions[koordinates(block->x(), block->y(), block->info())] = block;
+			m_regions[koordinates(block->x(), block->y(), block->info())] = block;
 
 			// get region owner (E3 only)
 			if (m_activefaction != m_blocks.end())
