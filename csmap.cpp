@@ -3151,14 +3151,14 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
     if (!report) return 1;
     if (selection.regionsSelected.empty())
     {
-        if (!(selection.selected & selection.REGION)) {
+        if (!(selection.selected & selection.REGION) || (selection.region->terrain() == data::TERRAIN_OCEAN)) {
             // nothing to do
             return 1;
         }
         selection.regionsSelected.insert(&*selection.region);
     }
 
-    // Inseln ausw\u00e4hlen
+    // select islands
     int visiblePlane = map->getVisiblePlane();
     bool changed;
     do
@@ -3169,15 +3169,16 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
         for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); ++itor)
         {
             datablock* blockPtr = *itor;
+            int terrain = blockPtr->terrain();
             if (blockPtr->info() != visiblePlane)
             {
                 // apply other planes without changes
                 continue;
             }
 
-            if ((blockPtr->terrain() == data::TERRAIN_OCEAN || blockPtr->terrain() == data::TERRAIN_FIREWALL))
+            if (terrain == data::TERRAIN_OCEAN)
             {
-                // ignore non-land regions and firewalls
+                // always ignore ocean
                 continue;
             }
 
@@ -3189,11 +3190,12 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
                 datablock::itor region;
                 if (report->getRegion(region, x + hex_offset[d][0], y + hex_offset[d][1], visiblePlane)) {
                     datablock* regionPtr = &*region;
-                    if (regionPtr->terrain() != data::TERRAIN_OCEAN
-                        && regionPtr->terrain() != data::TERRAIN_FIREWALL) {
-                        if (selection.regionsSelected.find(regionPtr) == selection.regionsSelected.end()) {
-                            selection.regionsSelected.insert(regionPtr);
-                            changed = true;
+                    if (regionPtr->terrain() != data::TERRAIN_OCEAN) {
+                        if ((terrain == data::TERRAIN_FIREWALL) == (regionPtr->terrain() == data::TERRAIN_FIREWALL)) {
+                            if (selection.regionsSelected.find(regionPtr) == selection.regionsSelected.end()) {
+                                selection.regionsSelected.insert(regionPtr);
+                                changed = true;
+                            }
                         }
                     }
                 }
