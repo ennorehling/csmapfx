@@ -1,3 +1,9 @@
+csmapfx (1.6.8-1) stable; urgency=low
+
+  * fix a crash when deleting regions.
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 09 Apr 2023 20:15:00 +0200
+
 csmapfx (1.6.7-1) stable; urgency=low
 
   * "select islands" extends firewall selections.

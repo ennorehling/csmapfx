@@ -1134,26 +1134,36 @@ void datafile::addRegion(const datablock& block)
 
 bool datafile::deleteRegion(datablock* block)
 {
-    Coordinates coor(block->x(), block->y(), block->info());
     datablock::itor first = region(block->x(), block->y(), block->info());
     // found the region. delete all blocks until next region.
     if (first == m_blocks.end()) {
         return false;
     }
-    datablock::itor last = first;
-    for (++last; last != m_blocks.end(); ++last) {
+    datablock::itor last = std::next(first);
+    while (last != m_blocks.end()) {
         // block is in region?
         if (last->depth() <= first->depth()) {
-            m_blocks.erase(first, last);
+            deleteBlocks(first, last);
             return true;
         }
+        ++last;
     }
-    m_blocks.erase(first, m_blocks.end());
-    regions_map::iterator it = m_regions.find(coor);
-    if (it != m_regions.end()) {
-        m_regions.erase(it);
-    }
+    deleteBlocks(first, m_blocks.end());
     return true;
+}
+
+bool datafile::deleteBlocks(datablock::itor& begin, datablock::itor& end)
+{
+    for (datablock::itor block = begin; block != end; ++block) {
+        Coordinates coor(block->x(), block->y(), block->info());
+        regions_map::iterator it = m_regions.find(coor);
+        if (it != m_regions.end()) {
+            m_regions.erase(it);
+        }
+    }
+    datablock::itor next = m_blocks.erase(begin, end);
+    updateHashTables(next);
+    return false;
 }
 
 datablock::itor datafile::group(int id)
@@ -1624,34 +1634,31 @@ void datafile::createIslands()
     floodIslandNames();
 }
 
-void datafile::createHashTables()
+void datafile::updateHashTables(datablock::itor& start)
 {
-	m_activefaction = m_blocks.end();
-    m_factionId = 0;
-	m_recruitment = 0;
-	m_turn = 0;
-
-	datablock* region = NULL;
+    datablock::itor block;
+    datablock* regionPtr = NULL;
     int unconfirmed = 0;
-	int region_own = 0;
-	int region_ally = 0;
-	int region_enemy = 0;
+    int region_own = 0;
+    int region_ally = 0;
+    int region_enemy = 0;
 
-	std::map<int, int> allied_status;	// what factions do we have HELP stati set to?
-	std::set<int> unit_got_taxes;		// units that got taxes (MSG id 1264208711); the regions will get a coins icon
+    m_activefaction = m_blocks.end();
+    m_factionId = 0;
+    m_recruitment = 0;
+    m_turn = 0;
 
-    createHierarchy();
-	datablock::itor block;
+
     datablock::itor insertFaction = m_blocks.end();
-	for (block = m_blocks.begin(); block != m_blocks.end(); block++)
-	{
-		// set turn number to that found in version block
-		if (block->type() == block_type::TYPE_VERSION)
-			m_turn = block->valueInt(TYPE_TURN, m_turn);
+    for (block = m_blocks.begin(); block != m_blocks.end(); block++)
+    {
+        // set turn number to that found in version block
+        if (block->type() == block_type::TYPE_VERSION)
+            m_turn = block->valueInt(TYPE_TURN, m_turn);
 
-		// set faction as active faction (for ally-state)
-		if (block->type() == block_type::TYPE_FACTION)
-		{
+        // set faction as active faction (for ally-state)
+        if (block->type() == block_type::TYPE_FACTION)
+        {
             if (m_factionId == 0) {
                 if (/*block->value(TYPE_TYPE) != "" ||*/ block->value(TYPE_OPTIONS) != "")
                 {
@@ -1666,26 +1673,29 @@ void datafile::createHashTables()
                     break;
                 }
             }
-		}
-	}
+        }
+    }
 
-	// continue to evaluate ALLIANCE blocks for active faction
+    std::map<int, int> allied_status;	// what factions do we have HELP stati set to?
+
+    // continue to evaluate ALLIANCE blocks for active faction
     block = m_activefaction;
     if (block != m_blocks.end())
-	{
-		int factionDepth = m_activefaction->depth();
-		for (block++; block != m_blocks.end() && block->depth() > factionDepth; block++)
-		{
+    {
+        int factionDepth = m_activefaction->depth();
+        for (block++; block != m_blocks.end() && block->depth() > factionDepth; block++)
+        {
             if (block->type() == block_type::TYPE_ALLIANCE) {
                 int status = block->valueInt("Status", 0);
                 allied_status[block->info()] = status;
             }
-		}
+        }
         insertFaction = block;
-	}
+    }
 
-	for (block = m_blocks.begin(); block != m_blocks.end(); block++)
-	{
+    std::set<int> unit_got_taxes;		// units that got taxes (MSG id 1264208711); the regions will get a coins icon
+    for (block = start; block != m_blocks.end(); ++block)
+    {
         // add battle to list
         if (block->type() == block_type::TYPE_BATTLE)
         {
@@ -1693,61 +1703,61 @@ void datafile::createHashTables()
         }
         // add region to region list
         else if (block->type() == block_type::TYPE_REGION)
-		{
-			if (region)
-			{
-				region->setFlags(region_own ? datablock::FLAG_REGION_SEEN : 0);
+        {
+            if (regionPtr)
+            {
+                regionPtr->setFlags(region_own ? datablock::FLAG_REGION_SEEN : 0);
 
                 int own_log = barHeight2(region_own);
                 int ally_log = barHeight2(region_ally);
                 int enemy_log = barHeight2(region_enemy);
-				
+
                 // generate new style flag information. log_2(people) = 1 to 13
-				if (own_log || ally_log || enemy_log || unconfirmed)
-				{
-					att_region* stats = new att_region;
-					region->attachment(stats);
+                if (own_log || ally_log || enemy_log || unconfirmed)
+                {
+                    att_region* stats = new att_region;
+                    regionPtr->attachment(stats);
                     stats->unconfirmed = unconfirmed;
                     stats->people.reserve(enemy_log ? 3 : 2);
-					stats->people.push_back(own_log / 13.0f);
-					stats->people.push_back(ally_log / 13.0f);
-					if (enemy_log)
-						stats->people.push_back(enemy_log / 13.0f);
-				}
-			}
+                    stats->people.push_back(own_log / 13.0f);
+                    stats->people.push_back(ally_log / 13.0f);
+                    if (enemy_log)
+                        stats->people.push_back(enemy_log / 13.0f);
+                }
+            }
 
-			region = &*block;
-			region->flags(region->flags() & (datablock::FLAG_BLOCKID_BIT0|datablock::FLAG_BLOCKID_BIT1));	// unset all flags except BLOCKID flags
-			unconfirmed = region_own = region_ally = region_enemy = 0;
+            regionPtr = &*block;
+            regionPtr->flags(regionPtr->flags() & (datablock::FLAG_BLOCKID_BIT0 | datablock::FLAG_BLOCKID_BIT1));	// unset all flags except BLOCKID flags
+            unconfirmed = region_own = region_ally = region_enemy = 0;
 
-			if (block->value(TYPE_VISIBILITY) == "lighthouse")
-				region->setFlags(datablock::FLAG_LIGHTHOUSE);		// region is seen by lighthouse
-			else if (block->value(TYPE_VISIBILITY) == "travel")
-				region->setFlags(datablock::FLAG_TRAVEL);			// region is seen by traveling throu
+            if (block->value(TYPE_VISIBILITY) == "lighthouse")
+                regionPtr->setFlags(datablock::FLAG_LIGHTHOUSE);		// region is seen by lighthouse
+            else if (block->value(TYPE_VISIBILITY) == "travel")
+                regionPtr->setFlags(datablock::FLAG_TRAVEL);			// region is seen by traveling throu
 
-			m_regions[Coordinates(block->x(), block->y(), block->info())] = block;
+            m_regions[Coordinates(block->x(), block->y(), block->info())] = block;
 
-			// get region owner (E3 only)
-			if (m_activefaction != m_blocks.end())
-			{
-				int ownerId = block->valueInt("owner", -1);
-				if (ownerId == m_factionId)
-					region->setFlags(datablock::FLAG_REGION_OWN);
+            // get region owner (E3 only)
+            if (m_activefaction != m_blocks.end())
+            {
+                int ownerId = block->valueInt("owner", -1);
+                if (ownerId == m_factionId)
+                    regionPtr->setFlags(datablock::FLAG_REGION_OWN);
                 else if (allied_status[ownerId] & HELP_GUARD) {
-                    region->setFlags(datablock::FLAG_REGION_ALLY);
+                    regionPtr->setFlags(datablock::FLAG_REGION_ALLY);
                 }
                 else if (ownerId != -1)
-					region->setFlags(datablock::FLAG_REGION_ENEMY);
-			}
-		}
+                    regionPtr->setFlags(datablock::FLAG_REGION_ENEMY);
+            }
+        }
 
         // add ships and buildings to their lists
         else if (block->type() == block_type::TYPE_SHIP)
-			m_ships[block->info()] = block;
+            m_ships[block->info()] = block;
         else if (block->type() == block_type::TYPE_BUILDING)
-			m_buildings[block->info()] = block;
+            m_buildings[block->info()] = block;
 
-		// generate list of units that got a "got taxes" message (E3 only)
+        // generate list of units that got a "got taxes" message (E3 only)
         else if (block->type() == block_type::TYPE_MESSAGE) {
             if (block->value("type") == "1264208711")
             {
@@ -1762,17 +1772,17 @@ void datafile::createHashTables()
             m_groups[block->info()] = block;
         }
         else if (block->type() == block_type::TYPE_UNIT)
-		{
-			m_units[block->info()] = block;
+        {
+            m_units[block->info()] = block;
 
-			int factionId = block->valueInt(TYPE_FACTION, -1);
+            int factionId = block->valueInt(TYPE_FACTION, -1);
 
             if (!hasFaction(factionId))
-			{
-				datablock faction;
-				faction.string("PARTEI");
-				faction.infostr(FXStringVal(factionId));
-				
+            {
+                datablock faction;
+                faction.string("PARTEI");
+                faction.infostr(FXStringVal(factionId));
+
                 FXString name;
                 if (factionId == 0 || factionId == 666)	// Monster (0) and the new Monster (ii)
                 {
@@ -1781,17 +1791,17 @@ void datafile::createHashTables()
                 else {
                     name.format("Partei %s", FXStringValEx(factionId, 36).text());
                 }
-				datakey key;
-				key.key("Parteiname", block->type());
-				key.value(name);
-				faction.addKey(key);
+                datakey key;
+                key.key("Parteiname", block->type());
+                key.value(name);
+                faction.addKey(key);
                 m_factions[factionId] = m_blocks.insert(insertFaction, faction);
-			}
+            }
 
-			// set attachment for unit of active faction
-			else if (factionId == m_factionId)
-			{
-				datablock::itor cmd;
+            // set attachment for unit of active faction
+            else if (factionId == m_factionId)
+            {
+                datablock::itor cmd;
                 if (getCommands(cmd, block))
                 {
                     // add att_commands to command block
@@ -1800,10 +1810,10 @@ void datafile::createHashTables()
                         cmd->attachment(new att_commands(*cmd));
                     }
                 }
-			}
-		}
+            }
+        }
 
-		// .. and factions to faction list
+        // .. and factions to faction list
         else if (block->type() == block_type::TYPE_FACTION) {
             m_factions[block->info()] = block;
         }
@@ -1813,31 +1823,31 @@ void datafile::createHashTables()
                 m_factions[block->info()] = block;
             }
         }
-		// .. and islands to island list
+        // .. and islands to island list
         else if (block->type() == block_type::TYPE_ISLAND) {
             m_islands[block->info()] = block;
         }
 
-		if (region)
-		{
-			if (block->type() == block_type::TYPE_UNIT)
-			{
+        if (regionPtr)
+        {
+            if (block->type() == block_type::TYPE_UNIT)
+            {
                 const datablock* unitPtr = &*block;
-                region->setFlags(datablock::FLAG_TROOPS);			// region has units
+                regionPtr->setFlags(datablock::FLAG_TROOPS);			// region has units
 
-				// count persons
-				int number = block->valueInt(TYPE_NUMBER, 0);
+                // count persons
+                int number = block->valueInt(TYPE_NUMBER, 0);
 
-				enum class owner_t
-				{
-					UNIT_ENEMY,
-					UNIT_OWN,
-					UNIT_ALLY,
-				} owner = owner_t::UNIT_ENEMY;
+                enum class owner_t
+                {
+                    UNIT_ENEMY,
+                    UNIT_OWN,
+                    UNIT_ALLY,
+                } owner = owner_t::UNIT_ENEMY;
 
-				if (m_factionId != 0)
-				{
-					int factionId = getFactionIdForUnit(unitPtr);
+                if (m_factionId != 0)
+                {
+                    int factionId = getFactionIdForUnit(unitPtr);
                     if (factionId > 0)
                     {
                         if (factionId == m_factionId)
@@ -1856,76 +1866,82 @@ void datafile::createHashTables()
                             number = 0;
                         }
                     }
-				}
+                }
                 region_enemy += number;
 
-				if (block->valueInt("bewacht") == 1)
-				{
-					if (owner == owner_t::UNIT_OWN)
-						region->setFlags(datablock::FLAG_GUARD_OWN);
-					else if (owner == owner_t::UNIT_ALLY)
-						region->setFlags(datablock::FLAG_GUARD_ALLY);
-					else
-						region->setFlags(datablock::FLAG_GUARD_ENEMY);
-				}
+                if (block->valueInt("bewacht") == 1)
+                {
+                    if (owner == owner_t::UNIT_OWN)
+                        regionPtr->setFlags(datablock::FLAG_GUARD_OWN);
+                    else if (owner == owner_t::UNIT_ALLY)
+                        regionPtr->setFlags(datablock::FLAG_GUARD_ALLY);
+                    else
+                        regionPtr->setFlags(datablock::FLAG_GUARD_ENEMY);
+                }
 
-				if (unit_got_taxes.find( block->info() ) != unit_got_taxes.end())
-					region->setFlags(datablock::FLAG_REGION_TAXES);
+                if (unit_got_taxes.find(block->info()) != unit_got_taxes.end())
+                    regionPtr->setFlags(datablock::FLAG_REGION_TAXES);
 
-				if (block->value(TYPE_FACTION) == "0")
-					region->setFlags(datablock::FLAG_MONSTER);		// Monster (0) in region
-				if (block->value(TYPE_FACTION) == "666")
-					region->setFlags(datablock::FLAG_MONSTER);		// Monster (ii) in region
-				if (block->valueInt(TYPE_FACTION) == 0 || block->valueInt(TYPE_FACTION) == 666
-					|| block->value(TYPE_FACTION).empty())
-				{
-					if (block->value(TYPE_TYPE) == "Skelette" ||
-							block->value(TYPE_TYPE) == "Skelettherren" ||
-							block->value(TYPE_TYPE) == "Zombies" ||
-							block->value(TYPE_TYPE) == "Juju-Zombies" ||
-							block->value(TYPE_TYPE) == "Ghoule" ||
-							block->value(TYPE_TYPE) == "Ghaste" ||
-							block->value(TYPE_TYPE) == "Ents" ||
-							block->value(TYPE_TYPE) == "Bauern" ||
-							block->value(TYPE_TYPE) == FXString(L"Hirnt\u00f6ter"))
-						region->setFlags(datablock::FLAG_MONSTER);		// monsters in the region
-					else if (block->value(TYPE_TYPE) == "Seeschlangen")
-						region->setFlags(datablock::FLAG_SEASNAKE);		// sea snake in region
-					else if (block->value(TYPE_TYPE) == "Jungdrachen" ||
-							block->value(TYPE_TYPE) == "Drachen" ||
-							block->value(TYPE_TYPE) == "Wyrme")
-						region->setFlags(datablock::FLAG_DRAGON);		// a dragon is in the region!
-				}
-			}
-			else if (block->type() == block_type::TYPE_DURCHSCHIFFUNG)
-				region->setFlags(datablock::FLAG_SHIPTRAVEL);		// region has travelled by ship
-			else if (block->type() == block_type::TYPE_BUILDING)
-			{
-				region->setFlags(datablock::FLAG_CASTLE);			// region has a building
-				
-				if (block->value(TYPE_TYPE) == "Wurmloch")
-					region->setFlags(datablock::FLAG_WORMHOLE);		// a wormhole is in the region!
-			}
-			else if (block->type() == block_type::TYPE_SHIP)
-				region->setFlags(datablock::FLAG_SHIP);				// region has ships inside
-			else if (block->type() == block_type::TYPE_BORDER)
-			{
-				const FXString& type = block->value("typ");
+                if (block->value(TYPE_FACTION) == "0")
+                    regionPtr->setFlags(datablock::FLAG_MONSTER);		// Monster (0) in region
+                if (block->value(TYPE_FACTION) == "666")
+                    regionPtr->setFlags(datablock::FLAG_MONSTER);		// Monster (ii) in region
+                if (block->valueInt(TYPE_FACTION) == 0 || block->valueInt(TYPE_FACTION) == 666
+                    || block->value(TYPE_FACTION).empty())
+                {
+                    if (block->value(TYPE_TYPE) == "Skelette" ||
+                        block->value(TYPE_TYPE) == "Skelettherren" ||
+                        block->value(TYPE_TYPE) == "Zombies" ||
+                        block->value(TYPE_TYPE) == "Juju-Zombies" ||
+                        block->value(TYPE_TYPE) == "Ghoule" ||
+                        block->value(TYPE_TYPE) == "Ghaste" ||
+                        block->value(TYPE_TYPE) == "Ents" ||
+                        block->value(TYPE_TYPE) == "Bauern" ||
+                        block->value(TYPE_TYPE) == FXString(L"Hirnt\u00f6ter"))
+                        regionPtr->setFlags(datablock::FLAG_MONSTER);		// monsters in the region
+                    else if (block->value(TYPE_TYPE) == "Seeschlangen")
+                        regionPtr->setFlags(datablock::FLAG_SEASNAKE);		// sea snake in region
+                    else if (block->value(TYPE_TYPE) == "Jungdrachen" ||
+                        block->value(TYPE_TYPE) == "Drachen" ||
+                        block->value(TYPE_TYPE) == "Wyrme")
+                        regionPtr->setFlags(datablock::FLAG_DRAGON);		// a dragon is in the region!
+                }
+            }
+            else if (block->type() == block_type::TYPE_DURCHSCHIFFUNG)
+                regionPtr->setFlags(datablock::FLAG_SHIPTRAVEL);		// region has travelled by ship
+            else if (block->type() == block_type::TYPE_BUILDING)
+            {
+                regionPtr->setFlags(datablock::FLAG_CASTLE);			// region has a building
 
-				if (type == "Strasse" || type == "Stra\u00dfe" || type == FXString(L"Stra\u00dfe"))	// TO FIX!
-				{												// region has street in some direction
-					int direction = block->valueInt("richtung");
-					if (direction >= 0 && direction <= 5)
-					{
-						if (block->valueInt("prozent") == 100)			// region has a complete street
-							region->setFlags(datablock::FLAG_STREET << direction);
-						else											// region has incomplete street
-							region->setFlags(datablock::FLAG_STREET_UNDONE << direction);
-					}
-				}
-			}
-		}
-	}
+                if (block->value(TYPE_TYPE) == "Wurmloch")
+                    regionPtr->setFlags(datablock::FLAG_WORMHOLE);		// a wormhole is in the region!
+            }
+            else if (block->type() == block_type::TYPE_SHIP)
+                regionPtr->setFlags(datablock::FLAG_SHIP);				// region has ships inside
+            else if (block->type() == block_type::TYPE_BORDER)
+            {
+                const FXString& type = block->value("typ");
+
+                if (type == "Strasse" || type == "Stra\u00dfe" || type == FXString(L"Stra\u00dfe"))	// TO FIX!
+                {												// region has street in some direction
+                    int direction = block->valueInt("richtung");
+                    if (direction >= 0 && direction <= 5)
+                    {
+                        if (block->valueInt("prozent") == 100)			// region has a complete street
+                            regionPtr->setFlags(datablock::FLAG_STREET << direction);
+                        else											// region has incomplete street
+                            regionPtr->setFlags(datablock::FLAG_STREET_UNDONE << direction);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void datafile::createHashTables()
+{
+    createHierarchy();
+    updateHashTables(m_blocks.begin());
     floodIslandNames();
 }
 
