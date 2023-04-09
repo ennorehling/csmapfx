@@ -753,15 +753,15 @@ int datafile::loadCmds(const FXString& filename)
                 int z = strtol(zstr.text(), nullptr, 10);
 
                 // add to order list if not already in it
-                if (m_cmds.region_lines.find(koordinates(x, y, z)) == m_cmds.region_lines.end())
+                if (m_cmds.region_lines.find(Coordinates(x, y, z)) == m_cmds.region_lines.end())
                 {
-                    m_cmds.region_order.push_back(std::make_pair(koordinates(x, y, z), std::vector<int>()));
+                    m_cmds.region_order.push_back(std::make_pair(Coordinates(x, y, z), std::vector<int>()));
                     unit_order = &m_cmds.region_order.back().second;
                 }
                 else
                     unit_order = NULL;
 
-                cmds_list = &m_cmds.region_lines[koordinates(x, y, z)];
+                cmds_list = &m_cmds.region_lines[Coordinates(x, y, z)];
             }
             else if (cmd == "EINHEIT")
             {
@@ -909,7 +909,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 			// add region to list when first unit of active faction occurs
 			if (region != m_blocks.end())
 			{
-				koordinates koord(region->x(), region->y(), region->info());
+				Coordinates koord(region->x(), region->y(), region->info());
 
 				if (m_cmds.region_lines.find(koord) == m_cmds.region_lines.end())
 				{
@@ -1075,8 +1075,8 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 // -----------------
 datablock::itor datafile::region(int x, int y, int plane)
 { 
-	std::map<koordinates, datablock::itor>::iterator region;
-	region = m_regions.find(koordinates(x, y, plane));
+	std::map<Coordinates, datablock::itor>::iterator region;
+	region = m_regions.find(Coordinates(x, y, plane));
 
 	if (region == m_regions.end())
 		return m_blocks.end();
@@ -1086,8 +1086,8 @@ datablock::itor datafile::region(int x, int y, int plane)
 
 datablock::itor datafile::battle(int x, int y, int plane)
 { 
-	std::map<koordinates, datablock::itor>::iterator block;
-    block = m_battles.find(koordinates(x, y, plane));
+	std::map<Coordinates, datablock::itor>::iterator block;
+    block = m_battles.find(Coordinates(x, y, plane));
 
 	if (block == m_battles.end())
 		return m_blocks.end();
@@ -1113,28 +1113,28 @@ bool datafile::getBattle(datablock::itor &out, int x, int y, int plane)
 
 bool datafile::hasBattle(int x, int y, int plane) const
 {
-    std::map<koordinates, datablock::itor>::const_iterator block;
-    block  = m_battles.find(koordinates(x, y, plane));
+    std::map<Coordinates, datablock::itor>::const_iterator block;
+    block  = m_battles.find(Coordinates(x, y, plane));
     return (block != m_battles.end());
 }
 
 bool datafile::hasRegion(int x, int y, int plane) const
 {
-    std::map<koordinates, datablock::itor>::const_iterator region;
-    region = m_regions.find(koordinates(x, y, plane));
+    std::map<Coordinates, datablock::itor>::const_iterator region;
+    region = m_regions.find(Coordinates(x, y, plane));
     return (region != m_regions.end());
 }
 
 void datafile::addRegion(const datablock& block)
 {
-    koordinates coor(block.x(), block.y(), block.info());
+    Coordinates coor(block.x(), block.y(), block.info());
     datablock::itor back = m_blocks.insert(m_blocks.end(), block);
     m_regions.insert(std::make_pair(coor, back));
 }
 
 bool datafile::deleteRegion(datablock* block)
 {
-    koordinates coor(block->x(), block->y(), block->info());
+    Coordinates coor(block->x(), block->y(), block->info());
     datablock::itor first = region(block->x(), block->y(), block->info());
     // found the region. delete all blocks until next region.
     if (first == m_blocks.end()) {
@@ -1688,7 +1688,7 @@ void datafile::createHashTables()
         // add battle to list
         if (block->type() == block_type::TYPE_BATTLE)
         {
-            m_battles[koordinates(block->x(), block->y(), block->info())] = block;
+            m_battles[Coordinates(block->x(), block->y(), block->info())] = block;
         }
         // add region to region list
         else if (block->type() == block_type::TYPE_REGION)
@@ -1724,7 +1724,7 @@ void datafile::createHashTables()
 			else if (block->value(TYPE_VISIBILITY) == "travel")
 				region->setFlags(datablock::FLAG_TRAVEL);			// region is seen by traveling throu
 
-			m_regions[koordinates(block->x(), block->y(), block->info())] = block;
+			m_regions[Coordinates(block->x(), block->y(), block->info())] = block;
 
 			// get region owner (E3 only)
 			if (m_activefaction != m_blocks.end())

@@ -157,16 +157,16 @@ protected:
     datablock::itor region(int x, int y, int plane);
     datablock::itor battle(int x, int y, int plane);
 
-	struct koordinates
+	struct Coordinates
 	{
-		koordinates(int x_, int y_, int z_) : x(x_), y(y_), z(z_) {}
+		Coordinates(int x_, int y_, int z_) : x(x_), y(y_), z(z_) {}
 
-		bool operator==(const koordinates& rhs) const
+		bool operator==(const Coordinates& rhs) const
 		{
             return x == rhs.x && y == rhs.y && z == rhs.z;
 		}
 
-		bool operator<(const koordinates& rhs) const
+		bool operator<(const Coordinates& rhs) const
 		{
 			if (x < rhs.x) return true;
 			if (x == rhs.x)
@@ -191,8 +191,8 @@ protected:
 		std::vector<FXString> prefix_lines;
 
 		// command lines in REGIONs
-		typedef std::map<koordinates, att_commands> region_map_t;
-		typedef std::list< std::pair<koordinates, std::vector<int> > > region_list_t;
+		typedef std::map<Coordinates, att_commands> region_map_t;
+		typedef std::list< std::pair<Coordinates, std::vector<int> > > region_list_t;
 
 		region_map_t region_lines;
 		region_list_t region_order;		// keeps the correct order of regions and units in it
@@ -213,9 +213,9 @@ protected:
 
 	// hash tables
 	std::map<int, datablock::itor> m_units, m_factions, m_buildings, m_ships, m_islands, m_groups;
-    typedef std::map<koordinates, datablock::itor> regions_map;
+    typedef std::map<Coordinates, datablock::itor> regions_map;
     regions_map m_regions;
-	std::map<koordinates, datablock::itor> m_battles;
+	std::map<Coordinates, datablock::itor> m_battles;
 };
 
 #endif //_CSMAP_DATAFILE
