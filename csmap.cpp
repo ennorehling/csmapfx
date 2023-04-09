@@ -403,14 +403,14 @@ CSMap::CSMap(FXApp *app) :
     // View menu
     viewmenu = new FXMenuPane(this);
     new FXMenuTitle(menubar,"&Ansicht",nullptr,viewmenu);
-    menu.toolbar = new FXMenuCheck(viewmenu,"Tool&bar\tCtrl-T\tToolbar ein- bzw. ausblenden.", toolbar,ID_TOGGLESHOWN);
+    menu.toolbar = new FXMenuCheck(viewmenu,"Tool&bar\t\tToolbar ein- bzw. ausblenden.", toolbar,ID_TOGGLESHOWN);
     menu.maponly = new FXMenuCheck(viewmenu,"&Nur Karte anzeigen\tCtrl-Shift-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this,ID_VIEW_MAPONLY,0);
     menu.messages = new FXMenuCheck(viewmenu,"&Meldungen\tCtrl-Shift-V\tRegionsmeldungen ein- bzw. ausblenden.", this, ID_VIEW_MESSAGES);
     menu.show_left = new FXMenuCheck(viewmenu,"&Regionsliste\tCtrl-Shift-R\tRegionsliste ein- bzw. ausblenden.", this, ID_VIEW_REGIONLIST);
     menu.show_right = new FXMenuCheck(viewmenu,"&Eigenschaften\tCtrl-Shift-E\tEinheiten- und Regionsdetails ein- bzw. ausblenden.", this, ID_VIEW_PROPERTIES);
     menu.calc = new FXMenuCheck(viewmenu,"&Taschenrechner\tCtrl-Shift-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
-    menu.minimap = new FXMenuCheck(viewmenu,FXString(L"\u00dcbersichts&karte\tF2\t\u00dcbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
-    menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tF1\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
+    menu.minimap = new FXMenuCheck(viewmenu,FXString(L"\u00dcbersichts&karte\tCtrl-Shift-M\t\u00dcbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
+    menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tCtrl-Shift-I\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
     new FXMenuSeparatorEx(viewmenu, "Liste");
     menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tCtrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
     menu.colorizeUnits = new FXMenuCheck(viewmenu, "Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
@@ -653,7 +653,6 @@ CSMap::CSMap(FXApp *app) :
     new FXButton(cmdOptFrame,
         "+&temp\tNeue Temp-Einheit\tTemp-Einheit erstellen", nullptr,
         commands, FXCommands::ID_UNIT_ADD, BUTTON_TOOLBAR);
-    btn->addHotKey(FXHotKey(MKUINT(KEY_t, CONTROLMASK)));
 
     FXTextField* rowcol = new FXTextField(cmdOptFrame, 5, commands,FXCommands::ID_ROWCOL, TEXTFIELD_READONLY|JUSTIFY_RIGHT|LAYOUT_FILL_X|LAYOUT_RIGHT);
     rowcol->disable();
@@ -663,7 +662,7 @@ CSMap::CSMap(FXApp *app) :
     // minimap
     minimap_frame = new FXDialogBox(this, FXString(L"\u00dcbersichtskarte"), DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100,100, 640,480, 0,0,0,0);
     minimap_frame->setIcon(icon);
-    minimap_frame->getAccelTable()->addAccel(MKUINT(KEY_N,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_MINIMAP));
+    minimap_frame->getAccelTable()->addAccel(MKUINT(KEY_M, CONTROLMASK | SHIFTMASK), this, FXSEL(SEL_COMMAND, ID_VIEW_MINIMAP));
 
     FXStatusBar *minimap_bar = new FXStatusBar(minimap_frame,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
     minimap_bar->getStatusLine()->setFrameStyle(FRAME_LINE);
@@ -678,7 +677,7 @@ CSMap::CSMap(FXApp *app) :
 
     // info dialog
     infodlg = new FXInfoDlg(this, "Informationen", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));
-    infodlg->getAccelTable()->addAccel(MKUINT(KEY_B,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_INFODLG));
+    infodlg->getAccelTable()->addAccel(MKUINT(KEY_I, CONTROLMASK|SHIFTMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_INFODLG));
 
     // search dialog
     searchdlg = new FXSearchDlg(this, this, ID_SELECTION, searchResults, "Suchen...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));
@@ -1599,10 +1598,12 @@ long CSMap::updViewLeftFrame(FXObject* sender, FXSelector, void*)
 
 long CSMap::onViewMiniMap(FXObject*, FXSelector, void*)
 {
-    if (minimap_frame->shown())
+    if (minimap_frame->shown()) {
         minimap_frame->hide();
-    else
+    }
+    else {
         minimap_frame->show(PLACEMENT_OWNER);
+    }
 
     return 1;
 }

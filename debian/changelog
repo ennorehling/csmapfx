@@ -1,9 +1,16 @@
+csmapfx (1.6.5-1) stable; urgency=low
+
+  * speed up createHashTables, call it less often.
+  * new hotkeys to open and close info dialog and minimap.
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 09 Apr 2023 15:00:00 +0200
+
 csmapfx (1.6.4-1) stable; urgency=low
 
-  * quick exit, don't call datafile.close()
+  * quick exit, don't call datafile.close().
   * fix crash when reloading infodlg data.
 
- -- Enno Rehling <enno@eressea.de>  Mon, 07 Apr 2023 19:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Fri, 07 Apr 2023 19:00:00 +0200
 
 csmapfx (1.6.3-1) stable; urgency=low
 
@@ -19,7 +26,7 @@ csmapfx (1.6.2-2) stable; urgency=low
 
 csmapfx (1.6.2-1) stable; urgency=low
 
-  * make "select island" work on cursor if nothing selected
+  * make "select island" work on cursor if nothing selected.
   * set info dialog focus to search field on opening.
   * current selection in messagte lists didn't stick.
   * double-click on messages does not always reset the list.

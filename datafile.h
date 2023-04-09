@@ -140,6 +140,7 @@ public:
     void createHashTables();
 
 protected:
+    void floodIslandNames();
     void createHierarchy();
     
     static void openFile(const char* filename, std::ifstream& stream, std::ios::openmode mode = std::ios::in);
