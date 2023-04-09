@@ -878,8 +878,6 @@ long FXCSMap::onLeftButtonRelease(FXObject* /*sender*/, FXSelector /*sel*/, void
 		if (modus >= MODUS_SETTERRAIN && modus < MODUS_SETTERRAIN+ data::TERRAIN_LAST)
 		{
             if (mapFile) {
-                mapFile->rebuildRegions();
-
                 selection.selected &= ~(selection.REGION | selection.UNKNOWN_REGION);
                 ++selection.fileChange;
                 getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
@@ -1173,7 +1171,7 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 
                     // islands changed, rebuild:
                     if (mapFile) {
-                        mapFile->rebuildIslands();
+                        mapFile->createIslands();
 
                         ++selection.fileChange;
                         getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
@@ -1205,7 +1203,7 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
                         }
 
 						// islands changed, rebuild:
-                        mapFile->rebuildIslands();
+                        mapFile->createIslands();
 
                         ++selection.fileChange;
                         getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
@@ -1294,7 +1292,6 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 		{
 			// delete region
             if (mapFile->deleteRegion(&*iregion)) {
-                mapFile->rebuildRegions();
 
                 if (selection.selected & selection.REGION)
 				{
@@ -1326,16 +1323,13 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 		region.string("REGION");
 		region.infostr(FXStringFormat("%d %d %d", x, y, plane));
 		region.terrain(new_terrain);
-
-        mapFile->blocks().push_back(region);
+		mapFile->addRegion(region);
 	}
 
 	// map changed
 	if (!(flags&FLAG_PRESSED) || modus < MODUS_SETTERRAIN || modus >= MODUS_SETTERRAIN+ data::TERRAIN_LAST)
 	{
         if (mapFile) {
-            mapFile->rebuildRegions();			// don't do this in painting mode
-
             selection.selected &= ~(selection.REGION | selection.UNKNOWN_REGION);
             ++selection.fileChange;
             getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);

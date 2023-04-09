@@ -218,7 +218,6 @@ bool datafile::load(const FXString& filename, FXString & outError)
         return false;
     }
 
-    createHashTables();
 	return m_blocks.size();
 }
 
@@ -621,7 +620,6 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
         }
         ++old_r;
     }
-    createHashTables();
 }
 
 const char* datafile::getConfigurationName(map_type type)
@@ -1127,8 +1125,16 @@ bool datafile::hasRegion(int x, int y, int plane) const
     return (region != m_regions.end());
 }
 
+void datafile::addRegion(const datablock& block)
+{
+    koordinates coor(block.x(), block.y(), block.info());
+    datablock::itor back = m_blocks.insert(m_blocks.end(), block);
+    m_regions.insert(std::make_pair(coor, back));
+}
+
 bool datafile::deleteRegion(datablock* block)
 {
+    koordinates coor(block->x(), block->y(), block->info());
     datablock::itor first = region(block->x(), block->y(), block->info());
     // found the region. delete all blocks until next region.
     if (first == m_blocks.end()) {
@@ -1143,6 +1149,10 @@ bool datafile::deleteRegion(datablock* block)
         }
     }
     m_blocks.erase(first, m_blocks.end());
+    regions_map::iterator it = m_regions.find(coor);
+    if (it != m_regions.end()) {
+        m_regions.erase(it);
+    }
     return true;
 }
 
@@ -1517,6 +1527,16 @@ void datafile::createHierarchy()
 static int barHeight2(int people) {
     int log = static_cast<int>(log2(people * 4 + 1));
     return log;
+}
+
+void datafile::createIslands()
+{
+    m_islands.clear();
+    for(datablock::itor block = m_blocks.begin(); block != m_blocks.end(); ++block) {
+        if (block->type() == block_type::TYPE_ISLAND) {
+            m_islands[block->info()] = block;
+        }
+    }
 }
 
 void datafile::createHashTables()

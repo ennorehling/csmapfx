@@ -78,6 +78,7 @@ public:
 	bool getRegion(datablock::itor &out, int x, int y, int plane);
     bool hasRegion(int x, int y, int plane) const;
     bool deleteRegion(datablock* region);
+    void addRegion(const datablock& region);
     FXString regionName(const datablock& block);
     FXString regionCoordinates(const datablock& block);
     FXString unitName(const datablock& block, bool verbose = false);
@@ -135,11 +136,10 @@ public:
         }
 	};
 
-    void rebuildIslands() { createHashTables(); }
-    void rebuildRegions() { createHashTables(); }
+    void createIslands();
+    void createHashTables();
 
 protected:
-    void createHashTables();
     void createHierarchy();
     
     static void openFile(const char* filename, std::ifstream& stream, std::ios::openmode mode = std::ios::in);
