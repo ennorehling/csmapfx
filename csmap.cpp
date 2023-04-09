@@ -2351,6 +2351,9 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames)
                 mergeFile(filename); // updates report in case of success
             }
         }
+        if (report) {
+            report->createHashTables();
+        }
         ++selection.fileChange;
         mapChange();
         checkCommands();
@@ -2453,7 +2456,8 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
             FXString filename = dlg.getFilename();
             beginLoading(filename);
             report.reset(loadFile(filename));
-            if (report.get()) {
+            if (report) {
+                report->createHashTables();
                 recentFiles.appendFile(filename);
             }
             mapChange();
@@ -2987,6 +2991,9 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
     if (loadReport) {
         if (closeFile()) {
             report.reset(loadFile(filename));
+            if (report) {
+                report->createHashTables();
+            }
             mapChange();
             updateFileNames();
             if (report.get()) {
@@ -3298,8 +3305,6 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
         // delete this region
         report->deleteRegion(region);
     }
-
-    report->rebuildRegions();
 
     // Markierung auch loeschen
     selection.regionsSelected.clear();
