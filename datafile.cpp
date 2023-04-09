@@ -883,8 +883,8 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 	// output prefix lines
 	if (!stripped && !m_cmds.prefix_lines.empty())
 	{
-		for (std::vector<FXString>::iterator itor = m_cmds.prefix_lines.begin(); itor != m_cmds.prefix_lines.end(); itor++)
-			out << (*itor).text() << "\n";
+		for (const FXString& line : m_cmds.prefix_lines)
+			out << line.text() << "\n";
 	}
 	else
 	{
@@ -975,17 +975,17 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 		out << cmds->header.text() << "\n";
 
 		// output prefix lines
-		for (att_commands::cmdlist_t::iterator itor = cmds->prefix_lines.begin(); itor != cmds->prefix_lines.end(); itor++)
-			out << (*itor).text() << "\n";
+		for (const FXString& itor : cmds->prefix_lines)
+			out << itor.text() << "\n";
 
 		// output changed commands
-		for (att_commands::cmdlist_t::iterator itor = cmds->commands.begin(); itor != cmds->commands.end(); itor++)
-			out << "    " << (*itor).text() << "\n";
+        for (const FXString& itor : cmds->commands)
+			out << "    " << itor.text() << "\n";
 
 		// output postfix lines
         out << "\n";
-        for (att_commands::cmdlist_t::iterator itor = cmds->postfix_lines.begin(); itor != cmds->postfix_lines.end(); itor++)
-			out << (*itor).text() << "\n";
+        for (const FXString& itor : cmds->postfix_lines)
+			out << itor.text() << "\n";
 
 		// output units in order
 		std::vector<int>& order = regord->second;
@@ -1042,27 +1042,27 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 					out << "; bestaetigt\n";
 
 				// output prefix lines
-				for (att_commands::cmdlist_t::iterator itor = attcmds->prefix_lines.begin(); itor != attcmds->prefix_lines.end(); itor++)
-					out << (*itor).text() << "\n";
+				for (const FXString& itor : attcmds->prefix_lines)
+					out << itor.text() << "\n";
 
 				// output changed commands
 				{
-					for (att_commands::cmdlist_t::iterator itor = attcmds->commands.begin(); itor != attcmds->commands.end(); itor++)
-						out << "    " << (*itor).text() << "\n";
+					for (const FXString& itor : attcmds->commands)
+						out << "    " << itor.text() << "\n";
 				}
 
                 out << "\n";
                 // output postfix lines
-				for (att_commands::cmdlist_t::iterator itor = attcmds->postfix_lines.begin(); itor != attcmds->postfix_lines.end(); itor++)
-					out << (*itor).text() << "\n";
+				for (const FXString& itor : attcmds->postfix_lines)
+					out << itor.text() << "\n";
 			}		
 			else
 			{
 				// output default commands
 				const datakey::list_type &list = cmdb->data();
 
-				for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); ++itor)
-					out << "    " << itor->value() << "\n";
+				for (const datakey &itor : list)
+					out << "    " << itor.value() << "\n";
 			}
 		}
 	}
@@ -1532,10 +1532,11 @@ static int barHeight2(int people) {
 void datafile::floodIslandNames()
 {
     // islands
-    std::list<datablock::itor> floodislands;		// regions whose island names flood the island
+    std::list<datablock *> floodislands;		// regions whose island names flood the island
 
-    for (datablock::itor block = m_blocks.begin(); block != m_blocks.end(); block++)
+    for (auto& it : m_regions)
     {
+        datablock * block = &*it.second;
         if (block->type() != block_type::TYPE_REGION)
             continue;
 
@@ -1574,13 +1575,13 @@ void datafile::floodIslandNames()
     // flood island names. add regions that get a name to list so that they also flood.
     int offsets[][2] = { {0,1}, {0,-1}, {1,0}, {-1,0}, {1,-1}, {-1,1} };
 
-    for (std::list<datablock::itor>::iterator itor = floodislands.begin(); itor != floodislands.end(); itor++)
+    for (datablock* block : floodislands)
     {
         FXString name;
-        if (att_region* stats = static_cast<att_region*>((*itor)->attachment()))
+        if (att_region* stats = static_cast<att_region*>(block->attachment()))
             name = stats->island;
 
-        int x = (*itor)->x(), y = (*itor)->y(), z = (*itor)->info();
+        int x = block->x(), y = block->y(), z = block->info();
 
         // get neighbours
         for (int i = 0; i < 6; i++)
@@ -1605,7 +1606,7 @@ void datafile::floodIslandNames()
                 if (stats->island.empty()) {
                     stats->island = name;
 
-                    floodislands.push_back(neighbour);
+                    floodislands.push_back(&*neighbour);
                 }
             }
         }

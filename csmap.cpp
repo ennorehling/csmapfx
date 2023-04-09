@@ -447,15 +447,15 @@ CSMap::CSMap(FXApp *app) :
     new FXMenuCommand(regionmenu, "&Ursprung setzen\t\tDen Kartenursprung (0/0) auf die markierte Region setzen.", nullptr, this, ID_MAP_SETORIGIN, 0);
     new FXMenuSeparatorEx(regionmenu, "Regionen");
     new FXMenuCommand(regionmenu,FXString(L"&Alle markieren\tCtrl-Shift-A\tAlle Regionen ausw\u00e4hlen."),nullptr,this,ID_REGION_SELALL);
-    new FXMenuCommand(regionmenu,FXString(L"Alle &Inseln ausw\u00e4hlen\t\tAlle Landregionen ausw\u00e4hlen (Ozean, Feuerwand und Eisberg z\u00e4hlen nicht als Land)."),nullptr,this,ID_REGION_SELALLISLANDS);
+    new FXMenuCommand(regionmenu,FXString(L"Alle &Inseln ausw\u00e4hlen\t\tAlle Landregionen ausw\u00e4hlen (Ozean, Feuerwand und Eisberg z\u00e4hlen nicht als Land)."), nullptr, this, ID_REGION_SELALLISLANDS);
     new FXMenuCommand(regionmenu, FXString(L"&Sichtbare markieren\t\tSichtbare Regionen ausw\u00e4hlen."), nullptr, this, ID_REGION_SELVISIBLE);
-    new FXMenuCommand(regionmenu,FXString(L"&Keine markieren\tEscape\tKeine Region ausw\u00e4hlen."),nullptr,this,ID_REGION_UNSEL);
-    new FXMenuCommand(regionmenu,FXString(L"Auswahl &invertieren\t\tAusgew\u00e4hlte Regionen abw\u00e4hlen und umgekehrt."),nullptr,this,ID_REGION_INVERTSEL);
+    new FXMenuCommand(regionmenu,FXString(L"&Keine markieren\tEscape\tKeine Region ausw\u00e4hlen."), nullptr, this, ID_REGION_UNSEL);
+    new FXMenuCommand(regionmenu,FXString(L"Auswahl &invertieren\tCtrl-Shift-N\tAusgew\u00e4hlte Regionen abw\u00e4hlen und umgekehrt."), nullptr, this, ID_REGION_INVERTSEL);
 
     selectionmenu = new FXMenuPane(this);
     new FXMenuCascade(regionmenu, "&Erweitern", nullptr, selectionmenu);
-    new FXMenuCommand(selectionmenu,"Auswahl &erweitern\tCtrl-F7\tAuswahl mit dem Radius von einer Region erweitern.",nullptr,this,ID_REGION_EXTENDSEL);
-    new FXMenuCommand(selectionmenu,FXString(L"&Inseln ausw\u00e4hlen\tCtrl-F9\tAuswahl auf komplette Inseln erweitern."),nullptr,this,ID_REGION_SELISLANDS);
+    new FXMenuCommand(selectionmenu,"Auswahl &erweitern\tCtrl-F7\tAuswahl mit dem Radius von einer Region erweitern.", nullptr, this, ID_REGION_EXTENDSEL);
+    new FXMenuCommand(selectionmenu,FXString(L"&Inseln ausw\u00e4hlen\tCtrl-F9\tAuswahl auf komplette Inseln erweitern."), nullptr, this, ID_REGION_SELISLANDS);
 
     new FXMenuCommand(regionmenu, L"Markierte &ausw\u00e4hlen\tCtrl-Space\tMarkierte Region ausw\u00e4hlen.", nullptr, this, ID_MAP_SELECTMARKED, 0);
     new FXMenuCommand(regionmenu, FXString(L"Markierte &l\u00f6schen\t\t"), nullptr, this, ID_REGION_REMOVESEL);
@@ -3079,11 +3079,9 @@ long CSMap::onRegionInvertSel(FXObject*, FXSelector, void*)
         if (regionPtr->info() != visiblePlane)
             continue;
 
-        std::set<datablock*>::iterator srch = regionsSelected.find(regionPtr);
-        if (srch == regionsSelected.end())
+        std::set<datablock*>::iterator srch = selection.regionsSelected.find(regionPtr);
+        if (srch == selection.regionsSelected.end())
             regionsSelected.insert(regionPtr);
-        else
-            regionsSelected.erase(srch);
     }
 
     selection.regionsSelected = regionsSelected;

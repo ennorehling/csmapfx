@@ -1,3 +1,9 @@
+csmapfx (1.6.6-1) stable; urgency=low
+
+  * fix "invert selection" command
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 09 Apr 2023 16:40:00 +0200
+
 csmapfx (1.6.5-1) stable; urgency=low
 
   * speed up createHashTables, call it less often.
