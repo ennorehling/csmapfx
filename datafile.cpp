@@ -1134,12 +1134,11 @@ void datafile::addRegion(const datablock& block)
 
 bool datafile::deleteRegion(datablock* block)
 {
-    datablock::itor first = region(block->x(), block->y(), block->info());
-    if (first == m_blocks.end()) {
+    datablock::itor first;
+    if (!getRegion(first, block->x(), block->y(), block->info())) {
         return false;
     }
-    datablock::itor next = eraseRegion(first);
-    updateHashTables(next);
+    eraseRegion(first);
     return true;
 }
 
@@ -1154,9 +1153,15 @@ void datafile::deleteRegions(std::set<datablock*>& regions)
         if (!region)
             continue;
 
+        datablock::itor match;
+        if (!getRegion(match, 0, 0, 0)) {
+            region = region;
+        }
+
         // delete this region
         deleteRegion(region);
     }
+    createHashTables();
 }
 
 datablock::itor datafile::group(int id)
@@ -1644,10 +1649,12 @@ datablock::itor datafile::eraseRegion(const datablock::itor& first)
 datablock::itor datafile::eraseBlocks(const datablock::itor& begin, const datablock::itor& end)
 {
     for (datablock::itor block = begin; block != end; ++block) {
-        Coordinates coor(block->x(), block->y(), block->info());
-        regions_map::iterator it = m_regions.find(coor);
-        if (it != m_regions.end()) {
-            m_regions.erase(it);
+        if (block->type() == block_type::TYPE_REGION) {
+            Coordinates coor(block->x(), block->y(), block->info());
+            regions_map::iterator it = m_regions.find(coor);
+            if (it != m_regions.end()) {
+                m_regions.erase(it);
+            }
         }
     }
     return m_blocks.erase(begin, end);
