@@ -3289,6 +3289,7 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
     if (res != MBOX_CLICKED_YES)
         return 1;
 
+    getApp()->beginWaitCursor();
     std::set<datablock*>::iterator itor;
     for (itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
     {
@@ -3311,6 +3312,7 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
     selection.regionsSelected.clear();
 
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
+    getApp()->endWaitCursor();
     return 1;
 }
 
