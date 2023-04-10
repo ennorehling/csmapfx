@@ -3310,9 +3310,9 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
 
     // Markierung auch loeschen
     selection.regionsSelected.clear();
-
-    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     getApp()->endWaitCursor();
+    ++selection.fileChange;
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
 
