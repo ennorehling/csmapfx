@@ -1152,20 +1152,6 @@ bool datafile::deleteRegion(datablock* block)
     return true;
 }
 
-bool datafile::deleteBlocks(datablock::itor& begin, datablock::itor& end)
-{
-    for (datablock::itor block = begin; block != end; ++block) {
-        Coordinates coor(block->x(), block->y(), block->info());
-        regions_map::iterator it = m_regions.find(coor);
-        if (it != m_regions.end()) {
-            m_regions.erase(it);
-        }
-    }
-    datablock::itor next = m_blocks.erase(begin, end);
-    updateHashTables(next);
-    return false;
-}
-
 datablock::itor datafile::group(int id)
 { 
 	std::map<int, datablock::itor>::iterator unit = m_groups.find(id);
@@ -1634,7 +1620,21 @@ void datafile::createIslands()
     floodIslandNames();
 }
 
-void datafile::updateHashTables(datablock::itor& start)
+bool datafile::deleteBlocks(const datablock::itor& begin, const datablock::itor& end)
+{
+    for (datablock::itor block = begin; block != end; ++block) {
+        Coordinates coor(block->x(), block->y(), block->info());
+        regions_map::iterator it = m_regions.find(coor);
+        if (it != m_regions.end()) {
+            m_regions.erase(it);
+        }
+    }
+    datablock::itor next = m_blocks.erase(begin, end);
+    updateHashTables(next);
+    return false;
+}
+
+void datafile::updateHashTables(const datablock::itor& start)
 {
     datablock::itor block;
     datablock* regionPtr = NULL;
