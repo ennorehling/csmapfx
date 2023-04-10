@@ -5,7 +5,7 @@ csmapfx (1.6.9-1) stable; urgency=low
   * update map display size when all regions are deleted.
   * improve performance of bulk delete.
 
- -- Enno Rehling <enno@eressea.de>  Mon, 09 Apr 2023 18:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Mon, 10 Apr 2023 15:00:00 +0200
 
 csmapfx (1.6.8-1) stable; urgency=low
 
