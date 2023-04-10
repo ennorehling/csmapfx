@@ -2,6 +2,7 @@ csmapfx (1.6.9-1) stable; urgency=low
 
   * show hourglass cursor during bulk delete operation.
   * update minimap after bulk delete.
+  * update map display size when all regions are deleted.
 
  -- Enno Rehling <enno@eressea.de>  Mon, 09 Apr 2023 18:00:00 +0200
 

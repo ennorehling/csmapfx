@@ -78,6 +78,7 @@ public:
 	bool getRegion(datablock::itor &out, int x, int y, int plane);
     bool hasRegion(int x, int y, int plane) const;
     bool deleteRegion(datablock* region);
+    void deleteRegions(std::set<datablock*>& regions);
     void addRegion(const datablock& region);
     FXString regionName(const datablock& block);
     FXString regionCoordinates(const datablock& block);
@@ -140,7 +141,8 @@ public:
     void createHashTables();
 
 protected:
-    bool deleteBlocks(const datablock::itor& begin, const datablock::itor& end);
+    datablock::itor eraseRegion(const datablock::itor& region);
+    datablock::itor eraseBlocks(const datablock::itor& begin, const datablock::itor& end);
     void updateHashTables(const datablock::itor& start);
     void floodIslandNames();
     void createHierarchy();

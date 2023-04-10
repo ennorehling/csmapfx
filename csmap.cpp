@@ -3290,29 +3290,26 @@ long CSMap::onRegionRemoveSel(FXObject*, FXSelector, void*)
         return 1;
 
     getApp()->beginWaitCursor();
-    std::set<datablock*>::iterator itor;
-    for (itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
-    {
-        datablock* region = *itor;
 
-        // what could store zero-pointer regions?
-        if (!region)
-            continue;
-
-        // deselect region if it is deleted here
-        if (selection.selected & selection.REGION)
-            if (&*selection.region == region)
-                selection.selected &= ~selection.REGION;
-
-        // delete this region
-        report->deleteRegion(region);
+    // deselect region if it is deleted here
+    if (selection.selected & selection.REGION) {
+        datablock* regionPtr = &*selection.region;
+        if (selection.regionsSelected.find(regionPtr) != selection.regionsSelected.end()) {
+            selection.selected &= ~selection.REGION;
+            selection.selected |= selection.UNKNOWN_REGION;
+            selection.sel_x = regionPtr->x();
+            selection.sel_y = regionPtr->y();
+            selection.sel_plane = regionPtr->info();
+        }
     }
 
+    report->deleteRegions(selection.regionsSelected);
     // Markierung auch loeschen
     selection.regionsSelected.clear();
     getApp()->endWaitCursor();
     ++selection.fileChange;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
+    getApp()->endWaitCursor();
     return 1;
 }
 

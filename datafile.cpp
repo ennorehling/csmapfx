@@ -1135,21 +1135,28 @@ void datafile::addRegion(const datablock& block)
 bool datafile::deleteRegion(datablock* block)
 {
     datablock::itor first = region(block->x(), block->y(), block->info());
-    // found the region. delete all blocks until next region.
     if (first == m_blocks.end()) {
         return false;
     }
-    datablock::itor last = std::next(first);
-    while (last != m_blocks.end()) {
-        // block is in region?
-        if (last->depth() <= first->depth()) {
-            deleteBlocks(first, last);
-            return true;
-        }
-        ++last;
-    }
-    deleteBlocks(first, m_blocks.end());
+    datablock::itor next = eraseRegion(first);
+    updateHashTables(next);
     return true;
+}
+
+void datafile::deleteRegions(std::set<datablock*>& regions)
+{
+    std::set<datablock*>::iterator itor;
+    for (itor = regions.begin(); itor != regions.end(); itor++)
+    {
+        datablock* region = *itor;
+
+        // what could store zero-pointer regions?
+        if (!region)
+            continue;
+
+        // delete this region
+        deleteRegion(region);
+    }
 }
 
 datablock::itor datafile::group(int id)
@@ -1620,7 +1627,21 @@ void datafile::createIslands()
     floodIslandNames();
 }
 
-bool datafile::deleteBlocks(const datablock::itor& begin, const datablock::itor& end)
+datablock::itor datafile::eraseRegion(const datablock::itor& first)
+{
+    // delete all blocks until next region.
+    datablock::itor last = std::next(first);
+    while (last != m_blocks.end()) {
+        // block is in region?
+        if (last->depth() <= first->depth()) {
+            return eraseBlocks(first, last);
+        }
+        ++last;
+    }
+    return eraseBlocks(first, m_blocks.end());
+}
+
+datablock::itor datafile::eraseBlocks(const datablock::itor& begin, const datablock::itor& end)
 {
     for (datablock::itor block = begin; block != end; ++block) {
         Coordinates coor(block->x(), block->y(), block->info());
@@ -1629,9 +1650,7 @@ bool datafile::deleteBlocks(const datablock::itor& begin, const datablock::itor&
             m_regions.erase(it);
         }
     }
-    datablock::itor next = m_blocks.erase(begin, end);
-    updateHashTables(next);
-    return false;
+    return m_blocks.erase(begin, end);
 }
 
 void datafile::updateHashTables(const datablock::itor& start)
