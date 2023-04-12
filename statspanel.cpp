@@ -294,7 +294,6 @@ void FXStatsPanel::updateData()
 		std::vector<Info> info;
 
 		// collect infos
-		datablock::itor notfound = mapFile->blocks().end();
 		for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); itor++)
 		{
             datablock::itor region;
