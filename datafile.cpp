@@ -1709,7 +1709,7 @@ void datafile::updateHashTables(const datablock::itor& start)
     if (block != m_blocks.end())
     {
         int factionDepth = m_activefaction->depth();
-        for (block++; block != m_blocks.end() && block->depth() > factionDepth; block++)
+        for (++block; block != m_blocks.end() && block->depth() > factionDepth; ++block)
         {
             if (block->type() == block_type::TYPE_ALLIANCE) {
                 int status = block->valueInt("Status", 0);

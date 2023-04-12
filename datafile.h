@@ -76,6 +76,9 @@ public:
     bool getBattle(datablock::itor& out, int x, int y, int plane);
     bool hasBattle(int x, int y, int plane) const;
 	bool getRegion(datablock::itor &out, int x, int y, int plane);
+    bool getRegion(datablock::itor& out, datablock& block) {
+        return getRegion(out, block.x(), block.y(), block.info());
+    }
     bool hasRegion(int x, int y, int plane) const;
     bool deleteRegion(datablock* region);
     void deleteRegions(std::set<datablock*>& regions);

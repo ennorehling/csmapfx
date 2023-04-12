@@ -202,18 +202,18 @@ CSMap::CSMap(FXApp *app) :
     status->getStatusLine()->setBorderColor(getApp()->getShadowColor());
     status->getStatusLine()->setNormalText("");
 
-    status_file = new FXLabel(status,"-",0,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-    status_lfile = new FXLabel(status," Datei:",nullptr,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+    status_file = new FXLabel(status, "-", 0,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+    status_lfile = new FXLabel(status, " Datei:", nullptr,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
     status_file->setBorderColor(getApp()->getShadowColor());
     status_file->hide(); status_lfile->hide();
 
-    status_turn = new FXLabel(status,"-",0,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-    status_lturn = new FXLabel(status," Runde:",nullptr,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+    status_turn = new FXLabel(status, "-", 0,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+    status_lturn = new FXLabel(status, " Runde:", nullptr,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
     status_turn->setBorderColor(getApp()->getShadowColor());
     status_turn->hide(); status_lturn->hide();
 
-    status_faction = new FXLabel(status,"-",0,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-    status_lfaction = new FXLabel(status," Partei:",nullptr,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+    status_faction = new FXLabel(status, "-", 0,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+    status_lfaction = new FXLabel(status, " Partei:", nullptr,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
     status_faction->setBorderColor(getApp()->getShadowColor());
     status_faction->hide(); status_lfaction->hide();
 
@@ -228,12 +228,12 @@ CSMap::CSMap(FXApp *app) :
     /*FXDockSite* leftdock =*/ new FXDockSite(this,LAYOUT_SIDE_LEFT|LAYOUT_FILL_Y);
     /*FXDockSite* rightdock =*/ new FXDockSite(this,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_Y);
 
-     FXToolBarShell* dragshell1 = new FXToolBarShell(this,FRAME_RAISED,0,0,600,600);
+     FXToolBarShell* dragshell1 = new FXToolBarShell(this,FRAME_RAISED, 0, 0,600,600);
     menubar = new FXMenuBar(topdock,dragshell1, LAYOUT_DOCK_NEXT|LAYOUT_SIDE_TOP);
     new FXToolBarGrip(menubar,menubar,FXMenuBar::ID_TOOLBARGRIP,TOOLBARGRIP_DOUBLE);
 
     // Toolbar
-    FXToolBarShell* dragshell2 = new FXToolBarShell(this,FRAME_RAISED,0,0,600,600);
+    FXToolBarShell* dragshell2 = new FXToolBarShell(this,FRAME_RAISED, 0, 0,600,600);
     toolbar = new FXToolBar(topdock,dragshell2, LAYOUT_DOCK_NEXT|LAYOUT_SIDE_TOP);
     new FXToolBarGrip(toolbar,toolbar,FXToolBar::ID_TOOLBARGRIP,TOOLBARGRIP_DOUBLE);
 
@@ -275,12 +275,12 @@ CSMap::CSMap(FXApp *app) :
     FXVerticalSeparator *tb_separator = new FXVerticalSeparator(toolbar, SEPARATOR_LINE|LAYOUT_FILL_Y);
     tb_separator->setBorderColor(getApp()->getShadowColor());
 
-    new FXToggleButton(toolbar, "\tZeige Regel-Informationen.", "\tZeige Regel-Informationen.", icons.info,icons.info, this,ID_VIEW_INFODLG, FRAME_RAISED|TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE);
+    new FXToggleButton(toolbar, "\tZeige Regel-Informationen.", "\tZeige Regel-Informationen.", icons.info,icons.info, this, ID_VIEW_INFODLG, FRAME_RAISED|TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE);
 
     tb_separator = new FXVerticalSeparator(toolbar, SEPARATOR_LINE|LAYOUT_FILL_Y);
     tb_separator->setBorderColor(getApp()->getShadowColor());
 
-    planes = new FXListBox(toolbar, this,ID_MAP_VISIBLEPLANE, LISTBOX_NORMAL|LAYOUT_FILL_Y|FRAME_LINE);
+    planes = new FXListBox(toolbar, this, ID_MAP_VISIBLEPLANE, LISTBOX_NORMAL|LAYOUT_FILL_Y|FRAME_LINE);
     planes->setBorderColor(getApp()->getShadowColor());
     planes->appendItem("Standardebene (0)", nullptr, (void*)0);
     planes->setNumVisible(planes->getNumItems());
@@ -289,9 +289,9 @@ CSMap::CSMap(FXApp *app) :
     tb_separator->setBorderColor(getApp()->getShadowColor());
 
     FXButton *modus;
-    modus = new FXButton(toolbar, "\tNormaler Modus", icons.pointer, this,ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
+    modus = new FXButton(toolbar, "\tNormaler Modus", icons.pointer, this, ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
     modus->setUserData((void*)FXCSMap::MODUS_NORMAL);
-    modus = new FXButton(toolbar, "\tAuswahl-Modus: Anklicken selektiert Regionen", icons.select, this,ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
+    modus = new FXButton(toolbar, "\tAuswahl-Modus: Anklicken selektiert Regionen", icons.select, this, ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
     modus->setUserData((void*)FXCSMap::MODUS_SELECT);
 
     terrainPopup = new FXPopup(this);
@@ -302,18 +302,18 @@ CSMap::CSMap(FXApp *app) :
         terrainRegion.terrain(i);
         FXival udata = FXCSMap::MODUS_SETTERRAIN + i;
 
-        FXMenuCommand *cmd = new FXMenuCommand(terrainPopup, terrainRegion.terrainString() + "\t\tZeichnen-Modus: Setze Regionen", icons.terrain[i], this,ID_MAP_SETMODUS);
+        FXMenuCommand *cmd = new FXMenuCommand(terrainPopup, terrainRegion.terrainString() + "\t\tZeichnen-Modus: Setze Regionen", icons.terrain[i], this, ID_MAP_SETMODUS);
         cmd->setUserData((void*)udata);
     }
 
     new FXMenuSeparatorEx(terrainPopup);
-    FXMenuCommand *cmd = new FXMenuCommand(terrainPopup, FXString(L"L\u00f6schen\t\tZeichnen-Modus: L\u00f6sche Regionen"), icons.terrain[0], this,ID_MAP_SETMODUS);
+    FXMenuCommand *cmd = new FXMenuCommand(terrainPopup, FXString(L"L\u00f6schen\t\tZeichnen-Modus: L\u00f6sche Regionen"), icons.terrain[0], this, ID_MAP_SETMODUS);
     cmd->setUserData((void*)(FXCSMap::MODUS_SETTERRAIN));
 
-    FXHorizontalFrame *terrainFrame = new FXHorizontalFrame(toolbar, LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0, 0,0);
-    terrainSelect = new FXButton(terrainFrame, FXString(L"\tZeichnen-Modus: Erstelle oder L\u00f6sche Regionen"), icons.terrain[0], this,ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
+    FXHorizontalFrame *terrainFrame = new FXHorizontalFrame(toolbar, LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    terrainSelect = new FXButton(terrainFrame, FXString(L"\tZeichnen-Modus: Erstelle oder L\u00f6sche Regionen"), icons.terrain[0], this, ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
     terrainSelect->setUserData((void*)FXCSMap::MODUS_SETTERRAIN);
-    new FXMenuButton(terrainFrame, FXString(L"\tZeichnen-Modus: Erstelle oder L\u00f6sche Regionen"), nullptr, terrainPopup, FRAME_RAISED|BUTTON_TOOLBAR|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|MENUBUTTON_DOWN, 0,0,12,0);
+    new FXMenuButton(terrainFrame, FXString(L"\tZeichnen-Modus: Erstelle oder L\u00f6sche Regionen"), nullptr, terrainPopup, FRAME_RAISED|BUTTON_TOOLBAR|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|MENUBUTTON_DOWN, 0, 0,12, 0);
 
     // Recent file list
     recentFiles.setTarget(this);
@@ -323,7 +323,7 @@ CSMap::CSMap(FXApp *app) :
 
     // File menu
     filemenu = new FXMenuPane(this);
-    new FXMenuTitle(menubar,"&Datei",nullptr,filemenu);
+    new FXMenuTitle(menubar, "&Datei", nullptr,filemenu);
     new FXMenuCommand(
         filemenu,
         L"\u00d6&ffnen...\tCtrl-O\tEinen Report \u00f6ffnen.",
@@ -402,25 +402,25 @@ CSMap::CSMap(FXApp *app) :
 
     // View menu
     viewmenu = new FXMenuPane(this);
-    new FXMenuTitle(menubar,"&Ansicht",nullptr,viewmenu);
-    menu.toolbar = new FXMenuCheck(viewmenu,"Tool&bar\t\tToolbar ein- bzw. ausblenden.", toolbar,ID_TOGGLESHOWN);
-    menu.maponly = new FXMenuCheck(viewmenu,"&Nur Karte anzeigen\tCtrl-Shift-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this,ID_VIEW_MAPONLY,0);
-    menu.messages = new FXMenuCheck(viewmenu,"&Meldungen\tCtrl-Shift-V\tRegionsmeldungen ein- bzw. ausblenden.", this, ID_VIEW_MESSAGES);
-    menu.show_left = new FXMenuCheck(viewmenu,"&Regionsliste\tCtrl-Shift-R\tRegionsliste ein- bzw. ausblenden.", this, ID_VIEW_REGIONLIST);
-    menu.show_right = new FXMenuCheck(viewmenu,"&Eigenschaften\tCtrl-Shift-E\tEinheiten- und Regionsdetails ein- bzw. ausblenden.", this, ID_VIEW_PROPERTIES);
-    menu.calc = new FXMenuCheck(viewmenu,"&Taschenrechner\tCtrl-Shift-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
-    menu.minimap = new FXMenuCheck(viewmenu,FXString(L"\u00dcbersichts&karte\tCtrl-Shift-M\t\u00dcbersichtskarte ein- bzw. ausblenden."), this,ID_VIEW_MINIMAP);
-    menu.infodlg = new FXMenuCheck(viewmenu,"&Informationen\tCtrl-Shift-I\tRegel-Informationen ein- bzw. ausblenden.", this,ID_VIEW_INFODLG);
+    new FXMenuTitle(menubar, "&Ansicht", nullptr,viewmenu);
+    menu.toolbar = new FXMenuCheck(viewmenu, "Tool&bar\t\tToolbar ein- bzw. ausblenden.", toolbar, ID_TOGGLESHOWN);
+    menu.maponly = new FXMenuCheck(viewmenu, "&Nur Karte anzeigen\tCtrl-Shift-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this, ID_VIEW_MAPONLY, 0);
+    menu.messages = new FXMenuCheck(viewmenu, "&Meldungen\tCtrl-Shift-V\tRegionsmeldungen ein- bzw. ausblenden.", this, ID_VIEW_MESSAGES);
+    menu.show_left = new FXMenuCheck(viewmenu, "&Regionsliste\tCtrl-Shift-R\tRegionsliste ein- bzw. ausblenden.", this, ID_VIEW_REGIONLIST);
+    menu.show_right = new FXMenuCheck(viewmenu, "&Eigenschaften\tCtrl-Shift-E\tEinheiten- und Regionsdetails ein- bzw. ausblenden.", this, ID_VIEW_PROPERTIES);
+    menu.calc = new FXMenuCheck(viewmenu, "&Taschenrechner\tCtrl-Shift-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
+    menu.minimap = new FXMenuCheck(viewmenu, FXString(L"\u00dcbersichts&karte\tCtrl-Shift-M\t\u00dcbersichtskarte ein- bzw. ausblenden."), this, ID_VIEW_MINIMAP);
+    menu.infodlg = new FXMenuCheck(viewmenu, "&Informationen\tCtrl-Shift-I\tRegel-Informationen ein- bzw. ausblenden.", this, ID_VIEW_INFODLG);
     new FXMenuSeparatorEx(viewmenu, "Liste");
-    menu.ownFactionGroup = new FXMenuCheck(viewmenu,"&Gruppe aktiver Partei\tCtrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
+    menu.ownFactionGroup = new FXMenuCheck(viewmenu, "&Gruppe aktiver Partei\tCtrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
     menu.colorizeUnits = new FXMenuCheck(viewmenu, "Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
     new FXMenuSeparatorEx(viewmenu, "Karte");
-    menu.streets = new FXMenuCheck(viewmenu,"&Strassen zeigen\tCtrl-F1\tStrassen auf der Karte anzeigen.");
-    menu.visibility = new FXMenuCheck(viewmenu,FXString(L"&Sichtbarkeit zeigen\tCtrl-F2\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise)."));
-    menu.shiptravel = new FXMenuCheck(viewmenu,"&Durchschiffung\tCtrl-F3\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
-    menu.shadowRegions = new FXMenuCheck(viewmenu,"Regionen ab&dunkeln\tCtrl-F4\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.");
-    menu.islands = new FXMenuCheck(viewmenu,"&Inselnamen zeigen\tCtrl-F5\tInselnamen auf der Karte zeigen.");
-    menu.minimap_islands = new FXMenuCheck(viewmenu,"&Inseln auf Minikarte\t\tInselnamen auf der Minikarte zeigen.");
+    menu.streets = new FXMenuCheck(viewmenu, "&Strassen zeigen\tCtrl-F1\tStrassen auf der Karte anzeigen.");
+    menu.visibility = new FXMenuCheck(viewmenu, FXString(L"&Sichtbarkeit zeigen\tCtrl-F2\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise)."));
+    menu.shiptravel = new FXMenuCheck(viewmenu, "&Durchschiffung\tCtrl-F3\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
+    menu.shadowRegions = new FXMenuCheck(viewmenu, "Regionen ab&dunkeln\tCtrl-F4\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.");
+    menu.islands = new FXMenuCheck(viewmenu, "&Inselnamen zeigen\tCtrl-F5\tInselnamen auf der Karte zeigen.");
+    menu.minimap_islands = new FXMenuCheck(viewmenu, "&Inseln auf Minikarte\t\tInselnamen auf der Minikarte zeigen.");
     planemenu = new FXMenuPane(this);
     planemenu->disable();
     FXMenuRadio* radio = new FXMenuRadio(planemenu, "Standardebene (0)", this, ID_MAP_VISIBLEPLANE, 0);
@@ -442,11 +442,11 @@ CSMap::CSMap(FXApp *app) :
 
     // Region menu
     regionmenu = new FXMenuPane(this);
-    new FXMenuTitle(menubar,"&Bearbeiten",nullptr,regionmenu);
+    new FXMenuTitle(menubar, "&Bearbeiten", nullptr,regionmenu);
     new FXMenuCommand(regionmenu, "&Suchen...\tCtrl-F\tEine Region, Einheit, Schiff, etc. suchen.", nullptr, this, ID_VIEW_SEARCHDLG);
     new FXMenuCommand(regionmenu, "&Ursprung setzen\t\tDen Kartenursprung (0/0) auf die markierte Region setzen.", nullptr, this, ID_MAP_SETORIGIN, 0);
     new FXMenuSeparatorEx(regionmenu, "Regionen");
-    new FXMenuCommand(regionmenu,FXString(L"&Alle markieren\tCtrl-Shift-A\tAlle Regionen ausw\u00e4hlen."),nullptr,this,ID_REGION_SELALL);
+    new FXMenuCommand(regionmenu,FXString(L"&Alle markieren\tCtrl-Shift-A\tAlle Regionen ausw\u00e4hlen."), nullptr,this, ID_REGION_SELALL);
     new FXMenuCommand(regionmenu,FXString(L"Alle &Inseln ausw\u00e4hlen\t\tAlle Landregionen ausw\u00e4hlen (Ozean, Feuerwand und Eisberg z\u00e4hlen nicht als Land)."), nullptr, this, ID_REGION_SELALLISLANDS);
     new FXMenuCommand(regionmenu, FXString(L"&Sichtbare markieren\t\tSichtbare Regionen ausw\u00e4hlen."), nullptr, this, ID_REGION_SELVISIBLE);
     new FXMenuCommand(regionmenu,FXString(L"&Keine markieren\tEscape\tKeine Region ausw\u00e4hlen."), nullptr, this, ID_REGION_UNSEL);
@@ -454,7 +454,7 @@ CSMap::CSMap(FXApp *app) :
 
     selectionmenu = new FXMenuPane(this);
     new FXMenuCascade(regionmenu, "&Erweitern", nullptr, selectionmenu);
-    new FXMenuCommand(selectionmenu,"Auswahl &erweitern\tCtrl-F7\tAuswahl mit dem Radius von einer Region erweitern.", nullptr, this, ID_REGION_EXTENDSEL);
+    new FXMenuCommand(selectionmenu, "Auswahl &erweitern\tCtrl-F7\tAuswahl mit dem Radius von einer Region erweitern.", nullptr, this, ID_REGION_EXTENDSEL);
     new FXMenuCommand(selectionmenu,FXString(L"&Inseln ausw\u00e4hlen\tCtrl-F9\tAuswahl auf komplette Inseln erweitern."), nullptr, this, ID_REGION_SELISLANDS);
 
     new FXMenuCommand(regionmenu, L"Markierte &ausw\u00e4hlen\tCtrl-Space\tMarkierte Region ausw\u00e4hlen.", nullptr, this, ID_MAP_SELECTMARKED, 0);
@@ -462,7 +462,7 @@ CSMap::CSMap(FXApp *app) :
 
     // Faction menu
     factionmenu = new FXMenuPane(this);
-    menu.faction = new FXMenuTitle(menubar,"&Partei",nullptr,factionmenu);
+    menu.faction = new FXMenuTitle(menubar, "&Partei", nullptr,factionmenu);
     menu.faction->disable();
 
     new FXMenuSeparatorEx(factionmenu, "Parteiinfo");
@@ -478,30 +478,30 @@ CSMap::CSMap(FXApp *app) :
 
     new FXMenuSeparatorEx(factionmenu, FXString(L"Gegenst\u00e4nde"));
         menu.factionpool = new FXMenuPane(this);
-        menu.poolnoitems = new FXMenuCommand(menu.factionpool,FXString(L"Keine Gegenst\u00e4nde\t\tDer Parteipool enth\u00e4lt keine Gegenst\u00e4nde."),nullptr);
+        menu.poolnoitems = new FXMenuCommand(menu.factionpool,FXString(L"Keine Gegenst\u00e4nde\t\tDer Parteipool enth\u00e4lt keine Gegenst\u00e4nde."), nullptr);
         menu.poolnoitems->disable();
     new FXMenuCascade(factionmenu, "&Parteipool", nullptr, menu.factionpool, 0);
 
-    getAccelTable()->addAccel(MKUINT(KEY_KP_5,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_SELECTMARKED));
-    getAccelTable()->addAccel(MKUINT(KEY_KP_7,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_MARKERNORTHWEST));
-    getAccelTable()->addAccel(MKUINT(KEY_KP_9,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_MARKERNORTHEAST));
-    getAccelTable()->addAccel(MKUINT(KEY_KP_6,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_MARKEREAST));
-    getAccelTable()->addAccel(MKUINT(KEY_KP_3,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_MARKERSOUTHEAST));
-    getAccelTable()->addAccel(MKUINT(KEY_KP_1,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_MARKERSOUTHWEST));
-    getAccelTable()->addAccel(MKUINT(KEY_KP_4,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_MARKERWEST));
+    getAccelTable()->addAccel(MKUINT(KEY_KP_5,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_SELECTMARKED));
+    getAccelTable()->addAccel(MKUINT(KEY_KP_7,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_MARKERNORTHWEST));
+    getAccelTable()->addAccel(MKUINT(KEY_KP_9,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_MARKERNORTHEAST));
+    getAccelTable()->addAccel(MKUINT(KEY_KP_6,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_MARKEREAST));
+    getAccelTable()->addAccel(MKUINT(KEY_KP_3,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_MARKERSOUTHEAST));
+    getAccelTable()->addAccel(MKUINT(KEY_KP_1,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_MARKERSOUTHWEST));
+    getAccelTable()->addAccel(MKUINT(KEY_KP_4,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_MARKERWEST));
 
-    getAccelTable()->addAccel(MKUINT(KEY_H,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_MARKERWEST));
-    getAccelTable()->addAccel(MKUINT(KEY_L,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_MARKEREAST));
-    getAccelTable()->addAccel(MKUINT(KEY_J,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_MARKERSOUTHWEST));
-    getAccelTable()->addAccel(MKUINT(KEY_K,CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_MAP_MARKERNORTHEAST));
+    getAccelTable()->addAccel(MKUINT(KEY_H,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_MARKERWEST));
+    getAccelTable()->addAccel(MKUINT(KEY_L,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_MARKEREAST));
+    getAccelTable()->addAccel(MKUINT(KEY_J,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_MARKERSOUTHWEST));
+    getAccelTable()->addAccel(MKUINT(KEY_K,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_MARKERNORTHEAST));
 
     // jump to calculator on ESCAPE
-    // getAccelTable()->addAccel(MKUINT(KEY_R, CONTROLMASK), this,FXSEL(SEL_COMMAND,ID_CALCULATOR));
+    // getAccelTable()->addAccel(MKUINT(KEY_R, CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_CALCULATOR));
 
     // Help menu
     helpmenu = new FXMenuPane(this);
-    new FXMenuTitle(menubar,"&?",nullptr,helpmenu);
-    new FXMenuCommand(helpmenu,"Wer mich schuf...\t\tKontaktinformationen",nullptr,this,ID_HELP_ABOUT);
+    new FXMenuTitle(menubar, "&?", nullptr,helpmenu);
+    new FXMenuCommand(helpmenu, "Wer mich schuf...\t\tKontaktinformationen", nullptr,this, ID_HELP_ABOUT);
 
     // tooltip
     new FXToolTip(app);
@@ -510,7 +510,7 @@ CSMap::CSMap(FXApp *app) :
     content = new FXSplitterEx(this, SPLITTER_HORIZONTAL|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
     // Left splitter
-    leftframe = new FXVerticalFrame(content,LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 3,0,0,0);
+    leftframe = new FXVerticalFrame(content,LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 3, 0, 0, 0);
 
     // Region list window
     regions = new FXRegionList(leftframe, this, ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
@@ -522,7 +522,7 @@ CSMap::CSMap(FXApp *app) :
     menu.colorizeUnits->setSelector(FXRegionList::ID_TOGGLE_UNITCOLORS);
 
     // Middle splitter
-    middle = new FXVerticalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0,0,0,0,0,0,2);
+    middle = new FXVerticalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0, 0,2);
     content->setStretcher(middle);
 
     FXSplitterEx *mapsplit = new FXSplitterEx(middle, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL_X|LAYOUT_FILL_Y);
@@ -547,7 +547,7 @@ CSMap::CSMap(FXApp *app) :
     menu.islands->setSelector(FXCSMap::ID_TOGGLEISLANDS);
 
     // List of regions messages
-    msgBorder = new FXVerticalFrame(mapsplit,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0,0,0,0, 0,0,0,0);
+    msgBorder = new FXVerticalFrame(mapsplit,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
     msgBorder->setBorderColor(getApp()->getShadowColor());
 
     outputTabs = new FXTabBook(msgBorder, nullptr, 0, TABBOOK_NORMAL | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -571,26 +571,26 @@ CSMap::CSMap(FXApp *app) :
     menu.calc->setSelector(FXCalculator::ID_TOGGLESHOWN);
 
     // Right splitter
-    rightframe = new FXVerticalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,3,0,0);
+    rightframe = new FXVerticalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0,3, 0, 0);
 
-    FXHorizontalFrame *riFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
-    riTab = new FXToolBarTab(riFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
+    FXHorizontalFrame *riFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    riTab = new FXToolBarTab(riFrame, nullptr, 0, TOOLBARTAB_HORIZONTAL, 0, 0, 0, 0);
     riTab->setTipText("Regionsinformationen ein- und ausblenden");
     regionPanel = new FXRegionPanel(riFrame, this, ID_SELECTION, LAYOUT_FILL_X);
 
-    FXHorizontalFrame *siFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
-    siTab = new FXToolBarTab(siFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
+    FXHorizontalFrame *siFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    siTab = new FXToolBarTab(siFrame, nullptr, 0, TOOLBARTAB_HORIZONTAL, 0, 0, 0, 0);
     siTab->setTipText("Statistik ein- und ausblenden");
-    statsPanel = new FXStatsPanel(siFrame, this,ID_SELECTION, LAYOUT_FILL_X);
+    statsPanel = new FXStatsPanel(siFrame, this, ID_SELECTION, LAYOUT_FILL_X);
 
-    FXHorizontalFrame *tiFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
-    tiTab = new FXToolBarTab(tiFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
+    FXHorizontalFrame *tiFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    tiTab = new FXToolBarTab(tiFrame, nullptr, 0, TOOLBARTAB_HORIZONTAL, 0, 0, 0, 0);
     tiTab->setTipText("Handelsinformationen ein- und ausblenden");
     tradePanel = new FXTradePanel(tiFrame, this, ID_SELECTION, LAYOUT_FILL_X);
 
     commandsplitter = new FXSplitterEx(rightframe, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
-    tabbook = new FXTabBook(commandsplitter, nullptr,0, TABBOOK_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
+    tabbook = new FXTabBook(commandsplitter, nullptr, 0, TABBOOK_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 
     new FXTabItem(tabbook, "Statistik");
     statistics = new FXStatistics(tabbook, this, ID_SELECTION, LAYOUT_FILL_X);
@@ -619,20 +619,20 @@ CSMap::CSMap(FXApp *app) :
     getAccelTable()->addAccel(MKUINT(KEY_2, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_2));
 
     // Befehlseditor
-    commandframe = new FXVerticalFrame(commandsplitter,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 0,0,0,0);
+    commandframe = new FXVerticalFrame(commandsplitter,LAYOUT_FILL_X|FRAME_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
     commandframe->setBorderColor(getApp()->getShadowColor());
-    commands = new FXCommands(commandframe, this,ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    commands = new FXCommands(commandframe, this, ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
     commands->connectMap(map);
     if (fontFixed) {
         commands->setFont(fontFixed);
     }
 
     // commands editor tools
-    FXHorizontalFrame *cmdBottomFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
-    FXToolBarTab *cmdTab = new FXToolBarTab(cmdBottomFrame, nullptr,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
+    FXHorizontalFrame *cmdBottomFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    FXToolBarTab *cmdTab = new FXToolBarTab(cmdBottomFrame, nullptr, 0, TOOLBARTAB_HORIZONTAL, 0, 0, 0, 0);
     cmdTab->setTipText("Befehlstools ein- und ausblenden");
 
-    FXHorizontalFrame *cmdOptFrame = new FXHorizontalFrame(cmdBottomFrame,LAYOUT_FILL_X|FRAME_LINE, 0,0,0,0, 3,3,1,1);
+    FXHorizontalFrame *cmdOptFrame = new FXHorizontalFrame(cmdBottomFrame,LAYOUT_FILL_X|FRAME_LINE, 0, 0, 0, 0, 3,3,1,1);
     cmdOptFrame->setBorderColor(getApp()->getShadowColor());
     FXCheckButton *chk = new FXCheckButton(cmdOptFrame,
         FXString(L"&best\u00e4tigt\tBefehle best\u00e4tigen\tBefehle f\u00fcr diese Einheit best\u00e4tigen"),
@@ -660,7 +660,7 @@ CSMap::CSMap(FXApp *app) :
     rowcol->setTextColor(getApp()->getShadowColor());
 
     // minimap
-    minimap_frame = new FXDialogBox(this, FXString(L"\u00dcbersichtskarte"), DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100,100, 640,480, 0,0,0,0);
+    minimap_frame = new FXDialogBox(this, FXString(L"\u00dcbersichtskarte"), DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100,100, 640,480, 0, 0, 0, 0);
     minimap_frame->setIcon(icon);
     minimap_frame->getAccelTable()->addAccel(MKUINT(KEY_M, CONTROLMASK | SHIFTMASK), this, FXSEL(SEL_COMMAND, ID_VIEW_MINIMAP));
 
@@ -677,7 +677,7 @@ CSMap::CSMap(FXApp *app) :
 
     // info dialog
     infodlg = new FXInfoDlg(this, "Informationen", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));
-    infodlg->getAccelTable()->addAccel(MKUINT(KEY_I, CONTROLMASK|SHIFTMASK), this,FXSEL(SEL_COMMAND,ID_VIEW_INFODLG));
+    infodlg->getAccelTable()->addAccel(MKUINT(KEY_I, CONTROLMASK|SHIFTMASK), this,FXSEL(SEL_COMMAND, ID_VIEW_INFODLG));
 
     // search dialog
     searchdlg = new FXSearchDlg(this, this, ID_SELECTION, searchResults, "Suchen...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE));
@@ -1413,8 +1413,8 @@ bool CSMap::checkCommands()
                                 }
                                 else if (tok == "R") {
                                     tok = str.section("|", 3);
-                                    error->region_x = FXIntVal(tok.section(",", 0));
-                                    error->region_y = FXIntVal(tok.section(",", 1));
+                                    error->region_x = FXIntVal(tok.section(", ", 0));
+                                    error->region_y = FXIntVal(tok.section(", ", 1));
                                 }
                                 output.push_back(error);
                                 display = str.section("|", 5);
@@ -2951,7 +2951,7 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
             if (patt.empty())
             {
                 // Der Dateiname endet nicht mit ".cr" o.\u00e4., deshalb wird Endung angehangen.
-                ext = pattern.section(',',0).after('.');
+                ext = pattern.section(',', 0).after('.');
                 if (!ext.empty())
                     filename += "." + ext;
                 break;
