@@ -1302,7 +1302,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 		else
 		{
 			// delete region
-            if (mapFile->deleteRegion(&*iregion)) {
+            if (mapFile->deleteRegion(*iregion)) {
                 mapFile->createHashTables();
 
                 if (selection.selected & selection.REGION)

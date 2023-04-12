@@ -147,7 +147,7 @@ void FXReportInfo::addBattle(datablock::itor& block)
     FXTreeItem* group = appendItem(battles, label);
 
     datablock::itor it;
-    if (mapFile->getRegion(it, block->x(), block->y(), block->info())) {
+    if (mapFile->getRegion(it, *block)) {
         group->setData((void*)&*it);
     }
     datablock::itor end = mapFile->blocks().end();

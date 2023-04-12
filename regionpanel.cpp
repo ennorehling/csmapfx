@@ -270,7 +270,7 @@ void FXRegionPanel::updateData()
 		for (datablock* block : selection.regionsSelected)
 		{
             datablock::itor region;
-            if (mapFile->getRegion(region, block->x(), block->y(), block->info()))
+            if (mapFile->getRegion(region, *block))
             {
 				collectData(info, region);
 			}

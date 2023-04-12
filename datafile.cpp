@@ -1132,10 +1132,10 @@ void datafile::addRegion(const datablock& block)
     m_regions.insert(std::make_pair(coor, back));
 }
 
-bool datafile::deleteRegion(datablock* block)
+bool datafile::deleteRegion(const datablock& block)
 {
     datablock::itor first;
-    if (!getRegion(first, block->x(), block->y(), block->info())) {
+    if (!getRegion(first, block)) {
         return false;
     }
     eraseRegion(first);
@@ -1148,18 +1148,8 @@ void datafile::deleteRegions(std::set<datablock*>& regions)
     for (itor = regions.begin(); itor != regions.end(); itor++)
     {
         datablock* region = *itor;
-
-        // what could store zero-pointer regions?
-        if (!region)
-            continue;
-
-        datablock::itor match;
-        if (!getRegion(match, 0, 0, 0)) {
-            region = region;
-        }
-
         // delete this region
-        deleteRegion(region);
+        deleteRegion(*region);
     }
     createHashTables();
 }
@@ -1366,7 +1356,7 @@ FXString datafile::regionName(const datablock& block)
         }
     } else {
         datablock::itor select;
-        if (getRegion(select, block.x(), block.y(), block.info())) {
+        if (getRegion(select, block)) {
             rname = select->value(TYPE_NAME);
             if (rname.empty()) {
                 rname = select->terrainString();
@@ -1982,7 +1972,7 @@ void datafile::SelectionState::transfer(datafile* old_cr, datafile* new_cr, int 
             }
         }
         if (selected & REGION) {
-            if (!new_cr->getRegion(region, region->x(), region->y(), region->info())) {
+            if (!new_cr->getRegion(region, *region)) {
                 selected -= REGION;
             }
         }
@@ -2010,7 +2000,7 @@ void datafile::SelectionState::transfer(datafile* old_cr, datafile* new_cr, int 
             std::set<datablock*> sel;
             for (datablock* r : regionsSelected) {
                 datablock::itor match;
-                if (new_cr->getRegion(match, r->x(), r->y(), r->info())) {
+                if (new_cr->getRegion(match, *r)) {
                     sel.insert(&*match);
                 }
             }

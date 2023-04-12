@@ -2090,7 +2090,7 @@ long CSMap::onSetSelection(FXObject* sender, FXSelector sel, void* ptr)
     ++selection.selChange;
     selection.selected = 0;
     if (block->type() == block_type::TYPE_REGION) {
-        if (report->getRegion(selection.region, block->x(), block->y(), block->info())) {
+        if (report->getRegion(selection.region, *block)) {
             selection.selected = selection.REGION;
         }
     }

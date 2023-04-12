@@ -230,7 +230,7 @@ void FXStatistics::updateList()
 		for (datablock* block : selection.regionsSelected)
 		{
             datablock::itor region;
-            if (mapFile->getRegion(region, block->x(), block->y(), block->info())) {
+            if (mapFile->getRegion(region, *block)) {
 				// collect if selected
 				collectData(persons, items, talents, ships, buildings, region);
 			}
@@ -685,7 +685,7 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 				for (datablock* block : selection.regionsSelected)
 				{
                     datablock::itor region;
-                    if (mapFile->getRegion(region, block->x(), block->y(), block->info())) {
+                    if (mapFile->getRegion(region, *block)) {
                         collectFactionList(factions, region);
 					}
 				}

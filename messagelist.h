@@ -29,7 +29,7 @@ protected:
 
     std::shared_ptr<datafile> mapFile;
 
-    void addMessage(FXTreeItem*, datablock * block);
+    void addMessage(FXTreeItem*, const datablock * block);
 
 	void clearChildren(FXTreeItem* parent);
 

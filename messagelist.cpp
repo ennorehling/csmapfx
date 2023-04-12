@@ -28,11 +28,11 @@ void FXMessageList::setMapFile(std::shared_ptr<datafile>& f)
     }
 }
 
-void FXMessageList::addMessage(FXTreeItem* group, datablock* block)
+void FXMessageList::addMessage(FXTreeItem* group, const datablock* block)
 {
     if (block->type() == block_type::TYPE_BATTLE) {
         datablock::itor region;
-        if (mapFile->getRegion(region, block->x(), block->y(), block->info())) {
+        if (mapFile->getRegion(region, *block)) {
             FXString name = region->value(key_type::TYPE_NAME);
             FXString label;
             if (name.empty()) name.assign("Unbekannt");
