@@ -169,8 +169,10 @@ void FXStatsPanel::collectData(std::vector<Info>& info, const datablock::itor& r
     int saplings = region->valueInt(TYPE_SAPLINGS);
     int salary = region->valueInt(TYPE_SALARY);
 
-    datablock::itor res = region;
-    while (mapFile->getNext(res, block_type::TYPE_RESOURCE)) {
+    datablock::itor end = mapFile->blocks().end();
+    for (datablock::itor res = std::next(region); res != end && res->depth() > region->depth(); ++res)
+    {
+        if (res->type() != block_type::TYPE_RESOURCE) continue;
         const FXString& value = res->value(TYPE_RESOURCE_TYPE);
         key_type type = static_cast<key_type>(datakey::parseType(value, block_type::TYPE_RESOURCE) & TYPE_MASK);
         if (type == TYPE_PEASANTS) {

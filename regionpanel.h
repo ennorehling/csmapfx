@@ -55,23 +55,14 @@ protected:
 
 	} tags;
 
-	struct Info
-	{
-		FXString name, tip;
-        FXulong value;
-		FXint skill;
-
-		Info(const FXString& n, const FXString& t, FXulong v, FXint s) : name(n), tip(t), value(v), skill(s) {}
-	};
-
 protected:
 	void clearLabels();
 	void createLabels(const FXString& name, const FXString& label, int column);
 
-	void setInfo(const std::vector<Info>& info);
-	void addEntry(std::vector<Info>& info, FXString name, FXulong value, int skill, FXString tip = "");
+	void setInfo(const std::vector<RegionInfo>& info);
+	void addEntry(std::vector<RegionInfo>& info, FXString name, FXulong value, int skill, FXString tip = "");
 
-	void collectData(std::vector<Info>& info, const datablock::itor& region);
+	void collectData(std::vector<RegionInfo>& info, const datablock::itor& region);
 	void updateData();
 
 protected:

@@ -166,10 +166,18 @@ public:
 	virtual ~attachment() {}
 };
 
+struct RegionInfo
+{
+    FXString name, tip;
+    FXulong value = 0;
+    FXint skill = 0;
+
+    RegionInfo(const FXString& n, const FXString& t, FXulong v, FXint s) : name(n), tip(t), value(v), skill(s) {}
+};
+
 struct region_info {
-    FXint Bauern, Silber, Unterh, Rekruten, Pferde;
-    FXint Personen, Parteipersonen, Parteisilber;
-    std::vector<std::pair<FXString, std::pair<FXint, FXint> > > resources;
+    FXint Personen = 0, Parteipersonen = 0, Parteisilber = 0;
+    std::vector<RegionInfo> resources;
 };
 
 class att_region : public attachment
@@ -178,12 +186,7 @@ public:
 	typedef std::vector<float> peoplelist_t;
 
 	peoplelist_t people;
-    region_info* regioninfos = nullptr;
-
-    ~att_region() {
-        delete regioninfos;
-    }
-    
+    std::unique_ptr<region_info> regioninfos;
     FXString		island;			// name of island
 
 	enum	// not yet used!!!

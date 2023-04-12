@@ -118,13 +118,13 @@ void FXRegionPanel::createLabels(const FXString& name, const FXString& label, in
 	tags.entries.push_back(lfirst);
 }
 
-void FXRegionPanel::setInfo(const std::vector<Info>& info)
+void FXRegionPanel::setInfo(const std::vector<RegionInfo>& info)
 {
 	clearLabels();
 
 	int number = info.size();
 	int index = 0;
-	for (std::vector<Info>::const_iterator itor = info.begin(); itor != info.end(); itor++, index++)
+	for (std::vector<RegionInfo>::const_iterator itor = info.begin(); itor != info.end(); itor++, index++)
 	{
 		FXString value = thousandsPoints(itor->value);
 		FXString offset = "";
@@ -147,32 +147,36 @@ void FXRegionPanel::setInfo(const std::vector<Info>& info)
 	}
 }
 
-void FXRegionPanel::addEntry(std::vector<Info>& info, FXString name, FXulong value, int skill, FXString tip)
+void FXRegionPanel::addEntry(std::vector<RegionInfo>& info, FXString name, FXulong value, int skill, FXString tip)
 {
-    std::vector<Info>::iterator itor;
-	for (itor = info.begin(); itor != info.end(); itor++)
-		if (itor->name == name)
-		{
-			itor->value += value;
-            if (skill < itor->skill) {
-                itor->skill = skill;
+    std::vector<RegionInfo>::iterator itor;
+    for (RegionInfo& itor : info)
+    {
+        if (itor.name == name)
+        {
+            itor.value += value;
+            if (skill < itor.skill) {
+                itor.skill = skill;
             }
-			break;
-		}
-
-	if (itor == info.end())
-		info.push_back(Info(name, tip, value, skill));
+            return;
+        }
+    }
+    info.push_back(RegionInfo(name, tip, value, skill));
 }
 
-void FXRegionPanel::collectData(std::vector<Info>& info, const datablock::itor& region)
+void FXRegionPanel::collectData(std::vector<RegionInfo>& info, const datablock::itor& region)
 {
-	FXint Bauern = region->valueInt(key_type::TYPE_PEASANTS, -1);
-	FXint Silber = region->valueInt(key_type::TYPE_SILVER, -1);
+    FXint Bauern = region->valueInt(key_type::TYPE_PEASANTS, -1);
+    FXint Silber = region->valueInt(key_type::TYPE_SILVER, -1);
     FXint Unterh = region->valueInt("Unterh", -1);
     FXint Rekruten = region->valueInt("Rekruten", -1);
     FXint Pferde = region->valueInt("Pferde", -1);
-
-	if (Bauern >= 0) addEntry(info, "Bauern", Bauern, 0, "Anzahl der Bauern");
+    att_region* att = static_cast<att_region *>(region->attachment());
+    if (!att) {
+        att = new att_region();
+        region->attachment(att);
+    }
+    if (Bauern >= 0) addEntry(info, "Bauern", Bauern, 0, "Anzahl der Bauern");
 	if (Silber >= 0) addEntry(info, "Silber", Silber, 0, "Silbervorrat der Bauern");
 	if (Unterh >= 0) addEntry(info, "Unterh.max", Unterh, 0, "Maximale Anzahl Silber, dass per Unterhaltung eingenommen werden kann");
 	if (Rekruten >= 0) addEntry(info, "Rekruten", Rekruten, 0, FXString(L"Anzahl der m\u00f6glichen Rekruten"));
@@ -183,63 +187,77 @@ void FXRegionPanel::collectData(std::vector<Info>& info, const datablock::itor& 
 	if (mapFile)
 		factionId = mapFile->getFactionId();
 
-	FXint Personen = 0, Parteipersonen = 0;
-	FXint Parteisilber = 0;
+    FXint Personen = 0, Parteipersonen = 0;
+    FXint Parteisilber = 0;
+    if (att->regioninfos.get()) {
+        Personen = att->regioninfos->Personen;
+        Parteipersonen = att->regioninfos->Parteipersonen;
+        Parteisilber = att->regioninfos->Parteisilber;
+    } else {
+        att->regioninfos = std::make_unique<region_info>();
 
-    datablock::itor block = region;
-    while (mapFile->getNext(block, block_type::TYPE_RESOURCE)) {
-		if (block->type() == block_type::TYPE_RESOURCE)
-		{
-			/*	RESOURCE 235898859
-				"Eisen";type
-				17;skill
-				5;number	*/
+        datablock::itor end = mapFile->blocks().end();
+        for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
+        {
+            if (block->type() == block_type::TYPE_RESOURCE)
+            {
+                /*	RESOURCE 235898859
+                    "Eisen";type
+                    17;skill
+                    5;number	*/
 
-			const FXString& type = block->value(TYPE_RESOURCE_TYPE);
+                const FXString& type = block->value(TYPE_RESOURCE_TYPE);
 
-			// don't double-count resources in REGION block
-			if (FXString("Bauern|Silber|Pferde").find(type) != -1)
-				continue;
+                // don't double-count resources in REGION block
+                if (FXString("Bauern|Silber|Pferde").find(type) != -1)
+                    continue;
 
-            if (!type.empty())
-			{
-				FXint skill = block->valueInt(TYPE_RESOURCE_SKILL);
-				FXint number = block->valueInt(TYPE_RESOURCE_COUNT);
-                FXString infotip = "Resource " + type;
-
-				addEntry(info, type, number, skill, infotip);
-			}
-		}
-		else if (block->type() == block_type::TYPE_UNIT)
-		{
-            const datablock* unitPtr = &*block;
-			myfaction = false;
-            int id = mapFile->getFactionIdForUnit(unitPtr);
-            if (factionId == id) {
-                myfaction = true;
+                if (!type.empty())
+                {
+                    FXint skill = block->valueInt(TYPE_RESOURCE_SKILL);
+                    FXint number = block->valueInt(TYPE_RESOURCE_COUNT);
+                    FXString infotip = "Resource " + type;
+                    addEntry(att->regioninfos->resources, type, number, skill, infotip);
+                }
             }
+            else if (block->type() == block_type::TYPE_UNIT)
+            {
+                const datablock* unitPtr = &*block;
+                myfaction = false;
+                int id = mapFile->getFactionIdForUnit(unitPtr);
+                if (factionId == id) {
+                    myfaction = true;
+                }
 
-			int number = unitPtr->valueInt(TYPE_NUMBER, -1);
-            if (number > 0)
-			{
-				Personen += number;
-				if (myfaction)
-					Parteipersonen += number;
-			}
-		}
-		else if (block->type() == block_type::TYPE_ITEMS)
-		{
-			// Silber der eigenen Partei zum Parteisilber zaehlen
-			if (myfaction)
-			{
-				int silber = block->valueInt(TYPE_SILVER, -1);
-				if (silber > 0)
-	                Parteisilber += silber;
-			}
-		}
-	}
+                int number = unitPtr->valueInt(TYPE_NUMBER, -1);
+                if (number > 0)
+                {
+                    Personen += number;
+                    if (myfaction)
+                        Parteipersonen += number;
+                }
+            }
+            else if (block->type() == block_type::TYPE_ITEMS)
+            {
+                // Silber der eigenen Partei zum Parteisilber zaehlen
+                if (myfaction)
+                {
+                    int silber = block->valueInt(TYPE_SILVER, -1);
+                    if (silber > 0)
+                        Parteisilber += silber;
+                }
+            }
+        }
+        att->regioninfos->Personen = Personen;
+        att->regioninfos->Parteipersonen = Parteipersonen;
+        att->regioninfos->Parteisilber = Parteisilber;
+    }
 
-	if (Personen)
+    for (auto& itor : att->regioninfos->resources) {
+        addEntry(info, itor.name, itor.value, itor.skill, itor.tip);
+    }
+    
+    if (Personen)
 	{
 		addEntry(info, "Personen", Personen, 0, "Anzahl (sichtbarer) Personen in dieser Region");
 	}
@@ -263,7 +281,7 @@ void FXRegionPanel::updateData()
 		// Beschreibungsfeld kann weg
 		tags.desc->setText("");
 
-        std::vector<Info> info;
+        std::vector<RegionInfo> info;
 
 		// collect infos
 		for (datablock* block : selection.regionsSelected)
@@ -325,7 +343,7 @@ void FXRegionPanel::updateData()
 		tags.name->setIcon(terrainIcons[terrain]);
 
 		// collect information (Bauern, Silber, Pferde...)
-        std::vector<Info> info;
+        std::vector<RegionInfo> info;
 
 		// Bauern, Silber, Unterhaltung (Unterh), Rekruten, Parteisilber,
 		// Pferde, Laen, Eisen, Baeume, Schoesslinge
