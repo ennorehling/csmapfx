@@ -1,3 +1,9 @@
+csmapfx (1.6.10-2) stable; urgency=low
+
+  * fix Linux compiation, missing header.
+
+ -- Enno Rehling <enno@eressea.de>  Wed, 12 Apr 2023 21:55:00 +0200
+
 csmapfx (1.6.10-1) stable; urgency=low
 
   * improve performance of bulk statistics.
