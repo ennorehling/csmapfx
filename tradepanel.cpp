@@ -192,7 +192,7 @@ void FXTradePanel::updateData()
 		// show information of newly selected region
 		datablock &region = *selection.region;
 		
-		FXString peasants = region.value("Bauern");
+		FXString peasants = region.value(key_type::TYPE_PEASANTS);
 		FXint goods_at_price = 0;
 
 		if (!peasants.empty())

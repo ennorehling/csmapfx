@@ -166,8 +166,8 @@ void FXRegionPanel::addEntry(std::vector<Info>& info, FXString name, FXulong val
 
 void FXRegionPanel::collectData(std::vector<Info>& info, datablock::itor region)
 {
-	FXint Bauern = region->valueInt("Bauern", -1);
-	FXint Silber = region->valueInt("Silber", -1);
+	FXint Bauern = region->valueInt(key_type::TYPE_PEASANTS, -1);
+	FXint Silber = region->valueInt(key_type::TYPE_SILVER, -1);
     FXint Unterh = region->valueInt("Unterh", -1);
     FXint Rekruten = region->valueInt("Rekruten", -1);
     FXint Pferde = region->valueInt("Pferde", -1);
