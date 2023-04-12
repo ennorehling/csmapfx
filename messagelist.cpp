@@ -28,38 +28,38 @@ void FXMessageList::setMapFile(std::shared_ptr<datafile>& f)
     }
 }
 
-void FXMessageList::addMessage(FXTreeItem* group, const datablock* block)
+void FXMessageList::addMessage(FXTreeItem* group, const datablock& block)
 {
-    if (block->type() == block_type::TYPE_BATTLE) {
+    if (block.type() == block_type::TYPE_BATTLE) {
         datablock::itor region;
-        if (mapFile->getRegion(region, *block)) {
+        if (mapFile->getRegion(region, block)) {
             FXString name = region->value(key_type::TYPE_NAME);
             FXString label;
             if (name.empty()) name.assign("Unbekannt");
-            FXTreeItem* item = appendItem(group, label.format("In %s (%d,%d) findet ein Kampf statt.", name.text(), block->x(), block->y()));
+            FXTreeItem* item = appendItem(group, label.format("In %s (%d,%d) findet ein Kampf statt.", name.text(), block.x(), block.y()));
             item->setData((void*)&*region);
         }
     }
-    else if (block->type() == block_type::TYPE_MESSAGE) {
-        FXTreeItem* item = appendItem(group, block->value("rendered"));
-        FXival uid = block->getReference(block_type::TYPE_UNIT);
+    else if (block.type() == block_type::TYPE_MESSAGE) {
+        FXTreeItem* item = appendItem(group, block.value("rendered"));
+        FXival uid = block.getReference(block_type::TYPE_UNIT);
 
         datablock::itor select;
         if (uid > 0 && mapFile->getUnit(select, uid)) {
             item->setData((void*)&*select);
         }
         else {
-            FXival b_id = block->getReference(block_type::TYPE_BUILDING);
+            FXival b_id = block.getReference(block_type::TYPE_BUILDING);
             if (b_id > 0 && mapFile->getBuilding(select, b_id)) {
                 item->setData((void*)&*select);
             }
             else {
-                FXival s_id = block->getReference(block_type::TYPE_SHIP);
+                FXival s_id = block.getReference(block_type::TYPE_SHIP);
                 if (s_id > 0 && mapFile->getShip(select, s_id)) {
                     item->setData((void*)&*select);
                 }
                 else {
-                    FXString loc = block->value("region");
+                    FXString loc = block.value("region");
                     if (loc.empty()) {
                         item->setData(nullptr);
                     }

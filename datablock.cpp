@@ -758,28 +758,28 @@ const char* datablock::UNITKEYS[] = {
     "target", "unit", "mage", "spy", "teacher", nullptr
 };
 
-bool datablock::hasReference(datablock* target) const
+bool datablock::hasReference(const datablock& target) const
 {
-    if (target->type() == block_type::TYPE_REGION) {
+    if (target.type() == block_type::TYPE_REGION) {
         FXString match;
-        match.format("%d %d %d", target->x(), target->y(), target->info());
+        match.format("%d %d %d", target.x(), target.y(), target.info());
         for (const datakey& key : m_data)
         {
             if (key.value() == match) return true;
         }
     }
-    else if (target->type() == block_type::TYPE_SHIP) {
-        int id = target->info();
+    else if (target.type() == block_type::TYPE_SHIP) {
+        int id = target.info();
         int uid = valueInt("ship");
         if (uid == id) return true;
     }
-    else if (target->type() == block_type::TYPE_BUILDING) {
-        int id = target->info();
+    else if (target.type() == block_type::TYPE_BUILDING) {
+        int id = target.info();
         int uid = valueInt("building");
         if (uid == id) return true;
     }
-    else if (target->type() == block_type::TYPE_UNIT) {
-        int id = target->info();
+    else if (target.type() == block_type::TYPE_UNIT) {
+        int id = target.info();
         for (int i = 0; UNITKEYS[i]; ++i)
         {
             int uid = valueInt(UNITKEYS[i]);

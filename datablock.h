@@ -295,7 +295,7 @@ public:
     FXString getLabel() const;
 
     /* TYPE_MESSAGE: */
-    bool hasReference(datablock* target) const;
+    bool hasReference(const datablock& target) const;
     int getReference(block_type type) const;
 
     bool hasKey(const key_type type) const;

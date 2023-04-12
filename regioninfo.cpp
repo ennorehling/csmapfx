@@ -80,7 +80,7 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
                     for (++block; block != end && block->depth() > depth; block++)
                     {
                         if (block->type() == block_type::TYPE_MESSAGE) {
-                            addMessage(battle, &*block);
+                            addMessage(battle, *block);
                         }
                     }
                 }
@@ -96,7 +96,7 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
                         MESSAGE 324149248
                         "von Figo (g351): 'KABUMM *kicher*'";rendered
                         */
-                        addMessage(regionMessages, &*block);
+                        addMessage(regionMessages, *block);
                     }
                     else if (block->depth() > regionPtr->depth() + 1) {
                         continue;
@@ -220,11 +220,11 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
                 while (block != end && block->type() != block_type::TYPE_MESSAGE) ++block;
                 for (; block != end && block->type() == block_type::TYPE_MESSAGE; ++block)
                 {
-                    datablock* msg = &*block;
-                    if (unitPtr && msg->hasReference(unitPtr)) {
+                    const datablock& msg = *block;
+                    if (unitPtr && msg.hasReference(*unitPtr)) {
                         addMessage(unitMessages, msg);
                     }
-                    if (regionPtr && msg->hasReference(regionPtr)) {
+                    if (regionPtr && msg.hasReference(*regionPtr)) {
                         addMessage(regionMessages, msg);
                     }
                 }

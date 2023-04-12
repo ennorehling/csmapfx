@@ -49,20 +49,20 @@ void FXReportInfo::setMapFile(std::shared_ptr<datafile>& f)
         if (mapFile) {
             end = mapFile->blocks().end();
             for (it = mapFile->blocks().begin(); it != end;) {
-                datablock* block = &*it;
-                if (block->type() == block_type::TYPE_REGION) {
+                const datablock& block = *it;
+                if (block.type() == block_type::TYPE_REGION) {
                     break;
                 }
-                else if (block->type() == block_type::TYPE_BATTLE) {
+                else if (block.type() == block_type::TYPE_BATTLE) {
                     addBattle(it);
                     /* block is already on the next object */
                     continue;
                 }
-                else if (block->type() == block_type::TYPE_FACTION) {
+                else if (block.type() == block_type::TYPE_FACTION) {
                     addFaction(it);
                     continue;
                 }
-                else if (block->type() == block_type::TYPE_MESSAGE && block->depth() == 3) {
+                else if (block.type() == block_type::TYPE_MESSAGE && block.depth() == 3) {
                     addMessage(messages, block);
                 }
                 ++it;
@@ -84,11 +84,11 @@ const char *FXReportInfo::messageSection(const FXString& section)
     return nullptr;
 }
 
-void FXReportInfo::addMessage(FXTreeItem *group, datablock * msg)
+void FXReportInfo::addMessage(FXTreeItem *group, const datablock& msg)
 {
     FXTreeItem* item;
-    FXival uid = msg->valueInt("target");
-    FXString section = msg->value("section");
+    FXival uid = msg.valueInt("target");
+    FXString section = msg.value("section");
 
     if (!section.empty()) {
         const char *text = messageSection(section);
@@ -106,23 +106,23 @@ void FXReportInfo::addMessage(FXTreeItem *group, datablock * msg)
             }
         }
     }
-    item = appendItem(group, msg->value("rendered"));
+    item = appendItem(group, msg.value("rendered"));
 
     if (uid <= 0)
-        uid = msg->valueInt("unit");
+        uid = msg.valueInt("unit");
     if (uid <= 0)
-        uid = msg->valueInt("mage");
+        uid = msg.valueInt("mage");
     if (uid <= 0)
-        uid = msg->valueInt("spy");
+        uid = msg.valueInt("spy");
     if (uid <= 0)
-        uid = msg->valueInt("teacher");
+        uid = msg.valueInt("teacher");
 
     datablock::itor select;
     if (uid > 0 && mapFile->getUnit(select, uid)) {
         item->setData((void*)&*select);
     }
     else {
-        FXString loc = msg->value("region");
+        FXString loc = msg.value("region");
         if (loc.empty()) {
             item->setData(nullptr);
         }
@@ -155,7 +155,7 @@ void FXReportInfo::addBattle(datablock::itor& block)
         if (block->type() != block_type::TYPE_MESSAGE) {
             break;
         }
-        addMessage(group, &*block);
+        addMessage(group, *block);
     }
 }
 

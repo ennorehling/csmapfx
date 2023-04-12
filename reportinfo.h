@@ -23,7 +23,7 @@ public:
     virtual void setMapFile(std::shared_ptr<datafile>& f);
 
 protected:
-    void addMessage(FXTreeItem* group, class datablock * msg);
+    void addMessage(FXTreeItem* group, const datablock& msg);
     void addBattle(datablock::itor& block);
     void addFaction(datablock::itor& block);
 
