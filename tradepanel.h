@@ -64,7 +64,7 @@ protected:
 	void setInfo(const std::vector<Info>& info);
 	void addEntry(std::vector<Info>& info, FXString name, int value, FXString tip = "");
 
-	void collectData(std::vector<Info>& info, datablock::itor region);
+	void collectData(std::vector<Info>& info, const datablock::itor & region);
 	void updateData();
 
 protected:

@@ -94,7 +94,7 @@ protected:
 	void collectFactionList(std::set<int> &factions, datablock::itor region);
 	void collectData(std::map<FXString, entry> &persons, std::map<FXString, entry> &items,
 				std::map<std::pair<FXString,int>, entry> &talents, std::map<FXString, entry> &ships,
-				std::map<FXString, entry> &buildings, datablock::itor region);
+				std::map<FXString, entry> &buildings, const datablock::itor& region);
 
 protected:
 	FXStatistics(){}

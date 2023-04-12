@@ -164,7 +164,7 @@ void FXRegionPanel::addEntry(std::vector<Info>& info, FXString name, FXulong val
 		info.push_back(Info(name, tip, value, skill));
 }
 
-void FXRegionPanel::collectData(std::vector<Info>& info, datablock::itor region)
+void FXRegionPanel::collectData(std::vector<Info>& info, const datablock::itor& region)
 {
 	FXint Bauern = region->valueInt(key_type::TYPE_PEASANTS, -1);
 	FXint Silber = region->valueInt(key_type::TYPE_SILVER, -1);
@@ -186,9 +186,8 @@ void FXRegionPanel::collectData(std::vector<Info>& info, datablock::itor region)
 	FXint Personen = 0, Parteipersonen = 0;
 	FXint Parteisilber = 0;
 
-	datablock::itor end = mapFile->blocks().end();
-	for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
-	{
+    datablock::itor block = region;
+    while (mapFile->getNext(block, block_type::TYPE_RESOURCE)) {
 		if (block->type() == block_type::TYPE_RESOURCE)
 		{
 			/*	RESOURCE 235898859

@@ -144,16 +144,11 @@ void FXTradePanel::addEntry(std::vector<Info>& info, FXString name, int value, F
 		info.push_back(Info(name, tip, value));
 }
 
-void FXTradePanel::collectData(std::vector<Info>& info, datablock::itor region)
+void FXTradePanel::collectData(std::vector<Info>& info, const datablock::itor& region)
 {
 	// search prices block of this region
-	datablock::itor end = mapFile->blocks().end(), block = end;
-	for (block = std::next(region); block != end && block->depth() > region->depth(); block++)
-		if (block->type() == block_type::TYPE_PRICES)
-			break;				// found
-
-	// found PREISE block?
-	if (block != end && block->type() == block_type::TYPE_PRICES)
+	datablock::itor block;
+	if (mapFile->getChild(block, region, block_type::TYPE_PRICES))
 	{
 		/*	PREISE
 			96;Balsam		// wird angekauft
@@ -169,7 +164,7 @@ void FXTradePanel::collectData(std::vector<Info>& info, datablock::itor region)
 				else
 				{
 					price = -price;
-					createLabels("Einkaufspreis "+goods->key(), thousandsPoints(price), -1);	// -1 == topmatrix
+					createLabels("Einkaufspreis " + goods->key(), thousandsPoints(price), -1);	// -1 == topmatrix
 				}
 			}
 	}

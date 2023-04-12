@@ -100,7 +100,7 @@ void FXStatistics::saveState(FXRegistry& reg)
 
 void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXString, entry> &items,
 							   std::map<std::pair<FXString,int>, entry> &talents, std::map<FXString, entry> &ships,
-							   std::map<FXString, entry> &buildings, datablock::itor region)
+							   std::map<FXString, entry> &buildings, const datablock::itor& region)
 {
 	bool unitInFaction = false;
 	int unitId = 0, personsInUnit = 0;

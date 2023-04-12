@@ -144,7 +144,7 @@ void FXStatsPanel::addEntry(std::vector<Info>& info, FXString name, int value, F
 		info.push_back(Info(name, tip, value));
 }
 
-void FXStatsPanel::collectData(std::vector<Info>& info, datablock::itor region)
+void FXStatsPanel::collectData(std::vector<Info>& info, const datablock::itor& region)
 {
 	int WorkPerRegion[] =	// Arbeitsplaetze pro Regionstyp
 	{
