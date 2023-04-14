@@ -2354,6 +2354,7 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames)
         }
         if (report) {
             report->createHashTables();
+            report->parseMessages();
         }
         ++selection.fileChange;
         mapChange();
@@ -2459,6 +2460,7 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
             report.reset(loadFile(filename));
             if (report) {
                 report->createHashTables();
+                report->parseMessages();
                 recentFiles.appendFile(filename);
             }
             mapChange();
@@ -2994,6 +2996,7 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
             report.reset(loadFile(filename));
             if (report) {
                 report->createHashTables();
+                report->parseMessages();
             }
             mapChange();
             updateFileNames();

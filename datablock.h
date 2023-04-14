@@ -181,6 +181,17 @@ struct region_info {
     std::vector<RegionInfo> resources;
 };
 
+enum {
+    INCOME_MISC,
+    INCOME_ENTERTAIN,
+    INCOME_TAXES,
+    INCOME_TRADE,
+    INCOME_TARIFFS,
+    INCOME_THEFT,
+    INCOME_MAGIC,
+    INCOME_MAX
+};
+
 class att_region : public attachment
 {
 public:
@@ -188,7 +199,10 @@ public:
 
 	peoplelist_t people;
     std::unique_ptr<region_info> regioninfos;
-    FXString		island;			// name of island
+    FXString island;			// name of island
+    FXlong income[INCOME_MAX];
+    FXlong learncost = 0;
+
 
 	enum	// not yet used!!!
 	{

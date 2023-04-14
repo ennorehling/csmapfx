@@ -49,9 +49,9 @@ protected:
 	struct Info
 	{
 		FXString name, tip;
-		FXint value;
+		FXlong value;
 
-		Info(const FXString& n, const FXString& t, FXint v) : name(n), tip(t), value(v) {}
+		Info(const FXString& n, const FXString& t, FXlong v) : name(n), tip(t), value(v) {}
 	};
 
 protected:
@@ -59,7 +59,7 @@ protected:
 	void createLabels(const FXString& name, const FXString& info, const FXString& info2, int column);
 
 	void setInfo(const std::vector<Info>& info);
-	void addEntry(std::vector<Info>& info, FXString name, int value, FXString tip = "");
+	void addEntry(std::vector<Info>& info, FXString name, FXlong value, FXString tip = "");
 
 	void collectData(std::vector<Info>& info, const datablock::itor& region);
 	void updateData();

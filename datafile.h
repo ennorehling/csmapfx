@@ -142,6 +142,7 @@ public:
 
     void createIslands();
     void createHashTables();
+    void parseMessages();
 
 protected:
     datablock::itor eraseRegion(const datablock::itor& region);

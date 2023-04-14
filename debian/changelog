@@ -1,6 +1,12 @@
+csmapfx (1.6.11-1) stable; urgency=low
+
+  *   * optimization for stats panel (income and education)
+
+ -- Enno Rehling <enno@eressea.de>  Fri, 14 Apr 2023 14:45:00 +0200
+
 csmapfx (1.6.10-2) stable; urgency=low
 
-  * fix Linux compiation, missing header.
+  * fix Linux compilation, missing header.
 
  -- Enno Rehling <enno@eressea.de>  Wed, 12 Apr 2023 21:55:00 +0200
 

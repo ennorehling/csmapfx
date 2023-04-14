@@ -1,5 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS // for sscanf
-
 #include "main.h"
 #include "fxhelper.h"
 #include "statspanel.h"
@@ -60,7 +58,7 @@ void FXStatsPanel::setMapFile(std::shared_ptr<datafile>& f)
     mapFile = f;
 }
 
-inline FXString thousandsPoints(FXint value, bool plusSign = false)
+inline FXString thousandsPoints(FXlong value, bool plusSign = false)
 {
 	FXString str = FXStringVal((value<0)?-value:value);
 
@@ -130,7 +128,7 @@ void FXStatsPanel::setInfo(const std::vector<Info>& info)
 	}
 }
 
-void FXStatsPanel::addEntry(std::vector<Info>& info, FXString name, int value, FXString tip)
+void FXStatsPanel::addEntry(std::vector<Info>& info, FXString name, FXlong value, FXString tip)
 {
     std::vector<Info>::iterator itor;
 	for (itor = info.begin(); itor != info.end(); itor++)
@@ -198,94 +196,19 @@ void FXStatsPanel::collectData(std::vector<Info>& info, const datablock::itor& r
     }
 	if (earnings) addEntry(info, "Bauernertrag", earnings, FXString(L"\u00dcberschuss der Bauerneinnahmen pro Runde. Kann sicher eingetrieben werden."));
 
-    if (mapFile) {
-        // search income messages for this region
-        datablock::itor faction, end = mapFile->blocks().end();
-        datablock::itor block = faction = mapFile->activefaction();
-        if (block != end) {
-            block++;
-        }
-    
-        /*
-            modes:
-            0: misc
-            1: Unterhaltung
-            2: Steuern
-            3: Handel
-            4: Handel fremder Parteien
-            5: Diebstahl
-            6: Zauberei
-        */
-        int income[7] = {};
-        int learncost = 0;
-
-        for (; block != end && block->depth() > faction->depth(); block++)
-        {
-            if (block->type() == block_type::TYPE_MESSAGE)
-            {
-                int type = block->valueInt(TYPE_MSG_TYPE);
-
-                if (type != 771334452 && type != 443066738)
-                    continue;
-
-                const datakey::list_type &list = block->data();
-
-                datakey::list_type::const_iterator reg = list.end();
-                int amount = 0, mode = 0;
-
-                for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); itor++)
-                {
-                    key_type key = itor->type();
-                    if (key == key_type::TYPE_MSG_REGION) {
-                        reg = itor;
-                    }
-                    else if (key == key_type::TYPE_MSG_AMOUNT) {
-                        amount = itor->getInt();
-                    }
-                    else if (key == key_type::TYPE_MSG_COST) {
-                        amount = itor->getInt();
-                    }
-                    else if (key == key_type::TYPE_MSG_MODE) {
-                        mode = itor->getInt();
-                    }
-                }
-
-                if (reg == list.end())
-                    continue;
-
-                FXString location = reg->value();
-                int x, y, z;
-                int num = sscanf(location.text(), "%d %d %d", &x, &y, &z);
-                if (num < 2) {
-                    continue;
-                }
-                else if (num < 3) {
-                    z = 0;
-                }
-
-                if (region->x() != x || region->y() != y || region->info() != z)
-                    continue;
-
-                if (mode < 0 || mode > 6)
-                    mode = 0;
-
-                if (type == 771334452)	// Einnahmen
-                    income[mode] += amount;
-                else if (type == 443066738)	// Ausgaben fuer teure Talente (+Akademie)
-                    learncost += amount;
-            }
-        }
+    att_region* att = static_cast<att_region*>(region->attachment());
+    if (att) {
         // display income messages
-        if (income[0]) addEntry(info, "Einnahmen", income[0], FXString(L"Einnahmen durch sonstige T\u00e4tigkeiten."));
-        if (income[1]) addEntry(info, "Unterhaltung", income[1], "Einnahmen durch Unterhaltung");
-        if (income[2]) addEntry(info, "Steuern", income[2], "Einnahmen durch Steuern");
-        if (income[3]) addEntry(info, "Handel", income[3], "Einnahmen durch Handel");
-        if (income[4]) addEntry(info, "Handelsabgaben", income[4], "Einnahmen durch Handel fremder Parteien");
-        if (income[5]) addEntry(info, "Diebstahl", income[5], "Einnahmen durch Diebstahl");
-        if (income[6]) addEntry(info, "Zauberei", income[6], "Einnahmen durch Zauberei");
+        if (att->income[0]) addEntry(info, "Einnahmen", att->income[0], FXString(L"Einnahmen durch sonstige T\u00e4tigkeiten."));
+        if (att->income[1]) addEntry(info, "Unterhaltung", att->income[1], "Einnahmen durch Unterhaltung");
+        if (att->income[2]) addEntry(info, "Steuern", att->income[2], "Einnahmen durch Steuern");
+        if (att->income[3]) addEntry(info, "Handel", att->income[3], "Einnahmen durch Handel");
+        if (att->income[4]) addEntry(info, "Handelsabgaben", att->income[4], "Einnahmen durch Handel fremder Parteien");
+        if (att->income[5]) addEntry(info, "Diebstahl", att->income[5], "Einnahmen durch Diebstahl");
+        if (att->income[6]) addEntry(info, "Zauberei", att->income[6], "Einnahmen durch Zauberei");
 
         // display learncost messages
-        if (learncost) addEntry(info, "Lernkosten", -learncost, "Ausgaben zum Lernen von Talenten");
+        if (att->learncost) addEntry(info, "Lernkosten", -att->learncost, "Ausgaben zum Lernen von Talenten");
     }
 }
 
