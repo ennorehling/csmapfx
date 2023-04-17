@@ -53,6 +53,7 @@ typedef enum key_type
     TYPE_NAME,
     TYPE_LOWERCASE_NAME,
     TYPE_DESCRIPTION,
+    TYPE_NOTES,
     TYPE_TERRAIN,
     TYPE_ISLAND,
     TYPE_ID,

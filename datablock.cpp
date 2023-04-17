@@ -87,6 +87,8 @@ int datakey::parseType(const FXString& type, enum block_type btype)
         return TYPE_PEASANTS;
     if (type == "name")
 		return TYPE_LOWERCASE_NAME;
+	if (type == "privat")
+		return TYPE_NOTES;
 	if (type == "Beschr")
 		return TYPE_DESCRIPTION;
     if (type == "Baeume" || type == L"B\u00e4ume")
@@ -197,6 +199,8 @@ FXString datakey::key() const
         return "Name";
     case TYPE_LOWERCASE_NAME:
         return "name";
+    case TYPE_NOTES:
+        return "privat";
     case TYPE_DESCRIPTION:
         return "Beschr";
     case TYPE_SAPLINGS:

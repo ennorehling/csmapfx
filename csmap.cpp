@@ -1963,6 +1963,20 @@ void CSMap::updateFileNames() {
     handle(this, FXSEL(SEL_COMMAND, ID_SETSTRINGVALUE), &titlestr);
 }
 
+static FXString descText(const datablock & block)
+{
+    const FXString& descr = block.value(TYPE_DESCRIPTION);
+    const FXString& notes = block.value(TYPE_NOTES);
+    if (notes.empty()) {
+        return descr;
+    } else if (descr.empty()) {
+        return FXString("Privat: ") + notes;
+    }
+    else {
+        return descr + "\nPrivat: " + notes;
+    }
+}
+
 long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
 {
     datafile::SelectionState* pstate = (datafile::SelectionState*)ptr;
@@ -1981,17 +1995,17 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     if (pstate->selected & selection.UNIT)
     {
         block = pstate->unit;
-        descriptionText->setText(block->value(TYPE_DESCRIPTION));
+        descriptionText->setText(descText(*block));
     }
     else if (pstate->selected & selection.SHIP)
     {
         block = pstate->ship;
-        descriptionText->setText(block->value(TYPE_DESCRIPTION));
+        descriptionText->setText(descText(*block));
     }
     else if (pstate->selected & selection.BUILDING)
     {
         block = pstate->building;
-        descriptionText->setText(block->value(TYPE_DESCRIPTION));
+        descriptionText->setText(descText(*block));
     }
     else {
         descriptionText->setText("");

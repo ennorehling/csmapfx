@@ -299,7 +299,7 @@ namespace
 			return true;
 
 		if (context.searchDescriptions)		// compare descriptions?
-			return compare(block->value(TYPE_DESCRIPTION));
+			return compare(block->value(TYPE_DESCRIPTION)) || compare(block->value(TYPE_NOTES));
 
 		return false;
 	}
@@ -315,7 +315,7 @@ namespace
 			return true;
 
         // compare descriptions?
-		if (context.searchDescriptions && compare(unitPtr->value(TYPE_DESCRIPTION)))
+		if (context.searchDescriptions && (compare(unitPtr->value(TYPE_DESCRIPTION)) || compare(block->value(TYPE_NOTES))))
 			return true;
 
         // compare faction names?
@@ -342,7 +342,7 @@ namespace
 			return true;
 
 		if (context.searchDescriptions)		// compare descriptions?
-			return compare(block->value(TYPE_DESCRIPTION));
+			return compare(block->value(TYPE_DESCRIPTION)) || compare(block->value(TYPE_NOTES));
 
 		return false;
 	}
@@ -358,7 +358,7 @@ namespace
 			return true;
 
         if (context.searchDescriptions)		// compare descriptions?
-            return compare(block->value(TYPE_DESCRIPTION));
+            return compare(block->value(TYPE_DESCRIPTION)) || compare(block->value(TYPE_NOTES));
 
 		return false;
 	}

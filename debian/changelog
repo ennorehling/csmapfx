@@ -1,6 +1,13 @@
+csmapfx (1.7.0-1) stable; urgency=low
+
+  * show private descriptions (notes)
+  * search in private descriptions (notes)
+
+ -- Enno Rehling <enno@eressea.de>  Mon, 17 Apr 2023 08:00:00 +0200
+
 csmapfx (1.6.11-1) stable; urgency=low
 
-  *   * optimization for stats panel (income and education)
+  * optimization for stats panel (income and education)
 
  -- Enno Rehling <enno@eressea.de>  Fri, 14 Apr 2023 14:45:00 +0200
 

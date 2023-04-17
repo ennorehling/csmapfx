@@ -1674,7 +1674,7 @@ void datafile::updateHashTables(const datablock::itor& start)
             m_turn = block->valueInt(TYPE_TURN, m_turn);
 
         // set faction as active faction (for ally-state)
-        if (block->type() == block_type::TYPE_FACTION)
+        else if (block->type() == block_type::TYPE_FACTION)
         {
             if (m_factionId == 0) {
                 if (/*block->value(TYPE_TYPE) != "" ||*/ block->value(TYPE_OPTIONS) != "")

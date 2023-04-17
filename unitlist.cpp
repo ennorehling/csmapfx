@@ -122,6 +122,7 @@ void FXUnitList::makeItems()
             case TYPE_ORDERS_CONFIRMED:
             case TYPE_FACTIONSTEALTH:
             case TYPE_DESCRIPTION:
+            case TYPE_NOTES:
                 // do not show
                 break;
             default:

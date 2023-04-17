@@ -66,6 +66,7 @@ void FXShipProperties::makeItems()
                 break;
             case TYPE_FACTION:
             case TYPE_DESCRIPTION:
+            case TYPE_NOTES:
                 /* ignore */
                 break;
             default:
