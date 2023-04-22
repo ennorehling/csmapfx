@@ -218,7 +218,7 @@ bool datafile::load(const FXString& filename, FXString & outError)
         outError.assign("Die Datei hat das falsche Format.");
         return false;
     }
-
+    createHashTables();
 	return m_blocks.size();
 }
 
@@ -621,6 +621,7 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
         }
         ++old_r;
     }
+    createHashTables(); 
 }
 
 const char* datafile::getConfigurationName(map_type type)

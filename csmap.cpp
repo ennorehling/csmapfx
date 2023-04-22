@@ -932,9 +932,10 @@ FXbool CSMap::close(FXbool notify)
     reg.writeUnsignedEntry("TABS", "STATSINFOS", siTab->isCollapsed());
     reg.writeUnsignedEntry("TABS", "TRADEINFOS", tiTab->isCollapsed());
 
-    // quit application, quickly
-    exit(0);
-    // return FXMainWindow::close(notify);
+    if (FXMainWindow::close(notify)) {
+        exit(0);
+    }
+    return false;
 }
 
 void CSMap::mapChange()
@@ -2361,14 +2362,11 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames)
         for (FXString const& filename : filenames) {
             if (!report) {
                 report.reset(loadFile(filename));    // normal laden, wenn vorher keine Datei geladen ist.
+                recentFiles.appendFile(filename);
             }
             else {
                 mergeFile(filename); // updates report in case of success
             }
-        }
-        if (report) {
-            report->createHashTables();
-            report->parseMessages();
         }
         ++selection.fileChange;
         mapChange();
@@ -2606,7 +2604,9 @@ long CSMap::onFileSaveMap(FXObject*, FXSelector, void*)
     FXString filename = askSaveFileName("Speichern unter...");
     if (!filename.empty() && allowReplaceFile(filename)) {
         getApp()->beginWaitCursor();
-        saveReport(filename, map_type::MAP_NORMAL);
+        if (saveReport(filename, map_type::MAP_NORMAL)) {
+            recentFiles.appendFile(filename);
+        }
         getApp()->endWaitCursor();
         return 1;
     }
@@ -2621,6 +2621,7 @@ long CSMap::onFileSaveAll(FXObject*, FXSelector, void*)
         if (saveReport(filename, map_type::MAP_FULL)) {
             recentFiles.appendFile(filename);
             report->filename(filename);
+            updateFileNames();
         }
         getApp()->endWaitCursor();
         return 1;
