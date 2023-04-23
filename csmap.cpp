@@ -1138,6 +1138,7 @@ void CSMap::mapChange()
     regionInfo->setMapFile(report);
     map->setMapFile(report);
     regions->setMapFile(report);
+    checkCommands();
 }
 
 long CSMap::updOpenFile(FXObject *sender, FXSelector, void *)
@@ -1297,7 +1298,6 @@ bool CSMap::loadCommands(const FXString& filename)
     reload_mode = CSMap::reload_type::RELOAD_ASK;
     mapChange();
     updateFileNames();
-    checkCommands();
     return true;
 }
 
@@ -2370,8 +2370,6 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames)
             }
         }
         ++selection.fileChange;
-        mapChange();
-        checkCommands();
     }
 }
 
@@ -2478,7 +2476,6 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
             }
             mapChange();
             updateFileNames();
-            checkCommands();
         }
         getApp()->endWaitCursor();
     }
@@ -2504,6 +2501,7 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
         }
         getApp()->beginWaitCursor();
         loadFiles(filenames);
+        mapChange();
         getApp()->endWaitCursor();
     }
     return 1;
@@ -3404,17 +3402,26 @@ std::vector<FXString> CSMap::ParseCommandLine()
 {
     LPWSTR* argv;
     int argc;
-    std::vector<FXString> filenames;
+    std::vector<FXString> args;
+    std::vector<FXString> tokens;
+    std::vector<FXString> switches;
+    std::vector<FXParam> params;
 
     argv = CommandLineToArgvW(GetCommandLineW(), &argc);
     for (int arg = 1; arg != argc; ++arg)
     {
-        if (argv[arg][0] != '-') {
-            FXString filename = FXPath::simplify(FXString(argv[arg]));
-            filenames.push_back(filename);
-        }
+        args.push_back(FXString(argv[arg]));
     }
     LocalFree(argv);
+
+    FXParseCommandLine(args, tokens, switches, params);
+    std::vector<FXString> filenames;
+
+    for (const FXString& token : tokens)
+    {
+        FXString filename = FXPath::simplify(token);
+        filenames.push_back(filename);
+    }
     return filenames;
 }
 #else

@@ -133,6 +133,26 @@ FXString FXStringValEx(FXulong num, unsigned int base)
     }
 }
 
+void FXParseCommandLine(const std::vector<FXString>& args, std::vector<FXString>& tokens, std::vector<FXString>& switches, std::vector<FXParam>& params)
+{
+    for (const FXString& arg : args) {
+        if (arg[0] == '-') {
+            FXint split = arg.find('=');
+            if (split < 0) {
+                switches.push_back(arg.right(arg.length() - 1));
+            } else {
+                FXParam param;
+                param.key = arg.mid(1, split - 1);
+                param.value = arg.right(arg.length() - split - 1);
+                params.push_back(param);
+            }
+        }
+        else {
+            tokens.push_back(arg);
+        }
+    }
+}
+
 std::string loadResourceFile(const char *relpath)
 {
     std::string result;

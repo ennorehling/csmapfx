@@ -95,121 +95,39 @@ int main(int argc, char *argv[])
 	CSApp.init(argc, argv); 
 	CSApp.create();
 
-	// hide programm file name
-	argv++; argc--;
-
-	bool startgui = true;
-	bool calculator = false;
-
-	int arg;
-	for (arg = 0; arg < argc; arg++)
-	{
-		if (argv[arg][0] == '-')	// check option
-		{
-			for (int i = 1; argv[arg][i]; i++)
-			{
-				char c = argv[arg][i];
-
-				if (c == 'h')			// help
-				{
-					showHelpText();
-					startgui = false;
-				}
-				else if (c == 'v')		// version
-				{
-					showVersion();
-					startgui = false;
-				}
-				else if (c == 'c')		// calculator
-					calculator = true;
-				else if (c == '-')		// --bla
-				{
-                    if (argv[arg][i+1] == 'h' && argv[arg][i+2] == 'e' && argv[arg][i+3] == 'l' &&
-						argv[arg][i+4] == 'p' && argv[arg][i+5] == '\0')
-					{
-						showHelpText();
-						startgui = false;
-					}
-                    else if (argv[arg][i+1] == 'v' && argv[arg][i+2] == 'e' && argv[arg][i+3] == 'r' &&
-						argv[arg][i+4] == 's' && argv[arg][i+5] == 'i' && argv[arg][i+6] == 'o' &&
-						argv[arg][i+7] == 'n' && argv[arg][i+8] == '\0')
-					{
-						showVersion();
-						startgui = false;
-					}
-					else
-					{
-						showError((std::string)"csmapfx: Ung\u00fcltige Option: --" + (argv[arg]+i+1) + "\nProbier 'csmapfx --help\' f\u00fcr m\u00f6gliche Optionen");
-						startgui = false;
-					}
-
-					break;
-				}
-				else
-				{
-					showError((std::string)"csmapfx: Ung\u00fcltige Option: -" + c + "\nProbier 'csmapfx --help\' f\u00fcr m\u00f6gliche Optionen");
-					startgui = false;
-				}
-			}
-		}
-		else if (argv[arg][0])		// stop here if a filename was found
-		{
-			startgui = true;
-			break;
-		}
-	}
-
-	if (!startgui && !calculator)
-		return 0;
-
 	// Make window 
-	CSMap* csmap = NULL;
-	FXMainWindow* shell = NULL;
-	
-	if (calculator)
-	{
-		shell = new FXMainWindow(&CSApp, "Taschenrechner", 0,0, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100,100,300);
-		FXCalculator* calc = new FXCalculator(shell, NULL,0, LAYOUT_FILL_X);
-		calc->recalc();
-	}
-	else
-		shell = csmap = new CSMap(&CSApp); 
+	CSMap* csmap = new CSMap(&CSApp); 
 
-    // Programm ohne GUI beenden?
-    if (!startgui && !calculator)
-        return 0;
-    
-    // Create it 
-	try
-	{
-		// create all windows
-		for(FXWindow* child = CSApp.getRootWindow()->getFirst(); child; child = child->getNext())
-			if (!child->id())
-				child->create();
-	}
-	catch (const FXException& e)
-	{
-		FXMessageBox::error(&CSApp, MBOX_OK, "CSMap - Fehler", "CSMap konnte nicht gestartet werden:\n%s", e.what());
-		return -1;
-	}
-	catch (const std::exception& e)
-	{
-		FXMessageBox::error(&CSApp, MBOX_OK, "CSMap - Fehler", "CSMap konnte nicht gestartet werden:\n%s", FXString(e.what()).text());
-		return -1;
-	}
-    if (shell)
-        shell->show(PLACEMENT_DEFAULT);
-
-    if (csmap) {
 #ifdef WIN32
-        std::vector<FXString> filenames = csmap->ParseCommandLine();
+    std::vector<FXString> filenames = csmap->ParseCommandLine();
 #else
-        std::vector<FXString> filenames = csmap->ParseCommandLine(argc, argv);
+    std::vector<FXString> filenames = csmap->ParseCommandLine(argc, argv);
 #endif
-        if (!filenames.empty()) {
-            csmap->loadFiles(filenames);
-        }
+    if (!filenames.empty()) {
+        csmap->loadFiles(filenames);
     }
+
+    // Create it 
+    try
+    {
+        // create all windows
+        for (FXWindow* child = CSApp.getRootWindow()->getFirst(); child; child = child->getNext())
+            if (!child->id())
+                child->create();
+    }
+    catch (const FXException& e)
+    {
+        FXMessageBox::error(&CSApp, MBOX_OK, "CSMap - Fehler", "CSMap konnte nicht gestartet werden:\n%s", e.what());
+        return -1;
+    }
+    catch (const std::exception& e)
+    {
+        FXMessageBox::error(&CSApp, MBOX_OK, "CSMap - Fehler", "CSMap konnte nicht gestartet werden:\n%s", FXString(e.what()).text());
+        return -1;
+    }
+    csmap->mapChange();
+    csmap->show(PLACEMENT_DEFAULT);
+
     // Run 
 	int exitcode = CSApp.run(); 
 #ifdef HAVE_CURL

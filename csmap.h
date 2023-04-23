@@ -31,6 +31,7 @@ public:
 #endif
 
 public:		// this functions are slots for menu commands
+    void mapChange();
     long updOpenFile(FXObject *sender, FXSelector, void *);
 	long updActiveFaction(FXObject *sender, FXSelector, void *);
 
@@ -218,7 +219,6 @@ private:
     void gotoObject(class datablock* block);
 
     bool saveReport(const FXString& filename, map_type mode, bool merge_commands = false);
-    void mapChange();
     bool haveActiveFaction() const;
     datafile* loadFile(const FXString& filename);
     bool mergeFile(const FXString& filename);

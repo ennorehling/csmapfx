@@ -47,5 +47,11 @@ inline std::ostream& operator<<(std::ostream& out, const FX::FXString& str)
 
 FXString FXStringValEx(FXulong num, unsigned int base = 10);
 
+struct FXParam {
+    FXString key;
+    FXString value;
+};
+void FXParseCommandLine(const std::vector<FXString>& args, std::vector<FXString>& tokens, std::vector<FXString>& switches, std::vector<FXParam>& params);
+
 std::string loadResourceFile(const char * relpath);
 #endif //_CSMAP_FXHELPER_H
