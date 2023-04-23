@@ -1369,14 +1369,14 @@ bool CSMap::checkCommands()
                 cmdline.append(" ");
                 cmdline.append(infile);
 #ifdef WIN32
-                STARTUPINFO si;
+                STARTUPINFOA si;
                 PROCESS_INFORMATION pi;
 
                 ZeroMemory(&si, sizeof(si));
                 si.cb = sizeof(si);
                 ZeroMemory(&pi, sizeof(pi));
                 // hack: set ECheck locale to German, since we don't support English CsMap yet:
-                if (!CreateProcess(nullptr, (LPSTR)cmdline.text(), nullptr, nullptr, FALSE, 0, (LPVOID)"LC_MESSAGES=de\0",
+                if (!CreateProcessA(nullptr, (LPSTR)cmdline.text(), nullptr, nullptr, FALSE, 0, (LPVOID)"LC_MESSAGES=de\0",
                     settings.echeck_dir.text(), &si, &pi)) {
                     errorList->appendItem("CreateProcess failed: " + cmdline);
                 }

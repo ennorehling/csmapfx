@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.0)
 
 project (csmapfx CXX C)
 
-if (NOT WIN32)
+if (WIN32)
+add_definitions(-DUNICODE)
+else (WIN32)
 find_package(PhysFS 2.1)
 endif (NOT WIN32)
 find_package(PNG)

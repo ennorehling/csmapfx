@@ -156,11 +156,11 @@ std::string loadResourceFile(const char *relpath)
     TCHAR pf[MAX_PATH];
     if (SHGetSpecialFolderPath(0, pf, CSIDL_APPDATA, FALSE))
     {
-        std::string filename(pf);
+        FXString filename(pf);
         filename += "\\Eressea\\CsMapFX\\";
         filename += relpath;
         std::ifstream file;
-        file.open(filename.c_str(), std::ios::in | std::ios::binary);
+        file.open(filename.text(), std::ios::in | std::ios::binary);
         if (file.is_open())
         {
             std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
