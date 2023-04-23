@@ -95,9 +95,7 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
 #else
     for (int arg = 0; arg != argc; ++arg)
     {
-        if (argv[arg][0] != '-') {
-            filenames.push_back(argv[arg]);
-        }
+        args.push_back(argv[arg]);
     }
 #endif
     std::vector<FXString> tokens;

@@ -6,7 +6,7 @@ if (WIN32)
 add_definitions(-DUNICODE)
 else (WIN32)
 find_package(PhysFS 2.1)
-endif (NOT WIN32)
+endif (WIN32)
 find_package(PNG)
 find_package(CURL)
 
