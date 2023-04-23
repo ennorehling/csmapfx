@@ -24,12 +24,6 @@ public:
 	virtual void create();
 	virtual FXbool close(FXbool notify=FALSE);
 
-#ifdef WIN32
-    std::vector<FXString> ParseCommandLine();
-#else
-    std::vector<FXString> ParseCommandLine(int argc, char** argv);
-#endif
-
 public:		// this functions are slots for menu commands
     void mapChange();
     long updOpenFile(FXObject *sender, FXSelector, void *);

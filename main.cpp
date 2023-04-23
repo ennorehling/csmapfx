@@ -77,6 +77,47 @@ void showVersion()
 	showError(help.str());
 }
 
+#ifdef WIN32
+std::vector<FXString> ParseCommandLine()
+{
+    LPWSTR* argv;
+    int argc;
+    std::vector<FXString> args;
+    std::vector<FXString> tokens;
+    std::vector<FXString> switches;
+    std::vector<FXParam> params;
+
+    argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+    for (int arg = 1; arg != argc; ++arg)
+    {
+        args.push_back(FXString(argv[arg]));
+    }
+    LocalFree(argv);
+
+    FXParseCommandLine(args, tokens, switches, params);
+    std::vector<FXString> filenames;
+
+    for (const FXString& token : tokens)
+    {
+        FXString filename = FXPath::simplify(token);
+        filenames.push_back(filename);
+    }
+    return filenames;
+}
+#else
+std::vector<FXString> CSMap::ParseCommandLine(int argc, char** argv)
+{
+    std::vector<FXString> filenames;
+    for (int arg = 0; arg != argc; ++arg)
+    {
+        if (argv[arg][0] != '-') {
+            filenames.push_back(argv[arg]);
+        }
+    }
+    return filenames;
+}
+#endif
+
 int main(int argc, char *argv[])
 {
 #ifdef HAVE_PHYSFS
@@ -99,9 +140,9 @@ int main(int argc, char *argv[])
 	CSMap* csmap = new CSMap(&CSApp); 
 
 #ifdef WIN32
-    std::vector<FXString> filenames = csmap->ParseCommandLine();
+    std::vector<FXString> filenames = ParseCommandLine();
 #else
-    std::vector<FXString> filenames = csmap->ParseCommandLine(argc, argv);
+    std::vector<FXString> filenames = ParseCommandLine(argc, argv);
 #endif
     if (!filenames.empty()) {
         csmap->loadFiles(filenames);
