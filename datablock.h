@@ -201,7 +201,7 @@ public:
 	peoplelist_t people;
     std::unique_ptr<region_info> regioninfos;
     FXString island;			// name of island
-    FXlong income[INCOME_MAX];
+    FXlong income[INCOME_MAX] = { 0 };
     FXlong learncost = 0;
 
     FXint unconfirmed = 0; // number of unconfirmed units

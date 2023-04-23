@@ -546,9 +546,9 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
                 x += x_offset;
                 y += y_offset;
             }
-            // cannot use getRegion here, because hash tables are not ready?
-            datablock::itor new_r = region(x, y, plane);
-            if (new_r != m_blocks.end())            // add some info to old cr (island names)
+
+            datablock::itor new_r;
+            if (getRegion(new_r, *old_r))            // add some info to old cr (island names)
             {
                 bool is_seen = !new_r->hasKey(TYPE_VISIBILITY);
                 copy_children = false;
