@@ -1138,7 +1138,9 @@ void CSMap::mapChange()
     regionInfo->setMapFile(report);
     map->setMapFile(report);
     regions->setMapFile(report);
-    checkCommands();
+    if (report) {
+        checkCommands();
+    }
 }
 
 long CSMap::updOpenFile(FXObject *sender, FXSelector, void *)
