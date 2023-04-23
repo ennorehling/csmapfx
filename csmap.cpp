@@ -43,6 +43,7 @@
 #include "FXMenuSeparatorEx.h"
 #include "FXSplitterEx.h"
 #include "FXFileDialogEx.h"
+#include <FXPath.h>
 #include <FXFont.h>
 #include <FXRex.h>
 #include <FXICOIcon.h>
@@ -3409,7 +3410,8 @@ std::vector<FXString> CSMap::ParseCommandLine()
     for (int arg = 1; arg != argc; ++arg)
     {
         if (argv[arg][0] != '-') {
-            filenames.push_back(argv[arg]);
+            FXString filename = FXPath::simplify(FXString(argv[arg]));
+            filenames.push_back(filename);
         }
     }
     LocalFree(argv);
