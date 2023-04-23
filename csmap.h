@@ -117,7 +117,7 @@ public:		// this functions are slots for menu commands
     long onPopupShowInfo(FXObject* sender, FXSelector sel, void* ptr);
     long onPopupGotoObject(FXObject* sender, FXSelector sel, void* ptr);
 
-    void loadFiles(const std::vector<FXString>& filenames);
+    void loadFiles(const std::vector<FXString>& filenames, std::vector<FXString>& errorMessages);
     int saveFile(const FXString& filename, map_type mode = map_type::MAP_FULL);
     void addClipboardPane(FXMenuPane* pane, datablock* block);
     void addPlane(int planeId);
@@ -215,8 +215,8 @@ private:
 
     bool saveReport(const FXString& filename, map_type mode, bool merge_commands = false);
     bool haveActiveFaction() const;
-    datafile* loadFile(const FXString& filename);
-    bool mergeFile(const FXString& filename);
+    datafile* loadFile(const FXString& filename, FXString &errorMessage);
+    bool mergeFile(const FXString& filename, FXString& errorMessage);
     bool closeFile();
     void saveCommandsDlg(bool stripped, bool replace);
     FXString askFileName(const FXString& title, const FXString& patterns);

@@ -106,7 +106,8 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
     FXParseCommandLine(args, tokens, switches, params);
 
     if (!tokens.empty()) {
-        csmap->loadFiles(tokens);
+        std::vector<FXString> errorMessages;
+        csmap->loadFiles(tokens, errorMessages);
     }
     for (const FXParam& param : params) {
         if (param.key == "out") {

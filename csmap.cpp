@@ -1168,10 +1168,9 @@ bool CSMap::haveActiveFaction() const
     return report->getFactionId() != 0;
 }
 
-datafile* CSMap::loadFile(const FXString& filename)
+datafile* CSMap::loadFile(const FXString& filename, FXString& errorMessage)
 {
     datafile* cr = new datafile();
-    FXString errorMessage;
 
     try
     {
@@ -1188,19 +1187,15 @@ datafile* CSMap::loadFile(const FXString& filename)
         delete cr;
         cr = nullptr;
     }
-    if (!errorMessage.empty()) {
-        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", errorMessage.text());
-    }
     return cr;
 }
 
-bool CSMap::mergeFile(const FXString& filename)
+bool CSMap::mergeFile(const FXString& filename, FXString & errorMessage)
 {
     // zuerst: Datei normal laden
     std::shared_ptr<datafile> new_cr = std::make_shared<datafile>();
     beginLoading(filename);
 
-    FXString errorMessage;
     try
     {
         if (!new_cr->load(filename, errorMessage)) {
@@ -1209,14 +1204,8 @@ bool CSMap::mergeFile(const FXString& filename)
     }
     catch(const std::runtime_error& err)
     {
-        recentFiles.removeFile(filename);
         errorMessage = FXString(filename) + ": " + FXString(err.what());
         new_cr.reset();
-    }
-    if (!errorMessage.empty())
-    {
-        recentFiles.removeFile(filename);
-        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", errorMessage.text());
     }
     if (!new_cr) {
         return false;
@@ -2356,17 +2345,26 @@ long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)
     return 1;
 }
 
-void CSMap::loadFiles(const std::vector<FXString> &filenames)
+void CSMap::loadFiles(const std::vector<FXString> &filenames, std::vector<FXString> & errorMessages)
 {
     if (!filenames.empty()) {
 
         for (FXString const& filename : filenames) {
+            FXString errorMessage;
             if (!report) {
-                report.reset(loadFile(filename));    // normal laden, wenn vorher keine Datei geladen ist.
-                recentFiles.appendFile(filename);
+                report.reset(loadFile(filename, errorMessage));    // normal laden, wenn vorher keine Datei geladen ist.
+                if (!errorMessage.empty()) {
+                    errorMessages.push_back(errorMessage);
+                }
+                else {
+                    recentFiles.appendFile(filename);
+                }
             }
             else {
-                mergeFile(filename); // updates report in case of success
+                mergeFile(filename, errorMessage); // updates report in case of success
+                if (!errorMessage.empty()) {
+                    errorMessages.push_back(errorMessage);
+                }
             }
         }
         ++selection.fileChange;
@@ -2473,7 +2471,11 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
         if (closeFile()) {
             FXString filename = dlg.getFilename();
             beginLoading(filename);
-            report.reset(loadFile(filename));
+            FXString errorMessage;
+            report.reset(loadFile(filename, errorMessage));
+            if (!errorMessage.empty()) {
+                FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", errorMessage.text());
+            }
             if (report) {
                 report->createHashTables();
                 report->parseMessages();
@@ -2505,7 +2507,13 @@ long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
             filenames.push_back(choices[i]);
         }
         getApp()->beginWaitCursor();
-        loadFiles(filenames);
+        std::vector<FXString> errorMessages;
+        loadFiles(filenames, errorMessages);
+        if (!errorMessages.empty()) {
+            for (const FXString& errorMessage : errorMessages) {
+                FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", errorMessage.text());
+            }
+        }
         mapChange();
         getApp()->endWaitCursor();
     }
@@ -3012,7 +3020,11 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
     beginLoading(filename);
     if (loadReport) {
         if (closeFile()) {
-            report.reset(loadFile(filename));
+            FXString errorMessage;
+            report.reset(loadFile(filename, errorMessage));
+            if (!errorMessage.empty()) {
+                FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", errorMessage.text());
+            }
             if (report) {
                 report->createHashTables();
                 report->parseMessages();
