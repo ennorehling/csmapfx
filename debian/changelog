@@ -1,8 +1,9 @@
 csmapfx (1.7.3-1) stable; urgency=low
 
   * simplify file names from command line, use canonical OS path separator
+  * command-line operations
 
- -- Enno Rehling <enno@eressea.de>  Sun, 23 Apr 2023 12:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 23 Apr 2023 13:45:00 +0200
 
 csmapfx (1.7.2-1) stable; urgency=high
 

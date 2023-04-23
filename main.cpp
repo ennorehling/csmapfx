@@ -77,46 +77,55 @@ void showVersion()
 	showError(help.str());
 }
 
-#ifdef WIN32
-std::vector<FXString> ParseCommandLine()
+static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
 {
-    LPWSTR* argv;
-    int argc;
     std::vector<FXString> args;
-    std::vector<FXString> tokens;
-    std::vector<FXString> switches;
-    std::vector<FXParam> params;
+#ifdef WIN32
+    LPWSTR* cmdArgs;
+    int numArgs;
 
-    argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-    for (int arg = 1; arg != argc; ++arg)
-    {
-        args.push_back(FXString(argv[arg]));
+    cmdArgs = CommandLineToArgvW(GetCommandLineW(), &numArgs);
+    if (numArgs > 1) {
+        for (int arg = 1; arg != numArgs; ++arg)
+        {
+            args.push_back(FXString(cmdArgs[arg]));
+        }
     }
-    LocalFree(argv);
-
-    FXParseCommandLine(args, tokens, switches, params);
-    std::vector<FXString> filenames;
-
-    for (const FXString& token : tokens)
-    {
-        FXString filename = FXPath::simplify(token);
-        filenames.push_back(filename);
-    }
-    return filenames;
-}
+    LocalFree(cmdArgs);
 #else
-std::vector<FXString> CSMap::ParseCommandLine(int argc, char** argv)
-{
-    std::vector<FXString> filenames;
     for (int arg = 0; arg != argc; ++arg)
     {
         if (argv[arg][0] != '-') {
             filenames.push_back(argv[arg]);
         }
     }
-    return filenames;
-}
 #endif
+    std::vector<FXString> tokens;
+    std::vector<FXString> switches;
+    std::vector<FXParam> params;
+    FXParseCommandLine(args, tokens, switches, params);
+
+    if (!tokens.empty()) {
+        csmap->loadFiles(tokens);
+    }
+    for (const FXParam& param : params) {
+        if (param.key == "out") {
+            csmap->saveFile(param.value);
+        }
+        else if (param.key == "export") {
+            csmap->saveFile(param.value, map_type::MAP_MINIMAL);
+        }
+    }
+    bool quit = false;
+    for (const FXString& option : switches) {
+        if (option == "quit") {
+            quit = true;
+        }
+    }
+    if (quit) {
+        exit(0);
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -139,14 +148,7 @@ int main(int argc, char *argv[])
 	// Make window 
 	CSMap* csmap = new CSMap(&CSApp); 
 
-#ifdef WIN32
-    std::vector<FXString> filenames = ParseCommandLine();
-#else
-    std::vector<FXString> filenames = ParseCommandLine(argc, argv);
-#endif
-    if (!filenames.empty()) {
-        csmap->loadFiles(filenames);
-    }
+    ParseCommandLine(csmap, argc, argv);
 
     // Create it 
     try
