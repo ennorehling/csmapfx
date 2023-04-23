@@ -145,6 +145,7 @@ public:
     void parseMessages();
 
 protected:
+    static bool isEphemeral(block_type type);
     datablock::itor eraseRegion(const datablock::itor& region);
     datablock::itor eraseBlocks(const datablock::itor& begin, const datablock::itor& end);
     void updateHashTables(const datablock::itor& start);
@@ -153,7 +154,7 @@ protected:
     
     static void openFile(const char* filename, std::ifstream& stream, std::ios::openmode mode = std::ios::in);
 
-    void mergeBlock(datablock::itor& block, const datablock::itor& begin, const datablock::itor& end, block_type parent_type);
+    void mergeBlock(datablock::itor& block, const datablock::itor& begin, datablock::itor& end);
     const char* getConfigurationName(map_type type);
 
     datablock::itor group(int id);

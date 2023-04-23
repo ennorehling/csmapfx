@@ -450,21 +450,32 @@ int datafile::save(const char* filename, map_type map_filter)
 	return m_blocks.size();
 }
 
-void datafile::mergeBlock(datablock::itor& block, const datablock::itor& begin, const datablock::itor& end, block_type parent_type)
+void datafile::mergeBlock(datablock::itor& block, const datablock::itor& parent, datablock::itor& end)
 {
+    int parent_depth = parent->depth();
     block_type type = block->type();
     int info = block->info();
-    datablock::itor child = begin;
-    datablock::itor insert = begin;
-    for (child++; child != end && child->type() != parent_type; ++child) {
-        if (child->type() == type && child->info() == info) {
-            // we already have a block of this type
+    datablock::itor insert = std::next(parent);
+    bool found = false;
+    for (datablock::itor child = insert; child != end; ++child) {
+        if (child->depth() == parent_depth) {
+            end = child;
             break;
         }
+        if (child->type() == type) {
+            if (insert->type() != type) {
+                insert = child;
+            }
+            if (child->info() == info) {
+                // we already have a newer report for this same block
+                found = true;
+                break;
+            }
+        }
     }
-    if (child == end || child->type() != type) {
+    if (!found) {
         // we do not have this kind of block
-        m_blocks.insert(++insert, *block);
+        m_blocks.insert(std::next(insert), *block);
     }
 }
 
@@ -528,7 +539,6 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
         // handle only regions
         if (old_r->type() == block_type::TYPE_REGION)
         {
-            bool was_seen = 0 != (old_r->flags() & datablock::FLAG_REGION_SEEN);
             int x = old_r->x();
             int y = old_r->y();
             int plane = old_r->info();
@@ -536,11 +546,11 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
                 x += x_offset;
                 y += y_offset;
             }
+            // cannot use getRegion here, because hash tables are not ready?
             datablock::itor new_r = region(x, y, plane);
-
             if (new_r != m_blocks.end())            // add some info to old cr (island names)
             {
-                bool is_seen = (0 != (new_r->flags() & datablock::FLAG_REGION_SEEN));
+                bool is_seen = !new_r->hasKey(TYPE_VISIBILITY);
                 copy_children = false;
                 if (const datakey* islandkey = old_r->valueKey(TYPE_ISLAND))
                 {
@@ -550,34 +560,26 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
                             new_r->addKey(*islandkey);
                     }
                 }
-                if (was_seen) {
-                    // old return contained good data that we may want to keep
-                    if (!is_seen) {
-                        for (const datakey& key : old_r->data())
-                        {
-                            if (key.type() == TYPE_NAME || key.type() == TYPE_TERRAIN) {
-                                continue;
-                            }
-                            if (!new_r->hasKey(key.type())) {
-                                new_r->addKey(key);
-                            }
+                if (!is_seen) {
+                    // old region contained good data that we may want to keep
+                    for (const datakey& key : old_r->data())
+                    {
+                        if (key.type() == TYPE_NAME || key.type() == TYPE_TERRAIN) {
+                            continue;
+                        }
+                        if (!new_r->hasKey(key.type())) {
+                            new_r->addKey(key);
                         }
                     }
                     // copy child blocks if we don't have them
                     int depth = old_r->depth();
+                    datablock::itor new_end = m_blocks.end();
                     for (old_r++; old_r != old_end && old_r->type() != block_type::TYPE_REGION; ++old_r)
                     {
                         if (old_r->depth() == depth + 1) {
                             block_type type = old_r->type();
-                            datablock::itor new_end = m_blocks.end();
-                            if (type == block_type::TYPE_PRICES) {
-                                mergeBlock(old_r, new_r, new_end, block_type::TYPE_REGION);
-                            }
-                            else if (!is_seen)
-                            {
-                                if (type == block_type::TYPE_BORDER || type == block_type::TYPE_RESOURCE) {
-                                    mergeBlock(old_r, new_r, new_end, block_type::TYPE_REGION);
-                                }
+                            if (!datafile::isEphemeral(type)) {
+                                mergeBlock(old_r, new_r, new_end);
                             }
                         }
                     }
@@ -1624,6 +1626,19 @@ void datafile::createIslands()
     floodIslandNames();
 }
 
+bool datafile::isEphemeral(block_type type)
+{
+    switch (type) {
+    case block_type::TYPE_UNIT:
+    case block_type::TYPE_DURCHREISE:
+    case block_type::TYPE_DURCHSCHIFFUNG:
+    case block_type::TYPE_SHIP:
+    case block_type::TYPE_MESSAGE:
+        return true;
+    default:
+        return false;
+    }
+}
 datablock::itor datafile::eraseRegion(const datablock::itor& first)
 {
     // delete all blocks until next region.
@@ -1725,7 +1740,6 @@ void datafile::updateHashTables(const datablock::itor& start)
             if (regionPtr)
             {
                 regionPtr->setFlags(region_own ? datablock::FLAG_REGION_SEEN : 0);
-
                 int own_log = barHeight2(region_own);
                 int ally_log = barHeight2(region_ally);
                 int enemy_log = barHeight2(region_enemy);

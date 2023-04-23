@@ -199,22 +199,11 @@ void FXCSMap::calculateContentSize()
 		if (scr_y+regionSize > max_y)	max_y = scr_y+regionSize;
 	}
 
-    if (min_x < max_x) {
-        offset_x = -min_x;
-        image_w = max_x - min_x;
-    }
-    else {
-        offset_x = 0;
-        image_w = 0;
-    }
-    if (min_y < max_y) {
-        offset_y = -min_y;
-        image_h = max_y - min_y;
-    }
-    else {
-        offset_y = 0;
-        image_h = 0;
-    }
+	offset_x = -min_x;
+	offset_y = -min_y;
+
+	image_w = max_x-min_x;
+	image_h = max_y-min_y;
 }
 
 FXint FXCSMap::getContentWidth()
@@ -1303,7 +1292,6 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 		{
 			// delete region
             if (mapFile->deleteRegion(*iregion)) {
-                mapFile->createHashTables();
 
                 if (selection.selected & selection.REGION)
 				{

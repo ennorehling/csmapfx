@@ -1,4 +1,10 @@
-csmapfx (1.7.1-1) stable; urgency=low
+csmapfx (1.7.2-1) stable; urgency=high
+
+  * report merge was losing data from old reports
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 23 Apr 2023 11:15:00 +0200
+
+csmapfx (1.7.1-1) stable; urgency=high
 
   * fix report merge creating duplicate regions, broken since 1.6.4
   * MRU list was missing files, not getting saved.

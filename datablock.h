@@ -204,52 +204,6 @@ public:
     FXlong income[INCOME_MAX];
     FXlong learncost = 0;
 
-
-	enum	// not yet used!!!
-	{
-		FLAG_STREET = (1 << 0),	// street in region (first)
-		FLAG_STREET_NW= (1 << 0),	// street to north west
-		FLAG_STREET_NO= (1 << 1),	// street to north east
-		FLAG_STREET_O = (1 << 2),	// street to east
-		FLAG_STREET_SO= (1 << 3),	// street to south east
-		FLAG_STREET_SW= (1 << 4),	// street to south west
-		FLAG_STREET_W = (1 << 5),	// street to west
-
-		FLAG_STREET_UNDONE = (1 << 6),	// incomplete street in region (first)
-		FLAG_STREET_UNDONE_NW= (1 << 6),	// incomplete street to north west
-		FLAG_STREET_UNDONE_NO= (1 << 7),	// incomplete street to north east
-		FLAG_STREET_UNDONE_O = (1 << 8),	// incomplete street to east
-		FLAG_STREET_UNDONE_SO= (1 << 9),	// incomplete street to south east
-		FLAG_STREET_UNDONE_SW= (1 << 10),	// incomplete street to south west
-		FLAG_STREET_UNDONE_W = (1 << 11),	// incomplete street to west
-	};
-	int				streets;		// street symbols
-
-	enum
-	{
-		FLAG_CASTLE	   = (1 << 0),	// there is a building/tower/castle in this region
-		FLAG_SHIP	   = (1 << 2),	// there are ships in this region
-		FLAG_SHIPTRAVEL= (1 << 3),	// ships travelled the region
-		
-		FLAG_LIGHTHOUSE= (1 << 4),	// region is seen by lighthouse
-		FLAG_TRAVEL    = (1 << 5),	// region is seen by traveling throu
-
-		FLAG_MONSTER   = (1 << 6),	// monster in region
-		FLAG_SEASNAKE  = (1 << 7),	// sea snake in region
-		FLAG_DRAGON    = (1 << 8),	// dragon/wyrm in region
-
-		FLAG_WORMHOLE  = (1 << 9),	// wurmloch in region
-
-		FLAG_TROOPS	    = (1 << 10),	// units are in this region
-		FLAG_REGION_SEEN= (1 << 11),	// region is seen by own units
-
-		FLAG_GUARDED      = (1 << 12),		// unit guard the region
-		FLAG_GUARDED_OWN  = (1 << 12),		// unit guard the region
-		FLAG_GUARDED_ALLY = (1 << 13),		// unit guard the region
-		FLAG_GUARDED_ENEMY= (1 << 14),		// unit guard the region
-	};
-	int				symbols;		// other symbols
-    
     FXint unconfirmed = 0; // number of unconfirmed units
 };
 
