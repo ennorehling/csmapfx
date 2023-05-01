@@ -48,11 +48,19 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
 
             if (pstate->selected & selection.UNIT)
             {
-                if ((selection.selected & selection.UNIT) == 0 || selection.unit != pstate->unit)
+                unitPtr = &*pstate->unit;
+                if ((selection.selected & selection.UNIT) == 0)
                 {
-                    unitPtr = &*pstate->unit;
                     clearChildren(unitMessages);
                 }
+                else if (selection.unit != pstate->unit) {
+                    removeItem(unitMessages);
+                    unitMessages = nullptr;
+                }
+            }
+            else if (unitMessages) {
+                removeItem(unitMessages);
+                unitMessages = nullptr;
             }
             if (pstate->selected & selection.REGION)
             {
@@ -207,10 +215,6 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
                 else {
                     unitMessages->setText(name);
                 }
-            }
-            else if (unitMessages) {
-                removeItem(unitMessages);
-                unitMessages = nullptr;
             }
 
             if (unitPtr || regionPtr)
