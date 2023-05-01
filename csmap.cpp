@@ -1170,6 +1170,20 @@ bool CSMap::haveActiveFaction() const
     return report->getFactionId() != 0;
 }
 
+void CSMap::loadFile(const FXString& filename)
+{
+    FXString errorMessage;
+    
+    report.reset(loadFile(filename, errorMessage));
+    if (!errorMessage.empty()) {
+        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", errorMessage.text());
+    }
+    if (report) {
+        report->createHashTables();
+        report->parseMessages();
+    }
+}
+
 datafile* CSMap::loadFile(const FXString& filename, FXString& errorMessage)
 {
     datafile* cr = new datafile();
@@ -2371,6 +2385,9 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames, std::vector<FXStri
         }
         ++selection.fileChange;
     }
+    if (report) {
+        report->parseMessages();
+    }
 }
 
 int CSMap::saveFile(const FXString& filename, map_type mode)
@@ -2473,15 +2490,10 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
         if (closeFile()) {
             FXString filename = dlg.getFilename();
             beginLoading(filename);
-            FXString errorMessage;
-            report.reset(loadFile(filename, errorMessage));
-            if (!errorMessage.empty()) {
-                FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", errorMessage.text());
-            }
+            loadFile(filename);
             if (report) {
-                report->createHashTables();
-                report->parseMessages();
                 recentFiles.appendFile(filename);
+                checkCommands();
             }
             mapChange();
             updateFileNames();
@@ -3023,17 +3035,10 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
     if (loadReport) {
         if (closeFile()) {
             FXString errorMessage;
-            report.reset(loadFile(filename, errorMessage));
-            if (!errorMessage.empty()) {
-                FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", errorMessage.text());
-            }
-            if (report) {
-                report->createHashTables();
-                report->parseMessages();
-            }
+            loadFile(filename);
             mapChange();
             updateFileNames();
-            if (report.get()) {
+            if (report) {
                 recentFiles.appendFile(filename);
                 checkCommands();
             }
