@@ -108,34 +108,7 @@ void FXReportInfo::addMessage(FXTreeItem *group, const datablock& msg)
     }
     item = appendItem(group, msg.value("rendered"));
 
-    if (uid <= 0)
-        uid = msg.valueInt("unit");
-    if (uid <= 0)
-        uid = msg.valueInt("mage");
-    if (uid <= 0)
-        uid = msg.valueInt("spy");
-    if (uid <= 0)
-        uid = msg.valueInt("teacher");
-
-    datablock::itor select;
-    if (uid > 0 && mapFile->getUnit(select, uid)) {
-        item->setData((void*)&*select);
-    }
-    else {
-        FXString loc = msg.value("region");
-        if (loc.empty()) {
-            item->setData(nullptr);
-        }
-        else {
-            int x, y, plane;
-            x = FXIntVal(loc.section(' ', 0));
-            y = FXIntVal(loc.section(' ', 1));
-            plane = FXIntVal(loc.section(' ', 2));
-            if (mapFile->getRegion(select, x, y, plane)) {
-                item->setData((void*)&*select);
-            }
-        }
-    }
+    item->setData(mapFile->getMessageTarget(msg));
 }
 
 void FXReportInfo::addBattle(datablock::itor& block)

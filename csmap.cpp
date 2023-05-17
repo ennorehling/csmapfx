@@ -2406,7 +2406,24 @@ void CSMap::addClipboardPane(FXMenuPane *pane, datablock* block)
     std::vector<clip_t> clips;
     if (block)
     {
-        new FXMenuSeparatorEx(pane, "Zwischenablage");
+        block_type type = block->type();
+        FXString label;
+        switch (type) {
+        case block_type::TYPE_UNIT:
+            label = "Einheit";
+            break;
+        case block_type::TYPE_SHIP:
+        case block_type::TYPE_BUILDING:
+            label = block->value(TYPE_TYPE);
+            break;
+        case block_type::TYPE_REGION:
+            label = "Region";
+            break;
+        default:
+            label = "Zwischenablage";
+        }
+        new FXMenuSeparatorEx(pane, label);
+
         FXString str = block->getName();
         if (!str.empty()) {
             clips.push_back(clip_t{ ID_POPUP_COPY_NAME, str + "\t\tName", const_cast<datablock *>(block) });

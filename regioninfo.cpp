@@ -57,6 +57,9 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
                     removeItem(unitMessages);
                     unitMessages = nullptr;
                 }
+                else {
+                    unitPtr = nullptr;
+                }
             }
             else if (unitMessages) {
                 removeItem(unitMessages);

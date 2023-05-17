@@ -119,6 +119,36 @@ FXString datafile::getFactionName(int factionId)
     return name;
 }
 
+datablock* datafile::getMessageTarget(const datablock& msg)
+{
+    int uid;
+    datablock::itor select;
+    uid = msg.getReference(block_type::TYPE_UNIT);
+    if (uid > 0 && getUnit(select, uid)) {
+        return &*select;
+    }
+    uid = msg.getReference(block_type::TYPE_SHIP);
+    if (uid > 0 && getShip(select, uid)) {
+        return &*select;
+    }
+    uid = msg.getReference(block_type::TYPE_BUILDING);
+    if (uid > 0 && getBuilding(select, uid)) {
+        return &*select;
+    }
+    FXString loc = msg.value("region");
+    if (!loc.empty()) {
+        int x, y, plane;
+        x = FXIntVal(loc.section(' ', 0));
+        y = FXIntVal(loc.section(' ', 1));
+        plane = FXIntVal(loc.section(' ', 2));
+        if (getRegion(select, x, y, plane)) {
+            return &*select;
+        }
+    }
+    return nullptr;
+    return nullptr;
+}
+
 void datafile::openFile(const char* filename, std::ifstream& file, std::ios::openmode mode)
 {
 #ifdef _MSC_VER
@@ -994,7 +1024,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 		// output units in order
 		std::vector<int>& order = regord->second;
 
-		for (std::vector<int>::iterator uid = order.begin(); uid != order.end(); uid++)
+		for (std::vector<int>::const_iterator uid = order.begin(); uid != order.end(); uid++)
 		{
 			datablock::itor unit = this->unit(*uid);
 			if (unit == m_blocks.end())
@@ -1079,7 +1109,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 // -----------------
 datablock::itor datafile::region(int x, int y, int plane)
 { 
-	std::map<Coordinates, datablock::itor>::iterator region;
+	std::map<Coordinates, datablock::itor>::const_iterator region;
 	region = m_regions.find(Coordinates(x, y, plane));
 
 	if (region == m_regions.end())
@@ -1090,7 +1120,7 @@ datablock::itor datafile::region(int x, int y, int plane)
 
 datablock::itor datafile::battle(int x, int y, int plane)
 { 
-	std::map<Coordinates, datablock::itor>::iterator block;
+	std::map<Coordinates, datablock::itor>::const_iterator block;
     block = m_battles.find(Coordinates(x, y, plane));
 
 	if (block == m_battles.end())
@@ -1373,14 +1403,6 @@ FXString datafile::regionName(const datablock& block)
     return rname;
 }
 
-FXString datafile::regionCoordinates(const datablock& block)
-{
-    FXASSERT(block.type() == block_type::TYPE_REGION);
-    FXString coor;
-    coor.format("%d,%d", block.x(), block.y());
-    return coor;
-}
-
 FXString datafile::unitName(const datablock& unit, bool verbose)
 {
     FXASSERT(unit.type() == block_type::TYPE_UNIT);
@@ -1407,6 +1429,14 @@ FXString datafile::unitName(const datablock& unit, bool verbose)
         return label;
     }
     return unit.getName();
+}
+
+FXString datafile::regionCoordinates(const datablock& block)
+{
+    FXASSERT(block.type() == block_type::TYPE_REGION);
+    FXString coor;
+    coor.format("%d,%d", block.x(), block.y());
+    return coor;
 }
 
 void datafile::setConfirmed(datablock::itor& unit, bool confirmed)

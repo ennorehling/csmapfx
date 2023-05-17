@@ -42,39 +42,8 @@ void FXMessageList::addMessage(FXTreeItem* group, const datablock& block)
     }
     else if (block.type() == block_type::TYPE_MESSAGE) {
         FXTreeItem* item = appendItem(group, block.value("rendered"));
-        FXival uid = block.getReference(block_type::TYPE_UNIT);
 
-        datablock::itor select;
-        if (uid > 0 && mapFile->getUnit(select, uid)) {
-            item->setData((void*)&*select);
-        }
-        else {
-            FXival b_id = block.getReference(block_type::TYPE_BUILDING);
-            if (b_id > 0 && mapFile->getBuilding(select, b_id)) {
-                item->setData((void*)&*select);
-            }
-            else {
-                FXival s_id = block.getReference(block_type::TYPE_SHIP);
-                if (s_id > 0 && mapFile->getShip(select, s_id)) {
-                    item->setData((void*)&*select);
-                }
-                else {
-                    FXString loc = block.value("region");
-                    if (loc.empty()) {
-                        item->setData(nullptr);
-                    }
-                    else {
-                        int x, y, plane;
-                        x = FXIntVal(loc.section(' ', 0));
-                        y = FXIntVal(loc.section(' ', 1));
-                        plane = FXIntVal(loc.section(' ', 2));
-                        if (mapFile->getRegion(select, x, y, plane)) {
-                            item->setData((void*)&*select);
-                        }
-                    }
-                }
-            }
-        }
+        item->setData(mapFile->getMessageTarget(block));
     }
 }
 long FXMessageList::onMapChange(FXObject* sender, FXSelector sel, void* ptr)
