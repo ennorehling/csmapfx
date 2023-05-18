@@ -610,16 +610,19 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 		{
 			FXString fac = block->value(TYPE_FACTION);
 			FXival factionId = -1;
-			if (fac.length())
+			if (!fac.empty())
 				factionId = atoi(fac.text());
 
-			if (factions.find(factionId) == factions.end())
+			if (factionId < 0 || factions.find(factionId) == factions.end())
 			{
 				factions.insert(factionId);
 
                 FXString label;
                 datablock::itor faction;
-                if (factionId >=0 && mapFile->getFaction(faction, factionId)) {
+                if (factionId <= 0) {
+                    label.assign("Parteigetarnt");
+                }
+                else if (mapFile->getFaction(faction, factionId)) {
                     FXString name = faction->value(TYPE_FACTIONNAME);
 
                     if (name.empty())
@@ -628,7 +631,7 @@ void FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
                         label.format("%s (%s)", name.text(), faction->id().text());
 
                 }
-                else if (factionId>0) {
+                else {
                     // missing PARTEI block in report? how?
                     label.format("Unbekannt (%s)", FXStringValEx((FXulong)factionId, 36).text());
                 }

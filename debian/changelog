@@ -3,8 +3,9 @@ csmapfx (1.7.4-1) stable; urgency=low
   * changes to context menus
   * fix for units duplicating their messages (bug 2958)
   * improve navigation for messages in report tab (bug 2960)
+  * select anonymous units in region statistics (bug 2961)
 
- -- Enno Rehling <enno@eressea.de>  WEd, 17 May 2023 12:30:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Thu, 18 May 2023 15:30:00 +0200
 
 csmapfx (1.7.3-1) stable; urgency=low
 

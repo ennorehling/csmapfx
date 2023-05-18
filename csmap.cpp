@@ -2292,7 +2292,7 @@ long CSMap::onPopupCopySpecial(FXObject* sender, FXSelector sel, void* ptr)
         }
         else if (FXSELID(sel) == ID_POPUP_COPY_ID) {
             if (block->type() == block_type::TYPE_REGION) {
-                FXString coor = report->regionCoordinates(*block);
+                FXString coor = datafile::regionCoordinates(*block);
                 setClipboard(coor.text());
             }
             else {
@@ -2401,63 +2401,73 @@ struct clip_t {
     void* data;
 };
 
-void CSMap::addClipboardPane(FXMenuPane *pane, datablock* block)
+void CSMap::addClipboardPane(FXMenuPane *pane, datablock * block)
 {
+    datablock::itor match;
+    datablock* parent = nullptr;
     std::vector<clip_t> clips;
-    if (block)
+    block_type type = block->type();
+    FXString label;
+    switch (type) {
+    case block_type::TYPE_UNIT:
+        label = "Einheit";
+/*
+        if (report->getUnit(match, block->info())) {
+            datablock::itor p;
+            if (report->getParent(p, match)) {
+                parent = &*p;
+            }
+        }
+*/
+        break;
+    case block_type::TYPE_SHIP:
+    case block_type::TYPE_BUILDING:
+        label = block->value(TYPE_TYPE);
+        break;
+    case block_type::TYPE_REGION:
+        label = "Region";
+        break;
+    default:
+        label = "Zwischenablage";
+    }
+    new FXMenuSeparatorEx(pane, label);
+
+    FXString str = block->getName();
+    if (!str.empty()) {
+        clips.push_back(clip_t{ ID_POPUP_COPY_NAME, str + "\t\tName", block });
+    }
+
+    if (block->type() == block_type::TYPE_REGION)
     {
-        block_type type = block->type();
-        FXString label;
-        switch (type) {
-        case block_type::TYPE_UNIT:
-            label = "Einheit";
-            break;
-        case block_type::TYPE_SHIP:
-        case block_type::TYPE_BUILDING:
-            label = block->value(TYPE_TYPE);
-            break;
-        case block_type::TYPE_REGION:
-            label = "Region";
-            break;
-        default:
-            label = "Zwischenablage";
-        }
-        new FXMenuSeparatorEx(pane, label);
+        FXString coor = datafile::regionCoordinates(*block);
+        clips.push_back(clip_t{ ID_POPUP_COPY_ID, coor + "\t\tKoordinaten", const_cast<datablock*>(block) });
 
-        FXString str = block->getName();
-        if (!str.empty()) {
-            clips.push_back(clip_t{ ID_POPUP_COPY_NAME, str + "\t\tName", const_cast<datablock *>(block) });
-        }
+        const FXString& terrain = block->terrainString();
+        clips.push_back(clip_t{ ID_POPUP_COPY_TEXT, terrain + "\t\tTerrain", const_cast<char*>(terrain.text()) });
+    }
+    else
+    {
+        str = block->id();
+        clips.push_back(clip_t{ ID_POPUP_COPY_ID, str + "\t\tNummer", const_cast<datablock*>(block) });
 
-        if (block->type() == block_type::TYPE_REGION)
+        if (block->type() == block_type::TYPE_FACTION)
         {
-            FXString coor = report->regionCoordinates(*block);
-            clips.push_back(clip_t{ ID_POPUP_COPY_ID, coor + "\t\tKoordinaten", const_cast<datablock*>(block) });
-
-            const FXString& terrain = block->terrainString();
-            clips.push_back(clip_t{ ID_POPUP_COPY_TEXT, terrain + "\t\tTerrain", const_cast<char*>(terrain.text()) });
-        }
-        else 
-        {
-            str = block->id();
-            clips.push_back(clip_t{ ID_POPUP_COPY_ID, str + "\t\tNummer", const_cast<datablock*>(block) });
-
-            if (block->type() == block_type::TYPE_FACTION)
+            const FXString& email = block->value(TYPE_EMAIL);
+            if (!email.empty())
             {
-                const FXString& email = block->value(TYPE_EMAIL);
-                if (!email.empty())
-                {
-                    clips.push_back(clip_t{ ID_POPUP_COPY_TEXT, email + "\t\tEmail", const_cast<char*>(email.text()) });
-                }
+                clips.push_back(clip_t{ ID_POPUP_COPY_TEXT, email + "\t\tEmail", const_cast<char*>(email.text()) });
             }
         }
-        if (!clips.empty()) {
-            for (const clip_t& clip : clips)
-            {
-                FXMenuCommand* menuitem = new FXMenuCommand(pane, clip.label, NULL, this, clip.sel_id);
-                menuitem->setUserData(clip.data);
-            }
+    }
+    if (!clips.empty()) {
+        for (const clip_t& clip : clips)
+        {
+            FXMenuCommand* menuitem = new FXMenuCommand(pane, clip.label, NULL, this, clip.sel_id);
+            menuitem->setUserData(clip.data);
         }
+    }
+    if (parent) {
+        addClipboardPane(pane, parent);
     }
 }
 
