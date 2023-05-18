@@ -308,7 +308,24 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
     if (current) {
         datablock* block = static_cast<datablock*>(current->getData());
         if (block) {
-            return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_SETVALUE), block);
+            if (block->type() == block_type::TYPE_FACTION) {
+                // select current region instead;
+                FXTreeItem* parent = current->getParent();
+                selection.selected = 0;
+                if (mapFile->getFaction(selection.faction, block->info())) {
+                    selection.selected |= selection.FACTION;
+                }
+                if (parent) {
+                    block = static_cast<datablock*>(parent->getData());
+                    if (block && mapFile->getRegion(selection.region, *block)) {
+                        selection.selected |= selection.REGION;
+                    }
+                }
+                return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
+            }
+            else {
+                return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_SETVALUE), block);
+            }
         }
     }
     return 0;

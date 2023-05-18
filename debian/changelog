@@ -4,6 +4,7 @@ csmapfx (1.7.4-1) stable; urgency=low
   * fix for units duplicating their messages (bug 2958)
   * improve navigation for messages in report tab (bug 2960)
   * select anonymous units in region statistics (bug 2961)
+  * show region statistics also when selecting a faction grouping
 
  -- Enno Rehling <enno@eressea.de>  Thu, 18 May 2023 15:30:00 +0200
 
