@@ -50,7 +50,7 @@ public:
     int getActiveFactionId() const { return m_factionId; }
 
 	bool load(const FXString& filename, FXString & outError);
-	int save(const char* filename, map_type map_filter);
+	int save(const char* filename, map_type map_filter, std::set<datablock*> const* const selection = nullptr);
 
     void removeTemporary();
     void findOffset(datafile* new_cr, int* x_offset, int* y_offset) const;

@@ -2392,7 +2392,7 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames, std::vector<FXStri
 
 int CSMap::saveFile(const FXString& filename, map_type mode)
 {
-    return report->save(filename.text(), mode);;
+    return report->save(filename.text(), mode, &selection.regionsSelected);
 }
 
 struct clip_t {
@@ -2581,7 +2581,6 @@ bool CSMap::saveReport(const FXString& filename, map_type mode, bool merge_comma
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
         return false;
     }
-    mapChange();
     return true;
 }
 

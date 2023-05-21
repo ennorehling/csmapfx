@@ -253,7 +253,7 @@ bool datafile::load(const FXString& filename, FXString & outError)
 }
 
 // saves file
-int datafile::save(const char* filename, map_type map_filter)
+int datafile::save(const char* filename, map_type map_filter, std::set<datablock*> const * const selection)
 {
 	if (!filename)
 		return 0;
@@ -301,7 +301,15 @@ int datafile::save(const char* filename, map_type map_filter)
 
         if (map_filter == map_type::MAP_MINIMAL) {
             /* skip over anything except version or region  */
-            if (type != block_type::TYPE_REGION && type != block_type::TYPE_VERSION) {
+            if (type == block_type::TYPE_REGION) {
+                if (selection && !selection->empty()) {
+                    datablock* region = &*block;
+                    if (selection->find(region) == selection->end()) {
+                        continue;
+                    }
+                }
+            }
+            else if (type != block_type::TYPE_VERSION) {
                 continue;
             }
         }

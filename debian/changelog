@@ -1,8 +1,10 @@
 csmapfx (1.7.5-1) stable; urgency=low
 
   * fix two crashes when loading maps.
+  * do not clear the selection after saving.
+  * restrict map export to selection, if there is one.
 
- -- Enno Rehling <enno@eressea.de>  Sun, 21 May 2023 12:45:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 21 May 2023 16:30:00 +0200
 
 csmapfx (1.7.4-2) stable; urgency=low
 
