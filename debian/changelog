@@ -1,3 +1,9 @@
+csmapfx (1.7.5-1) stable; urgency=low
+
+  * fix two crashes when loading maps.
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 21 May 2023 12:45:00 +0200
+
 csmapfx (1.7.4-2) stable; urgency=low
 
   * restore the old context menus

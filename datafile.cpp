@@ -2016,62 +2016,64 @@ void datafile::parseMessages()
             memset(att->income, 0, sizeof(att->income));
         }
     }
-    datablock::itor it;
-    if (getChild(it, m_activefaction, block_type::TYPE_MESSAGE)) {
-        do {
-            datablock& block = *it++;
-            int type = block.valueInt(TYPE_MSG_TYPE);
-            if (type != 771334452 && type != 443066738) {
-                continue;
-            }
-            const datakey::list_type& list = block.data();
-            int amount = 0, mode = 0;
-            datablock* reg = nullptr;
+    if (hasActiveFaction()) {
+        datablock::itor it;
+        if (getChild(it, m_activefaction, block_type::TYPE_MESSAGE)) {
+            do {
+                datablock& block = *it++;
+                int type = block.valueInt(TYPE_MSG_TYPE);
+                if (type != 771334452 && type != 443066738) {
+                    continue;
+                }
+                const datakey::list_type& list = block.data();
+                int amount = 0, mode = 0;
+                datablock* reg = nullptr;
 
-            for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); itor++)
-            {
-                key_type key = itor->type();
-                if (key == key_type::TYPE_MSG_REGION) {
-                    int x, y, z;
-                    int num = sscanf(itor->value().text(), "%d %d %d", &x, &y, &z);
-                    if (num >= 2) {
-                        if (num < 3) {
-                            z = 0;
+                for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); itor++)
+                {
+                    key_type key = itor->type();
+                    if (key == key_type::TYPE_MSG_REGION) {
+                        int x, y, z;
+                        int num = sscanf(itor->value().text(), "%d %d %d", &x, &y, &z);
+                        if (num >= 2) {
+                            if (num < 3) {
+                                z = 0;
+                            }
+                            datablock::itor match;
+                            if (getRegion(match, x, y, z)) {
+                                reg = &*match;
+                            }
                         }
-                        datablock::itor match;
-                        if (getRegion(match, x, y, z)) {
-                            reg = &*match;
-                        }
+
+                    }
+                    else if (key == key_type::TYPE_MSG_AMOUNT) {
+                        amount = itor->getInt();
+                    }
+                    else if (key == key_type::TYPE_MSG_COST) {
+                        amount = itor->getInt();
+                    }
+                    else if (key == key_type::TYPE_MSG_MODE) {
+                        mode = itor->getInt();
+                    }
+                }
+
+                if (reg) {
+                    att_region* att = static_cast<att_region*>(reg->attachment());
+                    if (!att) {
+                        reg->attachment(att = new att_region());
                     }
 
-                }
-                else if (key == key_type::TYPE_MSG_AMOUNT) {
-                    amount = itor->getInt();
-                }
-                else if (key == key_type::TYPE_MSG_COST) {
-                    amount = itor->getInt();
-                }
-                else if (key == key_type::TYPE_MSG_MODE) {
-                    mode = itor->getInt();
-                }
-            }
+                    if (mode < INCOME_MISC || mode >= INCOME_MAX) {
+                        mode = INCOME_MISC;
+                    }
 
-            if (reg) {
-                att_region* att = static_cast<att_region*>(reg->attachment());
-                if (!att) {
-                    reg->attachment(att = new att_region());
+                    if (type == 443066738)	// Ausgaben fuer teure Talente (+Akademie)
+                        att->learncost += amount;
+                    else // Einnahmen
+                        att->income[mode] += amount;
                 }
-
-                if (mode < INCOME_MISC || mode >= INCOME_MAX) {
-                    mode = INCOME_MISC;
-                }
-
-                if (type == 443066738)	// Ausgaben fuer teure Talente (+Akademie)
-                    att->learncost += amount;
-                else // Einnahmen
-                    att->income[mode] += amount;
-            }
-        } while (it != m_blocks.end() && it->type() == block_type::TYPE_MESSAGE);
+            } while (it != m_blocks.end() && it->type() == block_type::TYPE_MESSAGE);
+        }
     }
 }
 

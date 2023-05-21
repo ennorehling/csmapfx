@@ -2702,6 +2702,8 @@ bool CSMap::closeFile()
         }
     }
     selection.selected = 0;
+    selection.regionsSelected.clear();
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     report = nullptr;
     return true;
 }
