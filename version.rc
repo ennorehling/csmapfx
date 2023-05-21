@@ -70,7 +70,7 @@ END
 // remains consistent on all systems.
 1                       ICON                    "crsheet.ico"
 2                       ICON                    "nrsheet.ico"
-0                       ICON                    "csmapfx.ico"
+0                       ICON                    "csmap.ico"
 #endif    // German (Germany) resources
 /////////////////////////////////////////////////////////////////////////////
 
