@@ -1,5 +1,6 @@
 csmapfx (1.7.5-1) stable; urgency=low
 
+  * new icon
   * fix two crashes when loading maps.
   * do not clear the selection after saving.
   * restrict map export to selection, if there is one.
