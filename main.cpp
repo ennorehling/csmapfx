@@ -34,6 +34,15 @@
 #ifdef HAVE_CURL
 #include <curl/curl.h>
 #endif
+
+#ifdef HAVE_DBGHELP
+#include <windows.h>
+#include <tchar.h>
+#include <dbghelp.h>
+#include <stdio.h>
+#endif
+
+
 void showHelpText()
 {
 	std::ostringstream help;
@@ -126,6 +135,129 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
     }
 }
 
+#ifdef HAVE_DBGHELP
+BOOL CALLBACK MyMiniDumpCallback(
+    PVOID                            pParam,
+    const PMINIDUMP_CALLBACK_INPUT   pInput,
+    PMINIDUMP_CALLBACK_OUTPUT        pOutput
+)
+{
+    BOOL bRet = FALSE;
+
+
+    // Check parameters 
+
+    if (pInput == 0)
+        return FALSE;
+
+    if (pOutput == 0)
+        return FALSE;
+
+
+    // Process the callbacks 
+
+    switch (pInput->CallbackType)
+    {
+    case IncludeModuleCallback:
+    {
+        // Exclude the module 
+        bRet = FALSE;
+    }
+    break;
+
+    case IncludeThreadCallback:
+    {
+        // Exclude the module 
+        bRet = FALSE;
+    }
+    break;
+
+    case ModuleCallback:
+    {
+        _ASSERTE(!_T("It should not be called."));
+
+        bRet = TRUE;
+    }
+    break;
+
+    case ThreadCallback:
+    {
+        _ASSERTE(!_T("It should not be called."));
+
+        bRet = TRUE;
+    }
+    break;
+
+    case ThreadExCallback:
+    {
+        // Include this information 
+        bRet = TRUE;
+
+    }
+    break;
+
+    case MemoryCallback:
+    {
+        // We do not include any information here -> return FALSE 
+        bRet = FALSE;
+    }
+    break;
+
+    case CancelCallback:
+        break;
+    }
+
+
+    return bRet;
+
+}
+LONG WINAPI CreateMiniDump(PEXCEPTION_POINTERS pep)
+{
+    // Open the file 
+
+    HANDLE hFile = CreateFile(L"TinyDump.dmp", GENERIC_READ | GENERIC_WRITE,
+        0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    if ((hFile != NULL) && (hFile != INVALID_HANDLE_VALUE))
+    {
+        // Create the minidump 
+
+        MINIDUMP_EXCEPTION_INFORMATION mdei;
+
+        mdei.ThreadId = GetCurrentThreadId();
+        mdei.ExceptionPointers = pep;
+        mdei.ClientPointers = FALSE;
+
+        MINIDUMP_CALLBACK_INFORMATION mci;
+
+        mci.CallbackRoutine = (MINIDUMP_CALLBACK_ROUTINE)MyMiniDumpCallback;
+        mci.CallbackParam = 0;
+
+        MINIDUMP_TYPE mdt = MiniDumpNormal;
+
+        BOOL rv = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(),
+            hFile, mdt, (pep != 0) ? &mdei : 0, 0, &mci);
+
+        if (!rv)
+            _tprintf(_T("MiniDumpWriteDump failed. Error: %u \n"), GetLastError());
+        else
+            _tprintf(_T("Minidump created.\n"));
+
+        // Close the file 
+
+        CloseHandle(hFile);
+
+    }
+    else
+    {
+        _tprintf(_T("CreateFile failed. Error: %u \n"), GetLastError());
+    }
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+
+
+#endif
+
 int main(int argc, char *argv[])
 {
 #ifdef HAVE_PHYSFS
@@ -171,7 +303,11 @@ int main(int argc, char *argv[])
     csmap->show(PLACEMENT_DEFAULT);
 
     // Run 
-	int exitcode = CSApp.run(); 
+#ifdef HAVE_DBGHELP
+    SetUnhandledExceptionFilter(CreateMiniDump);
+#endif
+    int exitcode = CSApp.run();
+
 #ifdef HAVE_CURL
     curl_global_cleanup();
 #endif

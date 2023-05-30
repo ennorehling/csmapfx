@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.0)
 
 project (csmapfx CXX C)
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 if (WIN32)
 add_definitions(-DUNICODE)
+find_package(DbgHelp REQUIRED)
 else (WIN32)
 find_package(PhysFS 2.1)
 endif (WIN32)
@@ -113,6 +115,16 @@ include_directories(
   ${PNG_INCLUDE_DIRS}
 )
 endif(PNG_FOUND)
+
+if (DBGHELP_FOUND)
+add_compile_definitions(HAVE_DBGHELP)
+target_link_libraries(${PROJECT_NAME}
+  ${DBGHELP_LIBRARY}
+)
+include_directories(
+  ${DBGHELP_INCLUDE_DIR}
+)
+endif(DBGHELP_FOUND)
 
 find_library(LEGACY_STDIO_LIBRARY NAMES legacy_stdio_definitions)
 if (LEGACY_STDIO_LIBRARY)
