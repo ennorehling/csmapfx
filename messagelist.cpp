@@ -4,6 +4,14 @@
 
 #include <set>
 
+FXDEFMAP(FXMessageList) FXMessageListMap[] =
+{
+    //________Message_Type_____________________ID_______________Message_Handler_______
+    FXMAPFUNC(SEL_DOUBLECLICKED,	0,							FXMessageList::onDoubleClicked),
+};
+
+FXIMPLEMENT(FXMessageList, FXTreeList, FXMessageListMap, ARRAYNUMBER(FXMessageListMap))
+
 FXMessageList::FXMessageList(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h) :
     FXTreeList(p, tgt,sel, opts|TREELIST_SINGLESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES, x,y,w,h)
 {
@@ -54,7 +62,7 @@ long FXMessageList::onMapChange(FXObject* sender, FXSelector sel, void* ptr)
     return 1;
 }
 
-long FXMessageList::onDoubleClick(FXObject* sender, FXSelector sel, void* ptr)
+long FXMessageList::onDoubleClicked(FXObject* sender, FXSelector sel, void* ptr)
 {
     if (this != sender) {
         return 0;

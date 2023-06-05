@@ -1,14 +1,12 @@
 #include "regioninfo.h"
 
-FXDEFMAP(FXRegionInfo) MessageMap[] =
+FXDEFMAP(FXRegionInfo) FXRegionInfoMap[] =
 {
     //________Message_Type_____________________ID_______________Message_Handler_______
     FXMAPFUNC(SEL_COMMAND,			FXMessageList::ID_UPDATE,		FXRegionInfo::onMapChange),
-
-    FXMAPFUNC(SEL_DOUBLECLICKED,	0,								FXRegionInfo::onDoubleClick),
 };
 
-FXIMPLEMENT(FXRegionInfo, FXTreeList, MessageMap, ARRAYNUMBER(MessageMap))
+FXIMPLEMENT(FXRegionInfo, FXMessageList, FXRegionInfoMap, ARRAYNUMBER(FXRegionInfoMap))
 
 
 void FXRegionInfo::create()
