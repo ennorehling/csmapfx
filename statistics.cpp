@@ -424,18 +424,12 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 {
 	FXVerticalFrame::onRightBtnRelease(sender, sel, ptr);
 
-	FXEvent *event = (FXEvent*)ptr;
-
 	// no data, no popup:
 	if (!mapFile)
 		return 0;
 
-	// dont't show popup if mouse has moved
-	if (event->last_x != event->click_x || event->last_y != event->click_y)
-		return 0;
-	
 	// create popup
-	int itemIdx = list->getItemAt(event->click_x, event->click_y);
+	int itemIdx = list->getCursorItem();
 	if (itemIdx < 0)
 		return 0;
 	FXListItem* item = list->getItem(itemIdx);
@@ -483,7 +477,9 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 	}
 
 	// show popup
-	menu.create();
+    FXEvent* event = (FXEvent*)ptr;
+
+    menu.create();
 	menu.popup(NULL, event->root_x,event->root_y);
 
     getApp()->runModalWhileShown(&menu);

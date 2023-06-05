@@ -346,7 +346,7 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 		return 0;
 	
 	// create popup
-	FXTreeItem *item = getItemAt(event->click_x, event->click_y);
+	FXTreeItem *item = getCursorItem();
 	if (!item)
 		return 0;
 

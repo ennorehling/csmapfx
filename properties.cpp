@@ -124,14 +124,8 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
     if (!mapFile)
         return 0;
 
-    FXEvent* event = (FXEvent*)ptr;
-
-    // dont't show popup if mouse has moved
-    if (event->last_x != event->click_x || event->last_y != event->click_y)
-        return 0;
-
     // find item to create popup for
-    FXTreeItem* item = getItemAt(event->click_x, event->click_y);
+    FXTreeItem* item = getCursorItem();
     if (item) {
         void* udata = item->getData();
         if (udata) {
@@ -171,6 +165,8 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
                 command->setUserData(const_cast<char*>(label.text()));
                 (new FXMenuCommand(&pane, "Zeige &Info", nullptr, csmap, CSMap::ID_POPUP_SHOW_INFO))->setUserData(const_cast<char*>(info.text()));
             }
+
+            FXEvent* event = (FXEvent*)ptr;
 
             pane.create();
             pane.popup(nullptr, event->root_x, event->root_y);
