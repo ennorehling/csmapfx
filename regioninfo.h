@@ -4,8 +4,6 @@
 
 class FXRegionInfo : public FXMessageList
 {
-    FXDECLARE(FXRegionInfo)
-
 public:
     void create();
 

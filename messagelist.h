@@ -24,7 +24,16 @@ public:
 
 public:
     virtual long onMapChange(FXObject*, FXSelector, void*);
-	long onDoubleClicked(FXObject*, FXSelector, void*);
+
+    long onDoubleClicked(FXObject*, FXSelector, void*);
+    long onRightBtnRelease(FXObject*, FXSelector, void*);
+
+    enum
+    {
+        ID_MESSAGELIST = FXTreeList::ID_LAST,
+        ID_POPUP_COPY,
+        ID_LAST
+    };
 
 protected:
     datafile::SelectionState selection;

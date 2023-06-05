@@ -1,14 +1,5 @@
 #include "regioninfo.h"
 
-FXDEFMAP(FXRegionInfo) FXRegionInfoMap[] =
-{
-    //________Message_Type_____________________ID_______________Message_Handler_______
-    FXMAPFUNC(SEL_COMMAND,			FXMessageList::ID_UPDATE,		FXRegionInfo::onMapChange),
-};
-
-FXIMPLEMENT(FXRegionInfo, FXMessageList, FXRegionInfoMap, ARRAYNUMBER(FXRegionInfoMap))
-
-
 void FXRegionInfo::create()
 {
     FXMessageList::create();

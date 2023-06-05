@@ -12,8 +12,6 @@
 
 class FXReportInfo : public FXMessageList
 {
-	FXDECLARE(FXReportInfo)
-
 public:
     void create();
 

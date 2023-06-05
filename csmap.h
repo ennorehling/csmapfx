@@ -110,7 +110,9 @@ public:		// this functions are slots for menu commands
 
     long onWatchFiles(FXObject*, FXSelector, void* ptr);		// timer, watching external files
 	
-	long onCalculator(FXObject*, FXSelector, void* ptr);
+    long onMessageSelected(FXObject*, FXSelector, void* ptr);
+    
+    long onCalculator(FXObject*, FXSelector, void* ptr);
 
     long onPopupCopyText(FXObject* sender, FXSelector sel, void* ptr);
     long onPopupCopySpecial(FXObject* sender, FXSelector sel, void* ptr);

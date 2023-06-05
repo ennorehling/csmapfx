@@ -171,6 +171,8 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_COPY_ID,             CSMap::onPopupCopySpecial),
     FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_GOTO,                CSMap::onPopupGotoObject),
     FXMAPFUNC(SEL_TIMEOUT, CSMap::ID_WATCH_FILES,               CSMap::onWatchFiles),
+
+    FXMAPFUNC(SEL_DOUBLECLICKED, 0,    CSMap::onMessageSelected),
 };
 
 FXIMPLEMENT(CSMap,FXMainWindow,MessageMap,ARRAYNUMBER(MessageMap))
@@ -2257,6 +2259,11 @@ long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
     if (reload_mode != CSMap::reload_type::RELOAD_NEVER) {
         getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, nullptr);
     }
+    return 0;
+}
+
+long CSMap::onMessageSelected(FXObject* sender, FXSelector sel, void* ptr)
+{
     return 0;
 }
 

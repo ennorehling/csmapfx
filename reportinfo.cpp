@@ -7,14 +7,6 @@
 // *********************************************************************************************************
 // *** FXReportInfo implementation
 
-FXDEFMAP(FXReportInfo) MessageMap[]=
-{
-	//________Message_Type_____________________ID_______________Message_Handler_______
-	FXMAPFUNC(SEL_COMMAND,			FXReportInfo::ID_UPDATE,	FXReportInfo::onMapChange),
-};
-
-FXIMPLEMENT(FXReportInfo, FXMessageList,MessageMap, ARRAYNUMBER(MessageMap))
-
 FXReportInfo::FXReportInfo(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h) :
     FXMessageList(p, tgt, sel, opts|TREELIST_SINGLESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES, x, y, w, h)
 {
