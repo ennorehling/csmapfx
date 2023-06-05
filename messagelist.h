@@ -24,6 +24,7 @@ public:
 
 public:
     virtual long onMapChange(FXObject*, FXSelector, void*);
+    long onPopupCopy(FXObject*, FXSelector, void*);
 
     long onDoubleClicked(FXObject*, FXSelector, void*);
     long onRightBtnRelease(FXObject*, FXSelector, void*);
@@ -36,6 +37,8 @@ public:
     };
 
 protected:
+    void setClipboard(const FXString& text);
+
     datafile::SelectionState selection;
 
     std::shared_ptr<datafile> mapFile;

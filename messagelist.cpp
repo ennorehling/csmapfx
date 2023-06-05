@@ -7,8 +7,10 @@
 FXDEFMAP(FXMessageList) FXMessageListMap[] =
 {
     //________Message_Type_____________________ID_______________Message_Handler_______
-    FXMAPFUNC(SEL_DOUBLECLICKED,	0,							FXMessageList::onDoubleClicked),
-    FXMAPFUNC(SEL_COMMAND,			FXMessageList::ID_UPDATE,	FXMessageList::onMapChange)
+    FXMAPFUNC(SEL_DOUBLECLICKED,	    0,							    FXMessageList::onDoubleClicked),
+    FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	0,  						    FXMessageList::onRightBtnRelease),
+    FXMAPFUNC(SEL_COMMAND,			    FXMessageList::ID_UPDATE,	    FXMessageList::onMapChange),
+    FXMAPFUNC(SEL_COMMAND,			    FXMessageList::ID_POPUP_COPY,	FXMessageList::onPopupCopy)
 };
 
 FXIMPLEMENT(FXMessageList, FXTreeList, FXMessageListMap, ARRAYNUMBER(FXMessageListMap))
@@ -37,6 +39,11 @@ void FXMessageList::setMapFile(std::shared_ptr<datafile>& f)
     }
 }
 
+void FXMessageList::setClipboard(const FXString& text)
+{
+    getShell()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void*)text.text());
+}
+
 void FXMessageList::addMessage(FXTreeItem* group, const datablock& block)
 {
     if (block.type() == block_type::TYPE_BATTLE) {
@@ -63,11 +70,18 @@ long FXMessageList::onMapChange(FXObject* sender, FXSelector sel, void* ptr)
     return 1;
 }
 
+long FXMessageList::onPopupCopy(FXObject* sender, FXSelector sel, void* ptr)
+{
+    FXMenuCommand* cmd = static_cast<FXMenuCommand *>(sender);
+    FXTreeItem* item = static_cast<FXTreeItem*>(cmd->getUserData());
+    if (item) {
+        setClipboard(item->getText());
+    }
+    return 0;
+}
+
 long FXMessageList::onDoubleClicked(FXObject* sender, FXSelector sel, void* ptr)
 {
-    if (this != sender) {
-        return 0;
-    }
 	if (!mapFile)
 		return 0;
 
@@ -84,36 +98,27 @@ long FXMessageList::onDoubleClicked(FXObject* sender, FXSelector sel, void* ptr)
 
 	return FXTreeList::onDoubleClicked(this, sel, ptr);
 }
-/*
+
 long FXMessageList::onRightBtnRelease(FXObject* sender, FXSelector sel, void* ptr)
 {
-    if (this != sender) {
-        return 0;
-    }
-    if (!mapFile)
-        return 0;
-
-    FXEvent* event = (FXEvent*)ptr;
-    FXTreeItem* item = getItemAt(event->click_x, event->click_y);
-    if (item) {
-        datablock* select = (datablock*)item->getData();
-        if (select != nullptr)
-        {
+    if (mapFile) {
+        FXTreeItem* item = getCursorItem();
+        if (item) {
             FXMenuPane pane(this);
-            pane.create();
-            pane.popup(nullptr, event->root_x, event->root_y);
 
             FXMenuCommand* cmd;
             cmd = new FXMenuCommand(&pane, "&Kopieren", nullptr, this, FXMessageList::ID_POPUP_COPY);
+            cmd->setUserData(item);
 
+            FXEvent* event = (FXEvent*)ptr;
+            pane.create();
+            pane.popup(nullptr, event->root_x, event->root_y);
             getApp()->runModalWhileShown(&pane);
-
-            return 1;
         }
     }
     return FXTreeList::onRightBtnRelease(this, sel, ptr);
 }
-*/
+
 void FXMessageList::clearChildren(FXTreeItem* parent_item)
 {
     if (parent_item) {
