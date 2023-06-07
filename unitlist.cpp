@@ -1,4 +1,5 @@
 #include <vector>
+#include <algorithm>
 #include "main.h"
 #include "fxhelper.h"
 #include "unitlist.h"
@@ -19,6 +20,16 @@ FXIMPLEMENT(FXUnitList, FXTreeList, MessageMap, ARRAYNUMBER(MessageMap))
 FXUnitList::FXUnitList(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x, FXint y, FXint w, FXint h)
 		: FXProperties(p, tgt, sel, opts, x, y, w, h)
 {
+}
+
+struct UnitProperty {
+    FXString label;
+    int value;
+};
+
+static bool CompareProperties(const UnitProperty& a, const UnitProperty& b)
+{
+    return a.label < b.label;
 }
 
 void FXUnitList::makeItems()
@@ -360,20 +371,24 @@ void FXUnitList::makeItems()
         {
             FXTreeItem* node = appendItem(unititem, "Talente");
             node->setExpanded(true);
-
+            std::vector<UnitProperty> properties;
             for (datakey::list_type::const_iterator key = talents->data().begin(); key != talents->data().end(); ++key)
             {
                 FXString info = key->key();
-                FXString value = key->value().section(' ', 1);
-                label = key->key() + " " + value;
-                appendItem(node, makeItem(label, nullptr, &info));
+                FXint value = FXIntVal(key->value().section(' ', 1));
+                properties.push_back({ info, value });
 
                 // Talent, für Transportkapazität
                 if (riding_skill == 0) {
                     if (info == "Reiten") {
-                        riding_skill = FXIntVal(value, 10);
+                        riding_skill = value;
                     }
                 }
+            }
+            std::sort(properties.begin(), properties.end(), CompareProperties);
+            for (const UnitProperty& item : properties) {
+                label.format("%s %d", item.label.text(), item.value);
+                appendItem(node, makeItem(label, nullptr, &item.label));
             }
         }
 
@@ -381,21 +396,25 @@ void FXUnitList::makeItems()
         {
             FXTreeItem* node = appendItem(unititem, FXString(L"Gegenst\u00e4nde"));
             node->setExpanded(true);
-
+            std::vector<UnitProperty> properties;
             for (datakey::list_type::const_iterator key = items->data().begin(); key != items->data().end(); ++key)
             {
                 const FXString& info = key->key();
-                const FXString& value = key->value();
-                label = value + " " + info;
-                appendItem(node, makeItem(label, nullptr, &info));
+                FXint value = FXIntVal(key->value(), 10);
+                properties.push_back({ info, value });
 
                 // Pferde und Wagen, für Transportkapazität
                 if (info == "Pferd" || info == "Elfenpferd") {
-                    horses += FXIntVal(value, 10);
+                    horses += value;
                 }
                 else if (info == "Wagen") {
-                    carts += FXIntVal(value, 10);
+                    carts += value;
                 }
+            }
+            std::sort(properties.begin(), properties.end(), CompareProperties);
+            for (const UnitProperty& item : properties) {
+                label.format("%d %s", item.value, item.label.text());
+                appendItem(node, makeItem(label, nullptr, &item.label));
             }
         }
 
