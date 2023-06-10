@@ -85,7 +85,6 @@ public:
     bool deleteRegion(const datablock& region);
     void deleteRegions(std::set<datablock*>& regions);
     void addRegion(const datablock& region);
-    FXString regionName(const datablock& block);
     FXString unitName(const datablock& block, bool verbose = false);
     static FXString regionCoordinates(const datablock& block);
     void setConfirmed(datablock::itor& unit, bool value = true);

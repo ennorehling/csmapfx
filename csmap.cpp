@@ -1756,7 +1756,7 @@ long CSMap::onSetOrigin(FXObject*, FXSelector, void*)
     FXString name;
     if (selection.selected & selection.REGION)
     {
-        name = report->regionName(*selection.region);
+        name = selection.region->getName();
     }
     else {
         name = "Unbekannt";

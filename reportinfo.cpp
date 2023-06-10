@@ -103,10 +103,7 @@ void FXReportInfo::addMessage(FXTreeItem *group, const datablock& msg)
 
 void FXReportInfo::addBattle(datablock::itor& block)
 {
-    FXString name = mapFile->regionName(*block);
-    FXString label;
-    label.format(" (%d,%d)", block->x(), block->y());
-    label = name + label;
+    FXString label = block->getLabel();
     FXTreeItem* group = appendItem(battles, label);
 
     datablock::itor it;

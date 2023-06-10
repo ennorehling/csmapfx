@@ -522,17 +522,19 @@ FXString datablock::getName() const
     else {
         name = value(TYPE_NAME);
         if (name.empty()) {
-            if (type() == block_type::TYPE_UNIT) {
-                name = "Einheit " + id();
-            }
-            else if (type() == block_type::TYPE_REGION) {
+            switch(type()) {
+            case block_type::TYPE_UNIT:
+                return "Einheit " + id();
+            case block_type::TYPE_REGION:
+            case block_type::TYPE_BATTLE:
+            case block_type::TYPE_SCHEMEN:
                 name = terrainString();
                 if (name.empty()) {
                     name = "Unbekannt";
                 }
-            }
-            else {
-                name = value(TYPE_TYPE) + " " + id();
+                break;
+            default:
+                return value(TYPE_TYPE) + " " + id();
             }
         }
     }
@@ -541,7 +543,7 @@ FXString datablock::getName() const
 
 FXString datablock::getLabel() const
 {
-    if (type() == block_type::TYPE_REGION) {
+    if (type() == block_type::TYPE_REGION || type() == block_type::TYPE_BATTLE) {
         FXString label, name = getName();
         if (info()) {
             label.format("%s (%d,%d,%s)", name.text(), x(), y(), planeName(info()).text());
