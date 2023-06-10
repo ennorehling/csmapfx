@@ -5,7 +5,7 @@ csmapfx (1.7.6-1) stable; urgency=low
   * sort factions in region list
   * faster update of region list
 
- -- Enno Rehling <enno@eressea.de>  Wed, 10 Jun 2023 21:45:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Wed, 10 Jun 2023 22:45:00 +0200
 
 csmapfx (1.7.5-1) stable; urgency=low
 

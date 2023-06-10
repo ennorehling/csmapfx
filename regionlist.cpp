@@ -417,12 +417,13 @@ void FXRegionList::rebuildTree()
             const datablock* objectPtr = &*block;
             block_type type = objectPtr->type();
             if (type == block_type::TYPE_REGION) {
+                const att_region* att = static_cast<const att_region*>(objectPtr->attachment());
                 factions.clear();
                 regionItem = nullptr;
                 firstFactionItem = nullptr;
                 ships = nullptr;
                 buildings = nullptr;
-                regionPtr = objectPtr;
+                regionPtr = (att && !att->people.empty()) ? objectPtr : nullptr;
             }
             if (regionPtr) {
                 FXRegionItem* child = nullptr;
