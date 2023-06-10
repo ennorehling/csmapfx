@@ -2,8 +2,10 @@ csmapfx (1.7.6-1) stable; urgency=low
 
   * copy messages (right-click menu option)
   * sort unit skills and items
+  * sort factions in region list
+  * faster update of region list
 
- -- Enno Rehling <enno@eressea.de>  Wed, 07 Jun 2023 21:30:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Wed, 10 Jun 2023 21:45:00 +0200
 
 csmapfx (1.7.5-1) stable; urgency=low
 

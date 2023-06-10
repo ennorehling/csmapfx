@@ -8,6 +8,8 @@
 
 #include <list>
 
+class FXRegionItem;
+
 class FXRegionList : public FXTreeList
 {
 	FXDECLARE(FXRegionList)
@@ -71,6 +73,8 @@ private:
     FXRegionList(const FXRegionList&) = delete;
 
     void rebuildTree();
+    FXRegionItem* appendRegion(const datablock *regionPtr);
+    void appendFactions(FXRegionItem* parent, const std::vector<FXRegionItem*>& factions);
     FXColor getItemColor(const datablock& unit) const;
     friend class FXRegionItem;
 };

@@ -525,6 +525,12 @@ FXString datablock::getName() const
             if (type() == block_type::TYPE_UNIT) {
                 name = "Einheit " + id();
             }
+            else if (type() == block_type::TYPE_REGION) {
+                name = terrainString();
+                if (name.empty()) {
+                    name = "Unbekannt";
+                }
+            }
             else {
                 name = value(TYPE_TYPE) + " " + id();
             }
@@ -535,7 +541,19 @@ FXString datablock::getName() const
 
 FXString datablock::getLabel() const
 {
-    return getName() + " (" + id() + ")";
+    if (type() == block_type::TYPE_REGION) {
+        FXString label, name = getName();
+        if (info()) {
+            label.format("%s (%d,%d,%s)", name.text(), x(), y(), planeName(info()).text());
+        }
+        else {
+            label.format("%s (%d,%d)", name.text(), x(), y());
+        }
+        return label;
+    }
+    else {
+        return getName() + " (" + id() + ")";
+    }
 }
 
 /*static*/ int datablock::parseTerrain(const FXString& terrain)
