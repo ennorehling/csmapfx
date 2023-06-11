@@ -1,3 +1,9 @@
+csmapfx (1.7.8-1) stable; urgency=low
+
+  * make active faction always be on top of region list
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 11 Jun 2023 17:15:00 +0200
+
 csmapfx (1.7.7-1) stable; urgency=low
 
   * fix label of battles
