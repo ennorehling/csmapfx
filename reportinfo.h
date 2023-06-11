@@ -22,8 +22,8 @@ public:
 
 protected:
     void addMessage(FXTreeItem* group, const datablock& msg);
-    void addBattle(datablock::itor& block);
-    void addFaction(datablock::itor& block);
+    void addBattle(const datablock::itor& block);
+    void addFaction(const datablock::itor& block);
 
 protected:
 	FXReportInfo() {}

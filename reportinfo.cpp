@@ -45,12 +45,9 @@ void FXReportInfo::setMapFile(std::shared_ptr<datafile>& f)
                 }
                 else if (block.type() == block_type::TYPE_BATTLE) {
                     addBattle(it);
-                    /* block is already on the next object */
-                    continue;
                 }
                 else if (block.type() == block_type::TYPE_FACTION) {
                     addFaction(it);
-                    continue;
                 }
                 else if (block.type() == block_type::TYPE_MESSAGE && block.depth() == 3) {
                     addMessage(messages, block);
@@ -101,25 +98,24 @@ void FXReportInfo::addMessage(FXTreeItem *group, const datablock& msg)
     item->setData(mapFile->getMessageTarget(msg));
 }
 
-void FXReportInfo::addBattle(datablock::itor& block)
+void FXReportInfo::addBattle(const datablock::itor& block)
 {
-    FXString label = block->getLabel();
-    FXTreeItem* group = appendItem(battles, label);
-
-    datablock::itor it;
-    if (mapFile->getRegion(it, *block)) {
-        group->setData((void*)&*it);
-    }
-    datablock::itor end = mapFile->blocks().end();
-    for (++block; block != end; ++block) {
-        if (block->type() != block_type::TYPE_MESSAGE) {
-            break;
+    datablock::itor region;
+    if (mapFile->getRegion(region, *block)) {
+        datablock::itor message;
+        datablock* regionPtr = &*region;
+        FXString label = regionPtr->getLabel();
+        FXTreeItem* group = appendItem(battles, label);
+        group->setData(regionPtr);
+        if (mapFile->getChild(message, block, block_type::TYPE_MESSAGE)) {
+            do {
+                addMessage(group, *message);
+            }
+            while (mapFile->getNext(message, block_type::TYPE_MESSAGE));
         }
-        addMessage(group, *block);
     }
 }
 
-void FXReportInfo::addFaction(datablock::itor& block)
+void FXReportInfo::addFaction(const datablock::itor& block)
 {
-    ++block;
 }

@@ -1,3 +1,10 @@
+csmapfx (1.7.7-1) stable; urgency=low
+
+  * fix label of battles
+  * simplify code to display battles
+
+ -- Enno Rehling <enno@eressea.de>  Sun, 11 Jun 2023 06:30:00 +0200
+
 csmapfx (1.7.6-1) stable; urgency=low
 
   * copy messages (right-click menu option)
@@ -5,7 +12,7 @@ csmapfx (1.7.6-1) stable; urgency=low
   * sort factions in region list
   * faster update of region list
 
- -- Enno Rehling <enno@eressea.de>  Wed, 10 Jun 2023 22:45:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sat, 10 Jun 2023 22:45:00 +0200
 
 csmapfx (1.7.5-1) stable; urgency=low
 

@@ -1248,6 +1248,9 @@ bool datafile::getNext(datablock::itor& iter, block_type type)
             iter = it;
             return true;
         }
+        if (it->depth() < iter->depth()) {
+            break;
+        }
     }
     return false;
 }

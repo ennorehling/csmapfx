@@ -73,15 +73,14 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
                 datablock::itor end = mapFile->blocks().end();
                 std::set<FXint> guard_ids;
                 if (mapFile->getBattle(block, pstate->sel_x, pstate->sel_y, pstate->sel_plane)) {
-                    int depth = block->depth();
+                    datablock::itor message;
                     if (!battle) {
                         battle = appendItem(nullptr, "Kampf");
                     }
-                    for (++block; block != end && block->depth() > depth; block++)
-                    {
-                        if (block->type() == block_type::TYPE_MESSAGE) {
-                            addMessage(battle, *block);
-                        }
+                    if (mapFile->getChild(message, block, block_type::TYPE_MESSAGE)) {
+                        do {
+                            addMessage(battle, *message);
+                        } while (mapFile->getNext(message, block_type::TYPE_MESSAGE));
                     }
                 }
                 else if (battle) {

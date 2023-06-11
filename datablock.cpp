@@ -526,8 +526,6 @@ FXString datablock::getName() const
             case block_type::TYPE_UNIT:
                 return "Einheit " + id();
             case block_type::TYPE_REGION:
-            case block_type::TYPE_BATTLE:
-            case block_type::TYPE_SCHEMEN:
                 name = terrainString();
                 if (name.empty()) {
                     name = "Unbekannt";
