@@ -428,11 +428,16 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 	if (!mapFile)
 		return 0;
 
-	// create popup
-	int itemIdx = list->getCursorItem();
-	if (itemIdx < 0)
-		return 0;
-	FXListItem* item = list->getItem(itemIdx);
+    FXEvent* event = (FXEvent*)ptr;
+    
+    int itemIdx = list->getCursorItem();
+    if (itemIdx < 0) {
+        itemIdx = list->getItemAt(event->click_x, event->click_y);
+        if (itemIdx < 0) {
+            return 0;
+        }
+    }
+    FXListItem* item = list->getItem(itemIdx);
 	if (!item)
 		return 0;
 
@@ -477,8 +482,6 @@ long FXStatistics::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 	}
 
 	// show popup
-    FXEvent* event = (FXEvent*)ptr;
-
     menu.create();
 	menu.popup(NULL, event->root_x,event->root_y);
 

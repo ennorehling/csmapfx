@@ -102,7 +102,11 @@ long FXMessageList::onDoubleClicked(FXObject* sender, FXSelector sel, void* ptr)
 long FXMessageList::onRightBtnRelease(FXObject* sender, FXSelector sel, void* ptr)
 {
     if (mapFile) {
+        FXEvent* event = (FXEvent*)ptr;
         FXTreeItem* item = getCursorItem();
+        if (!item) {
+            item = getItemAt(event->click_x, event->click_y);
+        }
         if (item) {
             FXMenuPane pane(this);
 
@@ -110,7 +114,6 @@ long FXMessageList::onRightBtnRelease(FXObject* sender, FXSelector sel, void* pt
             cmd = new FXMenuCommand(&pane, "&Kopieren", nullptr, this, FXMessageList::ID_POPUP_COPY);
             cmd->setUserData(item);
 
-            FXEvent* event = (FXEvent*)ptr;
             pane.create();
             pane.popup(nullptr, event->root_x, event->root_y);
             getApp()->runModalWhileShown(&pane);
