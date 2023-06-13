@@ -351,7 +351,11 @@ long FXRegionList::onPopup(FXObject* sender,FXSelector sel, void* ptr)
 	if (!item)
 		return 0;
 
-    return showPopup(item->getText(), static_cast<datablock*>(item->getData()), event->root_x, event->root_y);
+    datablock* block = static_cast<datablock*>(item->getData());
+    if (!block) 
+        return 0;
+
+    return showPopup(item->getText(), block, event->root_x, event->root_y);
 }
 
 long FXRegionList::showPopup(const FXString& label, datablock* block, FXint root_x, FXint root_y)
