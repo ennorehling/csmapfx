@@ -1,15 +1,10 @@
-csmapfx (1.7.8-2) stable; urgency=low
-
-  * fix context menus when getCursorItem fails.
-
- -- Enno Rehling <enno@eressea.de>  Tue, 13 Jun 2023 21:50:00 +0200
-
 csmapfx (1.7.8-1) stable; urgency=low
 
+  * fix context menus when getCursorItem fails.
   * make active faction always be on top of region list
   * fix a crash when right-clicking on region list categories.
 
- -- Enno Rehling <enno@eressea.de>  Tue, 13 Jun 2023 06:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Tue, 13 Jun 2023 22:00:00 +0200
 
 csmapfx (1.7.7-1) stable; urgency=low
 
