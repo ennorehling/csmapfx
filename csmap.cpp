@@ -1197,6 +1197,7 @@ datafile* CSMap::loadFile(const FXString& filename, FXString& errorMessage)
             delete cr;
             cr = nullptr;
         }
+        cr->createHashTables();
     }
     catch(const std::runtime_error& err)
     {
@@ -1257,6 +1258,7 @@ bool CSMap::mergeFile(const FXString& filename, FXString & errorMessage)
     }
     else {
         datafile* input = report.get();
+        new_cr->createHashTables();
         new_cr->findOffset(input, &x_offset, &y_offset);
         new_cr->merge(input, x_offset, y_offset);
         selection.transfer(input, new_cr.get(), x_offset, y_offset);
