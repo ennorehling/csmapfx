@@ -1197,7 +1197,9 @@ datafile* CSMap::loadFile(const FXString& filename, FXString& errorMessage)
             delete cr;
             cr = nullptr;
         }
-        cr->createHashTables();
+        else {
+            cr->createHashTables();
+        }
     }
     catch(const std::runtime_error& err)
     {

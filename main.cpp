@@ -93,7 +93,7 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
     }
     LocalFree(cmdArgs);
 #else
-    for (int arg = 0; arg != argc; ++arg)
+    for (int arg = 1; arg != argc; ++arg)
     {
         args.push_back(argv[arg]);
     }
