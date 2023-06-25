@@ -104,23 +104,22 @@ void FXInfoDlg::setGame(const FXString& game)
         { "E3", (const char*)data::infodlg_data_e3, data::infodlg_data_e3_size },
     };
 
-    // clear current data
-    blocks.clear();
-
-    if (currentGame != "default") {
-        // load internal data for specific game
-        GameInfo* loadInfo = &infoData[0];		// load "default" info by default
+    // load internal data for specific game
+    GameInfo* loadInfo = &infoData[0];		// load "default" info by default
+    if (game != "default") {
         for (GameInfo* info = begin(infoData); info != end(infoData); ++info) {
             if (game == info->game) {
                 loadInfo = info;
                 break;
             }
         }
-	    if (loadInfo && loadInfo->data) {
-		    std::istringstream stream( std::string(loadInfo->data, loadInfo->size) );
-		    parseTableData(stream);
-	    }
     }
+	if (loadInfo && loadInfo->data) {
+        // clear current data
+        blocks.clear();
+        std::istringstream stream( std::string(loadInfo->data, loadInfo->size) );
+		parseTableData(stream);
+	}
 
     currentGame = game;
     // load additional info from file
@@ -139,6 +138,7 @@ void FXInfoDlg::setGame(const FXString& game)
         std::string str = loadResourceFile(filename.c_str());
         if (!str.empty()) {
             std::istringstream input(str);
+            blocks.clear();
             if (parseTableData(input)) break;
         }
 	}
