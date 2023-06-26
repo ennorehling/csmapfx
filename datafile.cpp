@@ -25,16 +25,17 @@ datafile::datafile() : m_factionId(0), m_recruitment(0), m_turn(-1), m_activefac
 
 const char* UTF8BOM = "\xEF\xBB\xBF";
 
-static void skip_bom(std::ifstream& file)
+static bool skip_bom(std::ifstream& file)
 {
     // skip BOM, if any
     for (int i = 0; i != 3; ++i) {
         int c = file.get();
         if ((char)c != UTF8BOM[i]) {
             file.seekg(0);
-            break;
+            return false;
         }
     }
+    return true;
 }
 
 // helper function that strips lines and return pointer to next line
@@ -676,10 +677,25 @@ const char* datafile::getConfigurationName(map_type type)
 
 // ====================================
 // === datafile command loading routine
+FXString decodeLine(const std::string& line, bool& checkUTF8, bool& utf8)
+{
+    // check if line is REGION or EINHEIT command
+    if (checkUTF8) {
+        if (!isUTF8(line.c_str(), line.length())) {
+            checkUTF8 = false;
+            utf8 = false;
+        }
+    }
+    if (!utf8) {
+        return iso2utf(line.c_str(), line.length());
+    }
+    return FXString(line.c_str());
+}
 
 // loads command file and attaches the commands to the units
 int datafile::loadCmds(const FXString& filename)
 {
+    bool utf8 = true, checkUTF8 = true; // file might not be UTF8
     if (filename.empty())
         return 0;
 
@@ -693,7 +709,10 @@ int datafile::loadCmds(const FXString& filename)
     if (!file.is_open()) {
         throw std::runtime_error(FXString(L"Datei konnte nicht ge\u00f6ffnet werden.").text());
     }
-    skip_bom(file);
+    if (skip_bom(file)) {
+        checkUTF8 = false;
+        utf8 = true;
+    }
     std::string line;
     while (std::getline(file, line)) 
     {
@@ -753,8 +772,7 @@ int datafile::loadCmds(const FXString& filename)
         }
         // strip the line
         if (!line.empty()) {
-            // check if line is REGION or EINHEIT command
-            str.assign(line.c_str());
+            str = decodeLine(line, checkUTF8, utf8);
             indent = str.find_first_not_of("\t ");
             if (!str.trim().empty()) {}
             cmd = str.before(' ');
@@ -775,6 +793,7 @@ int datafile::loadCmds(const FXString& filename)
 	att_commands* cmds_list = NULL;
 	std::vector<int> *unit_order = NULL;
     datablock::itor block;
+    int unitId = 0;
 
     while (file.good())
     {
@@ -783,30 +802,9 @@ int datafile::loadCmds(const FXString& filename)
             FXString param = str.section(' ', 1);
             headerindent = indent;
 
-            if (cmd == "REGION")
+            if (cmd == "EINHEIT")
             {
-                FXString xstr = param.section(',', 0);
-                FXString ystr = param.section(',', 1);
-                FXString zstr = param.section(',', 2);
-
-                int x = strtol(xstr.text(), nullptr, 10);
-                int y = strtol(ystr.text(), nullptr, 10);
-                int z = strtol(zstr.text(), nullptr, 10);
-
-                // add to order list if not already in it
-                if (m_cmds.region_lines.find(Coordinates(x, y, z)) == m_cmds.region_lines.end())
-                {
-                    m_cmds.region_order.push_back(std::make_pair(Coordinates(x, y, z), std::vector<int>()));
-                    unit_order = &m_cmds.region_order.back().second;
-                }
-                else
-                    unit_order = NULL;
-
-                cmds_list = &m_cmds.region_lines[Coordinates(x, y, z)];
-            }
-            else if (cmd == "EINHEIT")
-            {
-                int unitId = strtol(param.text(), nullptr, 36);
+                unitId = strtol(param.text(), nullptr, 36);
 
                 // add to order list for units of this region
                 if (unit_order)
@@ -829,7 +827,30 @@ int datafile::loadCmds(const FXString& filename)
                     throw std::runtime_error(("Einheit hat keinen Befehlsblock: " + str).text());
                 }
             }
+            else {
+                unitId = 0;
+                if (cmd == "REGION")
+                {
+                    FXString xstr = param.section(',', 0);
+                    FXString ystr = param.section(',', 1);
+                    FXString zstr = param.section(',', 2);
 
+                    int x = strtol(xstr.text(), nullptr, 10);
+                    int y = strtol(ystr.text(), nullptr, 10);
+                    int z = strtol(zstr.text(), nullptr, 10);
+
+                    // add to order list if not already in it
+                    if (m_cmds.region_lines.find(Coordinates(x, y, z)) == m_cmds.region_lines.end())
+                    {
+                        m_cmds.region_order.push_back(std::make_pair(Coordinates(x, y, z), std::vector<int>()));
+                        unit_order = &m_cmds.region_order.back().second;
+                    }
+                    else
+                        unit_order = NULL;
+
+                    cmds_list = &m_cmds.region_lines[Coordinates(x, y, z)];
+                }
+            }
             if (cmds_list) {
                 cmds_list->prefix_lines.clear();
                 cmds_list->commands.clear();
@@ -841,9 +862,8 @@ int datafile::loadCmds(const FXString& filename)
         {
             if (!str.empty()) {
                 if (str.left(1) == ";") {
-                    cmd = str.after(';');
-                    cmd.trim().lower();
-                    if (flatten(cmd) == "bestaetigt") {
+                    cmd = str.section(' ', 1);
+                    if (unitId != 0 && flatten(cmd.lower()) == "bestaetigt") {
                         // don't add "; bestaetigt" comment, just set confirmed flag
                         setConfirmed(block, true);
                     }
@@ -874,7 +894,7 @@ int datafile::loadCmds(const FXString& filename)
             }
         }
         // check if line is REGION oder EINHEIT command
-        str.assign(line.c_str());
+        str = decodeLine(line, checkUTF8, utf8);
         indent = str.find_first_not_of("\t ");
         cmd = str.trim().before(' ');
         cmd.upper();

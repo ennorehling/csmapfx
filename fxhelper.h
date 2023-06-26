@@ -26,6 +26,8 @@ FX::FXString utf2iso(const FX::FXString& s);
 FX::FXString iso2utf(const FX::FXString& s);
 FX::FXString iso2utf(const FXchar* src, FXint nsrc);
 
+int isUTF8(const char* data, size_t size);
+
 // flatten strings: Removed spaces,
 // german umlauts to ae,oe,ue,ss and
 // all letters to lower case.
