@@ -1,6 +1,7 @@
 csmapfx (1.7.11-1) stable; urgency=low
 
   * change list selection behavior.
+  * avoid duplicate recent files.
 
  -- Enno Rehling <enno@eressea.de>  Sun, 09 Jul 2023 10:00:00 +0200
 

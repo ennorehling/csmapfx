@@ -516,7 +516,7 @@ CSMap::CSMap(FXApp *app) :
     leftframe = new FXVerticalFrame(content,LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 3, 0, 0, 0);
 
     // Region list window
-    regions = new FXRegionList(leftframe, this, ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    regions = new FXRegionList(leftframe, this, ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y| TREELIST_SINGLESELECT);
 
     menu.ownFactionGroup->setTarget(regions);
     menu.ownFactionGroup->setSelector(FXRegionList::ID_TOGGLE_OWNFACTIONGROUP);
@@ -2372,6 +2372,12 @@ long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)
     return 1;
 }
 
+void CSMap::addRecentFile(const FXString& filename)
+{
+    FXString path = FXPath::convert(FXPath::simplify(filename));
+    recentFiles.appendFile(path);
+}
+
 void CSMap::loadFiles(const std::vector<FXString> &filenames, std::vector<FXString> & errorMessages)
 {
     if (!filenames.empty()) {
@@ -2384,7 +2390,7 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames, std::vector<FXStri
                     errorMessages.push_back(errorMessage);
                 }
                 else {
-                    recentFiles.appendFile(filename);
+                    addRecentFile(filename);
                 }
             }
             else {
@@ -2507,7 +2513,7 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
             beginLoading(filename);
             loadFile(filename);
             if (report) {
-                recentFiles.appendFile(filename);
+                addRecentFile(filename);
                 checkCommands();
             }
             mapChange();
@@ -2645,7 +2651,7 @@ long CSMap::onFileSaveMap(FXObject*, FXSelector, void*)
     if (!filename.empty() && allowReplaceFile(filename)) {
         getApp()->beginWaitCursor();
         if (saveReport(filename, map_type::MAP_NORMAL)) {
-            recentFiles.appendFile(filename);
+            addRecentFile(filename);
         }
         getApp()->endWaitCursor();
         return 1;
@@ -2659,7 +2665,7 @@ long CSMap::onFileSaveAll(FXObject*, FXSelector, void*)
     if (!filename.empty() && allowReplaceFile(filename)) {
         getApp()->beginWaitCursor();
         if (saveReport(filename, map_type::MAP_FULL)) {
-            recentFiles.appendFile(filename);
+            addRecentFile(filename);
             report->filename(filename);
             updateFileNames();
         }
@@ -2747,7 +2753,7 @@ long CSMap::onFileOpenCommands(FXObject *, FXSelector, void *)
         getApp()->beginWaitCursor();
         FXString filename = dlg.getFilename();
         if (loadCommands(filename)) {
-            recentFiles.appendFile(filename);
+            addRecentFile(filename);
             updateFileNames();
             checkCommands();
         }
@@ -3055,14 +3061,14 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
             mapChange();
             updateFileNames();
             if (report) {
-                recentFiles.appendFile(filename);
+                addRecentFile(filename);
                 checkCommands();
             }
         }
     }
     else {
         if (loadCommands(filename)) {
-            recentFiles.appendFile(filename);
+            addRecentFile(filename);
             checkCommands();
         }
         updateFileNames();

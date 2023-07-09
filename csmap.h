@@ -119,6 +119,7 @@ public:		// this functions are slots for menu commands
     long onPopupShowInfo(FXObject* sender, FXSelector sel, void* ptr);
     long onPopupGotoObject(FXObject* sender, FXSelector sel, void* ptr);
 
+    void addRecentFile(const FXString& filename);
     void loadFiles(const std::vector<FXString>& filenames, std::vector<FXString>& errorMessages);
     void loadFile(const FXString& filename);
     int saveFile(const FXString& filename, map_type mode = map_type::MAP_FULL);
