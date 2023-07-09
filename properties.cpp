@@ -15,7 +15,7 @@ public:
 
 
 FXProperties::FXProperties(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x, FXint y, FXint w, FXint h)
-    : FXTreeList(p, tgt, sel, opts, x, y, w, h)
+    : FXTreeList(p, tgt, sel, opts | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES, x, y, w, h)
 {
 }
 

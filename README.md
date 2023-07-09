@@ -33,3 +33,12 @@ Ich habe vorübergehend ein Visual Studio Projekt aufgesetzt, Fox habe ich aus
 den Sourcen selber kompiliert, mit dem selben Compiler und gleicher CRT 
 (Multihreaded), und verweise direkt auf das Verzeichnis, in das ich es lokal
 installiert habe. Das sollte bei Gelegenheit besser gemacht werden.
+
+### Minor UI Bugs
+
+* ctrl+n/ctrl+p macht die befehle zum aktiven widget, nicht die regionsliste, warum?
+* popups haben keine cursor-navigation
+* make context menu key open popups
+* faction details: show alliance status
+* regionlist: Gebäude/Schiffe nodes löschen die detail-anzeige nicht (nur Partei-Gruppierung tut das)
+* details: selektion bewegt sich nicht mit cursor.

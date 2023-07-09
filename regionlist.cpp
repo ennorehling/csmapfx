@@ -591,7 +591,7 @@ FXColor FXRegionList::getItemColor(const datablock& block) const
     return 0;
 }
 
-long FXRegionList::onMapChange(FXObject* sender, FXSelector, void* ptr)
+long FXRegionList::onMapChange(FXObject* sender, FXSelector sel, void* ptr)
 {
     datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 

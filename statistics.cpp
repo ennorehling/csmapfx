@@ -63,6 +63,7 @@ FXStatistics::FXStatistics(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 
 	// create list
     list = new FXList(this, this,ID_LIST, LIST_BROWSESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    // hide the selection:
 	list->setSelTextColor(list->getTextColor());
 	list->setSelBackColor(list->getBackColor());
 }

@@ -20,10 +20,6 @@ FXMessageList::FXMessageList(FXComposite* p, FXObject* tgt,FXSelector sel, FXuin
 {
 	// set styles...
 	setNumVisible(7);
-
-	setSelTextColor(getTextColor());
-	setSelBackColor(getBackColor());
-
 }
 
 void FXMessageList::create()

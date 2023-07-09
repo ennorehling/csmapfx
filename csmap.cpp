@@ -516,7 +516,7 @@ CSMap::CSMap(FXApp *app) :
     leftframe = new FXVerticalFrame(content,LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 3, 0, 0, 0);
 
     // Region list window
-    regions = new FXRegionList(leftframe, this, ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y| TREELIST_SINGLESELECT);
+    regions = new FXRegionList(leftframe, this, ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y| TREELIST_BROWSESELECT);
 
     menu.ownFactionGroup->setTarget(regions);
     menu.ownFactionGroup->setSelector(FXRegionList::ID_TOGGLE_OWNFACTIONGROUP);
@@ -608,14 +608,14 @@ CSMap::CSMap(FXApp *app) :
     descriptionText = new FXText(hFrame, this, ID_SELECTION, LAYOUT_FILL_X|TEXT_READONLY|TEXT_WORDWRAP|HSCROLLER_NEVER);
     descriptionText->disable();
 
-    unitProperties = new FXUnitList(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
-        TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
+    unitProperties = new FXUnitList(frame, this, ID_SELECTION, 
+        TREELIST_SINGLESELECT | LAYOUT_FILL_X | LAYOUT_FILL_Y);
     unitProperties->hide();
     shipProperties = new FXShipProperties(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
-        TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
+        TREELIST_SINGLESELECT);
     shipProperties->hide();
     buildingProperties = new FXBuildingProperties(frame, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y |
-        TREELIST_SINGLESELECT | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES);
+        TREELIST_SINGLESELECT);
     buildingProperties->hide();
 
     getAccelTable()->addAccel(MKUINT(KEY_1, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_1));

@@ -13,9 +13,6 @@ FXReportInfo::FXReportInfo(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	// set styles...
 	setNumVisible(7);
 
-	setSelTextColor(getTextColor());
-	setSelBackColor(getBackColor());
-
 	messages = appendItem(nullptr, "Meldungen");
 	battles = appendItem(nullptr, L"K\u00e4mpfe");
 }
