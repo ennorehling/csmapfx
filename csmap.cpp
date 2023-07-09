@@ -561,7 +561,7 @@ CSMap::CSMap(FXApp *app) :
     new FXTabItem(outputTabs, "&Fehler");
     errorList = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
     new FXTabItem(outputTabs, "&Suchergebnisse");
-    searchResults = new FXSearchResults(outputTabs, this, ID_RESULT_SELECTED, FOLDINGLIST_SINGLESELECT | LAYOUT_FILL_X | LAYOUT_FILL_Y);
+    searchResults = new FXSearchResults(outputTabs, this, ID_RESULT_SELECTED, FOLDINGLIST_BROWSESELECT | LAYOUT_FILL_X | LAYOUT_FILL_Y);
     searchResults->getHeader()->setHeaderStyle(HEADER_RESIZE | HEADER_TRACKING);
     searchResults->appendHeader("Region");
     searchResults->appendHeader(FXString(L"Einheit/Geb\u00e4ude/Schiff"));

@@ -8,7 +8,7 @@
 // *** FXReportInfo implementation
 
 FXReportInfo::FXReportInfo(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h) :
-    FXMessageList(p, tgt, sel, opts|TREELIST_SINGLESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES, x, y, w, h)
+    FXMessageList(p, tgt, sel, opts|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES, x, y, w, h)
 {
 	// set styles...
 	setNumVisible(7);

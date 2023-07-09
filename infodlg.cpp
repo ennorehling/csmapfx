@@ -257,7 +257,7 @@ void FXInfoDlg::createTable()
 
         FXTabItem* tab = new FXTabItem(tabbook, itor->first);
         FXHorizontalFrame* frame = new FXHorizontalFrame(tabbook, LAYOUT_FILL_X | LAYOUT_FILL_Y | FRAME_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
-        FXFoldingList* list = new FXFoldingList(frame, this, FXInfoDlg::ID_LIST, FOLDINGLIST_SINGLESELECT | FOLDINGLIST_SHOWS_LINES | FOLDINGLIST_SHOWS_BOXES | LAYOUT_FILL_X | LAYOUT_FILL_Y);
+        FXFoldingList* list = new FXFoldingList(frame, this, FXInfoDlg::ID_LIST, FOLDINGLIST_BROWSESELECT | FOLDINGLIST_SHOWS_LINES | FOLDINGLIST_SHOWS_BOXES | LAYOUT_FILL_X | LAYOUT_FILL_Y);
 
         delete block.list;
         delete block.frame;

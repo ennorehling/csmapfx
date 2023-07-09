@@ -101,7 +101,7 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, FXObject* tgt, FXSelector sel, FXSearc
 	FXHorizontalFrame *list_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
 	list_frame->setBorderColor(getApp()->getShadowColor());
 
-    matches = new FXSearchResults(list_frame, this, ID_RESULTS, FOLDINGLIST_SINGLESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    matches = new FXSearchResults(list_frame, this, ID_RESULTS, FOLDINGLIST_BROWSESELECT |LAYOUT_FILL_X|LAYOUT_FILL_Y);
     matches->getHeader()->setHeaderStyle(HEADER_RESIZE|HEADER_TRACKING);
 	
     matches->appendHeader("Region");
