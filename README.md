@@ -40,4 +40,3 @@ installiert habe. Das sollte bei Gelegenheit besser gemacht werden.
 * popups haben keine cursor-navigation
 * make context menu key open popups
 * faction details: show alliance status
-* regionlist: Gebäude/Schiffe nodes löschen die detail-anzeige nicht (nur Partei-Gruppierung tut das)

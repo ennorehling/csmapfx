@@ -325,6 +325,17 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
                 return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_SETVALUE), block);
             }
         }
+        else {
+            FXTreeItem* parent = current->getParent();
+            if (parent) {
+                block = static_cast<datablock*>(parent->getData());
+                if (block && mapFile->getRegion(selection.region, *block)) {
+                    selection.selected |= selection.REGION;
+                }
+            }
+            selection.selected &= ~(selection.UNIT | selection.BUILDING | selection.SHIP);
+            return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
+        }
     }
     return 0;
 }
@@ -643,7 +654,12 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector sel, void* ptr)
                     else if (selection.selected & selection.FACTION)
                         item = findTreeItem(region, &*selection.faction);
 
-                    if (!item) item = region;
+                    if (!item) {
+                        FXTreeItem* cur = getCurrentItem();
+                        if (cur->getParent() == region) {
+                            item = cur;
+                        }
+                    }
                     if (item) {
                         selectItem(item);
                         makeItemVisible(item);
