@@ -8,8 +8,6 @@ FXDEFMAP(FXCommands) MessageMap[]=
 { 
 	//________Message_Type_____________________ID_______________Message_Handler_______ 
 	FXMAPFUNC(SEL_COMMAND,			FXCommands::ID_UPDATE,			FXCommands::onMapChange), 
-    FXMAPFUNC(SEL_COMMAND,          FXCommands::ID_UNIT_NEXT,		FXCommands::onNextUnit),
-    FXMAPFUNC(SEL_COMMAND,          FXCommands::ID_UNIT_PREV,		FXCommands::onPrevUnit),
     FXMAPFUNC(SEL_COMMAND,          FXCommands::ID_UNIT_CONFIRM,    FXCommands::onConfirmUnit),
     FXMAPFUNC(SEL_COMMAND,          FXCommands::ID_UNIT_ADD,        FXCommands::onCreateUnit),
 
@@ -98,98 +96,6 @@ void FXCommands::setMapFile(std::shared_ptr<datafile>& f)
 void FXCommands::connectMap(FXCSMap* map_)
 {
 	map = map_;
-}
-
-long FXCommands::onPrevUnit(FXObject *, FXSelector, void *)
-{
-	if (!mapFile)
-		return 0;
-
-    datablock::itor begin;
-    if (selection.selected & selection.UNIT)
-        begin = selection.unit;
-	else if (selection.selected & selection.REGION)
-        begin = selection.region;
-    else
-		return 0;
-    bool wrap = true;
-    datablock::itor unit = begin;
-    for(;;)
-	{
-        if (unit == mapFile->blocks().begin()) {
-            unit = mapFile->blocks().end();
-        }
-        --unit;
-        if (unit == begin) {
-            if (!wrap) break;
-            wrap = false;
-            unit = mapFile->blocks().end();
-        }
-        if (unit->type() != block_type::TYPE_UNIT)
-			continue;
-
-        if (!mapFile->isConfirmed(*unit))
-        {
-			// send selectionchange, select this unit
-	
-            selection.selected = selection.UNIT;
-            selection.unit = unit;
-            updateSelection();
-				
-			flags |= FLAG_UPDATE;
-			forceRefresh();
-			setFocus();
-			return 1;
-		}
-    }
-
-	// no next unit found: beep
-	getApp()->beep();
-	return 1;
-}
-
-long FXCommands::onNextUnit(FXObject *, FXSelector, void *)
-{
-	if (!mapFile)
-		return 0;
-
-	datablock::citor end = mapFile->blocks().end();
-	datablock::itor unit;
-	if (selection.selected & selection.UNIT)
-		unit = std::next(selection.unit);
-	else if (selection.selected & selection.REGION)
-		unit = std::next(selection.region);
-    else
-        return 0;
-
-    bool wrap = true;
-	for (; wrap || unit != end; ++unit)
-	{
-        if (unit == end) {
-            wrap = false;
-            unit = mapFile->blocks().begin();
-        }
-		if (unit->type() != block_type::TYPE_UNIT)
-			continue;
-
-		// search command block
-        if (!mapFile->isConfirmed(*unit))
-		{
-            selection.selected = selection.UNIT;
-            selection.unit = unit;
-            updateSelection();
-
-			// force update and set focus
-			flags |= FLAG_UPDATE;
-			forceRefresh();
-			setFocus();
-			return 1;
-		}
-	}
-
-	// no next unit found: beep
-	getApp()->beep();
-	return 0;
 }
 
 void FXCommands::makeTemp()

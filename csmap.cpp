@@ -123,6 +123,9 @@ FXDEFMAP(CSMap) MessageMap[]=
 
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_VIEW_SEARCHDLG,           CSMap::onViewSearchDlg),
 
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_UNIT_NEXT,		        CSMap::onNextUnit),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_UNIT_PREV,		        CSMap::onPrevUnit),
+
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_SELALL,            CSMap::onRegionSelAll),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_UNSEL,             CSMap::onRegionUnSel),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_REGION_INVERTSEL,         CSMap::onRegionInvertSel),
@@ -644,12 +647,13 @@ CSMap::CSMap(FXApp *app) :
     FXButton* btn;
     btn = new FXButton(cmdOptFrame,
         FXString(L"<\tVorherige Einheit\tZur vorhergehenden unbest\u00e4tigten Einheit"), nullptr,
-        commands, FXCommands::ID_UNIT_PREV, BUTTON_TOOLBAR);
+        this, ID_UNIT_PREV, BUTTON_TOOLBAR);
     btn->addHotKey(FXHotKey(MKUINT(KEY_comma, CONTROLMASK)));
     btn->addHotKey(FXHotKey(MKUINT(KEY_p, CONTROLMASK)));
+
     btn = new FXButton(cmdOptFrame,
         FXString(L">\tN\u00e4chste Einheit\tZur n\u00e4chsten unbest\u00e4tigten Einheit"), nullptr,
-        commands, FXCommands::ID_UNIT_NEXT, BUTTON_TOOLBAR);
+        this, ID_UNIT_NEXT, BUTTON_TOOLBAR);
     btn->addHotKey(FXHotKey(MKUINT(KEY_period, CONTROLMASK)));
     btn->addHotKey(FXHotKey(MKUINT(KEY_n, CONTROLMASK)));
 
@@ -2331,6 +2335,90 @@ long CSMap::onPopupGotoObject(FXObject* sender, FXSelector sel, void* ptr)
         gotoObject(block);
     }
     return 0;
+}
+
+long CSMap::onNextUnit(FXObject*, FXSelector, void*)
+{
+    if (!report)
+        return 0;
+
+    datablock::citor end = report->blocks().end();
+    datablock::itor unit;
+    if (selection.selected & selection.UNIT)
+        unit = std::next(selection.unit);
+    else if (selection.selected & selection.REGION)
+        unit = std::next(selection.region);
+    else
+        return 0;
+
+    bool wrap = true;
+    for (; wrap || unit != end; ++unit)
+    {
+        if (unit == end) {
+            wrap = false;
+            unit = report->blocks().begin();
+        }
+        if (unit->type() != block_type::TYPE_UNIT)
+            continue;
+
+        // search command block
+        if (!report->isConfirmed(*unit))
+        {
+            selection.selected = selection.UNIT;
+            selection.unit = unit;
+            handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
+
+            return 1;
+        }
+    }
+
+    // no next unit found: beep
+    getApp()->beep();
+    return 0;
+}
+
+long CSMap::onPrevUnit(FXObject*, FXSelector, void*)
+{
+    if (!report)
+        return 0;
+
+    datablock::itor begin;
+    if (selection.selected & selection.UNIT)
+        begin = selection.unit;
+    else if (selection.selected & selection.REGION)
+        begin = selection.region;
+    else
+        return 0;
+    bool wrap = true;
+    datablock::itor unit = begin;
+    for (;;)
+    {
+        if (unit == report->blocks().begin()) {
+            unit = report->blocks().end();
+        }
+        --unit;
+        if (unit == begin) {
+            if (!wrap) break;
+            wrap = false;
+            unit = report->blocks().end();
+        }
+        if (unit->type() != block_type::TYPE_UNIT)
+            continue;
+
+        if (!report->isConfirmed(*unit))
+        {
+            // send selectionchange, select this unit
+
+            selection.selected = selection.UNIT;
+            selection.unit = unit;
+            handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
+            return 1;
+        }
+    }
+
+    // no next unit found: beep
+    getApp()->beep();
+    return 1;
 }
 
 long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)

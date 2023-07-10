@@ -22,9 +22,6 @@ public:
 
 	void connectMap(FXCSMap* map);
 
-    long onNextUnit(FXObject *, FXSelector, void *); // goto next unconfirmed unit
-    long onPrevUnit(FXObject *, FXSelector, void *); // goto previous
-
     void makeTemp();
 	FXString getFreeTemp();
 
@@ -46,8 +43,6 @@ public:
 	enum
 	{
 		ID_ROWCOL = FXText::ID_LAST,
-        ID_UNIT_NEXT,
-        ID_UNIT_PREV,
         ID_UNIT_CONFIRM,
         ID_UNIT_ADD,
         ID_LAST

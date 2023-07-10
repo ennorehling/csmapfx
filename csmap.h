@@ -119,6 +119,9 @@ public:		// this functions are slots for menu commands
     long onPopupShowInfo(FXObject* sender, FXSelector sel, void* ptr);
     long onPopupGotoObject(FXObject* sender, FXSelector sel, void* ptr);
 
+    long onNextUnit(FXObject*, FXSelector, void*); // goto next unconfirmed unit
+    long onPrevUnit(FXObject*, FXSelector, void*); // goto previous
+
     void addRecentFile(const FXString& filename);
     void loadFiles(const std::vector<FXString>& filenames, std::vector<FXString>& errorMessages);
     void loadFile(const FXString& filename);
@@ -156,6 +159,10 @@ public:		// this functions are slots for menu commands
         // ECheck error list
         ID_ERRROR_SELECTED,
         ID_RESULT_SELECTED,
+
+        // Navigation
+        ID_UNIT_NEXT,
+        ID_UNIT_PREV,
 
 		// View menu
 		ID_VIEW_MAPONLY,
