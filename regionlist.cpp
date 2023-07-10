@@ -333,7 +333,7 @@ long FXRegionList::onSelected(FXObject*,FXSelector,void*)
                     selection.selected |= selection.REGION;
                 }
             }
-            selection.selected &= ~(selection.UNIT | selection.BUILDING | selection.SHIP);
+            selection.selected &= ~(selection.UNIT | selection.FACTION | selection.BUILDING | selection.SHIP);
             return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
         }
     }
