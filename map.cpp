@@ -70,6 +70,7 @@ FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbo
 
 	// create client area
 	map = new FXCSMapCanvas(this, this,FXCSMap::ID_MAP, FRAME_SUNKEN|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    map->disable();
 	map->setBackColor(FXRGB(0,0,0));
 
 	verticalScrollBar()->setLine(10);
@@ -204,6 +205,12 @@ void FXCSMap::calculateContentSize()
 
 	image_w = max_x-min_x;
 	image_h = max_y-min_y;
+    if (image_w > 0 && image_h > 0) {
+        map->enable();
+    }
+    else {
+        map->disable();
+    }
 }
 
 FXint FXCSMap::getContentWidth()
