@@ -103,7 +103,7 @@ long FXMessageList::onRightBtnRelease(FXObject* sender, FXSelector sel, void* pt
         if (!item) {
             item = getItemAt(event->click_x, event->click_y);
         }
-        if (item) {
+        if (item && item->getData()) {
             FXMenuPane pane(this);
 
             FXMenuCommand* cmd;

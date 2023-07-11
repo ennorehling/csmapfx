@@ -1,6 +1,7 @@
 csmapfx (1.7.12-1) stable; urgency=low
 
   * small navigation fix for ship/building group nodes.
+  * update region list when clicking in the map.
 
  -- Enno Rehling <enno@eressea.de>  Tue, 11 Jul 2023 21:00:00 +0200
 

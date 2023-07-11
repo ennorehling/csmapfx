@@ -659,6 +659,9 @@ long FXRegionList::onMapChange(FXObject* sender, FXSelector sel, void* ptr)
                         if (cur->getParent() == region) {
                             item = cur;
                         }
+                        else {
+                            item = region;
+                        }
                     }
                     if (item) {
                         selectItem(item);
