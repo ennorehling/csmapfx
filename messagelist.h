@@ -28,6 +28,9 @@ public:
 
     long onDoubleClicked(FXObject*, FXSelector, void*);
     long onRightBtnRelease(FXObject*, FXSelector, void*);
+    long onKeyPress(FXObject*, FXSelector, void*);
+
+    void showPopup(FXTreeItem* item, FXint x, FXint y);
 
     enum
     {

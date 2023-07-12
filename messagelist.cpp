@@ -2,6 +2,7 @@
 #include "fxhelper.h"
 #include "messagelist.h"
 
+#include <fxkeys.h>
 #include <set>
 
 FXDEFMAP(FXMessageList) FXMessageListMap[] =
@@ -9,6 +10,7 @@ FXDEFMAP(FXMessageList) FXMessageListMap[] =
     //________Message_Type_____________________ID_______________Message_Handler_______
     FXMAPFUNC(SEL_DOUBLECLICKED,	    0,							    FXMessageList::onDoubleClicked),
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	0,  						    FXMessageList::onRightBtnRelease),
+    FXMAPFUNC(SEL_KEYPRESS,         	0,  						    FXMessageList::onKeyPress),
     FXMAPFUNC(SEL_COMMAND,			    FXMessageList::ID_UPDATE,	    FXMessageList::onMapChange),
     FXMAPFUNC(SEL_COMMAND,			    FXMessageList::ID_POPUP_COPY,	FXMessageList::onPopupCopy)
 };
@@ -104,18 +106,35 @@ long FXMessageList::onRightBtnRelease(FXObject* sender, FXSelector sel, void* pt
             item = getItemAt(event->click_x, event->click_y);
         }
         if (item && item->getData()) {
-            FXMenuPane pane(this);
-
-            FXMenuCommand* cmd;
-            cmd = new FXMenuCommand(&pane, "&Kopieren", nullptr, this, FXMessageList::ID_POPUP_COPY);
-            cmd->setUserData(item);
-
-            pane.create();
-            pane.popup(nullptr, event->root_x, event->root_y);
-            getApp()->runModalWhileShown(&pane);
+            showPopup(item, event->root_x, event->root_y);
         }
     }
     return FXTreeList::onRightBtnRelease(this, sel, ptr);
+}
+
+long FXMessageList::onKeyPress(FXObject* sender, FXSelector sel, void* ptr)
+{
+    FXEvent* event = (FXEvent*)ptr;
+    if (event->code == KEY_F10 && event->state & SHIFTMASK) {
+        FXTreeItem* item = getCurrentItem();
+        if (item && item->getData()) {
+            showPopup(item, event->root_x, event->root_y);
+        }
+    }
+    return FXTreeList::onKeyPress(sender, sel, ptr);
+}
+
+void FXMessageList::showPopup(FXTreeItem* item, FXint x, FXint y)
+{
+    FXMenuPane pane(this);
+
+    FXMenuCommand* cmd;
+    cmd = new FXMenuCommand(&pane, "&Kopieren", nullptr, this, FXMessageList::ID_POPUP_COPY);
+    cmd->setUserData(item);
+
+    pane.create();
+    pane.popup(nullptr, x, y);
+    getApp()->runModalWhileShown(&pane);
 }
 
 void FXMessageList::clearChildren(FXTreeItem* parent_item)

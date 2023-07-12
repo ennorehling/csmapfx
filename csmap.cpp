@@ -410,23 +410,23 @@ CSMap::CSMap(FXApp *app) :
     viewmenu = new FXMenuPane(this);
     new FXMenuTitle(menubar, "&Ansicht", nullptr,viewmenu);
     menu.toolbar = new FXMenuCheck(viewmenu, "Tool&bar\t\tToolbar ein- bzw. ausblenden.", toolbar, ID_TOGGLESHOWN);
-    menu.maponly = new FXMenuCheck(viewmenu, "&Nur Karte anzeigen\tCtrl-Shift-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this, ID_VIEW_MAPONLY, 0);
+    menu.maponly = new FXMenuCheck(viewmenu, "Nur &Karte anzeigen\tCtrl-Shift-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this, ID_VIEW_MAPONLY, 0);
     menu.messages = new FXMenuCheck(viewmenu, "&Meldungen\tCtrl-Shift-V\tRegionsmeldungen ein- bzw. ausblenden.", this, ID_VIEW_MESSAGES);
     menu.show_left = new FXMenuCheck(viewmenu, "&Regionsliste\tCtrl-Shift-R\tRegionsliste ein- bzw. ausblenden.", this, ID_VIEW_REGIONLIST);
     menu.show_right = new FXMenuCheck(viewmenu, "&Eigenschaften\tCtrl-Shift-E\tEinheiten- und Regionsdetails ein- bzw. ausblenden.", this, ID_VIEW_PROPERTIES);
     menu.calc = new FXMenuCheck(viewmenu, "&Taschenrechner\tCtrl-Shift-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
-    menu.minimap = new FXMenuCheck(viewmenu, FXString(L"\u00dcbersichts&karte\tCtrl-Shift-M\t\u00dcbersichtskarte ein- bzw. ausblenden."), this, ID_VIEW_MINIMAP);
+    menu.minimap = new FXMenuCheck(viewmenu, FXString(L"\u00dcber&sichtskarte\tCtrl-Shift-M\t\u00dcbersichtskarte ein- bzw. ausblenden."), this, ID_VIEW_MINIMAP);
     menu.infodlg = new FXMenuCheck(viewmenu, "&Informationen\tCtrl-Shift-I\tRegel-Informationen ein- bzw. ausblenden.", this, ID_VIEW_INFODLG);
     new FXMenuSeparatorEx(viewmenu, "Liste");
     menu.ownFactionGroup = new FXMenuCheck(viewmenu, "&Gruppe aktiver Partei\tCtrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
     menu.colorizeUnits = new FXMenuCheck(viewmenu, "Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
     new FXMenuSeparatorEx(viewmenu, "Karte");
-    menu.streets = new FXMenuCheck(viewmenu, "&Strassen zeigen\tCtrl-F1\tStrassen auf der Karte anzeigen.");
-    menu.visibility = new FXMenuCheck(viewmenu, FXString(L"&Sichtbarkeit zeigen\tCtrl-F2\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise)."));
+    menu.streets = new FXMenuCheck(viewmenu, "S&trassen zeigen\tCtrl-F1\tStrassen auf der Karte anzeigen.");
+    menu.visibility = new FXMenuCheck(viewmenu, FXString(L"Si&chtbarkeit zeigen\tCtrl-F2\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise)."));
     menu.shiptravel = new FXMenuCheck(viewmenu, "&Durchschiffung\tCtrl-F3\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
     menu.shadowRegions = new FXMenuCheck(viewmenu, "Regionen ab&dunkeln\tCtrl-F4\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.");
-    menu.islands = new FXMenuCheck(viewmenu, "&Inselnamen zeigen\tCtrl-F5\tInselnamen auf der Karte zeigen.");
-    menu.minimap_islands = new FXMenuCheck(viewmenu, "&Inseln auf Minikarte\t\tInselnamen auf der Minikarte zeigen.");
+    menu.islands = new FXMenuCheck(viewmenu, "Insel&namen zeigen\tCtrl-F5\tInselnamen auf der Karte zeigen.");
+    menu.minimap_islands = new FXMenuCheck(viewmenu, "In&seln auf Minikarte\t\tInselnamen auf der Minikarte zeigen.");
     planemenu = new FXMenuPane(this);
     planemenu->disable();
     FXMenuRadio* radio = new FXMenuRadio(planemenu, "Standardebene (0)", this, ID_MAP_VISIBLEPLANE, 0);
@@ -448,7 +448,7 @@ CSMap::CSMap(FXApp *app) :
 
     // Region menu
     regionmenu = new FXMenuPane(this);
-    new FXMenuTitle(menubar, "&Bearbeiten", nullptr,regionmenu);
+    new FXMenuTitle(menubar, "B&earbeiten", nullptr,regionmenu);
     new FXMenuCommand(regionmenu, "&Suchen...\tCtrl-F\tEine Region, Einheit, Schiff, etc. suchen.", nullptr, this, ID_VIEW_SEARCHDLG);
     new FXMenuCommand(regionmenu, "&Ursprung setzen\t\tDen Kartenursprung (0/0) auf die markierte Region setzen.", nullptr, this, ID_MAP_SETORIGIN, 0);
     new FXMenuSeparatorEx(regionmenu, "Regionen");
@@ -3471,14 +3471,15 @@ long CSMap::onShowTab(FXObject *, FXSelector sel, void *)
 long CSMap::onHelpAbout(FXObject*, FXSelector, void*)
 {
     FXString abouttext = CSMAP_APP_TITLE_VERSION;
+    FXString version;
 
     abouttext.append("\n\n" CSMAP_APP_COPYRIGHT "\nWeb: " CSMAP_APP_URL);
     abouttext.append("\n\nSpecial thanks to Xolgrim for assembling Eressea rules information.\nThanks to all users for suggesting features and finding bugs.");
-    abouttext.append("\n\nThis software uses the FOX Toolkit Library (http://www.fox-toolkit.org).");
-    abouttext.append("\nThis software uses the cparse library (https://github.com/cparse/cparse).");
-    abouttext.append("\nThis software uses the curl library (https://curl.se/).\n");
+    abouttext.append("\n\nThis software uses the following libraries:\n");
+    abouttext.append(version.format("FOX Toolkit %d.%d.%d  (http://www.fox-toolkit.org)\n", (int)fxversion[0], (int)fxversion[1], (int)fxversion[2]));
+    abouttext.append("cparse (https://github.com/cparse/cparse)\n");
+    abouttext.append(version.format("%s\n", curl_version()));
     abouttext.append(png_get_copyright(NULL));
-    abouttext.append("\nThis software is based in part on the work of the Independent JPEG Group.");
 
     FXMessageBox about(this, "Wer mich schuf...", abouttext, getIcon(), MBOX_OK);
 
