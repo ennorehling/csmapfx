@@ -243,7 +243,7 @@ void FXUnitList::makeItems()
         }
         else if (!prefix.empty()) {
             label += prefix;
-            label += race.lower();
+            label += FXString(race).lower();
         }
         else {
             label += race;
@@ -430,11 +430,11 @@ void FXUnitList::makeItems()
         // Kapazität berechnen
         FXint carry = CAPACITY_PERSON;
         FXint self = WEIGHT_PERSON;
-        if (race == "Goblin") {
+        if (race == "Goblins") {
             carry = CAPACITY_GOBLIN;
             self = WEIGHT_GOBLIN;
         }
-        else if (race == "Troll") {
+        else if (race == "Trolle") {
             carry = CAPACITY_TROLL;
             self = WEIGHT_TROLL;
         }
