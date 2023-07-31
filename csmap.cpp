@@ -2341,18 +2341,20 @@ long CSMap::onNextUnit(FXObject*, FXSelector, void*)
         return 0;
 
     datablock::citor end = report->blocks().end();
-    datablock::itor unit;
+    datablock::itor start;
     if (selection.selected & selection.UNIT)
-        unit = std::next(selection.unit);
+        start = selection.unit;
     else if (selection.selected & selection.REGION)
-        unit = std::next(selection.region);
+        start = selection.region;
     else
         return 0;
 
     bool wrap = true;
-    for (; wrap || unit != end; ++unit)
+    for (datablock::itor unit = std::next(start); wrap || unit != end; ++unit)
     {
+        if (unit == start) break;
         if (unit == end) {
+            if (!wrap) break;
             wrap = false;
             unit = report->blocks().begin();
         }
@@ -2398,7 +2400,7 @@ long CSMap::onPrevUnit(FXObject*, FXSelector, void*)
         if (unit == begin) {
             if (!wrap) break;
             wrap = false;
-            unit = report->blocks().end();
+            unit = std::prev(report->blocks().end());
         }
         if (unit->type() != block_type::TYPE_UNIT)
             continue;
