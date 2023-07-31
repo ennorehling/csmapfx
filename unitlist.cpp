@@ -4,21 +4,33 @@
 #include "fxhelper.h"
 #include "unitlist.h"
 
+#define WEIGHT_PERSON    1000
+#define WEIGHT_TROLL     2000
+#define WEIGHT_GOBLIN     600
+#define WEIGHT_HORSE     5000
+#define WEIGHT_CART      4000
+#define CAPACITY_PERSON   540
+#define CAPACITY_TROLL   1080
+#define CAPACITY_GOBLIN   440
+#define CAPACITY_HORSE   2000
+#define CAPACITY_CART   10000
+
+
 // *********************************************************************************************************
 // *** FXStatistics implementation
 
 FXDEFMAP(FXUnitList) MessageMap[]=
 { 
 	//________Message_Type_____________________ID_______________Message_Handler_______ 
-	FXMAPFUNC(SEL_COMMAND,			FXUnitList::ID_UPDATE,				FXUnitList::onMapChange), 
-    FXMAPFUNC(SEL_QUERY_HELP,		0,									FXUnitList::onQueryHelp),
-    FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	0,								FXUnitList::onPopup),
+	FXMAPFUNC(SEL_COMMAND,              FXUnitList::ID_UPDATE,  FXUnitList::onMapChange), 
+    FXMAPFUNC(SEL_QUERY_HELP,           0,                      FXUnitList::onQueryHelp),
+    FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,   0,                      FXUnitList::onPopup),
 };
 
 FXIMPLEMENT(FXUnitList, FXTreeList, MessageMap, ARRAYNUMBER(MessageMap))
 
 FXUnitList::FXUnitList(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x, FXint y, FXint w, FXint h)
-		: FXProperties(p, tgt, sel, opts, x, y, w, h)
+	: FXProperties(p, tgt, sel, opts, x, y, w, h)
 {
 }
 
@@ -65,10 +77,10 @@ void FXUnitList::makeItems()
                 combatspells[block->info()] = block;
         }
 
-        FXString name, number, prefix, race, weight;
+        FXString name, number, prefix, race;
         FXString aura, auramax, hero;
         FXString hp, hungry, combatstatus, guards;
-        FXint factionId = -1, familiarMage = -1, group = -1;
+        FXint factionId = -1, familiarMage = -1, group = -1, weight = 0;
         FXint otherFactionId = -2;
 
         std::vector<datakey::list_type::const_iterator> unhandled;
@@ -80,10 +92,10 @@ void FXUnitList::makeItems()
                 name = key->value();
                 break;
             case TYPE_FACTION:
-                factionId = atoi(key->value().text());
+                factionId = FXIntVal(key->value());
                 break;
             case TYPE_OTHER_FACTION:
-                otherFactionId = atoi(key->value().text());
+                otherFactionId = FXIntVal(key->value());
                 break;
             case TYPE_NUMBER:
                 number = key->value();
@@ -98,16 +110,16 @@ void FXUnitList::makeItems()
                 auramax = key->value();
                 break;
             case TYPE_BUILDING:
-                mapFile->getBuilding(building, atoi(key->value().text()));
+                mapFile->getBuilding(building, FXIntVal(key->value()));
                 break;
             case TYPE_SHIP:
-                mapFile->getShip(ship, atoi(key->value().text()));
+                mapFile->getShip(ship, FXIntVal(key->value()));
                 break;
             case TYPE_WEIGHT:
-                weight = key->value();
+                weight = FXIntVal(key->value());
                 break;
             case TYPE_GROUP:
-                group = atoi(key->value().text());
+                group = FXIntVal(key->value());
                 break;
             case TYPE_PREFIX:
                 prefix = key->value();
@@ -119,7 +131,7 @@ void FXUnitList::makeItems()
                 hp = key->value();
                 break;
             case TYPE_FAMILIARMAGE:
-                familiarMage = atoi(key->value().text());
+                familiarMage = FXIntVal(key->value());
                 break;
             case TYPE_GUARDING:
                 guards = key->value();
@@ -295,19 +307,16 @@ void FXUnitList::makeItems()
             item = appendItem(unititem, label);
         }
 
-        if (!weight.empty())
+        if (weight > 0)
         {
-            // fill to 3 numbers
-            while (weight.length() < 3)
-                weight = "0" + weight;
-
-            // cut up
-            if (weight.right(2) == "00")
-                weight = weight.left(weight.length() - 2);
-            else
-                weight = weight.left(weight.length() - 2) + "." + weight.right(2);
-
-            item = appendItem(unititem, "Gewicht: " + weight);
+            FXString label;
+            if (weight % 100 == 0) {
+                label = FXStringVal(weight / 100);
+            }
+            else {
+                label.format("%.2f", weight / 100.f);
+            }
+            item = appendItem(unititem, "Gewicht: " + label);
         }
 
         // list unhandled keys
@@ -419,18 +428,17 @@ void FXUnitList::makeItems()
         }
 
         // Kapazität berechnen
-        FXint carry = 540;
-        FXint self = 10;
+        FXint carry = CAPACITY_PERSON;
+        FXint self = WEIGHT_PERSON;
         if (race == "Goblin") {
-            carry = 440;
-            self = 6;
+            carry = CAPACITY_GOBLIN;
+            self = WEIGHT_GOBLIN;
         }
         else if (race == "Troll") {
-            carry = 1040;
-            self = 20;
+            carry = CAPACITY_TROLL;
+            self = WEIGHT_TROLL;
         }
         // walking capacity
-        FXint walk_cap = carry * count;
         FXint max_horses = (riding_skill * 4 + 1) * count;
         if (max_horses > horses) {
             max_horses = horses;
@@ -439,10 +447,21 @@ void FXUnitList::makeItems()
         if (max_carts > carts) {
             max_carts = carts;
         }
-        walk_cap += max_carts * 10000 + max_horses * 2000;
+        FXint walk_cap = max_carts * CAPACITY_CART + max_horses * CAPACITY_HORSE;
+        walk_cap -= weight;
+        /* the following are included in weight, but we don't have to carry them: */
+        walk_cap += carry * count;
+        walk_cap += max_carts * WEIGHT_CART;
+        walk_cap += horses * WEIGHT_HORSE;
+        walk_cap += self * count;
 
-        FXString tail;
-        label = L"Kapazit\u00e4t: ";
+        if (max_horses < horses) {
+            label.format("%.2f (%ld Pferde zu viel)", walk_cap / 100.f, horses - max_horses);
+        }
+        else {
+            label.format("%.2f", walk_cap / 100.f);
+        }
+        insertItem(item, unititem, L"Kapazit\u00e4t: " + label);
         if (horses > 0) {
             // riding capacity
             max_horses = riding_skill * 2 * count;
@@ -453,15 +472,21 @@ void FXUnitList::makeItems()
             if (max_carts > carts) {
                 max_carts = carts;
             }
-            FXint ride_cap = max_carts * 100 + max_horses * 20 - count * self;
-            if (ride_cap > 0) {
-                tail.format("%.2f (%d)", walk_cap / 100.0f, ride_cap);
+            FXint ride_cap = max_carts * CAPACITY_CART + max_horses * CAPACITY_HORSE;
+            ride_cap -= weight;
+            /* the following are included in weight, but we don't have to carry them: */
+            ride_cap += max_carts * WEIGHT_CART;
+            ride_cap += horses * WEIGHT_HORSE;
+            if (max_horses > 0) {
+                if (max_horses < horses) {
+                    label.format("%.2f (%ld Pferde zu viel)", ride_cap / 100.f, horses - max_horses);
+                }
+                else {
+                    label.format("%.2f", ride_cap / 100.f);
+                }
+                insertItem(item, unititem, L"Kapazit\u00e4t beritten: " + label);
             }
         }
-        if (tail.empty()) {
-            tail.format("%.2f", walk_cap / 100.0f);
-        }
-        insertItem(item, unititem, label + tail);
 
         if (building != end)	// unit in a building?
         {
