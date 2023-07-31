@@ -448,9 +448,9 @@ void FXUnitList::makeItems()
             max_carts = carts;
         }
         FXint walk_cap = max_carts * CAPACITY_CART + max_horses * CAPACITY_HORSE;
+        walk_cap += carry * count;
         walk_cap -= weight;
         /* the following are included in weight, but we don't have to carry them: */
-        walk_cap += carry * count;
         walk_cap += max_carts * WEIGHT_CART;
         walk_cap += horses * WEIGHT_HORSE;
         walk_cap += self * count;
