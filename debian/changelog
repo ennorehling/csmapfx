@@ -1,5 +1,6 @@
 csmapfx (1.7.13-1) stable; urgency=low
 
+  * display remaining capacity when walking or riding.
   * add Shift-F10 hotkey for some context menus.
   * bugfix: missing statistics for the last region in the report.
   * fix next/prev unit navigation crash.
