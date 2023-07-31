@@ -1704,6 +1704,28 @@ datablock::itor datafile::eraseBlocks(const datablock::itor& begin, const databl
     return m_blocks.erase(begin, end);
 }
 
+static void setRegionStats(datablock *regionPtr, int region_own, int region_ally, int region_enemy, int unconfirmed)
+{
+    regionPtr->setFlags(region_own ? datablock::FLAG_REGION_SEEN : 0);
+    int own_log = barHeight2(region_own);
+    int ally_log = barHeight2(region_ally);
+    int enemy_log = barHeight2(region_enemy);
+
+    // generate new style flag information. log_2(people) = 1 to 13
+    if (own_log || ally_log || enemy_log || unconfirmed)
+    {
+        att_region *stats = new att_region;
+        regionPtr->attachment(stats);
+        stats->unconfirmed = unconfirmed;
+        stats->people.reserve(enemy_log ? 3 : 2);
+        stats->people.push_back(own_log / 13.0f);
+        stats->people.push_back(ally_log / 13.0f);
+        if (enemy_log) {
+            stats->people.push_back(enemy_log / 13.0f);
+        }
+    }
+}
+
 void datafile::updateHashTables(const datablock::itor& start)
 {
     datablock::itor block;
@@ -1774,25 +1796,8 @@ void datafile::updateHashTables(const datablock::itor& start)
         // add region to region list
         else if (block->type() == block_type::TYPE_REGION)
         {
-            if (regionPtr)
-            {
-                regionPtr->setFlags(region_own ? datablock::FLAG_REGION_SEEN : 0);
-                int own_log = barHeight2(region_own);
-                int ally_log = barHeight2(region_ally);
-                int enemy_log = barHeight2(region_enemy);
-
-                // generate new style flag information. log_2(people) = 1 to 13
-                if (own_log || ally_log || enemy_log || unconfirmed)
-                {
-                    att_region* stats = new att_region;
-                    regionPtr->attachment(stats);
-                    stats->unconfirmed = unconfirmed;
-                    stats->people.reserve(enemy_log ? 3 : 2);
-                    stats->people.push_back(own_log / 13.0f);
-                    stats->people.push_back(ally_log / 13.0f);
-                    if (enemy_log)
-                        stats->people.push_back(enemy_log / 13.0f);
-                }
+            if (regionPtr) {
+                setRegionStats(regionPtr, region_own, region_ally, region_enemy, unconfirmed);
             }
 
             regionPtr = &*block;
@@ -2004,6 +2009,9 @@ void datafile::updateHashTables(const datablock::itor& start)
                 }
             }
         }
+    }
+    if (regionPtr) {
+        setRegionStats(regionPtr, region_own, region_ally, region_enemy, unconfirmed);
     }
 }
 

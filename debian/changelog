@@ -1,8 +1,9 @@
 csmapfx (1.7.13-1) stable; urgency=low
 
   * add Shift-F10 hotkey for some context menus.
+  * bugfix: missing statistics for the last region in the report
 
- -- Enno Rehling <enno@eressea.de>  Wed, 12 Jul 2023 21:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Wed, 31 Jul 2023 18:00:00 +0200
 
 csmapfx (1.7.12-1) stable; urgency=low
 
