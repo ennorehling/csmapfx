@@ -375,7 +375,7 @@ void FXUnitList::makeItems()
         }
 
         FXint riding_skill = 0;
-        FXint horses = 0;
+        FXint horses = 0, elven_horses = 0;
         FXint carts = 0;
         if (talents != end)		// does a TALENTE block exist?
         {
@@ -414,8 +414,11 @@ void FXUnitList::makeItems()
                 properties.push_back({ info, value });
 
                 // Pferde und Wagen, für Transportkapazität
-                if (info == "Pferd" || info == "Elfenpferd") {
+                if (info == "Pferd") {
                     horses += value;
+                }
+                else if (info == "Elfenpferd") {
+                    elven_horses += value;
                 }
                 else if (info == "Wagen") {
                     carts += value;
@@ -429,6 +432,11 @@ void FXUnitList::makeItems()
         }
 
         // walking capacity
+        FXint use_horses = horses;
+        if (riding_skill >= 5) {
+            horses += elven_horses;
+            elven_horses = 0;
+        }
         FXint max_horses = (riding_skill * 4 + 1) * count;
         if (max_horses > horses) {
             max_horses = horses;
@@ -456,11 +464,14 @@ void FXUnitList::makeItems()
         walk_cap -= weight;
         /* the following are included in weight, but we don't have to carry them: */
         walk_cap += max_carts * WEIGHT_CART;
-        walk_cap += horses * WEIGHT_HORSE;
+        walk_cap += (elven_horses + horses) * WEIGHT_HORSE;
         walk_cap += self * count;
 
-        if (max_horses < horses) {
-            FXint n = horses - max_horses;
+        if (max_horses < horses || elven_horses > 0) {
+            FXint n = elven_horses;
+            if (max_horses < horses) {
+                n += (horses - max_horses);
+            }
             label.format(
                 NGETTEXT(
                     "%.2f (%d Pferd zu viel)",
@@ -485,10 +496,13 @@ void FXUnitList::makeItems()
             ride_cap -= weight;
             /* the following are included in weight, but we don't have to carry them: */
             ride_cap += max_carts * WEIGHT_CART;
-            ride_cap += horses * WEIGHT_HORSE;
+            ride_cap += (elven_horses + horses) * WEIGHT_HORSE;
             if (max_horses > 0) {
-                if (max_horses < horses) {
-                    FXint n = horses - max_horses;
+                if (max_horses < horses || elven_horses > 0) {
+                    FXint n = elven_horses;
+                    if (max_horses < horses) {
+                        n += (horses - max_horses);
+                    }
                     label.format(
                         NGETTEXT(
                             "%.2f (%d Pferd zu viel)",
