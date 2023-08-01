@@ -4,6 +4,8 @@
 #include "fxhelper.h"
 #include "unitlist.h"
 
+#define NGETTEXT(a, b, n) ((n==1) ? (a) : (b))
+
 #define WEIGHT_PERSON    1000
 #define WEIGHT_TROLL     2000
 #define WEIGHT_GOBLIN     600
@@ -14,7 +16,6 @@
 #define CAPACITY_GOBLIN   440
 #define CAPACITY_HORSE   2000
 #define CAPACITY_CART   10000
-
 
 // *********************************************************************************************************
 // *** FXStatistics implementation
@@ -387,7 +388,7 @@ void FXUnitList::makeItems()
                 FXint value = FXIntVal(key->value().section(' ', 1));
                 properties.push_back({ info, value });
 
-                // Talent, für Transportkapazität
+                // Talent, fï¿½r Transportkapazitï¿½t
                 if (riding_skill == 0) {
                     if (info == "Reiten") {
                         riding_skill = value;
@@ -412,7 +413,7 @@ void FXUnitList::makeItems()
                 FXint value = FXIntVal(key->value(), 10);
                 properties.push_back({ info, value });
 
-                // Pferde und Wagen, für Transportkapazität
+                // Pferde und Wagen, fÃ¼r TransportkapazitÃ¤t
                 if (info == "Pferd" || info == "Elfenpferd") {
                     horses += value;
                 }
@@ -427,7 +428,13 @@ void FXUnitList::makeItems()
             }
         }
 
-        // Kapazität berechnen
+        // walking capacity
+        FXint max_horses = (riding_skill * 4 + 1) * count;
+        if (max_horses > horses) {
+            max_horses = horses;
+        }
+        FXint max_carts = max_horses / 2;
+        FXint troll_carts = 0;
         FXint carry = CAPACITY_PERSON;
         FXint self = WEIGHT_PERSON;
         if (race == "Goblins") {
@@ -437,16 +444,13 @@ void FXUnitList::makeItems()
         else if (race == "Trolle") {
             carry = CAPACITY_TROLL;
             self = WEIGHT_TROLL;
+            troll_carts = count / 4;
         }
-        // walking capacity
-        FXint max_horses = (riding_skill * 4 + 1) * count;
-        if (max_horses > horses) {
-            max_horses = horses;
-        }
-        FXint max_carts = max_horses / 2;
+        max_carts += troll_carts;
         if (max_carts > carts) {
             max_carts = carts;
         }
+
         FXint walk_cap = max_carts * CAPACITY_CART + max_horses * CAPACITY_HORSE;
         walk_cap += carry * count;
         walk_cap -= weight;
@@ -456,7 +460,12 @@ void FXUnitList::makeItems()
         walk_cap += self * count;
 
         if (max_horses < horses) {
-            label.format("%.2f (%ld Pferde zu viel)", walk_cap / 100.f, horses - max_horses);
+            FXint n = horses - max_horses;
+            label.format(
+                NGETTEXT(
+                    "%.2f (%d Pferd zu viel)",
+                    "%.2f (%d Pferde zu viel)", n), 
+                walk_cap / 100.f, n);
         }
         else {
             label.format("%.2f", walk_cap / 100.f);
@@ -479,7 +488,12 @@ void FXUnitList::makeItems()
             ride_cap += horses * WEIGHT_HORSE;
             if (max_horses > 0) {
                 if (max_horses < horses) {
-                    label.format("%.2f (%ld Pferde zu viel)", ride_cap / 100.f, horses - max_horses);
+                    FXint n = horses - max_horses;
+                    label.format(
+                        NGETTEXT(
+                            "%.2f (%d Pferd zu viel)",
+                            "%.2f (%d Pferde zu viel)", n), 
+                        ride_cap / 100.f, n);
                 }
                 else {
                     label.format("%.2f", ride_cap / 100.f);
