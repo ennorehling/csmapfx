@@ -432,7 +432,6 @@ void FXUnitList::makeItems()
         }
 
         // walking capacity
-        FXint use_horses = horses;
         if (riding_skill >= 5) {
             horses += elven_horses;
             elven_horses = 0;

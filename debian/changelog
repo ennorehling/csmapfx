@@ -5,7 +5,7 @@ csmapfx (1.7.13-1) stable; urgency=low
   * bugfix: missing statistics for the last region in the report.
   * fix next/prev unit navigation crash.
 
- -- Enno Rehling <enno@eressea.de>  Wed, 31 Jul 2023 18:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Tue, 01 Aug 2023 09:00:00 +0200
 
 csmapfx (1.7.12-1) stable; urgency=low
 
