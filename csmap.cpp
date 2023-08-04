@@ -14,6 +14,9 @@
 #ifndef PATH_MAX
 #define PATH_MAX 260
 #endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
 #include "version.h"
 #include "main.h"
@@ -1338,7 +1341,9 @@ static char* u_mkstemp(char* buffer) {
     int fd;
     strncpy(buffer, "/tmp/csmapXXXXXX", PATH_MAX);
     if (0 <= (fd = mkstemp(buffer))) {
+#ifdef HAVE_UNISTD_H
         close(fd);
+#endif
         return buffer;
     }
     return nullptr;
