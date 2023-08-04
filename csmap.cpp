@@ -8,11 +8,13 @@
 #endif
 
 #include <sys/stat.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 #include "platform.h"
 
-#if !defined(PATH_MAX)
+#ifndef PATH_MAX
 #define PATH_MAX 260
 #endif
 
