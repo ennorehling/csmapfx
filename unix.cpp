@@ -51,6 +51,7 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
             curl_easy_setopt(ch, CURLOPT_URL, "https://www.eressea.kn-bremen.de/eressea/orders-php/upload.php");
             curl_easy_setopt(ch, CURLOPT_WRITEDATA, &response);
             curl_easy_setopt(ch, CURLOPT_WRITEFUNCTION, write_data);
+            curl_easy_setopt(ch, CURLOPT_USERAGENT, CSMAP_APP_TITLE_VERSION);
             curl_easy_setopt(ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
             curl_easy_setopt(ch, CURLOPT_USERNAME, username.text());
             curl_easy_setopt(ch, CURLOPT_PASSWORD, password.text());

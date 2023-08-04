@@ -1,5 +1,5 @@
 #include "platform.h"
-
+#include "version.h"
 #ifndef WIN32
 #error "This code only for use with Windows targets"
 #endif
@@ -17,7 +17,7 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
     HINTERNET hConnect = NULL, hRequest = NULL;
 
     // Use InternetOpen to obtain a session handle.
-    HINTERNET hSession = InternetOpen(L"WinHTTP Example/1.0",
+    HINTERNET hSession = InternetOpen(TEXT(CSMAP_APP_TITLE_VERSION),
         INTERNET_OPEN_TYPE_PRECONFIG,
         NULL,
         NULL, 0);
