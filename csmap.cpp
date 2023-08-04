@@ -3,7 +3,11 @@
 #ifdef WIN32
 #include <windows.h>
 #include <shlobj_core.h>
-#elif defined (HAVE_UNISTD_H)
+#endif
+
+#include "platform.h"
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #include <sys/stat.h>
 #endif
@@ -57,9 +61,6 @@
 #include <stdexcept>
 #include <string>
 
-#ifdef HAVE_CURL
-#include <curl/curl.h>
-#endif
 FXDEFMAP(CSMap) MessageMap[]=
 {
     //________Message_Type_____________________ID_______________Message_Handler_______
@@ -2881,104 +2882,44 @@ long CSMap::onFileExportCommands(FXObject*, FXSelector, void* ptr)
     return 1;
 }
 
-struct memory {
-    char *response;
-    size_t size;
-};
-
 long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
 {
-#ifdef HAVE_CURL
-    return curlUpload();
-#else
-    return FXMessageBox::error(this, MBOX_OK, "Not Implemented", 
-        "Sorry, this version of CsMap was compiled without CURL support");
-#endif
-}
-
-#ifdef HAVE_CURL
-static size_t write_data(void* data, size_t size, size_t nmemb, void* userp)
-{
-    size_t realsize = size * nmemb;
-    struct memory* mem = (struct memory*)userp;
-
-    char* ptr = (char*)realloc(mem->response, mem->size + realsize + 1);
-    if (ptr == nullptr)
-        return 0;  /* out of memory! */
-
-    mem->response = ptr;
-    memcpy(&(mem->response[mem->size]), data, realsize);
-    mem->size += realsize;
-    mem->response[mem->size] = 0;
-
-    return realsize;
-}
-
-long CSMap::curlUpload()
-{
     char infile[PATH_MAX];
-    memory response = { 0 };
     if (!report)
         return 0;
 
+#if !defined(HAVE_CURL) && !defined(WIN32)
+    return FXMessageBox::error(this, MBOX_OK, "Not Implemented",
+        "Sorry, this version of CsMap was compiled without CURL support");
+#endif
     int factionId = report->getFactionId();
     if (factionId == 0)
         return 0;
     FXString id = FXStringValEx(factionId, 36);
     FXString passwd = askPasswordDlg(id);
-    if (u_mkstemp(infile) && report->saveCmds(infile, passwd, true) == 0) {
-        CURL *ch;
-        CURLcode success;
-        ch = curl_easy_init();
-        if (ch) {
-            long code = 0;
-            curl_mime *form;
-            form = curl_mime_init(ch);
-            if (form) {
-                curl_mimepart *field;
-                field = curl_mime_addpart(form);
-                curl_mime_name(field, "input");
-                curl_mime_filedata(field, infile);
-                field = curl_mime_addpart(form);
-                curl_mime_name(field, "submit");
-                curl_mime_data(field, "submit", CURL_ZERO_TERMINATED);
-
-                curl_easy_setopt(ch, CURLOPT_URL, "https://www.eressea.kn-bremen.de/eressea/orders-php/upload.php");
-                curl_easy_setopt(ch, CURLOPT_WRITEDATA, &response);
-                curl_easy_setopt(ch, CURLOPT_WRITEFUNCTION, write_data);
-                curl_easy_setopt(ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-                curl_easy_setopt(ch, CURLOPT_USERNAME, id.text());
-                curl_easy_setopt(ch, CURLOPT_PASSWORD, passwd.text());
-                curl_easy_setopt(ch, CURLOPT_MIMEPOST, form);
-                success = curl_easy_perform(ch);
-                if (success == CURLE_OK) {
-                    curl_easy_getinfo(ch, CURLINFO_RESPONSE_CODE, &code);
-                    FXString msg(response.response, response.size);
-                    if (code == 401) {
-                        settings.password.clear();
-                        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: Falsches Passwort.", code);
-                    }
-                    else if (code >= 500) {
-                        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Serverfehler %ld: Bitte sp\u00e4ter noch einmal versuchen.", code);
-                    }
-                    else if (code < 200 || code >= 300) {
-                        FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: %s (Befehle nicht akzeptiert).", code, msg.text());
-                    }
-                    else {
-                        FXMessageBox::information(this, MBOX_OK, CSMAP_APP_TITLE, "Die Befehle wurden empfangen.");
-                    }
-                    free(response.response);
-                }
-                curl_mime_free(form);
+    if (u_mkstemp(infile)) {
+        FXString filename(infile);
+        if (report->saveCmds(filename, passwd, true) == 0) {
+            long code;
+            FXString body;
+            code = UploadFile(filename, id, passwd, body);
+            if (code == 401) {
+                settings.password.clear();
+                FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: Falsches Passwort.", code);
             }
-            curl_easy_cleanup(ch);
+            else if (code >= 500) {
+                FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Serverfehler %ld: Bitte sp\u00e4ter noch einmal versuchen.", code);
+            }
+            else if (code < 200 || code >= 300) {
+                FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: %s (Befehle nicht akzeptiert).", code, body.text());
+            }
+            else {
+                FXMessageBox::information(this, MBOX_OK, CSMAP_APP_TITLE, "Die Befehle wurden empfangen.");
+            }
         }
-        unlink(infile);
-        return 1;
     }
     return 0;
 }
-#endif
 
 FXString CSMap::askPasswordDlg(const FXString &faction_id) {
     FXString passwd = settings.password;
@@ -3480,7 +3421,9 @@ long CSMap::onHelpAbout(FXObject*, FXSelector, void*)
     abouttext.append("\n\nThis software uses the following libraries:\n");
     abouttext.append(version.format("FOX Toolkit %d.%d.%d  (http://www.fox-toolkit.org)\n", (int)fxversion[0], (int)fxversion[1], (int)fxversion[2]));
     abouttext.append("cparse (https://github.com/cparse/cparse)\n");
+#ifdef HAVE_CURL
     abouttext.append(version.format("%s\n", curl_version()));
+#endif
     abouttext.append(png_get_copyright(NULL));
 
     FXMessageBox about(this, "Wer mich schuf...", abouttext, getIcon(), MBOX_OK);

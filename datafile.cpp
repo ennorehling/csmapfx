@@ -154,7 +154,7 @@ void datafile::openFile(const char* filename, std::ifstream& file, std::ios::ope
 {
 #ifdef _MSC_VER
     WCHAR pf[MAX_PATH];
-    MultiByteToWideChar(CP_UTF8, 0, filename, strlen(filename) + 1, pf, MAX_PATH);
+    MultiByteToWideChar(CP_UTF8, 0, filename, -1, pf, MAX_PATH);
     std::wstring wname(pf);
     file.open(wname, mode);
 #else

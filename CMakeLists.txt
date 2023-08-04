@@ -4,11 +4,13 @@ project (csmapfx CXX C)
 
 if (WIN32)
 add_definitions(-DUNICODE)
+set(PLATFORM_SOURCES win32.cpp)
 else (WIN32)
+find_package(CURL)
 find_package(PhysFS 2.1)
+set(PLATFORM_SOURCES unix.cpp)
 endif (WIN32)
 find_package(PNG)
-find_package(CURL)
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
   #GCC >= 7.2 needs -Wno-psabi

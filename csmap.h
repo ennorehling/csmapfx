@@ -242,9 +242,6 @@ private:
 #ifdef HAVE_PNG
     bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
 #endif
-#ifdef HAVE_CURL
-    long curlUpload();
-#endif
 
     typedef enum class reload_type { RELOAD_NEVER, RELOAD_AUTO, RELOAD_ASK } reload_type;
     reload_type reload_mode = reload_type::RELOAD_ASK;
