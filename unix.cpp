@@ -1,4 +1,5 @@
 #include "platform.h"
+#include "version.h"
 
 #include <curl/curl.h>
 #include <memory>
