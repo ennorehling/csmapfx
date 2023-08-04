@@ -3,6 +3,10 @@
 #include <curl/curl.h>
 #include <memory>
 
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 struct memory {
     char *response;
     size_t size;
@@ -39,7 +43,7 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
             curl_mimepart *field;
             field = curl_mime_addpart(form);
             curl_mime_name(field, "input");
-            curl_mime_filedata(field, filename);
+            curl_mime_filedata(field, filename.text());
             field = curl_mime_addpart(form);
             curl_mime_name(field, "submit");
             curl_mime_data(field, "submit", CURL_ZERO_TERMINATED);
@@ -48,7 +52,7 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
             curl_easy_setopt(ch, CURLOPT_WRITEDATA, &response);
             curl_easy_setopt(ch, CURLOPT_WRITEFUNCTION, write_data);
             curl_easy_setopt(ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            curl_easy_setopt(ch, CURLOPT_USERNAME, userName);
+            curl_easy_setopt(ch, CURLOPT_USERNAME, username);
             curl_easy_setopt(ch, CURLOPT_PASSWORD, password);
             curl_easy_setopt(ch, CURLOPT_MIMEPOST, form);
             success = curl_easy_perform(ch);
@@ -60,7 +64,5 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
         }
         curl_easy_cleanup(ch);
     }
-    unlink(infile);
     return code;
 }
-#endif

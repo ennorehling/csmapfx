@@ -1,5 +1,9 @@
 #include "platform.h"
 
+#ifndef WIN32
+#error "This code only for use with Windows targets"
+#endif
+
 #include <wininet.h>
 
 #pragma comment(lib, "wininet.lib")

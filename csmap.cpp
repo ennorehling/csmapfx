@@ -3,14 +3,14 @@
 #ifdef WIN32
 #include <windows.h>
 #include <shlobj_core.h>
+#elif defined(HAVE_CURL)
+#include <curl/curl.h>
 #endif
+
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "platform.h"
-
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#include <sys/stat.h>
-#endif
 
 #if !defined(PATH_MAX)
 #define PATH_MAX 260
@@ -2903,6 +2903,7 @@ long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
             long code;
             FXString body;
             code = UploadFile(filename, id, passwd, body);
+            unlink(infile);
             if (code == 401) {
                 settings.password.clear();
                 FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: Falsches Passwort.", code);
