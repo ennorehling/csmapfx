@@ -14,7 +14,11 @@ find_package(PNG)
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
   #GCC >= 7.2 needs -Wno-psabi
-  add_compile_options(-Wno-psabi)
+  add_compile_options(-Wno-psabi -Wno-inconsistent-missing-override)
+endif()
+
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL Clang)
+  add_compile_options(-Wno-inconsistent-missing-override)
 endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL AppleClang)

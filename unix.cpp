@@ -52,8 +52,8 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
             curl_easy_setopt(ch, CURLOPT_WRITEDATA, &response);
             curl_easy_setopt(ch, CURLOPT_WRITEFUNCTION, write_data);
             curl_easy_setopt(ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            curl_easy_setopt(ch, CURLOPT_USERNAME, username);
-            curl_easy_setopt(ch, CURLOPT_PASSWORD, password);
+            curl_easy_setopt(ch, CURLOPT_USERNAME, username.text());
+            curl_easy_setopt(ch, CURLOPT_PASSWORD, password.text());
             curl_easy_setopt(ch, CURLOPT_MIMEPOST, form);
             success = curl_easy_perform(ch);
             if (success == CURLE_OK) {
