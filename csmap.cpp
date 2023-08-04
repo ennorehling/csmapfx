@@ -8,9 +8,6 @@
 #endif
 
 #include <sys/stat.h>
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 
 #include "platform.h"
 
@@ -1445,9 +1442,9 @@ bool CSMap::checkCommands()
                         }
                     }
                 }
-                unlink(outfile);
+                remove(outfile);
             }
-            unlink(infile);
+            remove(infile);
         }
     }
     return true;
@@ -2656,14 +2653,6 @@ long CSMap::onFileCheckCommands(FXObject *, FXSelector, void *)
     return 0;
 }
 
-int CSMap::unlink(const char *pathname) {
-#ifdef WIN32
-    return _unlink(pathname);
-#else
-    return ::unlink(pathname);
-#endif
-}
-
 void CSMap::setClipboard(const char* text)
 {
     handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), const_cast<char*>(text));
@@ -2905,7 +2894,7 @@ long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
             long code;
             FXString body;
             code = UploadFile(filename, id, passwd, body);
-            unlink(infile);
+            remove(infile);
             if (code == 401) {
                 settings.password.clear();
                 FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: Falsches Passwort.", code);
