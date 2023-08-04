@@ -65,8 +65,8 @@ FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbo
 	setSelector(sel);
 
 	// createing resources
-	font = std::make_unique<FXFont>(getApp(), "helvetica", 8);
-	islandfont = std::make_unique<FXFont>(getApp(), "helvetica", 5*8, FXFont::Bold);
+	font = std::unique_ptr<FXFont>(new FXFont(getApp(), "helvetica", 8));
+	islandfont = std::unique_ptr<FXFont>(new FXFont(getApp(), "helvetica", 5*8, FXFont::Bold));
 
 	// create client area
 	map = new FXCSMapCanvas(this, this,FXCSMap::ID_MAP, FRAME_SUNKEN|LAYOUT_FILL_X|LAYOUT_FILL_Y);
@@ -76,9 +76,9 @@ FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbo
 	verticalScrollBar()->setLine(10);
 	horizontalScrollBar()->setLine(10);
 
-	backbuffer = std::make_unique<FXImage>(getApp(), nullptr, IMAGE_SHMI|IMAGE_SHMP);
+	backbuffer = std::unique_ptr<FXImage>(new FXImage(getApp(), nullptr, IMAGE_SHMI|IMAGE_SHMP));
 	if (minimap)
-		imagebuffer = std::make_unique<FXImage>(getApp(), nullptr, IMAGE_SHMI|IMAGE_SHMP);
+		imagebuffer = std::unique_ptr<FXImage>(new FXImage(getApp(), nullptr, IMAGE_SHMI|IMAGE_SHMP));
 
 	// button between the scrollbars, toggling shadowed map mode
 	if (!minimap)

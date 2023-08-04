@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
 project (csmapfx CXX C)
-
 if (WIN32)
 add_definitions(-DUNICODE)
 set(PLATFORM_SOURCES win32.cpp)
@@ -14,7 +13,7 @@ find_package(PNG)
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
   #GCC >= 7.2 needs -Wno-psabi
-  add_compile_options(-Wno-psabi -Wno-inconsistent-missing-override)
+  add_compile_options(-Wno-psabi)
 endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL Clang)
@@ -138,7 +137,9 @@ endif (PKG_CONFIG_FOUND)
 endif (WIN32)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-	CXX_STANDARD 14)
+	CXX_STANDARD 11)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+	CXX_STANDARD_REQUIRED 11)
 target_link_libraries(${PROJECT_NAME}
   ${FOX_LIBRARIES}
   ${CMAKE_DL_LIBS} 

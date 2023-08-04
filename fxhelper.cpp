@@ -237,7 +237,7 @@ std::string loadResourceFile(const char *relpath)
 
         if (filesize > 0) {
             size_t size = (size_t)filesize;
-            auto arr = std::make_unique<char[]>(size);
+            auto arr = std::unique_ptr<char[]>(new char[size]);
             char * data = arr.get();
             if (PHYSFS_readBytes(file, data, filesize) == filesize) {
                 result.assign(data, size);

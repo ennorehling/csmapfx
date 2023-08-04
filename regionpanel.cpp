@@ -194,7 +194,7 @@ void FXRegionPanel::collectData(std::vector<RegionInfo>& info, const datablock::
         Parteipersonen = att->regioninfos->Parteipersonen;
         Parteisilber = att->regioninfos->Parteisilber;
     } else {
-        att->regioninfos = std::make_unique<region_info>();
+        att->regioninfos = std::unique_ptr<region_info>(new region_info);
 
         datablock::itor end = mapFile->blocks().end();
         for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
