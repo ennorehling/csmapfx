@@ -7,9 +7,14 @@ set(PLATFORM_SOURCES win32.cpp)
 else (WIN32)
 find_package(CURL)
 find_package(PhysFS 2.1)
-set(PLATFORM_SOURCES unix.cpp)
-endif (WIN32)
+set(PLATFORM_SOURCES unix.cpp imageio.cpp)
 find_package(PNG)
+if (PNG_FOUND)
+set(PLATFORM_SOURCES ${PLATFORM_SOURCES} imageio.cpp)
+add_compile_definitions(WITH_PNG_EXPORT)
+endif (PNG_FOUND)
+
+endif (WIN32)
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
   #GCC >= 7.2 needs -Wno-psabi
@@ -77,10 +82,6 @@ set (SOURCES
 	tradepanel.cpp
 	unitlist.cpp
 )
-
-if (PNG_FOUND)
-set(SOURCES ${SOURCES} imageio.cpp)
-endif (PNG_FOUND)
 
 if (WIN32)
 set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/version.rc")

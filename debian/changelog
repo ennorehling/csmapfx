@@ -1,3 +1,11 @@
+csmapfx (1.7.16-1) stable; urgency=low
+
+  * don't use libpng on windows
+  * adaptive "about" dialog
+  * show physfs version
+
+  -- Enno Rehling <enno@eressea.de>  Sat, 05 Aug 2023 12:00:00 +0200
+
 csmapfx (1.7.15-2) stable; urgency=low
 
   * set user agent string

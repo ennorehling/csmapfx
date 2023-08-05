@@ -3,10 +3,16 @@
 #ifdef WIN32
 #include <windows.h>
 #include <shlobj_core.h>
-#elif defined(HAVE_CURL)
+#endif
+#ifdef HAVE_PHYSFS
+#include <physfs.h>
+#endif
+#ifdef HAVE_PNG
+#include <png.h>
+#endif
+#ifdef HAVE_CURL
 #include <curl/curl.h>
 #endif
-
 #include <sys/stat.h>
 
 #include "platform.h"
@@ -369,11 +375,12 @@ CSMap::CSMap(FXApp *app) :
         mapmenu,
         L"E&xportieren...\t\tKarte ohne Details speichern.",
         icons.save, this, ID_FILE_EXPORT_MAP);
+#ifdef WITH_PNG_EXPORT
     new FXMenuCommand(
         mapmenu,
         L"Als &PNG exportieren...\t\tDie Karte als PNG speichern.",
         nullptr, this, ID_FILE_EXPORT_IMAGE);
-
+#endif
 
     new FXMenuCommand(
         filemenu,
@@ -3000,7 +3007,7 @@ long CSMap::onFilePreferences(FXObject*, FXSelector, void*)
 
 long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
 {
-#ifdef HAVE_PNG
+#ifdef WITH_PNG_EXPORT
     FXExportDlg exp(this, "Karte exportieren...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100, 100, 400, 250);
     FXint res = exp.execute(PLACEMENT_SCREEN);
     if (!res)
@@ -3405,11 +3412,18 @@ long CSMap::onHelpAbout(FXObject*, FXSelector, void*)
     abouttext.append("\n\nThis software uses the following libraries:\n");
     abouttext.append(version.format("FOX Toolkit %d.%d.%d  (http://www.fox-toolkit.org)\n", (int)fxversion[0], (int)fxversion[1], (int)fxversion[2]));
     abouttext.append("cparse (https://github.com/cparse/cparse)\n");
+#ifdef HAVE_PHYSFS
+    PHYSFS_Version linked;
+    PHYSFS_getLinkedVersion(&linked);
+    abouttext.append(version.format("PhysFS %d.%d.%d\n",
+        linked.major, linked.minor, linked.patch);
+#endif
 #ifdef HAVE_CURL
     abouttext.append(version.format("%s\n", curl_version()));
 #endif
+#ifdef HAVE_PNG
     abouttext.append(png_get_copyright(NULL));
-
+#endif
     FXMessageBox about(this, "Wer mich schuf...", abouttext, getIcon(), MBOX_OK);
 
     about.execute(PLACEMENT_SCREEN);

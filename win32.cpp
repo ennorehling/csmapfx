@@ -125,3 +125,8 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
 
     return dwStatusCode;
 }
+
+bool SavePNG(const FXString &filename, const class FXCSMap &map, class FXImage &image, class FXProgressDialog &win)
+{
+    return false;
+}
