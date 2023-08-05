@@ -412,7 +412,7 @@ long FXCSMap::onUpdVisiblePlane(FXObject* sender, FXSelector, void*)
 	return 1;
 }
 
-FXint FXCSMap::GetHexFromScreenY(FXint scrx, FXint scry)
+FXint FXCSMap::GetHexFromScreenY(FXint scrx, FXint scry) const
 {
 	// Berechne y-Koordinate
 	float fy = (scry) / 48.0f/scale;
@@ -427,18 +427,18 @@ FXint FXCSMap::GetHexFromScreenY(FXint scrx, FXint scry)
 	return -y;
 }
 
-FXint FXCSMap::GetHexFromScreenX(FXint scrx, FXint scry)
+FXint FXCSMap::GetHexFromScreenX(FXint scrx, FXint scry) const
 {
 	return (FXint)floorf(scrx / 64.0f/scale - GetHexFromScreenY(scrx, scry)/2.0f);
 }
 
-FXint FXCSMap::GetScreenFromHexY(FXint /*x*/, FXint y)
+FXint FXCSMap::GetScreenFromHexY(FXint /*x*/, FXint y) const
 {
 	return (FXint)(-y*48*scale);
 
 }
 
-FXint FXCSMap::GetScreenFromHexX(FXint x, FXint y)
+FXint FXCSMap::GetScreenFromHexX(FXint x, FXint y) const
 {
 	return (FXint)(x*64*scale + y*32*scale);
 }
@@ -1653,7 +1653,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 	return true;
 }
 
-void FXCSMap::paintMapLines(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br)
+void FXCSMap::paintMapLines(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br) const
 {
 	dc.setFont(font.get());
 	dc.setForeground(map->getBackColor());
@@ -1735,7 +1735,7 @@ void FXCSMap::paintMapLines(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br
 	}
 }
 
-LeftTop FXCSMap::getMapLeftTop()
+LeftTop FXCSMap::getMapLeftTop() const
 {
 	// no datafile loaded?
 	if (!mapFile) return LeftTop{0, 0};
@@ -1762,7 +1762,7 @@ LeftTop FXCSMap::getMapLeftTop()
 	return LeftTop{min_x, min_y};
 }
 
-std::map<FXString, IslandPos> FXCSMap::collectIslandNames()
+std::map<FXString, IslandPos> FXCSMap::collectIslandNames() const
 {
 	std::map<FXString, IslandPos> islands;
 
@@ -1811,7 +1811,7 @@ std::map<FXString, IslandPos> FXCSMap::collectIslandNames()
 	return islands;
 }
 
-void FXCSMap::paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, std::map<FXString, IslandPos> const& islands)
+void FXCSMap::paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, std::map<FXString, IslandPos> const& islands) const
 {
 	if (!show_islands) return;
 

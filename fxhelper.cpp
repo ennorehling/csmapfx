@@ -181,7 +181,7 @@ void showError(const FX::FXString& str)
 void showError(const std::string& str)
 {
 #ifdef WIN32
-	showError((FXString)FXString(str.c_str()));	// caution: cross forwarding!
+	showError(FXString(str.c_str()));	// caution: cross forwarding!
 #else
 	std::cerr << str << std::endl;
 #endif

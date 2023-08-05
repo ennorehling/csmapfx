@@ -34,10 +34,10 @@ public:
 	void create();
 	virtual ~FXCSMap();
 
-	LeftTop getMapLeftTop();
-	std::map<FXString, IslandPos> collectIslandNames();
-	void paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, std::map<FXString, IslandPos> const& islands);
-	void paintMapLines(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br);
+	LeftTop getMapLeftTop() const;
+	std::map<FXString, IslandPos> collectIslandNames() const;
+	void paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, std::map<FXString, IslandPos> const& islands) const;
+	void paintMapLines(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br) const;
 
 	virtual void moveContents(FXint x,FXint y);
 
@@ -210,10 +210,10 @@ protected:
 	virtual FXint getDefaultHeight();
 	// Recalculate layout
 	void layout();
-	FXint GetHexFromScreenY(FXint scrx, FXint scry);
-	FXint GetHexFromScreenX(FXint scrx, FXint scry);
-	FXint GetScreenFromHexY(FXint x, FXint y);
-	FXint GetScreenFromHexX(FXint x, FXint y);
+	FXint GetHexFromScreenY(FXint scrx, FXint scry) const;
+	FXint GetHexFromScreenX(FXint scrx, FXint scry) const;
+	FXint GetScreenFromHexY(FXint x, FXint y) const;
+	FXint GetScreenFromHexX(FXint x, FXint y) const;
 
     void updateMap();
 

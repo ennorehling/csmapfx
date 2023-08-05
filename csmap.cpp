@@ -1456,8 +1456,6 @@ bool CSMap::checkCommands()
 }
 
 #ifdef HAVE_PNG
-extern FXbool csmap_savePNG(FXStream& store, FXCSMap& map, FXImage& image, FXProgressDialog& win);
-
 bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool show_koords, bool show_islands, int color)
 {
     if (filename.empty())
@@ -1466,45 +1464,34 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
     if (!report)
         return false;
 
-    FXCSMap *csmap = new FXCSMap(this);
-    csmap->hide();
-    csmap->setMapFile(report);
-    csmap->create();
+    FXCSMap csmap(this);
+    csmap.hide();
+    csmap.setMapFile(report);
+    csmap.create();
 
     // options
     if (scale == 64)
-        csmap->scaleChange(16/64.0f);    // bugfix: scaleChange(1.0); doesn't work without previous scaleing
+        csmap.scaleChange(16/64.0f);    // bugfix: scaleChange(1.0); doesn't work without previous scaleing
 
-    csmap->scaleChange(scale/64.0f);
-    csmap->setShowNames(show_names);
-    csmap->setShowKoords(show_koords);
-    csmap->setShowIslands(show_islands);
+    csmap.scaleChange(scale/64.0f);
+    csmap.setShowNames(show_names);
+    csmap.setShowKoords(show_koords);
+    csmap.setShowIslands(show_islands);
 
     if (color == 1)    // white background
-        csmap->setBackColor(FXRGB(255, 255, 255));
+        csmap.setBackColor(FXRGB(255, 255, 255));
     else
-        csmap->setBackColor(FXRGB(0, 0, 0));
+        csmap.setBackColor(FXRGB(0, 0, 0));
 
-    FXImage image(getApp(), nullptr, 0, csmap->getContentWidth(), 500);
+    FXImage image(getApp(), nullptr, 0, csmap.getContentWidth(), 500);
     image.create();
-
-    FXFileStream file;
-    file.open(filename,FXStreamSave);
-    if (file.status() != FXStreamOK)
-    {
-        return false;
-    }
 
     FXProgressDialog progress(this, "Karte exportieren...", "Erzeuge Abbild der Karte...", PROGRESSDIALOG_NORMAL|PROGRESSDIALOG_CANCEL);
     progress.setIcon(icon);
     progress.create();
     getApp()->refresh();
     progress.show(PLACEMENT_SCREEN);
-    csmap_savePNG(file, *csmap, image, progress);
-
-    delete csmap;
-
-    return true;
+    return SavePNG(filename, csmap, csmap.getContentHeight(), image, progress);
 }
 #endif
 
