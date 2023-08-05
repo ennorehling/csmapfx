@@ -173,41 +173,39 @@ bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDia
 {
     bool bSuccess = false;
     FXImage image(win.getApp(), nullptr, 0, map.getImageWidth(), map.getImageHeight());
-    const FXColor *pixels = image.getData();
-    SIZE_T size = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFO) + image.getWidth() * image.getHeight() * sizeof(FXColor);
-
-    HGLOBAL hImage = GlobalAlloc(0, size);
-    IStream *pStream = NULL;
-    
-    if (hImage)
-    {
-        if (!CreateStreamOnHGlobal(hImage, TRUE, &pStream))
-        {
-            pStream = NULL;
+    LeftTop mapOffset = map.getMapLeftTop();
+    FXRectangle slice(mapOffset.left, mapOffset.top, image.getWidth(), image.getHeight());
+    image.create();
+    map.drawSlice(image, slice, nullptr);
+    image.mirror(false, true);
+    FXColor *pixels = image.getData();
+    FXint size = image.getWidth() * image.getHeight();
+    for (FXint i = 0; i != size; ++i) {
+        FXColor rgba = pixels[i];
+        if (pixels[i] & 0xffffff) {
+            pixels[i] = ((rgba & 0xff0000) >> 16) + ((rgba & 0xff) << 16) + (rgba & 0xff00ff00);
         }
     }
 
-    if (pStream)
+    BITMAPINFO bmi;
+    ZeroMemory(&bmi, sizeof(BITMAPINFO));
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth = image.getWidth();
+    bmi.bmiHeader.biHeight = image.getHeight();
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biCompression = BI_RGB;
+    bmi.bmiHeader.biBitCount = 32;
+
+    CLSID encoderClsid;
+    // Get the CLSID of the PNG encoder.
+    if (GetEncoderClsid(L"image/png", &encoderClsid) >= 0)
     {
         WCHAR wszFilename[MAX_PATH];
-        BITMAPINFO bmi;
-        ZeroMemory(&bmi, sizeof(BITMAPINFO));
-        bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-        bmi.bmiHeader.biWidth = image.getWidth();
-        bmi.bmiHeader.biHeight = image.getHeight();
-        bmi.bmiHeader.biPlanes = 1;
-        bmi.bmiHeader.biCompression = BI_RGB;
-        bmi.bmiHeader.biBitCount = 32;
-        Gdiplus::Image *pImage = new Gdiplus::Bitmap(&bmi, image.getData());
-
-        CLSID encoderClsid;
-        // Get the CLSID of the PNG encoder.
-        GetEncoderClsid(L"image/png", &encoderClsid);
-        bSuccess = pImage->Save(wszFilename, &encoderClsid) == Gdiplus::Ok;
-        delete pImage;
+        MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, filename.text(), -1, wszFilename, MAX_PATH);
+        Gdiplus::Bitmap bitmap(&bmi, pixels);
+        bSuccess = bitmap.Save(wszFilename, &encoderClsid) == Gdiplus::Ok;
     }
 
-    if (pStream) pStream->Release();
     return bSuccess;
 }
 
