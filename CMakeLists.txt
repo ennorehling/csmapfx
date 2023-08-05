@@ -2,19 +2,20 @@ cmake_minimum_required(VERSION 3.0)
 
 project (csmapfx CXX C)
 if (WIN32)
-add_definitions(-DUNICODE)
+#add_compile_definitions(WITH_PNG_EXPORT)
+add_compile_definitions(-DUNICODE)
 set(PLATFORM_SOURCES win32.cpp)
 else (WIN32)
 find_package(CURL)
 find_package(PhysFS 2.1)
 set(PLATFORM_SOURCES unix.cpp imageio.cpp)
+endif (WIN32)
+
 find_package(PNG)
 if (PNG_FOUND)
 set(PLATFORM_SOURCES ${PLATFORM_SOURCES} imageio.cpp)
 add_compile_definitions(WITH_PNG_EXPORT)
 endif (PNG_FOUND)
-
-endif (WIN32)
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
   #GCC >= 7.2 needs -Wno-psabi

@@ -38,6 +38,7 @@ public:
 	std::map<FXString, IslandPos> collectIslandNames() const;
 	void paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, std::map<FXString, IslandPos> const& islands) const;
 	void paintMapLines(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br) const;
+    void drawSlice(FXImage &image, const FXRectangle &rect, const std::map<FXString, IslandPos> *islands = nullptr) const;
 
 	virtual void moveContents(FXint x,FXint y);
 

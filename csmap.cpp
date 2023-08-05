@@ -1462,7 +1462,7 @@ bool CSMap::checkCommands()
     return true;
 }
 
-#ifdef HAVE_PNG
+#ifdef WITH_PNG_EXPORT
 bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool show_koords, bool show_islands, int color)
 {
     if (filename.empty())
@@ -1490,15 +1490,12 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
     else
         csmap.setBackColor(FXRGB(0, 0, 0));
 
-    FXImage image(getApp(), nullptr, 0, csmap.getImageWidth(), 500);
-    image.create();
-
     FXProgressDialog progress(this, "Karte exportieren...", "Erzeuge Abbild der Karte...", PROGRESSDIALOG_NORMAL|PROGRESSDIALOG_CANCEL);
     progress.setIcon(icon);
     progress.create();
     getApp()->refresh();
     progress.show(PLACEMENT_SCREEN);
-    return SavePNG(filename, csmap, image, progress);
+    return SavePNG(filename, csmap, progress);
 }
 #endif
 

@@ -239,7 +239,7 @@ private:
     bool checkCommands();
     void updateFileNames();
 
-#ifdef HAVE_PNG
+#ifdef WITH_PNG_EXPORT
     bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
 #endif
 

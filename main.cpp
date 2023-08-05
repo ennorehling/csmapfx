@@ -28,6 +28,9 @@
 #include <sstream>
 #include <string>
 #include <fx.h>
+#ifdef WIN32
+#include <gdiplus.h>
+#endif
 #ifdef HAVE_PHYSFS
 #include <physfs.h>
 #endif
@@ -92,6 +95,7 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
         }
     }
     LocalFree(cmdArgs);
+
 #else
     for (int arg = 1; arg != argc; ++arg)
     {
@@ -128,6 +132,12 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
 
 int main(int argc, char *argv[])
 {
+#ifdef WIN32
+    // Initialize GDI+.
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    ULONG_PTR gdiplusToken;
+    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+#endif
 #ifdef HAVE_PHYSFS
     PHYSFS_init(argv[0]);
     PHYSFS_mount(PHYSFS_getBaseDir(), NULL, 0);
@@ -177,6 +187,9 @@ int main(int argc, char *argv[])
 #endif
 #ifdef HAVE_PHYSFS
     PHYSFS_deinit();
+#endif
+#ifdef WIN32
+    Gdiplus::GdiplusShutdown(gdiplusToken);
 #endif
     return exitcode;
 }

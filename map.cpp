@@ -1643,6 +1643,19 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 	return true;
 }
 
+void FXCSMap::drawSlice(FXImage &image, const FXRectangle &rect, const std::map<FXString, IslandPos> *islands) const
+{
+    FXPoint br(FXshort(rect.x + rect.w), FXshort(rect.y + rect.h));
+    FXDCWindow dc(&image);
+    dc.setForeground(getBackColor());
+    dc.fillRectangle(0, 0, image.getWidth(), image.getHeight());
+    paintMapLines(dc, rect.tl(), rect.br());
+    if (islands) {
+        paintIslandNames(dc, rect.tl(), rect.br(), *islands);
+    }
+    image.restore();
+}
+
 void FXCSMap::paintMapLines(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br) const
 {
 	dc.setFont(font.get());

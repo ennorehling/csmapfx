@@ -1,13 +1,23 @@
 #include "platform.h"
 #include "version.h"
+#include "map.h"
 #ifndef WIN32
 #error "This code only for use with Windows targets"
 #endif
 
 #include <windows.h>
 #include <wininet.h>
+#ifdef WITH_PNG_EXPORT
+#include <gdiplus.h>
+#include <gdiplusimagecodec.h>
+#include <gdiplusimaging.h>
+#endif
+#include <shlwapi.h>
+
+#include <memory>
 
 #pragma comment(lib, "wininet.lib")
+#pragma comment(lib, "gdiplus.lib")
 
 long UploadFile(const FXString &filename, const FXString &username, const FXString &password, FXString &outBody)
 {
@@ -126,7 +136,85 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
     return dwStatusCode;
 }
 
-bool SavePNG(const FXString &filename, const class FXCSMap &map, class FXImage &image, class FXProgressDialog &win)
+#ifdef WITH_PNG_EXPORT
+int GetEncoderClsid(const WCHAR *format, CLSID *pClsid)
 {
-    return false;
+    UINT  num = 0;          // number of image encoders
+    UINT  size = 0;         // size of the image encoder array in bytes
+
+    Gdiplus::ImageCodecInfo *pImageCodecInfo = NULL;
+
+    Gdiplus::GetImageEncodersSize(&num, &size);
+    if (size == 0)
+        return -1;  // Failure
+
+    pImageCodecInfo = (Gdiplus::ImageCodecInfo *)new char[size];
+    if (pImageCodecInfo == NULL)
+        return -1;  // Failure
+
+    if (GetImageEncoders(num, size, pImageCodecInfo) != Gdiplus::Ok)
+        return -1;  // Failure
+
+    for (UINT j = 0; j < num; ++j)
+    {
+        if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
+        {
+            *pClsid = pImageCodecInfo[j].Clsid;
+            delete [] pImageCodecInfo;
+            return j;  // Success
+        }
+    }
+
+    delete [] pImageCodecInfo;
+    return -1;  // Failure
 }
+
+bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDialog &win)
+{
+    bool bSuccess = false;
+    FXImage image(win.getApp(), nullptr, 0, map.getImageWidth(), map.getImageHeight());
+    const FXColor *pixels = image.getData();
+    SIZE_T size = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFO) + image.getWidth() * image.getHeight() * sizeof(FXColor);
+
+    HGLOBAL hImage = GlobalAlloc(0, size);
+    IStream *pStream = NULL;
+    
+    if (hImage)
+    {
+        if (!CreateStreamOnHGlobal(hImage, TRUE, &pStream))
+        {
+            pStream = NULL;
+        }
+    }
+
+    if (pStream)
+    {
+        WCHAR wszFilename[MAX_PATH];
+        BITMAPINFO bmi;
+        ZeroMemory(&bmi, sizeof(BITMAPINFO));
+        bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+        bmi.bmiHeader.biWidth = image.getWidth();
+        bmi.bmiHeader.biHeight = image.getHeight();
+        bmi.bmiHeader.biPlanes = 1;
+        bmi.bmiHeader.biCompression = BI_RGB;
+        bmi.bmiHeader.biBitCount = 32;
+        Gdiplus::Image *pImage = new Gdiplus::Bitmap(&bmi, image.getData());
+
+        CLSID encoderClsid;
+        // Get the CLSID of the PNG encoder.
+        GetEncoderClsid(L"image/png", &encoderClsid);
+        bSuccess = pImage->Save(wszFilename, &encoderClsid) == Gdiplus::Ok;
+        delete pImage;
+    }
+
+    if (pStream) pStream->Release();
+    return bSuccess;
+}
+
+#ifndef HAVE_PNG
+bool SavePNG(const FXString &filename, const FXCSMap &map, FXProgressDialog &win)
+{
+    return SavePNG_GdiPlus(filename, map, win);
+}
+#endif
+#endif

@@ -10,14 +10,6 @@
 // interaction between '_setjmp' and C++ object destruction is non-portable
 #endif
 
-// Custom read function, which will read from the stream in our case
-/* not used
-static void user_read_fn(png_structp png_ptr, png_bytep buffer, png_size_t size){
-  FXStream *store=(FXStream*)png_get_io_ptr(png_ptr);
-  store->load((FXchar*)buffer, size);
-  }
-*/
-
 // Custom write function, which will write to the stream in our case
 static void user_write_fn(png_structp png_ptr, png_bytep buffer, png_size_t size){
   FXStream *store=(FXStream*)png_get_io_ptr(png_ptr);
@@ -45,14 +37,17 @@ static void user_warning_fn(png_structp, png_const_charp message){
   }
 
 // Save a PNG image
-bool SavePNG(const FXString& filename, const FXCSMap& map, FXImage& image, FXProgressDialog& dlg)
+bool SavePNG(const FXString& filename, const FXCSMap& map, FXProgressDialog& dlg)
 {
 	png_structp png_ptr = nullptr;
 	png_infop info_ptr = nullptr;
 	png_bytep *row_pointers = nullptr;
     FXint width = map.getImageWidth();
     FXint height = map.getImageHeight();
-    FXint stepsize = image.getHeight();
+    FXint stepsize = 500;
+
+    FXImage image(dlg.getApp(), nullptr, 0, map.getImageWidth(), stepsize);
+    image.create();
 
     FXFileStream store;
     store.open(filename, FXStreamSave);
@@ -99,17 +94,12 @@ bool SavePNG(const FXString& filename, const FXCSMap& map, FXImage& image, FXPro
 	dlg.setTotal(height);
 	dlg.getApp()->runModalWhileEvents(&dlg);
 
-    FXDCWindow dc(&image);
+    FXRectangle slice(mapOffset.left, mapOffset.top, image.getWidth(), stepsize);
     // paint it slice by slice
 	for (FXint y = 0; y < height && !dlg.isCancelled(); y+=stepsize)
 	{
-        FXPoint tl(mapOffset.left, FXshort(mapOffset.top + y));
-        FXPoint br(FXshort(tl.x + image.getWidth()), FXshort(tl.y + stepsize));
-        dc.setForeground(map.getBackColor());
-        dc.fillRectangle(0, 0, image.getWidth(), image.getHeight());
-        map.paintMapLines(dc, tl, br);
-        map.paintIslandNames(dc, tl, br, islands);
-		image.restore();
+        slice.y = mapOffset.top + y;
+        map.drawSlice(image, slice, &islands);
 
 		FXColor* data = image.getData();
 		if (!data)
@@ -120,19 +110,18 @@ bool SavePNG(const FXString& filename, const FXCSMap& map, FXImage& image, FXPro
 		}
 
 		// Set up row pointers
-		if (y+stepsize > height)
-			stepsize = height - y;
+		if (y+ slice.h > height)
+            slice.h = height - y;
 
-		for(int i = 0; i < stepsize; i++)
+		for(int i = 0; i < slice.h; i++)
 			row_pointers[i]=(png_bytep)&data[i*width];
 
-		png_write_rows(png_ptr, &row_pointers[0], stepsize);
+		png_write_rows(png_ptr, &row_pointers[0], slice.h);
 
 		// update statusbar
 		dlg.setProgress(y);
 		dlg.getApp()->runModalWhileEvents(&dlg);
 	}
-
 	// Wrap up
 	png_write_end(png_ptr, info_ptr);
 
