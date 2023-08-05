@@ -64,10 +64,12 @@ public:
 
 	FXint sendRouteCmds(const FXString& str, int which);
 
-	FXint getContentWidth() const;
-	FXint getContentHeight() const;
+	FXint getImageWidth() const { return image_w; }
+	FXint getImageHeight() const { return image_h; }
 
-public:
+    virtual FXint getContentWidth() override { return getImageWidth(); }
+    virtual FXint getContentHeight() override { return getImageHeight(); }
+
     long onMotion(FXObject*,FXSelector,void*);  
 	long onLeftButtonPress(FXObject*,FXSelector,void*);  
 	long onLeftButtonRelease(FXObject*,FXSelector,void*);  
@@ -182,10 +184,10 @@ protected:
 	std::vector< IconRecord > iconRecords;
 
 	// what text is shown
-	FXbool		show_koords, show_names, show_islands;
+	bool		show_koords, show_names, show_islands;
 
 	// what symbols are shown
-	FXbool		show_streets, show_visibility_symbol, show_ship_travel, show_shadow_regions;
+	bool		show_streets, show_visibility_symbol, show_ship_travel, show_shadow_regions;
 
 	struct arrow
 	{

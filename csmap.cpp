@@ -1490,7 +1490,7 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
     else
         csmap.setBackColor(FXRGB(0, 0, 0));
 
-    FXImage image(getApp(), nullptr, 0, csmap.getContentWidth(), 500);
+    FXImage image(getApp(), nullptr, 0, csmap.getImageWidth(), 500);
     image.create();
 
     FXProgressDialog progress(this, "Karte exportieren...", "Erzeuge Abbild der Karte...", PROGRESSDIALOG_NORMAL|PROGRESSDIALOG_CANCEL);
@@ -1498,7 +1498,7 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
     progress.create();
     getApp()->refresh();
     progress.show(PLACEMENT_SCREEN);
-    return SavePNG(filename, csmap, csmap.getContentHeight(), image, progress);
+    return SavePNG(filename, csmap, image, progress);
 }
 #endif
 

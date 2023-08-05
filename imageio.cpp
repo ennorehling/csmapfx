@@ -45,14 +45,14 @@ static void user_warning_fn(png_structp, png_const_charp message){
   }
 
 // Save a PNG image
-bool SavePNG(const FXString& filename, const FXCSMap& map, FXint height, FXImage& image, FXProgressDialog& dlg)
+bool SavePNG(const FXString& filename, const FXCSMap& map, FXImage& image, FXProgressDialog& dlg)
 {
 	png_structp png_ptr = nullptr;
 	png_infop info_ptr = nullptr;
 	png_bytep *row_pointers = nullptr;
-    FXint width = image.getWidth();
-	// what size the image is?
-	FXint stepsize = image.getHeight();
+    FXint width = map.getImageWidth();
+    FXint height = map.getImageHeight();
+    FXint stepsize = image.getHeight();
 
     FXFileStream store;
     store.open(filename, FXStreamSave);
