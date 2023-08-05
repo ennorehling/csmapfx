@@ -64,8 +64,8 @@ public:
 
 	FXint sendRouteCmds(const FXString& str, int which);
 
-	FXint getContentWidth();
-	FXint getContentHeight();
+	FXint getContentWidth() const;
+	FXint getContentHeight() const;
 
 public:
     long onMotion(FXObject*,FXSelector,void*);  

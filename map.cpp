@@ -213,12 +213,12 @@ void FXCSMap::calculateContentSize()
     }
 }
 
-FXint FXCSMap::getContentWidth()
+FXint FXCSMap::getContentWidth() const
 {
 	return image_w;
 }
 
-FXint FXCSMap::getContentHeight()
+FXint FXCSMap::getContentHeight() const
 {
 	return image_h;
 }
