@@ -3413,7 +3413,7 @@ long CSMap::onHelpAbout(FXObject*, FXSelector, void*)
     PHYSFS_Version linked;
     PHYSFS_getLinkedVersion(&linked);
     abouttext.append(version.format("PhysFS %d.%d.%d\n",
-        linked.major, linked.minor, linked.patch);
+        linked.major, linked.minor, linked.patch));
 #endif
 #ifdef HAVE_CURL
     abouttext.append(version.format("%s\n", curl_version()));
