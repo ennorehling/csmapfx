@@ -1395,26 +1395,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
             // island names
             if (show_islands)
             {
-                if (att_region *stats = static_cast<att_region *>(block.attachment()))
-                {
-                    if (!stats->island.empty())
-                    {
-                        std::map<FXString, IslandPos>::iterator itor = islands.find(stats->island);
-                        if (itor == islands.end())
-                        {
-                            IslandPos is{};
-                            is.left = scr_x; is.top = scr_y;
-                            is.right = scr_x + regionSize; is.bottom = scr_y + regionSize;
-                            islands[stats->island] = is;
-                        }
-                        else
-                        {
-                            IslandPos &is = itor->second;
-                            is.left = std::min(is.left, scr_x); is.top = std::min(is.top, scr_y);
-                            is.right = std::max(is.right, scr_x + regionSize); is.bottom = std::max(is.bottom, scr_y + regionSize);
-                        }
-                    }
-                }
+				updateIslands(islands, block, regionSize);
             }
 
             // don't draw special icons on minimap
@@ -1764,14 +1745,11 @@ LeftTop FXCSMap::getMapLeftTop() const
 
 	return LeftTop{min_x, min_y};
 }
-
-std::map<FXString, IslandPos> FXCSMap::collectIslandNames() const
+void FXCSMap::collectIslandNames(std::map<FXString, IslandPos>& islands) const
 {
-	std::map<FXString, IslandPos> islands;
-
 	// no datafile loaded?
     if (!mapFile) {
-        return islands;
+        return;
     }
 
 	FXint regionSize = FXint(64*scale);
@@ -1784,36 +1762,37 @@ std::map<FXString, IslandPos> FXCSMap::collectIslandNames() const
 		if (block.type() != block_type::TYPE_REGION ||
 			block.info() != visiblePlane)
 			continue;
+		updateIslands(islands, block, regionSize);
+	}
+}
 
-		FXint scr_x = GetScreenFromHexX(block.x(), block.y());
-		FXint scr_y = GetScreenFromHexY(block.x(), block.y());
+void FXCSMap::updateIslands(std::map<FXString, IslandPos>& islands, const datablock& block, FXint regionSize) const
+{
+	FXint scr_x = GetScreenFromHexX(block.x(), block.y());
+	FXint scr_y = GetScreenFromHexY(block.x(), block.y());
 
-		//  calculate island rect
-		if (att_region* stats = static_cast<att_region*>(block.attachment()))
+	//  calculate island rect
+	if (att_region* stats = static_cast<att_region*>(block.attachment()))
+	{
+		if (!stats->island.empty())
 		{
-			if (!stats->island.empty())
+			std::map<FXString, IslandPos>::iterator itor = islands.find(stats->island);
+			if (itor == islands.end())
 			{
-				std::map<FXString, IslandPos>::iterator itor = islands.find(stats->island);
-				if (itor == islands.end())
-				{
-					IslandPos is{};
-					is.left = scr_x; is.top = scr_y;
-					is.right = scr_x + regionSize; is.bottom = scr_y + regionSize;
-					islands[stats->island] = is;
-				}
-				else
-				{
-					IslandPos& is = itor->second;
-					is.left = std::min(is.left, scr_x); is.top = std::min(is.top, scr_y);
-					is.right = std::max(is.right, scr_x + regionSize); is.bottom = std::max(is.bottom, scr_y + regionSize);
-				}
+				IslandPos is{};
+				is.left = scr_x; is.top = scr_y;
+				is.right = scr_x + regionSize; is.bottom = scr_y + regionSize;
+				islands[stats->island] = is;
+			}
+			else
+			{
+				IslandPos& is = itor->second;
+				is.left = std::min(is.left, scr_x); is.top = std::min(is.top, scr_y);
+				is.right = std::max(is.right, scr_x + regionSize); is.bottom = std::max(is.bottom, scr_y + regionSize);
 			}
 		}
 	}
-
-	return islands;
 }
-
 void FXCSMap::paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, std::map<FXString, IslandPos> const& islands) const
 {
 	if (!show_islands) return;

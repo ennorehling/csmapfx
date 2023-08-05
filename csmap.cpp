@@ -1495,7 +1495,13 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
     progress.create();
     getApp()->refresh();
     progress.show(PLACEMENT_SCREEN);
-    return SavePNG(filename, csmap, progress);
+
+    if (show_islands) {
+        std::map<FXString, IslandPos> islands;
+        csmap.collectIslandNames(islands);
+        return SavePNG(filename, csmap, progress, &islands);
+    }
+    return SavePNG(filename, csmap, progress, nullptr);
 }
 #endif
 

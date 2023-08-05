@@ -37,7 +37,7 @@ static void user_warning_fn(png_structp, png_const_charp message){
   }
 
 // Save a PNG image
-bool SavePNG(const FXString& filename, const FXCSMap& map, FXProgressDialog& dlg)
+bool SavePNG(const FXString& filename, const FXCSMap& map, FXProgressDialog& dlg, const void *islandMap)
 {
 	png_structp png_ptr = nullptr;
 	png_infop info_ptr = nullptr;
@@ -57,7 +57,6 @@ bool SavePNG(const FXString& filename, const FXCSMap& map, FXProgressDialog& dlg
     }
 
     LeftTop mapOffset = map.getMapLeftTop();
-	std::map<FXString, IslandPos> islands = map.collectIslandNames();
 
 	// Create and initialize the png_struct with the desired error handler functions.
 	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, &store, user_error_fn, user_warning_fn);
@@ -95,11 +94,13 @@ bool SavePNG(const FXString& filename, const FXCSMap& map, FXProgressDialog& dlg
 	dlg.getApp()->runModalWhileEvents(&dlg);
 
     FXRectangle slice(mapOffset.left, mapOffset.top, image.getWidth(), stepsize);
+	const std::map<FXString, IslandPos> * islands = 
+		static_cast< const std::map<FXString, IslandPos> *>(islandMap);
     // paint it slice by slice
 	for (FXint y = 0; y < height && !dlg.isCancelled(); y+=stepsize)
 	{
         slice.y = mapOffset.top + y;
-        map.drawSlice(image, slice, &islands);
+        map.drawSlice(image, slice, islands);
 
 		FXColor* data = image.getData();
 		if (!data)
