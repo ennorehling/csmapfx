@@ -177,24 +177,12 @@ bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDia
     FXRectangle slice(mapOffset.left, mapOffset.top, image.getWidth(), image.getHeight());
     image.create();
     map.drawSlice(image, slice, &islands);
-    image.mirror(false, true);
     FXColor *pixels = image.getData();
     FXint size = image.getWidth() * image.getHeight();
     for (FXint i = 0; i != size; ++i) {
         FXColor rgba = pixels[i];
-        if (pixels[i] & 0xffffff) {
-            pixels[i] = ((rgba & 0xff0000) >> 16) + ((rgba & 0xff) << 16) + (rgba & 0xff00ff00);
-        }
+        pixels[i] = FXBLUEVAL(rgba) + (FXGREENVAL(rgba) << 8) + (FXREDVAL(rgba) << 16);
     }
-
-    BITMAPINFO bmi;
-    ZeroMemory(&bmi, sizeof(BITMAPINFO));
-    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bmi.bmiHeader.biWidth = image.getWidth();
-    bmi.bmiHeader.biHeight = image.getHeight();
-    bmi.bmiHeader.biPlanes = 1;
-    bmi.bmiHeader.biCompression = BI_RGB;
-    bmi.bmiHeader.biBitCount = 32;
 
     CLSID encoderClsid;
     // Get the CLSID of the PNG encoder.
@@ -202,8 +190,21 @@ bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDia
     {
         WCHAR wszFilename[MAX_PATH];
         MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, filename.text(), -1, wszFilename, MAX_PATH);
-        Gdiplus::Bitmap bitmap(&bmi, pixels);
-        bSuccess = bitmap.Save(wszFilename, &encoderClsid) == Gdiplus::Ok;
+        Gdiplus::Bitmap bitmap(image.getWidth(), image.getHeight(), PixelFormat32bppRGB);
+        Gdiplus::Rect area(0, 0, bitmap.GetWidth(), bitmap.GetHeight());
+        Gdiplus::BitmapData bitmapData;
+        bitmapData.Scan0 = image.getData();
+        bitmapData.Stride = image.getWidth() * 4;
+        bitmapData.Width = image.getWidth();
+        bitmapData.Height = image.getHeight();
+        bSuccess = bitmap.LockBits(&area, Gdiplus::ImageLockModeWrite | Gdiplus::ImageLockModeUserInputBuf,
+            bitmap.GetPixelFormat(), &bitmapData) == Gdiplus::Ok;
+        if (bSuccess) {
+            bSuccess = bitmap.UnlockBits(&bitmapData) == Gdiplus::Ok;
+        }
+        if (bSuccess) {
+            bSuccess = bitmap.Save(wszFilename, &encoderClsid) == Gdiplus::Ok;
+        }
     }
 
     return bSuccess;
