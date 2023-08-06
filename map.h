@@ -14,11 +14,6 @@
 #include <functional>
 
 
-struct LeftTop
-{
-	FXshort left, top;
-};
-
 struct IslandPos
 {
 	FXint left, top, right, bottom;
@@ -34,7 +29,7 @@ public:
 	void create();
 	virtual ~FXCSMap();
 
-	LeftTop getMapLeftTop() const;
+	FXPoint getMapLeftTop() const;
 	void collectIslandNames(std::map<FXString, IslandPos>& islands) const;
     void updateIslands(std::map<FXString, IslandPos> &islands, datablock &block, FXint scr_x, FXint scr_y, FXint regionSize) const;
 	void paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, std::map<FXString, IslandPos> const& islands) const;

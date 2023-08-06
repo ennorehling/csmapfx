@@ -177,14 +177,14 @@ bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDia
     bSuccess = GetEncoderClsid(L"image/png", &encoderClsid) >= 0;
 
     if (bSuccess) {
-        FXint tileHeight = 512;
-        FXImage image(dlg.getApp(), nullptr, 0, map.getImageWidth(), tileHeight);
+        FXint tileSize = 512;
+        FXImage image(dlg.getApp(), nullptr, 0, map.getImageWidth(), tileSize);
         image.create();
 
         dlg.setTotal(map.getImageHeight());
         dlg.getApp()->runModalWhileEvents(&dlg);
 
-        LeftTop mapOffset = map.getMapLeftTop();
+        FXPoint mapOffset = map.getMapLeftTop();
         Gdiplus::Bitmap bitmap(map.getImageWidth(), map.getImageHeight(), PixelFormat32bppRGB);
         Gdiplus::Status status = Gdiplus::Ok;
         for (FXint startLine = 0; status == Gdiplus::Ok && startLine < map.getImageHeight(); startLine += image.getHeight()) {
@@ -198,7 +198,7 @@ bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDia
             if (height + startLine > map.getImageHeight()) {
                 height = map.getImageHeight() - startLine;
             }
-            FXRectangle slice(mapOffset.left, mapOffset.top + startLine, image.getWidth(), height);
+            FXRectangle slice(mapOffset.x, mapOffset.y + startLine, image.getWidth(), height);
             map.drawSlice(image, slice, &islands);
             FXColor *pixels = image.getData();
             FXint size = image.getWidth() * height;

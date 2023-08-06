@@ -1719,10 +1719,10 @@ void FXCSMap::paintMapLines(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br
 	}
 }
 
-LeftTop FXCSMap::getMapLeftTop() const
+FXPoint FXCSMap::getMapLeftTop() const
 {
 	// no datafile loaded?
-	if (!mapFile) return LeftTop{0, 0};
+	if (!mapFile) return FXPoint{0, 0};
 
 	// initialize to 'impossible' values
 	FXshort min_x = SHRT_MAX, min_y = SHRT_MAX;
@@ -1743,7 +1743,7 @@ LeftTop FXCSMap::getMapLeftTop() const
 		if (scr_y < min_y) min_y = scr_y;
 	}
 
-	return LeftTop{min_x, min_y};
+	return FXPoint{min_x, min_y};
 }
 
 void FXCSMap::collectIslandNames(std::map<FXString, IslandPos>& islands) const

@@ -56,7 +56,7 @@ bool SavePNG(const FXString& filename, const FXCSMap& map, FXProgressDialog& dlg
         return false;
     }
 
-    LeftTop mapOffset = map.getMapLeftTop();
+    FXPoint mapOffset = map.getMapLeftTop();
     std::map<FXString, IslandPos> islands;
     map.collectIslandNames(islands);
 
@@ -95,11 +95,11 @@ bool SavePNG(const FXString& filename, const FXCSMap& map, FXProgressDialog& dlg
 	dlg.setTotal(height);
 	dlg.getApp()->runModalWhileEvents(&dlg);
 
-    FXRectangle slice(mapOffset.left, mapOffset.top, image.getWidth(), stepsize);
+    FXRectangle slice(mapOffset.x, mapOffset.y, image.getWidth(), stepsize);
     // paint it slice by slice
 	for (FXint y = 0; y < height && !dlg.isCancelled(); y+=stepsize)
 	{
-        slice.y = mapOffset.top + y;
+        slice.y = mapOffset.y + y;
         map.drawSlice(image, slice, &islands);
 
 		FXColor* data = image.getData();
