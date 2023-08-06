@@ -49,7 +49,7 @@ Section "${MAIN_SECTION} (required)"
   
   ; Put files there
   File Release\CsMapFX.exe
-  File Release\*.dll
+  ; File Release\*.dll
   
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\CsMapFX "Install_Dir" "$INSTDIR"
