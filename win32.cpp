@@ -172,41 +172,48 @@ int GetEncoderClsid(const WCHAR *format, CLSID *pClsid)
 bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDialog &win, const std::map<FXString, IslandPos> &islands)
 {
     bool bSuccess = false;
-    FXImage image(win.getApp(), nullptr, 0, map.getImageWidth(), map.getImageHeight());
-    LeftTop mapOffset = map.getMapLeftTop();
-    FXRectangle slice(mapOffset.left, mapOffset.top, image.getWidth(), image.getHeight());
-    image.create();
-    map.drawSlice(image, slice, &islands);
-    FXColor *pixels = image.getData();
-    FXint size = image.getWidth() * image.getHeight();
-    for (FXint i = 0; i != size; ++i) {
-        FXColor rgba = pixels[i];
-        pixels[i] = FXBLUEVAL(rgba) + (FXGREENVAL(rgba) << 8) + (FXREDVAL(rgba) << 16);
-    }
-
-    CLSID encoderClsid;
     // Get the CLSID of the PNG encoder.
-    if (GetEncoderClsid(L"image/png", &encoderClsid) >= 0)
-    {
-        WCHAR wszFilename[MAX_PATH];
-        MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, filename.text(), -1, wszFilename, MAX_PATH);
-        Gdiplus::Bitmap bitmap(image.getWidth(), image.getHeight(), PixelFormat32bppRGB);
-        Gdiplus::Rect area(0, 0, bitmap.GetWidth(), bitmap.GetHeight());
-        Gdiplus::BitmapData bitmapData;
-        bitmapData.Scan0 = image.getData();
-        bitmapData.Stride = image.getWidth() * 4;
-        bitmapData.Width = image.getWidth();
-        bitmapData.Height = image.getHeight();
-        bSuccess = bitmap.LockBits(&area, Gdiplus::ImageLockModeWrite | Gdiplus::ImageLockModeUserInputBuf,
-            bitmap.GetPixelFormat(), &bitmapData) == Gdiplus::Ok;
-        if (bSuccess) {
-            bSuccess = bitmap.UnlockBits(&bitmapData) == Gdiplus::Ok;
+    CLSID encoderClsid;
+    bSuccess = GetEncoderClsid(L"image/png", &encoderClsid) >= 0;
+
+    if (bSuccess) {
+        Gdiplus::Bitmap bitmap(map.getImageWidth(), map.getImageHeight(), PixelFormat32bppRGB);
+        FXImage image(win.getApp(), nullptr, 0, map.getImageWidth(), 500);
+        image.create();
+
+        LeftTop mapOffset = map.getMapLeftTop();
+        for (FXint startLine = 0; startLine < map.getImageHeight(); startLine += image.getHeight()) {
+            FXint height = image.getHeight();
+            if (height + startLine > map.getImageHeight()) {
+                height = map.getImageHeight() - startLine;
+            }
+            FXRectangle slice(mapOffset.left, mapOffset.top + startLine, image.getWidth(), height);
+            map.drawSlice(image, slice, &islands);
+            FXColor *pixels = image.getData();
+            FXint size = image.getWidth() * height;
+            for (FXint i = 0; i != size; ++i) {
+                FXColor rgba = pixels[i];
+                pixels[i] = FXBLUEVAL(rgba) + (FXGREENVAL(rgba) << 8) + (FXREDVAL(rgba) << 16);
+            }
+            Gdiplus::Rect area(0, startLine, image.getWidth(), height);
+            Gdiplus::BitmapData bitmapData;
+            bitmapData.Scan0 = image.getData();
+            bitmapData.Stride = image.getWidth() * 4;
+            bitmapData.Width = image.getWidth();
+            bitmapData.Height = height;
+            bSuccess = bitmap.LockBits(&area, Gdiplus::ImageLockModeWrite | Gdiplus::ImageLockModeUserInputBuf,
+                bitmap.GetPixelFormat(), &bitmapData) == Gdiplus::Ok;
+            if (bSuccess) {
+                bSuccess = bitmap.UnlockBits(&bitmapData) == Gdiplus::Ok;
+            }
         }
+
         if (bSuccess) {
+            WCHAR wszFilename[MAX_PATH];
+            MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, filename.text(), -1, wszFilename, MAX_PATH);
             bSuccess = bitmap.Save(wszFilename, &encoderClsid) == Gdiplus::Ok;
         }
     }
-
     return bSuccess;
 }
 
