@@ -1765,13 +1765,11 @@ LeftTop FXCSMap::getMapLeftTop() const
 	return LeftTop{min_x, min_y};
 }
 
-std::map<FXString, IslandPos> FXCSMap::collectIslandNames() const
+void FXCSMap::collectIslandNames(std::map<FXString, IslandPos>& islands) const
 {
-	std::map<FXString, IslandPos> islands;
-
 	// no datafile loaded?
     if (!mapFile) {
-        return islands;
+        return;
     }
 
 	FXint regionSize = FXint(64*scale);
@@ -1810,8 +1808,6 @@ std::map<FXString, IslandPos> FXCSMap::collectIslandNames() const
 			}
 		}
 	}
-
-	return islands;
 }
 
 void FXCSMap::paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, std::map<FXString, IslandPos> const& islands) const
