@@ -169,7 +169,7 @@ int GetEncoderClsid(const WCHAR *format, CLSID *pClsid)
     return -1;  // Failure
 }
 
-bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDialog &dlg, const std::map<FXString, IslandPos> &islands)
+bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDialog &dlg, const FXCSMap::IslandInfo& islands)
 {
     bool bSuccess;
     // Get the CLSID of the PNG encoder.
@@ -235,7 +235,7 @@ bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDia
 #ifndef HAVE_PNG
 bool SavePNG(const FXString &filename, const FXCSMap &map, FXProgressDialog &win)
 {
-    std::map<FXString, IslandPos> islands;
+    FXCSMap::IslandInfo islands;
     map.collectIslandNames(islands);
     return SavePNG_GdiPlus(filename, map, win, islands);
 }

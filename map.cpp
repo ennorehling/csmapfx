@@ -1364,7 +1364,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 		if (getHeight() > image_h)	scr_offset_y += (getHeight() - image_h)/2;
 	}
 
-	std::map<FXString, IslandPos> islands;
+	IslandInfo islands;
 
     if (mapFile) {
         // iterate throu all datafiles and all regions
@@ -1624,7 +1624,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 	return true;
 }
 
-void FXCSMap::drawSlice(FXImage &image, const FXRectangle &rect, const std::map<FXString, IslandPos> *islands) const
+void FXCSMap::drawSlice(FXImage &image, const FXRectangle &rect, const IslandInfo *islands) const
 {
     FXPoint br(FXshort(rect.x + rect.w), FXshort(rect.y + rect.h));
     FXDCWindow dc(&image);
@@ -1746,7 +1746,7 @@ FXPoint FXCSMap::getMapLeftTop() const
 	return FXPoint{min_x, min_y};
 }
 
-void FXCSMap::collectIslandNames(std::map<FXString, IslandPos>& islands) const
+void FXCSMap::collectIslandNames(IslandInfo& islands) const
 {
 	// no datafile loaded?
     if (!mapFile) {
@@ -1775,14 +1775,14 @@ void FXCSMap::collectIslandNames(std::map<FXString, IslandPos>& islands) const
 	}
 }
 
-void FXCSMap::updateIslands(std::map<FXString, IslandPos> &islands, datablock &block, FXint scr_x, FXint scr_y, FXint regionSize) const
+void FXCSMap::updateIslands(IslandInfo &islands, datablock &block, FXint scr_x, FXint scr_y, FXint regionSize) const
 {
     //  calculate island rect
     if (att_region *stats = static_cast<att_region *>(block.attachment()))
     {
         if (!stats->island.empty())
         {
-            std::map<FXString, IslandPos>::iterator itor = islands.find(stats->island);
+            IslandInfo::iterator itor = islands.find(stats->island);
             if (itor == islands.end())
             {
                 IslandPos is{};
@@ -1800,7 +1800,7 @@ void FXCSMap::updateIslands(std::map<FXString, IslandPos> &islands, datablock &b
     }
 }
 
-void FXCSMap::paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, std::map<FXString, IslandPos> const& islands) const
+void FXCSMap::paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, IslandInfo const& islands) const
 {
 	if (!show_islands) return;
 
@@ -1808,7 +1808,7 @@ void FXCSMap::paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const&
 	dc.setFont(islandfont.get());
 	dc.setForeground(map->getBackColor());
 
-	for (std::map<FXString, IslandPos>::value_type const& entry : islands)
+	for (IslandInfo::value_type const& entry : islands)
 	{
 		const FXString& label = entry.first;
 		const IslandPos& is = entry.second;

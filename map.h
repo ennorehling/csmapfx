@@ -24,17 +24,18 @@ class FXCSMap : public FXScrollArea
 	FXDECLARE(FXCSMap)
 
 public:
+	typedef std::map<FXString, IslandPos> IslandInfo;
 	FXCSMap(FXComposite* p, FXObject* tgt=NULL,FXSelector sel=0, FXuint opts=(FRAME_SUNKEN|FRAME_THICK), FXbool minimap=false, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
 	void create();
 	virtual ~FXCSMap();
 
 	FXPoint getMapLeftTop() const;
-	void collectIslandNames(std::map<FXString, IslandPos>& islands) const;
-    void updateIslands(std::map<FXString, IslandPos> &islands, datablock &block, FXint scr_x, FXint scr_y, FXint regionSize) const;
-	void paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, std::map<FXString, IslandPos> const& islands) const;
+	void collectIslandNames(IslandInfo& islands) const;
+    void updateIslands(IslandInfo &islands, datablock &block, FXint scr_x, FXint scr_y, FXint regionSize) const;
+	void paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, IslandInfo const& islands) const;
 	void paintMapLines(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br) const;
-    void drawSlice(FXImage &image, const FXRectangle &rect, const std::map<FXString, IslandPos> *islands = nullptr) const;
+    void drawSlice(FXImage &image, const FXRectangle &rect, const IslandInfo *islands = nullptr) const;
 
 	virtual void moveContents(FXint x,FXint y);
 

@@ -57,7 +57,7 @@ bool SavePNG(const FXString& filename, const FXCSMap& map, FXProgressDialog& dlg
     }
 
     FXPoint mapOffset = map.getMapLeftTop();
-    std::map<FXString, IslandPos> islands;
+    FXCSMap::IslandInfo islands;
     map.collectIslandNames(islands);
 
 	// Create and initialize the png_struct with the desired error handler functions.
