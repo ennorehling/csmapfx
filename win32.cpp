@@ -178,7 +178,7 @@ bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDia
 
     if (bSuccess) {
         FXint tileSize = 512;
-        FXImage image(dlg.getApp(), nullptr, 0, map.getImageWidth(), tileSize);
+        FXImage image(dlg.getApp(), nullptr, 0, tileSize, tileSize);
         image.create();
 
         dlg.setTotal(map.getImageHeight());
@@ -187,46 +187,58 @@ bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDia
         FXPoint mapOffset = map.getMapLeftTop();
         Gdiplus::Bitmap bitmap(map.getImageWidth(), map.getImageHeight(), PixelFormat32bppRGB);
         Gdiplus::Status status = Gdiplus::Ok;
-        for (FXint startLine = 0; status == Gdiplus::Ok && startLine < map.getImageHeight(); startLine += image.getHeight()) {
-            if (dlg.isCancelled()) {
-                bSuccess = false;
+        for (FXint tileY = 0; tileY < map.getImageHeight(); tileY += image.getHeight()) {
+            FXint height = image.getHeight();
+            if (height + tileY > map.getImageHeight()) {
+                height = map.getImageHeight() - tileY;
+            }
+            dlg.setProgress(tileY);
+            dlg.getApp()->runModalWhileEvents(&dlg);
+            for (FXint tileX = 0; tileX < map.getImageWidth(); tileY += image.getWidth()) {
+                if (dlg.isCancelled()) {
+                    bSuccess = false;
+                    break;
+                }
+                FXint width = image.getWidth();
+                if (width + tileX > map.getImageWidth()) {
+                    width = map.getImageWidth() - tileX;
+                }
+                FXRectangle slice(mapOffset.x, mapOffset.y + tileY, width, height);
+                map.drawSlice(image, slice, &islands);
+                FXColor *pixels = image.getData();
+                for (FXint i = 0; i != width * height; ++i) {
+                    FXColor rgba = pixels[i];
+                    pixels[i] = FXBLUEVAL(rgba) + (FXGREENVAL(rgba) << 8) + (FXREDVAL(rgba) << 16);
+                }
+                Gdiplus::Rect tile(tileX, tileY, width, height);
+                Gdiplus::BitmapData bitmapData;
+                ZeroMemory(&bitmapData, sizeof(bitmapData));
+                bitmapData.Scan0 = image.getData();
+                bitmapData.Stride = image.getWidth() * 4;
+                bitmapData.Width = width;
+                bitmapData.Height = height;
+                bitmapData.PixelFormat = bitmap.GetPixelFormat();
+                status = bitmap.LockBits(&tile, Gdiplus::ImageLockModeWrite | Gdiplus::ImageLockModeUserInputBuf,
+                    PixelFormat32bppARGB, &bitmapData);
+                if (status == Gdiplus::Ok) {
+                    status = bitmap.UnlockBits(&bitmapData);
+                }
+                if (status != Gdiplus::Ok) {
+                    bSuccess = false;
+                    break;
+                }
+            }
+            if (status != Gdiplus::Ok) {
                 break;
             }
-            dlg.setProgress(startLine);
-            dlg.getApp()->runModalWhileEvents(&dlg);
-            FXint height = image.getHeight();
-            if (height + startLine > map.getImageHeight()) {
-                height = map.getImageHeight() - startLine;
-            }
-            FXRectangle slice(mapOffset.x, mapOffset.y + startLine, image.getWidth(), height);
-            map.drawSlice(image, slice, &islands);
-            FXColor *pixels = image.getData();
-            FXint size = image.getWidth() * height;
-            for (FXint i = 0; i != size; ++i) {
-                FXColor rgba = pixels[i];
-                pixels[i] = FXBLUEVAL(rgba) + (FXGREENVAL(rgba) << 8) + (FXREDVAL(rgba) << 16);
-            }
-            Gdiplus::Rect area(0, startLine, image.getWidth(), height);
-            Gdiplus::BitmapData bitmapData;
-            ZeroMemory(&bitmapData, sizeof(bitmapData));
-            bitmapData.Scan0 = image.getData();
-            bitmapData.Stride = image.getWidth() * 4;
-            bitmapData.Width = image.getWidth();
-            bitmapData.Height = height;
-            bitmapData.PixelFormat = bitmap.GetPixelFormat();
-            status = bitmap.LockBits(&area, Gdiplus::ImageLockModeWrite | Gdiplus::ImageLockModeUserInputBuf,
-                PixelFormat32bppARGB, &bitmapData);
-            if (status == Gdiplus::Ok) {
-                status = bitmap.UnlockBits(&bitmapData);
-            }
-        }
-        if (status != Gdiplus::Ok) {
-            bSuccess = false;
         }
         if (bSuccess) {
             WCHAR wszFilename[MAX_PATH];
             MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, filename.text(), -1, wszFilename, MAX_PATH);
             bSuccess = bitmap.Save(wszFilename, &encoderClsid) == Gdiplus::Ok;
+        }
+        else {
+            throw std::runtime_error("Ein Fehler ist aufgetreten, die Datei konnte nicht erzeugt werden.");
         }
     }
     return bSuccess;
