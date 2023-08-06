@@ -36,6 +36,7 @@ public:
 
 	LeftTop getMapLeftTop() const;
 	void collectIslandNames(std::map<FXString, IslandPos>& islands) const;
+    void updateIslands(std::map<FXString, IslandPos> &islands, datablock &block, FXint scr_x, FXint scr_y, FXint regionSize) const;
 	void paintIslandNames(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br, std::map<FXString, IslandPos> const& islands) const;
 	void paintMapLines(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br) const;
     void drawSlice(FXImage &image, const FXRectangle &rect, const std::map<FXString, IslandPos> *islands = nullptr) const;

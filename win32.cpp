@@ -169,14 +169,14 @@ int GetEncoderClsid(const WCHAR *format, CLSID *pClsid)
     return -1;  // Failure
 }
 
-bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDialog &win)
+bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDialog &win, const std::map<FXString, IslandPos> &islands)
 {
     bool bSuccess = false;
     FXImage image(win.getApp(), nullptr, 0, map.getImageWidth(), map.getImageHeight());
     LeftTop mapOffset = map.getMapLeftTop();
     FXRectangle slice(mapOffset.left, mapOffset.top, image.getWidth(), image.getHeight());
     image.create();
-    map.drawSlice(image, slice, nullptr);
+    map.drawSlice(image, slice, &islands);
     image.mirror(false, true);
     FXColor *pixels = image.getData();
     FXint size = image.getWidth() * image.getHeight();
@@ -212,7 +212,9 @@ bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDia
 #ifndef HAVE_PNG
 bool SavePNG(const FXString &filename, const FXCSMap &map, FXProgressDialog &win)
 {
-    return SavePNG_GdiPlus(filename, map, win);
+    std::map<FXString, IslandPos> islands;
+    map.collectIslandNames(islands);
+    return SavePNG_GdiPlus(filename, map, win, islands);
 }
 #endif
 #endif

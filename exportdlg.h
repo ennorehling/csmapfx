@@ -20,9 +20,14 @@ public:
 
 	long onAccept(FXObject* sender, FXSelector sel, void* ptr);
 
+    void loadState(FXRegistry &reg);
+    void saveState(FXRegistry &reg);
+
 public:
-	int getScale() const;
-	int getColor() const;
+    FXuval getScale() const;
+    void setScale(FXuval scale);
+    FXuval getColor() const;
+    void setColor(FXuval color);
 
 	bool getShowNames() const;
 	bool getShowKoords() const;

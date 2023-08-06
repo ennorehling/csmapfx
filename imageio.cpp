@@ -57,8 +57,8 @@ bool SavePNG(const FXString& filename, const FXCSMap& map, FXProgressDialog& dlg
     }
 
     LeftTop mapOffset = map.getMapLeftTop();
-	std::map<FXString, IslandPos> islands;
-	map.collectIslandNames(islands);
+    std::map<FXString, IslandPos> islands;
+    map.collectIslandNames(islands);
 
 	// Create and initialize the png_struct with the desired error handler functions.
 	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, &store, user_error_fn, user_warning_fn);

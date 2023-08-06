@@ -70,22 +70,63 @@ long FXExportDlg::onAccept(FXObject* sender, FXSelector sel, void* ptr)
 	return FXDialogBox::onCmdAccept(sender, sel, ptr);
 }
 
-int FXExportDlg::getScale() const
+void FXExportDlg::loadState(FXRegistry &reg)
+{
+    shownamesbox->setCheck(reg.readUnsignedEntry("EXPORTDLG", "NAMES", 0) != 0);
+    showislandsbox->setCheck(reg.readUnsignedEntry("EXPORTDLG", "ISLANDS", 0) != 0);
+    showkoordsbox->setCheck(reg.readUnsignedEntry("EXPORTDLG", "COORDINATES", 0) != 0);
+    setScale(reg.readUnsignedEntry("EXPORTDLG", "SCALE", 16));
+    setColor(reg.readUnsignedEntry("EXPORTDLG", "COLOR", 0));
+}
+
+void FXExportDlg::saveState(FXRegistry &reg)
+{
+    reg.writeUnsignedEntry("EXPORTDLG", "NAMES", shownamesbox->getCheck());
+    reg.writeUnsignedEntry("EXPORTDLG", "ISLANDS", showislandsbox->getCheck());
+    reg.writeUnsignedEntry("EXPORTDLG", "COORDINATES", showkoordsbox->getCheck());
+    reg.writeUnsignedEntry("EXPORTDLG", "SCALE", getScale());
+    reg.writeUnsignedEntry("EXPORTDLG", "COLOR", getColor());
+}
+
+FXuval FXExportDlg::getScale() const
 {
 	int item = scalebox->getCurrentItem();
 	if (item < 0)
 		return 1;	// no current item?
 
-	return (FXival)scalebox->getItemData(item);	// item data is scale
+	return (FXuval)scalebox->getItemData(item);	// item data is scale
 }
 
-int FXExportDlg::getColor() const
+void FXExportDlg::setScale(FXuval scale)
+{
+    for (FXint i = 0; i != scalebox->getNumItems(); ++i) {
+        FXuval val = (FXuval)scalebox->getItemData(i);
+        if (val == scale) {
+            scalebox->setCurrentItem(i);
+            break;
+        }
+    }
+    
+}
+
+FXuval FXExportDlg::getColor() const
 {
 	int item = colorbox->getCurrentItem();
 	if (item < 0)
-		return 1;	// no current item?
+		return 0;	// no current item?
 
-	return (FXival)colorbox->getItemData(item);	// item data is color index (0=black, 1=white)
+	return (FXuval)colorbox->getItemData(item);	// item data is color index (0=black, 1=white)
+}
+
+void FXExportDlg::setColor(FXuval color)
+{
+    for (FXint i = 0; i != colorbox->getNumItems(); ++i) {
+        FXuval val = (FXuval)colorbox->getItemData(i);
+        if (val == color) {
+            colorbox->setCurrentItem(i);
+            break;
+        }
+    }
 }
 
 bool FXExportDlg::getShowNames() const

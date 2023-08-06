@@ -3005,11 +3005,14 @@ long CSMap::onFilePreferences(FXObject*, FXSelector, void*)
 long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
 {
 #ifdef WITH_PNG_EXPORT
+    FXRegistry &reg = getApp()->reg();
     FXExportDlg exp(this, "Karte exportieren...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100, 100, 400, 250);
+    exp.loadState(reg);
     FXint res = exp.execute(PLACEMENT_SCREEN);
     if (!res)
         return 0;
 
+    exp.saveState(reg);
     FXint scale = exp.getScale();
     FXint color = exp.getColor();
     bool show_names = exp.getShowNames();

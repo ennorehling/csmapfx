@@ -1,10 +1,11 @@
 csmapfx (1.7.16-1) stable; urgency=low
 
-  * don't use libpng on windows
-  * adaptive "about" dialog
-  * show physfs version
+  * make PNG export dialog remember its settings.
+  * don't use libpng on windows.
+  * show physfs version in about dialog.
+  * adaptive license display in "about" dialog.
 
-  -- Enno Rehling <enno@eressea.de>  Sat, 05 Aug 2023 12:00:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Sun, 06 Aug 2023 12:00:00 +0200
 
 csmapfx (1.7.15-2) stable; urgency=low
 
