@@ -169,20 +169,31 @@ int GetEncoderClsid(const WCHAR *format, CLSID *pClsid)
     return -1;  // Failure
 }
 
-bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDialog &win, const std::map<FXString, IslandPos> &islands)
+bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDialog &dlg, const std::map<FXString, IslandPos> &islands)
 {
-    bool bSuccess = false;
+    bool bSuccess;
     // Get the CLSID of the PNG encoder.
     CLSID encoderClsid;
     bSuccess = GetEncoderClsid(L"image/png", &encoderClsid) >= 0;
 
     if (bSuccess) {
-        Gdiplus::Bitmap bitmap(map.getImageWidth(), map.getImageHeight(), PixelFormat32bppRGB);
-        FXImage image(win.getApp(), nullptr, 0, map.getImageWidth(), 500);
+        FXint tileHeight = 512;
+        FXImage image(dlg.getApp(), nullptr, 0, map.getImageWidth(), tileHeight);
         image.create();
 
+        dlg.setTotal(map.getImageHeight());
+        dlg.getApp()->runModalWhileEvents(&dlg);
+
         LeftTop mapOffset = map.getMapLeftTop();
-        for (FXint startLine = 0; startLine < map.getImageHeight(); startLine += image.getHeight()) {
+        Gdiplus::Bitmap bitmap(map.getImageWidth(), map.getImageHeight(), PixelFormat32bppRGB);
+        Gdiplus::Status status = Gdiplus::Ok;
+        for (FXint startLine = 0; status == Gdiplus::Ok && startLine < map.getImageHeight(); startLine += image.getHeight()) {
+            if (dlg.isCancelled()) {
+                bSuccess = false;
+                break;
+            }
+            dlg.setProgress(startLine);
+            dlg.getApp()->runModalWhileEvents(&dlg);
             FXint height = image.getHeight();
             if (height + startLine > map.getImageHeight()) {
                 height = map.getImageHeight() - startLine;
@@ -197,17 +208,21 @@ bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDia
             }
             Gdiplus::Rect area(0, startLine, image.getWidth(), height);
             Gdiplus::BitmapData bitmapData;
+            ZeroMemory(&bitmapData, sizeof(bitmapData));
             bitmapData.Scan0 = image.getData();
             bitmapData.Stride = image.getWidth() * 4;
             bitmapData.Width = image.getWidth();
             bitmapData.Height = height;
-            bSuccess = bitmap.LockBits(&area, Gdiplus::ImageLockModeWrite | Gdiplus::ImageLockModeUserInputBuf,
-                bitmap.GetPixelFormat(), &bitmapData) == Gdiplus::Ok;
-            if (bSuccess) {
-                bSuccess = bitmap.UnlockBits(&bitmapData) == Gdiplus::Ok;
+            bitmapData.PixelFormat = bitmap.GetPixelFormat();
+            status = bitmap.LockBits(&area, Gdiplus::ImageLockModeWrite | Gdiplus::ImageLockModeUserInputBuf,
+                PixelFormat32bppARGB, &bitmapData);
+            if (status == Gdiplus::Ok) {
+                status = bitmap.UnlockBits(&bitmapData);
             }
         }
-
+        if (status != Gdiplus::Ok) {
+            bSuccess = false;
+        }
         if (bSuccess) {
             WCHAR wszFilename[MAX_PATH];
             MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, filename.text(), -1, wszFilename, MAX_PATH);
