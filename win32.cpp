@@ -169,7 +169,10 @@ int GetEncoderClsid(const WCHAR *format, CLSID *pClsid)
     return -1;  // Failure
 }
 
-bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDialog &dlg, const FXCSMap::IslandInfo& islands)
+#define MAX_BITMAP_SIZE (16 * 16 * 1024 * 1024)
+#define MAX_IMAGE_SIZE (32 * 1024 * 1024)
+
+bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, const FXCSMap::IslandInfo &islands, FXApp *app, FXProgressDialog * dlg = nullptr)
 {
     bool bSuccess;
     // Get the CLSID of the PNG encoder.
@@ -177,33 +180,42 @@ bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDia
     bSuccess = GetEncoderClsid(L"image/png", &encoderClsid) >= 0;
 
     if (bSuccess) {
-        FXint tileSize = 512;
-        FXImage image(dlg.getApp(), nullptr, 0, tileSize, tileSize);
+        FXival mapWidth = map.getImageWidth();
+        FXival mapHeight = map.getImageHeight();
+        if (mapHeight * mapWidth > MAX_BITMAP_SIZE)
+            mapHeight = MAX_BITMAP_SIZE / mapWidth;
+        FXint tileHeight = 512;
+        FXint tileWidth = mapWidth;
+        if (tileWidth * tileHeight > MAX_IMAGE_SIZE)
+            tileWidth = MAX_IMAGE_SIZE / tileHeight;
+        FXImage image(app, nullptr, 0, tileWidth, tileHeight);
         image.create();
-
-        dlg.setTotal(map.getImageHeight());
-        dlg.getApp()->runModalWhileEvents(&dlg);
-
+        if (dlg) {
+            dlg->setTotal(mapHeight);
+            app->runModalWhileEvents(dlg);
+        }
         FXPoint mapOffset = map.getMapLeftTop();
-        Gdiplus::Bitmap bitmap(map.getImageWidth(), map.getImageHeight(), PixelFormat32bppRGB);
+        Gdiplus::Bitmap bitmap(mapWidth, mapHeight, PixelFormat32bppRGB);
         Gdiplus::Status status = Gdiplus::Ok;
-        for (FXint tileY = 0; tileY < map.getImageHeight(); tileY += image.getHeight()) {
+        for (FXint tileY = 0; tileY < mapHeight; tileY += image.getHeight()) {
             FXint height = image.getHeight();
-            if (height + tileY > map.getImageHeight()) {
-                height = map.getImageHeight() - tileY;
+            if (height + tileY > mapHeight) {
+                height = mapHeight - tileY;
             }
-            dlg.setProgress(tileY);
-            dlg.getApp()->runModalWhileEvents(&dlg);
-            for (FXint tileX = 0; tileX < map.getImageWidth(); tileY += image.getWidth()) {
-                if (dlg.isCancelled()) {
+            if (dlg) {
+                dlg->setProgress(tileY);
+                app->runModalWhileEvents(dlg);
+            }
+            for (FXint tileX = 0; tileX < mapWidth; tileX += image.getWidth()) {
+                if (dlg && dlg->isCancelled()) {
                     bSuccess = false;
                     break;
                 }
                 FXint width = image.getWidth();
-                if (width + tileX > map.getImageWidth()) {
-                    width = map.getImageWidth() - tileX;
+                if (width + tileX > mapWidth) {
+                    width = mapWidth - tileX;
                 }
-                FXRectangle slice(mapOffset.x, mapOffset.y + tileY, width, height);
+                FXRectangle slice(mapOffset.x + tileX, mapOffset.y + tileY, width, height);
                 map.drawSlice(image, slice, &islands);
                 FXColor *pixels = image.getData();
                 for (FXint i = 0; i != width * height; ++i) {
@@ -219,7 +231,7 @@ bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDia
                 bitmapData.Height = height;
                 bitmapData.PixelFormat = bitmap.GetPixelFormat();
                 status = bitmap.LockBits(&tile, Gdiplus::ImageLockModeWrite | Gdiplus::ImageLockModeUserInputBuf,
-                    PixelFormat32bppARGB, &bitmapData);
+                    bitmapData.PixelFormat, &bitmapData);
                 if (status == Gdiplus::Ok) {
                     status = bitmap.UnlockBits(&bitmapData);
                 }
@@ -245,11 +257,11 @@ bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, FXProgressDia
 }
 
 #ifndef HAVE_PNG
-bool SavePNG(const FXString &filename, const FXCSMap &map, FXProgressDialog &win)
+bool SavePNG(const FXString &filename, const FXCSMap &map, FXApp *app, FXProgressDialog * win)
 {
     FXCSMap::IslandInfo islands;
     map.collectIslandNames(islands);
-    return SavePNG_GdiPlus(filename, map, win, islands);
+    return SavePNG_GdiPlus(filename, map, islands, app, win);
 }
 #endif
 #endif

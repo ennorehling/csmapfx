@@ -37,7 +37,7 @@ static void user_warning_fn(png_structp, png_const_charp message){
   }
 
 // Save a PNG image
-bool SavePNG(const FXString& filename, const FXCSMap& map, FXProgressDialog& dlg)
+bool SavePNG(const FXString& filename, const FXCSMap& map, FXApp * app, FXProgressDialog * dlg)
 {
 	png_structp png_ptr = nullptr;
 	png_infop info_ptr = nullptr;
@@ -46,7 +46,7 @@ bool SavePNG(const FXString& filename, const FXCSMap& map, FXProgressDialog& dlg
     FXint height = map.getImageHeight();
     FXint stepsize = 500;
 
-    FXImage image(dlg.getApp(), nullptr, 0, map.getImageWidth(), stepsize);
+    FXImage image(app, nullptr, 0, map.getImageWidth(), stepsize);
     image.create();
 
     FXFileStream store;
@@ -92,12 +92,14 @@ bool SavePNG(const FXString& filename, const FXCSMap& map, FXProgressDialog& dlg
 		return FALSE;
 	}
 
-	dlg.setTotal(height);
-	dlg.getApp()->runModalWhileEvents(&dlg);
+    if (dlg) {
+        dlg->setTotal(height);
+        app->runModalWhileEvents(dlg);
+    }
 
     FXRectangle slice(mapOffset.x, mapOffset.y, image.getWidth(), stepsize);
     // paint it slice by slice
-	for (FXint y = 0; y < height && !dlg.isCancelled(); y+=stepsize)
+	for (FXint y = 0; y < height && !(dlg && dlg->isCancelled()); y += stepsize)
 	{
         slice.y = mapOffset.y + y;
         map.drawSlice(image, slice, &islands);
@@ -119,9 +121,11 @@ bool SavePNG(const FXString& filename, const FXCSMap& map, FXProgressDialog& dlg
 
 		png_write_rows(png_ptr, &row_pointers[0], slice.h);
 
-		// update statusbar
-		dlg.setProgress(y);
-		dlg.getApp()->runModalWhileEvents(&dlg);
+		// update progress bar
+        if (dlg) {
+            dlg->setProgress(y);
+            app->runModalWhileEvents(dlg);
+        }
 	}
 	// Wrap up
 	png_write_end(png_ptr, info_ptr);

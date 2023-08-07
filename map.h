@@ -27,7 +27,6 @@ public:
 	typedef std::map<FXString, IslandPos> IslandInfo;
 	FXCSMap(FXComposite* p, FXObject* tgt=NULL,FXSelector sel=0, FXuint opts=(FRAME_SUNKEN|FRAME_THICK), FXbool minimap=false, FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
-	void create();
 	virtual ~FXCSMap();
 
 	FXPoint getMapLeftTop() const;

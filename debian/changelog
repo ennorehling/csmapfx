@@ -1,8 +1,9 @@
 csmapfx (1.7.17-1) stable; urgency=low
 
   * reduce memory usage during PNG export.
+  * add command line option for PNG export.
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 06 Aug 2023 21:00:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Mon, 07 Aug 2023 17:00:00 +0200
 
 csmapfx (1.7.16-1) stable; urgency=low
 

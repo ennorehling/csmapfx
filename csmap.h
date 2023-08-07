@@ -240,13 +240,20 @@ private:
     void updateFileNames();
 
 #ifdef WITH_PNG_EXPORT
-    bool exportMapFile(FXString filename, FXint scale, bool show_text, bool show_koords, bool show_islands, int color);
+public:
+    enum ExportOptions {
+        exportNames = 0x01,
+        exportIslands = 0x02,
+        exportCoordinates = 0x04,
+    };
+    bool savePNG(const FXString &filename, FXint scale, FXColor color, FXint options, FXProgressDialog *progress = nullptr);
+private:
+    bool exportMapFile(const FXString &filename, FXint scale, FXColor color, FXint options);
 #endif
 
     typedef enum class reload_type { RELOAD_NEVER, RELOAD_AUTO, RELOAD_ASK } reload_type;
     reload_type reload_mode = reload_type::RELOAD_ASK;
 
-    int unlink(const char *pathname);
     FXString askSaveFileName(const FXString& dlgTitle);
     void updateModificationTime();
     void setAutoReload(reload_type mode);

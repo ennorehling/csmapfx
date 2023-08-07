@@ -1463,7 +1463,17 @@ bool CSMap::checkCommands()
 }
 
 #ifdef WITH_PNG_EXPORT
-bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool show_koords, bool show_islands, int color)
+bool CSMap::exportMapFile(const FXString &filename, FXint scale, FXColor bgColor, FXint options)
+{
+    FXProgressDialog progress(this, "Karte exportieren...", "Erzeuge Abbild der Karte...", PROGRESSDIALOG_NORMAL | PROGRESSDIALOG_CANCEL);
+    progress.setIcon(icon);
+    progress.create();
+    getApp()->refresh(); // TODO: why?
+    progress.show(PLACEMENT_SCREEN);
+    return savePNG(filename, scale, bgColor, options, &progress);
+}
+
+bool CSMap::savePNG(const FXString &filename, FXint scale, FXColor color, FXint options, FXProgressDialog *progress)
 {
     if (filename.empty())
         return false;
@@ -1474,28 +1484,19 @@ bool CSMap::exportMapFile(FXString filename, FXint scale, bool show_names, bool 
     FXCSMap csmap(this);
     csmap.hide();
     csmap.setMapFile(report);
-    csmap.create();
+    // csmap.create();
 
     // options
     if (scale == 64)
         csmap.scaleChange(16/64.0f);    // bugfix: scaleChange(1.0); doesn't work without previous scaleing
 
     csmap.scaleChange(scale/64.0f);
-    csmap.setShowNames(show_names);
-    csmap.setShowKoords(show_koords);
-    csmap.setShowIslands(show_islands);
+    csmap.setShowNames(options & exportNames);
+    csmap.setShowKoords(options & exportCoordinates);
+    csmap.setShowIslands(options & exportIslands);
+    csmap.setBackColor(color);
 
-    if (color == 1)    // white background
-        csmap.setBackColor(FXRGB(255, 255, 255));
-    else
-        csmap.setBackColor(FXRGB(0, 0, 0));
-
-    FXProgressDialog progress(this, "Karte exportieren...", "Erzeuge Abbild der Karte...", PROGRESSDIALOG_NORMAL|PROGRESSDIALOG_CANCEL);
-    progress.setIcon(icon);
-    progress.create();
-    getApp()->refresh();
-    progress.show(PLACEMENT_SCREEN);
-    return SavePNG(filename, csmap, progress);
+    return SavePNG(filename, csmap, csmap.getApp(), progress);
 }
 #endif
 
@@ -3015,9 +3016,10 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
     exp.saveState(reg);
     FXint scale = exp.getScale();
     FXint color = exp.getColor();
-    bool show_names = exp.getShowNames();
-    bool show_koords = exp.getShowKoords();
-    bool show_islands = exp.getShowIslands();
+    FXint options = 0;
+    if (exp.getShowNames()) options |= exportNames;
+    if (exp.getShowKoords()) options |= exportCoordinates;
+    if (exp.getShowIslands()) options |= exportIslands;
 
     FXFileDialog dlg(this, "Karte exportieren unter...", DLGEX_SAVE);
     dlg.setIcon(icon);
@@ -3048,7 +3050,10 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
         }
 
         getApp()->beginWaitCursor();
-        exportMapFile(filename, scale, show_names, show_koords, show_islands, color);
+        FXColor rgb = FXRGB(0, 0, 0);
+        if (color == 1)    // white background
+            rgb = FXRGB(255, 255, 255);
+        exportMapFile(filename, scale, rgb, options);
         getApp()->endWaitCursor();
     }
     return 0;

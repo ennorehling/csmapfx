@@ -57,6 +57,9 @@ FXDEFMAP(FXCSMap) MessageMap[]=
 
 FXIMPLEMENT(FXCSMap,FXScrollArea,MessageMap, ARRAYNUMBER(MessageMap))
 
+// helper function
+void scaleTransformIcon(FXIcon *icon, const unsigned char data[], FXint w, FXint h, FXfloat scale, std::function<FXColor(FXColor)> transform);
+
 FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbool minimap, FXint x,FXint y,FXint w,FXint h)
 	: FXScrollArea(p, opts, x, y, w, h), minimap(minimap)
 {
@@ -113,35 +116,27 @@ FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbo
 
 	// selected region
 	sel_x = sel_y = sel_plane = 0;
-}
 
-// helper function
-void scaleTransformIcon(FXIcon* icon, const unsigned char data[], FXint w, FXint h, FXfloat scale, std::function<FXColor(FXColor)> transform);
+    // create fonts and image buffers
+    font->create();
+    islandfont->create();
+    backbuffer->create();
+    if (imagebuffer)
+        imagebuffer->create();
 
-void FXCSMap::create()
-{
-	FXScrollArea::create();
+    // create all registered images
+    for (std::vector<IconRecord>::iterator it = iconRecords.begin(); it != iconRecords.end(); ++it)
+    {
+        IconRecord &icon = *it;
 
-	// create fonts and image buffers
-	font->create();
-	islandfont->create();
-	backbuffer->create();
-	if (imagebuffer)
-		imagebuffer->create();
+        (*icon.icon)->create();	// create image
 
-	// create all registered images
-	for (std::vector<IconRecord>::iterator it = iconRecords.begin(); it != iconRecords.end(); ++it)
-	{
-		IconRecord& icon = *it;
-
-		(*icon.icon)->create();	// create image
-
-		// load image data and resize
-		if (icon.scaleable)
-			scaleTransformIcon(*icon.icon, icon.data, icon.width, icon.height, scale, icon.transform);
-		else
-			scaleTransformIcon(*icon.icon, icon.data, icon.width, icon.height, 1.0, icon.transform);
-	}
+        // load image data and resize
+        if (icon.scaleable)
+            scaleTransformIcon(*icon.icon, icon.data, icon.width, icon.height, scale, icon.transform);
+        else
+            scaleTransformIcon(*icon.icon, icon.data, icon.width, icon.height, 1.0, icon.transform);
+    }
 }
 
 FXCSMap::~FXCSMap()

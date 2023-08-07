@@ -106,10 +106,29 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
     std::vector<FXString> switches;
     std::vector<FXParam> params;
     FXParseCommandLine(args, tokens, switches, params);
-
     if (!tokens.empty()) {
         std::vector<FXString> errorMessages;
         csmap->loadFiles(tokens, errorMessages);
+    }
+    FXColor color = FXRGB(0, 0, 0);
+    FXint options = 0, scale = 32;
+    bool quit = false;
+    for (const FXString &option : switches) {
+        if (option == "quit") {
+            quit = true;
+        }
+        else if (option == "islands") {
+            options |= CSMap::ExportOptions::exportIslands;
+        }
+        else if (option == "names") {
+            options |= CSMap::ExportOptions::exportNames;
+        }
+        else if (option == "coordinates") {
+            options |= CSMap::ExportOptions::exportCoordinates;
+        }
+        else if (option == "white") {
+            color = FXRGB(255, 255, 255);
+        }
     }
     for (const FXParam& param : params) {
         if (param.key == "out") {
@@ -118,12 +137,14 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
         else if (param.key == "export") {
             csmap->saveFile(param.value, map_type::MAP_MINIMAL);
         }
-    }
-    bool quit = false;
-    for (const FXString& option : switches) {
-        if (option == "quit") {
-            quit = true;
+#ifdef WITH_PNG_EXPORT
+        else if (param.key == "scale") {
+            scale = FXIntVal(param.value);
         }
+        else if (param.key == "png") {
+            csmap->savePNG(param.value, scale, color, options);
+        }
+#endif
     }
     if (quit) {
         exit(0);
