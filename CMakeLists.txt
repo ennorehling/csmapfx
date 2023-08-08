@@ -1,22 +1,29 @@
 cmake_minimum_required(VERSION 3.5)
 
+
 project (csmapfx CXX C)
+find_package(PNG)
+
+if (PNG_FOUND)
+set(USE_LIBPNG TRUE)
+else(PNG_FOUND)
+set(USE_LIBPNG FALSE)
+endif(PNG_FOUND)
+
 if (WIN32)
 add_compile_definitions(-DUNICODE)
 add_compile_definitions(WITH_PNG_EXPORT)
 set(PLATFORM_SOURCES win32.cpp)
 else (WIN32)
-find_package(PNG)
 find_package(CURL)
 find_package(PhysFS 2.1)
 set(PLATFORM_SOURCES unix.cpp)
 endif (WIN32)
 
-
-if (PNG_FOUND)
+if (USE_LIBPNG)
 add_compile_definitions(WITH_PNG_EXPORT)
 set(PLATFORM_SOURCES ${PLATFORM_SOURCES} imageio.cpp)
-endif (PNG_FOUND)
+endif (USE_LIBPNG)
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
   #GCC >= 7.2 needs -Wno-psabi
@@ -112,7 +119,7 @@ include_directories(
 )
 endif(PHYSFS_FOUND)
 
-if (PNG_FOUND)
+if (USE_LIBPNG)
 add_compile_definitions(HAVE_PNG)
 target_link_libraries(${PROJECT_NAME}
   ${PNG_LIBRARIES}
@@ -120,7 +127,7 @@ target_link_libraries(${PROJECT_NAME}
 include_directories(
   ${PNG_INCLUDE_DIRS}
 )
-endif(PNG_FOUND)
+endif(USE_LIBPNG)
 
 find_library(LEGACY_STDIO_LIBRARY NAMES legacy_stdio_definitions)
 if (LEGACY_STDIO_LIBRARY)

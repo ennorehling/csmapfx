@@ -1473,6 +1473,26 @@ bool CSMap::exportMapFile(const FXString &filename, FXint scale, FXColor bgColor
     return savePNG(filename, scale, bgColor, options, &progress);
 }
 
+#ifdef WITH_PNG_EXPORT
+#ifdef WIN32
+bool WinApi_SavePNG(const FXString &filename, const class FXCSMap &map, const FXCSMap::IslandInfo &islands, FXApp *app, FXProgressDialog *progress = nullptr);
+#endif
+#ifdef HAVE_PNG
+bool LibPng_SavePNG(const FXString &filename, const class FXCSMap &map, const FXCSMap::IslandInfo &islands, FXApp *app, FXProgressDialog *progress = nullptr);
+#endif
+
+bool SavePNG(const FXString &filename, const FXCSMap &map, FXApp *app, FXProgressDialog *win)
+{
+    FXCSMap::IslandInfo islands;
+    map.collectIslandNames(islands);
+#ifdef HAVE_PNG
+    return LibPng_SavePNG(filename, map, islands, app, win);
+#else
+    return WinApi_SavePNG(filename, map, islands, app, win);
+#endif
+}
+#endif
+
 bool CSMap::savePNG(const FXString &filename, FXint scale, FXColor color, FXint options, FXProgressDialog *progress)
 {
     if (filename.empty())
