@@ -1,7 +1,3 @@
-#include <sstream>
-#include <cmath>
-#include <climits>
-
 #include "version.h"
 #include "main.h"
 #include "fxhelper.h"
@@ -13,6 +9,11 @@
 #include "FXMenuSeparatorEx.h"
 #include "csmap.h"
 #include "datablock.h"
+
+#include <algorithm>
+#include <sstream>
+#include <cmath>
+#include <climits>
 
 using namespace std::placeholders;
 
@@ -684,10 +685,12 @@ void FXCSMap::registerImages()
 	}
 }
 
+#define CLAMP(v, lo, hi) (((v) < (lo)) ? (lo) : (((hi) < (lo)) ? (hi) : (v)))
+
 void FXCSMap::scaleChange(FXfloat new_scale)
 {
 	// scale must be in range [1/64, 2]
-	new_scale = std::max(1/64.0f, std::min(2.0f, new_scale));
+	new_scale = CLAMP(new_scale, 1/64.0f, 2.0f);
 
 	if (scale == new_scale)	// don't resize stuff when not necessary.
 		return;

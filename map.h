@@ -130,19 +130,19 @@ protected:
 	//Scout scout;
 
 	FXival visiblePlane;	
-	FXint cursor_x, cursor_y;	// coordinates of cursor grap for moving map view
-	FXint offset_x, offset_y;	// used to center map on screen
-	FXint image_w, image_h;		// width and height of the whole map
+	FXint cursor_x = 0, cursor_y = 0;	// coordinates of cursor grap for moving map view
+	FXint offset_x = 0, offset_y = 0;	// used to center map on screen
+	FXint image_w = 0, image_h = 0;		// width and height of the whole map
 
 	datafile::SelectionState selection;
 	FXint sel_x, sel_y, sel_plane;	// selected region koordinates
 	FXint popup_x, popup_y;			// which region is popup selected
 
-	FXfloat		scale;			// paint map in this scale
+	FXfloat		scale = 1.0f;			// paint map in this scale
     FXival  	modus;			// mouse button modus
-	FXint		mouse_select;	// select_set==1: select regions on mouse-over, select_set==2: unselect them
+	FXint		mouse_select = 0;	// select_set==1: select regions on mouse-over, select_set==2: unselect them
 
-	FXbool		minimap;		// is this map a minimap?
+	FXbool		minimap = FALSE;		// is this map a minimap?
 	FXCSMap		*main_map = nullptr;		// pointer to the normal map
 	
 	FXCanvas	*map = nullptr;			// the bitmap where the image data will be written to
