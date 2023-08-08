@@ -264,7 +264,18 @@ static bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, const 
         FXPoint mapOffset = map.getMapLeftTop();
         FXImage image(app, nullptr, 0, tileWidth, tileHeight);
         image.create();
-        bSuccess = SavePNG_Internal(filename, map, &islands, image, mapOffset, sliceHeight, encoderClsid);
+        if (sliceHeight == mapHeight) {
+            bSuccess = SavePNG_Internal(filename, map, &islands, image, mapOffset, sliceHeight, encoderClsid);
+        }
+        else {
+            FXString basename = FXPath::stripExtension(filename);
+            FXint slice = 1;
+            for (FXint sliceOffset = 0; sliceOffset < mapHeight; sliceOffset += sliceHeight, ++slice) {
+                mapOffset.y += sliceOffset;
+                FXString sliceFile = basename + "_" + FXStringVal(slice) + ".png";
+                bSuccess &= SavePNG_Internal(sliceFile, map, &islands, image, mapOffset, sliceHeight, encoderClsid);
+            }
+        }
     }
     return bSuccess;
 }
