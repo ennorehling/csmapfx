@@ -236,7 +236,7 @@ static bool SavePNG_Internal(const FXString &filename, const FXCSMap &map, const
     return bSuccess;
 }
 
-static bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, const FXCSMap::IslandInfo &islands, FXApp *app, FXProgressDialog * dlg = nullptr)
+bool WinApi_SavePNG(const FXString &filename, const FXCSMap &map, const FXCSMap::IslandInfo &islands, FXApp *app, FXProgressDialog * dlg = nullptr)
 {
     FXival mapWidth = map.getImageWidth();
     FXival mapHeight = map.getImageHeight();
@@ -259,7 +259,6 @@ static bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, const 
             tileWidth = MAX_IMAGE_SIZE / tileHeight;
         if (dlg) {
             dlg->setTotal(sliceHeight);
-            app->runModalWhileEvents(dlg);
         }
         FXPoint mapOffset = map.getMapLeftTop();
         FXImage image(app, nullptr, 0, tileWidth, tileHeight);
@@ -279,13 +278,4 @@ static bool SavePNG_GdiPlus(const FXString &filename, const FXCSMap &map, const 
     }
     return bSuccess;
 }
-
-#ifndef HAVE_PNG
-bool SavePNG(const FXString &filename, const FXCSMap &map, FXApp *app, FXProgressDialog * win)
-{
-    FXCSMap::IslandInfo islands;
-    map.collectIslandNames(islands);
-    return SavePNG_GdiPlus(filename, map, islands, app, win);
-}
-#endif
 #endif

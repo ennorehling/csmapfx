@@ -37,104 +37,107 @@ static void user_warning_fn(png_structp, png_const_charp message){
   }
 
 // Save a PNG image
-bool SavePNG(const FXString& filename, const FXCSMap& map, FXApp * app, FXProgressDialog * dlg)
+bool LibPng_SavePNG(const FXString& filename, const FXCSMap& map, const FXCSMap::IslandInfo &islands, FXApp * app, FXProgressDialog * dlg)
 {
-	png_structp png_ptr = nullptr;
-	png_infop info_ptr = nullptr;
-	png_bytep *row_pointers = nullptr;
     FXint width = map.getImageWidth();
     FXint height = map.getImageHeight();
-    FXint stepsize = 500;
-
-    FXImage image(app, nullptr, 0, map.getImageWidth(), stepsize);
+    FXint tileSize = 2048;
+    bool bSuccess = true;
+    FXImage image(app, nullptr, 0, tileSize, tileSize);
     image.create();
 
+    // Resources that must be released:
     FXFileStream store;
+    png_bytep *row_pointers = nullptr;
+    png_bytep rows = nullptr;
+    png_structp png_ptr = nullptr;
+    png_infop info_ptr = nullptr;
+
     store.open(filename, FXStreamSave);
-    if (store.status() != FXStreamOK)
-    {
-        return false;
-    }
-
-    FXPoint mapOffset = map.getMapLeftTop();
-    FXCSMap::IslandInfo islands;
-    map.collectIslandNames(islands);
-
-	// Create and initialize the png_struct with the desired error handler functions.
-	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, &store, user_error_fn, user_warning_fn);
-	if(!png_ptr) return FALSE;
-
-	// Allocate/initialize the image information data.
-	info_ptr=png_create_info_struct(png_ptr);
-	if(!info_ptr){
-		png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
-		return FALSE;
-	}
-
-	// Set error handling.
-	if(setjmp(png_jmpbuf(png_ptr))){
-		png_destroy_write_struct(&png_ptr, &info_ptr);
-		return FALSE;
-	}
-
-	// Using replacement read functions
-	png_set_write_fn(png_ptr, (void *)&store, user_write_fn, user_flush_fn);
-
-	// Set the header
-	png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
-	png_write_info(png_ptr, info_ptr);
-
-	// Row pointers
-	FXMALLOC(&row_pointers, png_bytep, stepsize);
-	if(!row_pointers)
-	{
-		png_destroy_write_struct(&png_ptr, &info_ptr);
-		return FALSE;
-	}
-
-    if (dlg) {
-        dlg->setTotal(height);
-        app->runModalWhileEvents(dlg);
-    }
-
-    FXRectangle slice(mapOffset.x, mapOffset.y, image.getWidth(), stepsize);
-    // paint it slice by slice
-	for (FXint y = 0; y < height && !(dlg && dlg->isCancelled()); y += stepsize)
-	{
-        slice.y = mapOffset.y + y;
-        map.drawSlice(image, slice, &islands);
-
-		FXColor* data = image.getData();
-		if (!data)
-		{
-			png_destroy_write_struct(&png_ptr, &info_ptr);
-			FXFREE(&row_pointers);
-			return FALSE;
-		}
-
-		// Set up row pointers
-		if (y+ slice.h > height)
-            slice.h = height - y;
-
-		for(int i = 0; i < slice.h; i++)
-			row_pointers[i]=(png_bytep)&data[i*width];
-
-		png_write_rows(png_ptr, &row_pointers[0], slice.h);
-
-		// update progress bar
-        if (dlg) {
-            dlg->setProgress(y);
-            app->runModalWhileEvents(dlg);
+    bSuccess = store.status() == FXStreamOK;
+    // Row pointers
+    if (bSuccess) {
+        bSuccess = FXMALLOC(&row_pointers, png_bytep, tileSize);
+        if (bSuccess) {
+            bSuccess = FXMALLOC(&rows, FXColor, width * tileSize);
+            if (bSuccess) {
+                for (int i = 0; i != tileSize; ++i) {
+                    row_pointers[i] = rows + i * tileSize * sizeof(FXColor);
+                }
+            }
         }
-	}
-	// Wrap up
-	png_write_end(png_ptr, info_ptr);
+    }
+
+    if (bSuccess) {
+        // Create and initialize the png_struct with the desired error handler functions.
+        png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, &store, user_error_fn, user_warning_fn);
+        if (png_ptr) {
+            // Allocate/initialize the image information data.
+            info_ptr = png_create_info_struct(png_ptr);
+        }
+    }
+	// Set error handling.
+    if (info_ptr)
+        bSuccess = setjmp(png_jmpbuf(png_ptr)) == 0;
+
+    if (bSuccess) {
+        // Using replacement read functions
+        png_set_write_fn(png_ptr, (void *)&store, user_write_fn, user_flush_fn);
+
+        // Set the header
+        png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+        png_write_info(png_ptr, info_ptr);
+
+        if (dlg) {
+            dlg->setTotal(height);
+        }
+        FXPoint mapOffset = map.getMapLeftTop();
+        FXRectangle tile(mapOffset.x, mapOffset.y, tileSize, tileSize);
+        // paint it slice by slice
+        for (FXint y = 0; y < height && !(dlg && dlg->isCancelled()); y += tileSize)
+        {
+            // update progress bar
+            if (dlg) {
+                dlg->setProgress(y);
+                app->runModalWhileEvents(dlg);
+            }
+            tile.y = mapOffset.y + y;
+            for (FXint x = 0; bSuccess && x < width && !(dlg && dlg->isCancelled()); x += tileSize)
+            {
+                tile.x = mapOffset.x + x;
+                map.drawSlice(image, tile, &islands);
+
+                FXColor *data = image.getData();
+                if (data) {
+                    // Set up row pointers
+                    if (y + tile.h > height)
+                        tile.h = height - y;
+
+                    for (int i = 0; i < tile.h; ++i) {
+                        int tw = tile.w;
+                        if (x + tile.w > width)
+                            tw = width - x;
+                        memcpy(row_pointers[i] + x * sizeof(FXColor), data + x + i * tile.w, tw * sizeof(FXColor));
+                    }
+                }
+                else {
+                    bSuccess = false;
+                }
+            }
+            if (!bSuccess) break;
+            png_write_rows(png_ptr, row_pointers, tile.h);
+        }
+        // Wrap up
+        if (bSuccess)
+            png_write_end(png_ptr, info_ptr);
+    }
 
 	// clean up after the write, and free any memory allocated
 	png_destroy_write_struct(&png_ptr, &info_ptr);
 
 	// Get rid of it
-	FXFREE(&row_pointers);
+    FXFREE(&rows);
+    FXFREE(&row_pointers);
 
-	return TRUE;
+	return bSuccess;
 }
