@@ -3028,6 +3028,9 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
     if (res)
     {
         FXString filename = dlg.getFilename();
+        if (filename.empty() || !allowReplaceFile(filename)) {
+            return 0;
+        }
         FXString pattern = dlg.getPattern();
 
         // Pr\u00fcft, ob Dateiname bereits Endung enth\u00e4lt.
