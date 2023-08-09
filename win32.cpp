@@ -210,7 +210,7 @@ static bool SavePNG_Internal(const FXString &filename, const FXCSMap &map, const
             bitmapData.Stride = image.getWidth() * 4;
             bitmapData.Width = width;
             bitmapData.Height = height;
-            bitmapData.PixelFormat = bitmap.GetPixelFormat();
+            bitmapData.PixelFormat = PixelFormat32bppRGB;
             status = bitmap.LockBits(&tile, Gdiplus::ImageLockModeWrite | Gdiplus::ImageLockModeUserInputBuf,
                 bitmapData.PixelFormat, &bitmapData);
             if (status == Gdiplus::Ok) {

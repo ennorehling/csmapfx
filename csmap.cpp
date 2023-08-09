@@ -61,10 +61,7 @@
 #include <FXICOIcon.h>
 #include <FXSocket.h>
 
-#include <climits>
-#include <cstdio>
-#include <cstring>
-#include <fstream>
+#include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -1488,7 +1485,13 @@ bool SavePNG(const FXString &filename, const FXCSMap &map, FXApp *app, FXProgres
 #ifdef HAVE_PNG
     return LibPng_SavePNG(filename, map, islands, app, win);
 #else
-    return WinApi_SavePNG(filename, map, islands, app, win);
+    try {
+        return WinApi_SavePNG(filename, map, islands, app, win);
+    }
+    catch (std::runtime_error e) {
+        std::cout << e.what() << std::endl;
+        return false;
+    }
 #endif
 }
 #endif
