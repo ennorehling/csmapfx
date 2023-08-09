@@ -152,18 +152,18 @@ protected:
 
 	FXButton	*button = nullptr;
 
-	FXIcon		*terrain[data::TERRAIN_LAST];
-	FXIcon		*terrainShadow[data::TERRAIN_LAST];
-	FXIcon		*terrainIcons[data::TERRAIN_LAST];
-	FXIcon		*activeRegion, *selectedRegion;
-	FXIcon		*troopsunknown, *troopally, *troopenemy;
-	FXIcon		*guardown, *guardally, *guardenemy, *guardmixed;
-	FXIcon		*ship, *castle, *shiptravel, *lighthouse, *travel;
-	FXIcon		*castleown, *castleally, *castleenemy, *castlecoins;
-	FXIcon		*monster, *seasnake, *dragon, *battle;
-	FXIcon		*wormhole;
-	FXIcon		*street[6], *street_undone[6];
-	FXIcon		*redarrows[6], *greenarrows[6], *bluearrows[6], *greyarrows[6];
+	FXIcon *terrain[data::TERRAIN_LAST];
+	FXIcon *terrainShadow[data::TERRAIN_LAST];
+	FXIcon *terrainIcons[data::TERRAIN_LAST];
+	FXIcon *activeRegion = nullptr, *selectedRegion = nullptr;
+	FXIcon *troopsunknown = nullptr, *troopally = nullptr, *troopenemy = nullptr;
+	FXIcon *guardown = nullptr, *guardally = nullptr, *guardenemy = nullptr, *guardmixed = nullptr;
+	FXIcon *ship = nullptr, *castle = nullptr, *shiptravel = nullptr, *lighthouse = nullptr, *travel = nullptr;
+	FXIcon *castleown = nullptr, *castleally = nullptr, *castleenemy = nullptr, *castlecoins = nullptr;
+	FXIcon *monster = nullptr, *seasnake = nullptr, *dragon = nullptr, *battle = nullptr;
+	FXIcon *wormhole = nullptr;
+	FXIcon *street[6], *street_undone[6];
+	FXIcon *redarrows[6], *greenarrows[6], *bluearrows[6], *greyarrows[6];
 
 	std::vector< std::vector<FXIcon*> > overlays;		// terrain color overlays
 	std::vector< FXColor > overlayColors;
@@ -222,8 +222,8 @@ protected:
     void updateMap();
 
 protected:
-	FXCSMap() {}
-	FXCSMap(const FXCSMap&) {}
+    FXCSMap() {}
+    FXCSMap(const FXCSMap &) {}
 
 };
 
