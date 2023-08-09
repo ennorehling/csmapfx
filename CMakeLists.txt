@@ -1,28 +1,26 @@
 cmake_minimum_required(VERSION 3.5)
 
-
 project (csmapfx CXX C)
-find_package(PNG)
-
-if (PNG_FOUND)
-set(USE_LIBPNG TRUE)
-else(PNG_FOUND)
-set(USE_LIBPNG FALSE)
-endif(PNG_FOUND)
 
 if (WIN32)
 add_compile_definitions(-DUNICODE)
 add_compile_definitions(WITH_PNG_EXPORT)
 set(PLATFORM_SOURCES win32.cpp)
 else (WIN32)
+set(USE_LIBPNG TRUE)
 find_package(CURL)
 find_package(PhysFS 2.1)
 set(PLATFORM_SOURCES unix.cpp)
 endif (WIN32)
 
 if (USE_LIBPNG)
+find_package (PNG)
+if (PNG_FOUND)
 add_compile_definitions(WITH_PNG_EXPORT)
 set(PLATFORM_SOURCES ${PLATFORM_SOURCES} imageio.cpp)
+else (PNG_FOUND)
+set (USE_LIBPNG FALSE)
+endif (PNG_FOUND)
 endif (USE_LIBPNG)
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)

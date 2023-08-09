@@ -228,7 +228,8 @@ static bool SavePNG_Internal(const FXString &filename, const FXCSMap &map, const
     if (bSuccess) {
         WCHAR wszFilename[MAX_PATH];
         MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, filename.text(), -1, wszFilename, MAX_PATH);
-        bSuccess = bitmap.Save(wszFilename, &encoderClsid) == Gdiplus::Ok;
+        status = bitmap.Save(wszFilename, &encoderClsid);
+        bSuccess = status == Gdiplus::Ok;
     }
     else {
         throw std::runtime_error("Ein Fehler ist aufgetreten, die Datei konnte nicht erzeugt werden.");

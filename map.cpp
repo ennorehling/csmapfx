@@ -97,27 +97,6 @@ FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbo
 	for (std::vector<IconRecord>::iterator it = iconRecords.begin(); it != iconRecords.end(); ++it)
 		(*it->icon) = new FXGIFIcon(getApp(), 0, 0, IMAGE_ALPHAGUESS);
 
-	// init members
-	visiblePlane = 0;
-	cursor_x = cursor_y = 0;
-	offset_x = offset_y = 0;
-	scale = 1.0f;
-	modus = MODUS_NORMAL;
-
-	// shown text
-	show_koords = true;
-	show_names = true;
-	show_islands = true;
-
-	// shown symbols
-	show_streets = false;
-	show_visibility_symbol = false;
-	show_ship_travel = false;
-	show_shadow_regions = false;
-
-	// selected region
-	sel_x = sel_y = sel_plane = 0;
-
     // create fonts and image buffers
     font->create();
     islandfont->create();
@@ -1094,7 +1073,7 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 	FXMenuPane *menu = new FXMenuPane(this);
 
 	FXString label;
-	label.format("Unbekannt (%d,%d)", popup_x,popup_y);
+	label.format("Unbekannt (%d,%d)", popup_x, popup_y);
 
 	new FXMenuSeparatorEx(menu, label);
 
@@ -1960,7 +1939,6 @@ void FXCSMap::updateMap()
             image_h /= 2;
         }
 
-        // resize (& layout() & calculateContentSize())
         float sc = scale;
         scale = 0;
         scaleChange(sc);	// sc must be != scale

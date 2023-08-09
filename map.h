@@ -129,17 +129,17 @@ public:
 protected:
 	//Scout scout;
 
-	FXival visiblePlane;	
+	FXival visiblePlane = 0;	
 	FXint cursor_x = 0, cursor_y = 0;	// coordinates of cursor grap for moving map view
 	FXint offset_x = 0, offset_y = 0;	// used to center map on screen
 	FXint image_w = 0, image_h = 0;		// width and height of the whole map
 
 	datafile::SelectionState selection;
-	FXint sel_x, sel_y, sel_plane;	// selected region koordinates
+	FXint sel_x = 0, sel_y = 0, sel_plane = 0;	// selected region koordinates
 	FXint popup_x, popup_y;			// which region is popup selected
 
-	FXfloat		scale = 1.0f;			// paint map in this scale
-    FXival  	modus;			// mouse button modus
+	FXfloat		scale = 0.0f;		// paint map in this scale
+    FXival  	modus = MODUS_NORMAL;			// mouse button modus
 	FXint		mouse_select = 0;	// select_set==1: select regions on mouse-over, select_set==2: unselect them
 
 	FXbool		minimap = FALSE;		// is this map a minimap?
@@ -181,10 +181,15 @@ protected:
 	std::vector< IconRecord > iconRecords;
 
 	// what text is shown
-	bool		show_koords, show_names, show_islands;
+    bool show_koords = true;
+    bool show_names = true;
+    bool show_islands = true;
 
 	// what symbols are shown
-	bool		show_streets, show_visibility_symbol, show_ship_travel, show_shadow_regions;
+    bool show_streets = false;
+    bool show_visibility_symbol = false;
+    bool show_ship_travel = false;
+    bool show_shadow_regions = false;
 
 	struct arrow
 	{
