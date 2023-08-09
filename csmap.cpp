@@ -1506,10 +1506,6 @@ bool CSMap::savePNG(const FXString &filename, FXint scale, FXColor color, FXint 
     csmap.setMapFile(report);
     // csmap.create();
 
-    // options
-    if (scale == 64)
-        csmap.scaleChange(16/64.0f);    // bugfix: scaleChange(1.0); doesn't work without previous scaleing
-
     csmap.scaleChange(scale/64.0f);
     csmap.setShowNames(options & exportNames);
     csmap.setShowKoords(options & exportCoordinates);
