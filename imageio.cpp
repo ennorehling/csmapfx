@@ -62,7 +62,7 @@ bool LibPng_SavePNG(const FXString& filename, const FXCSMap& map, const FXCSMap:
             bSuccess = FXMALLOC(&rows, FXColor, width * tileSize);
             if (bSuccess) {
                 for (int i = 0; i != tileSize; ++i) {
-                    row_pointers[i] = rows + i * tileSize * sizeof(FXColor);
+                    row_pointers[i] = rows + i * width * sizeof(FXColor);
                 }
             }
         }
@@ -102,6 +102,10 @@ bool LibPng_SavePNG(const FXString& filename, const FXCSMap& map, const FXCSMap:
                 app->runModalWhileEvents(dlg);
             }
             tile.y = mapOffset.y + y;
+            tile.h = tileSize;
+            if (y + tile.h > height)
+                tile.h = height - y;
+
             for (FXint x = 0; bSuccess && x < width && !(dlg && dlg->isCancelled()); x += tileSize)
             {
                 tile.x = mapOffset.x + x;
@@ -109,15 +113,12 @@ bool LibPng_SavePNG(const FXString& filename, const FXCSMap& map, const FXCSMap:
 
                 FXColor *data = image.getData();
                 if (data) {
+                    tile.w = tileSize;
+                    if (x + tile.w > width)
+                        tile.w = width - x;
                     // Set up row pointers
-                    if (y + tile.h > height)
-                        tile.h = height - y;
-
                     for (int i = 0; i < tile.h; ++i) {
-                        int tw = tile.w;
-                        if (x + tile.w > width)
-                            tw = width - x;
-                        memcpy(row_pointers[i] + x * sizeof(FXColor), data + x + i * tile.w, tw * sizeof(FXColor));
+                        memcpy(row_pointers[i] + x * sizeof(FXColor), data + x + i * tileSize, tile.w * sizeof(FXColor));
                     }
                 }
                 else {
