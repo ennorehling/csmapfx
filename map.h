@@ -138,7 +138,7 @@ protected:
 	FXint sel_x = 0, sel_y = 0, sel_plane = 0;	// selected region koordinates
 	FXint popup_x, popup_y;			// which region is popup selected
 
-	FXfloat		scale = 0.0f;		// paint map in this scale
+	FXfloat		scale = 1.0f;		// paint map in this scale
     FXival  	modus = MODUS_NORMAL;			// mouse button modus
 	FXint		mouse_select = 0;	// select_set==1: select regions on mouse-over, select_set==2: unselect them
 

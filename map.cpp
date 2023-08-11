@@ -671,7 +671,7 @@ void FXCSMap::scaleChange(FXfloat new_scale)
 	// scale must be in range [1/64, 2]
 	new_scale = CLAMP(new_scale, 1/64.0f, 2.0f);
 
-	if (scale == new_scale)	// don't resize stuff when not necessary.
+	if (image_w != 0 && scale == new_scale)	// don't resize stuff when not necessary.
 		return;
 	scale = new_scale;
 
