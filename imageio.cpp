@@ -118,7 +118,7 @@ bool LibPng_SavePNG(const FXString& filename, const FXCSMap& map, const FXCSMap:
                         tile.w = width - x;
                     // Set up row pointers
                     for (int i = 0; i < tile.h; ++i) {
-                        memcpy(row_pointers[i] + x * sizeof(FXColor), data + x + i * tileSize, tile.w * sizeof(FXColor));
+                        memcpy(row_pointers[i] + x * sizeof(FXColor), data + i * tileSize, tile.w * sizeof(FXColor));
                     }
                 }
                 else {
