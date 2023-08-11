@@ -102,7 +102,7 @@ endif (WIN32)
 
 if (CURL_FOUND)
 add_compile_definitions(HAVE_CURL)
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} PRIVATE
   ${CURL_LIBRARIES}
 )
 include_directories(
@@ -112,7 +112,7 @@ endif(CURL_FOUND)
 
 if (PHYSFS_FOUND)
 add_compile_definitions(HAVE_PHYSFS)
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} PRIVATE
   ${PHYSFS_LIBRARY}
 )
 include_directories(
@@ -122,8 +122,8 @@ endif(PHYSFS_FOUND)
 
 if (USE_LIBPNG)
 add_compile_definitions(HAVE_PNG)
-target_link_libraries(${PROJECT_NAME}
-  ${PNG_LIBRARIES}
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  PNG::PNG
 )
 include_directories(
   ${PNG_INCLUDE_DIRS}
@@ -132,7 +132,7 @@ endif(USE_LIBPNG)
 
 find_library(LEGACY_STDIO_LIBRARY NAMES legacy_stdio_definitions)
 if (LEGACY_STDIO_LIBRARY)
-target_link_libraries(${PROJECT_NAME} ${LEGACY_STDIO_LIBRARY})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LEGACY_STDIO_LIBRARY})
 endif ()
 
 if (WIN32)
@@ -151,7 +151,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 	CXX_STANDARD 11)
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	CXX_STANDARD_REQUIRED 11)
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} PRIVATE
   ${FOX_LIBRARIES}
   ${CMAKE_DL_LIBS} 
 )
