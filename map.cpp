@@ -327,10 +327,12 @@ long FXCSMap::onSetVisiblePlane(FXObject* sender, FXSelector, void* ptr)
 
 	if (minimap)
 	{
+        FXint w = getWidth();
+        FXint h = getHeight();
 		scale = 1.0f;
 		calculateContentSize();
 
-		while (scale >= 2/64.0f && (image_w > getWidth() || image_h > getHeight()))
+		while (scale >= 2/64.0f && (getImageWidth() > w || getImageHeight() > h))
 		{
 			scale /= 2;
 			image_w /= 2;
@@ -344,7 +346,7 @@ long FXCSMap::onSetVisiblePlane(FXObject* sender, FXSelector, void* ptr)
 		scaleChange(sc);
 
 		// paint map into buffer
-		imagebuffer->resize(image_w, image_h);
+		imagebuffer->resize(getImageWidth(), getImageHeight());
 		paintMap(imagebuffer.get());	// minimap paints map only when changed data
 	}
 
@@ -441,8 +443,8 @@ void FXCSMap::scrollTo(FXint x, FXint y)
 	FXint scr_x = -(GetScreenFromHexX(x, y) + offset_x + FXint(32*scale)) + getWidth()/2;
 	FXint scr_y = -(GetScreenFromHexY(x, y) + offset_y + FXint(32*scale)) + getHeight()/2;
 
-	if (getWidth() > image_w)	scr_x -= (getWidth() - image_w)/2;
-	if (getHeight() > image_h)	scr_y -= (getHeight() - image_h)/2;
+	if (getWidth() > getImageWidth())	scr_x -= (getWidth() - getImageWidth())/2;
+	if (getHeight() > getImageHeight())	scr_y -= (getHeight() - getImageHeight())/2;
 
 	// is region currently visible (in view pane)?
 	FXint diff_x = scr_x - pos_x; if (diff_x < 0) diff_x = -diff_x;
@@ -752,8 +754,8 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 		cursor_y = event->last_y - pos_y - offset_y;
 
 		// calculate map offset
-		if (getWidth() > image_w)	cursor_x -= (getWidth() - image_w)/2;
-		if (getHeight() > image_h)	cursor_y -= (getHeight() - image_h)/2;
+		if (getWidth() > getImageWidth())	cursor_x -= (getWidth() - getImageWidth())/2;
+		if (getHeight() > getImageHeight())	cursor_y -= (getHeight() - getImageHeight())/2;
 
 		// minimap: set position to mouse-click coordinates
 		if (main_map)
@@ -966,8 +968,8 @@ long FXCSMap::onPopup(FXObject* /*sender*/, FXSelector /*sel*/, void* ptr)
 	cursor_x = event->last_x - pos_x;
 	cursor_y = event->last_y - pos_y;
 
-	if (getWidth() > image_w)	cursor_x -= (getWidth() - image_w)/2;
-	if (getHeight() > image_h)	cursor_y -= (getHeight() - image_h)/2;
+	if (getWidth() > getImageWidth())	cursor_x -= (getWidth() - getImageWidth())/2;
+	if (getHeight() > getImageHeight())	cursor_y -= (getHeight() - getImageHeight())/2;
 
 	popup_x = GetHexFromScreenX(cursor_x-offset_x, cursor_y-offset_y);
 	popup_y = GetHexFromScreenY(cursor_x-offset_x, cursor_y-offset_y);
@@ -1337,8 +1339,8 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 		scr_offset_x += pos_x;
 		scr_offset_y += pos_y;
 
-		if (getWidth() > image_w)	scr_offset_x += (getWidth() - image_w)/2;
-		if (getHeight() > image_h)	scr_offset_y += (getHeight() - image_h)/2;
+		if (getWidth() > getImageWidth())	scr_offset_x += (getWidth() - getImageWidth())/2;
+		if (getHeight() > getImageHeight())	scr_offset_y += (getHeight() - getImageHeight())/2;
 	}
 
 	IslandInfo islands;
@@ -1823,8 +1825,8 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 		FXint center_x = pos_x;
 		FXint center_y = pos_y;
 
-		if (getWidth() > image_w)	center_x += (getWidth() - image_w)/2;
-		if (getHeight() > image_h)	center_y += (getHeight() - image_h)/2;
+		if (getWidth() > getImageWidth())	center_x += (getWidth() - getImageWidth())/2;
+		if (getHeight() > getImageHeight())	center_y += (getHeight() - getImageHeight())/2;
 
 		dc.drawImage(imagebuffer.get(), center_x,center_y);
 
@@ -1836,8 +1838,8 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 			FXint left = center_x + offset_x - int((main_map->offset_x + main_map->pos_x)*map_scale);
 			FXint top = center_y + offset_y - int((main_map->offset_y + main_map->pos_y)*map_scale);
 
-			if (main_map->getWidth() > main_map->image_w)	left -= int((main_map->getWidth() - main_map->image_w)*0.5*map_scale);
-			if (main_map->getHeight() > main_map->image_h)	top -= int((main_map->getHeight() - main_map->image_h)*0.5*map_scale);
+			if (main_map->getWidth() > main_map->getImageWidth())	left -= int((main_map->getWidth() - main_map->getImageWidth())*0.5*map_scale);
+			if (main_map->getHeight() > main_map->getImageHeight())	top -= int((main_map->getHeight() - main_map->getImageHeight())*0.5*map_scale);
 
 			FXint right = left + int(main_map->getWidth()*map_scale);
 			FXint bottom = top + int(main_map->getHeight()*map_scale);
@@ -1932,7 +1934,7 @@ void FXCSMap::updateMap()
         scale = 1.0f;
         calculateContentSize();
 
-        while (scale >= 2 / 64.0f && (image_w > getWidth() || image_h > getHeight()))
+        while (scale >= 2 / 64.0f && (getImageWidth() > getWidth() || getImageHeight() > getHeight()))
         {
             scale /= 2;
             image_w /= 2;
@@ -1944,7 +1946,7 @@ void FXCSMap::updateMap()
         scaleChange(sc);	// sc must be != scale
 
         // paint map into buffer
-        imagebuffer->resize(image_w, image_h);
+        imagebuffer->resize(getImageWidth(), getImageHeight());
         paintMap(imagebuffer.get());	// minimap paints map only when changed data
     }
 }
@@ -2181,8 +2183,8 @@ long FXCSMap::onQueryHelp(FXObject* sender, FXSelector, void*)
 	scrx -= offset_x + pos_x;
 	scry -= offset_y + pos_y;
 
-	if (getWidth() > image_w)	scrx -= (getWidth() - image_w)/2;
-	if (getHeight() > image_h)	scry -= (getHeight() - image_h)/2;
+	if (getWidth() > getImageWidth())	scrx -= (getWidth() - getImageWidth())/2;
+	if (getHeight() > getImageHeight())	scry -= (getHeight() - getImageHeight())/2;
 
 	FXint x = GetHexFromScreenX(scrx, scry);
 	FXint y = GetHexFromScreenY(scrx, scry);
