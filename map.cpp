@@ -153,7 +153,7 @@ void FXCSMap::calculateContentSize()
 	FXint min_y = INT_MAX;
 	FXint max_y = INT_MIN;
 
-	FXint regionSize = FXint(64*scale);
+	FXint regionSize = 64;
 
 	for (const datablock& block : mapFile->blocks())
 	{
@@ -175,8 +175,8 @@ void FXCSMap::calculateContentSize()
 		if (scr_y+regionSize > max_y)	max_y = scr_y+regionSize;
 	}
 
-	offset_x = -min_x;
-	offset_y = -min_y;
+	offset_x = -FXint(scale * min_x);
+	offset_y = -FXint(scale * min_y);
 
 	image_w = max_x-min_x;
 	image_h = max_y-min_y;
@@ -401,13 +401,13 @@ FXint FXCSMap::GetHexFromScreenX(FXint scrx, FXint scry) const
 
 FXint FXCSMap::GetScreenFromHexY(FXint /*x*/, FXint y) const
 {
-	return (FXint)(-y*48*scale);
+	return (FXint)(-y*48);
 
 }
 
 FXint FXCSMap::GetScreenFromHexX(FXint x, FXint y) const
 {
-	return (FXint)(x*64*scale + y*32*scale);
+	return (FXint)(x*64+ y*32);
 }
 
 // Move content
@@ -430,6 +430,7 @@ void FXCSMap::setMapFile(std::shared_ptr<datafile>& f)
     if (!f) {
         sel_x = sel_y = offset_x = offset_y = 0;
     }
+    calculateContentSize();
 }
 
 void FXCSMap::connectMap(FXCSMap* a_map)
@@ -440,8 +441,8 @@ void FXCSMap::connectMap(FXCSMap* a_map)
 void FXCSMap::scrollTo(FXint x, FXint y)
 {
 	// calculate 'screen' position of region coordinates
-	FXint scr_x = -(GetScreenFromHexX(x, y) + offset_x + FXint(32*scale)) + getWidth()/2;
-	FXint scr_y = -(GetScreenFromHexY(x, y) + offset_y + FXint(32*scale)) + getHeight()/2;
+	FXint scr_x = getWidth() / 2 - (FXint(scale * (32 + GetScreenFromHexX(x, y))) + offset_x);
+	FXint scr_y = getHeight() / 2 - (FXint(scale * (32 + GetScreenFromHexY(x, y))) + offset_y);
 
 	if (getWidth() > getImageWidth())	scr_x -= (getWidth() - getImageWidth())/2;
 	if (getHeight() > getImageHeight())	scr_y -= (getHeight() - getImageHeight())/2;
@@ -1356,8 +1357,8 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
                 continue;
 
             // map coordinates to screen
-            FXint scr_x = GetScreenFromHexX(block.x(), block.y()) + scr_offset_x;
-            FXint scr_y = GetScreenFromHexY(block.x(), block.y()) + scr_offset_y;
+            FXint scr_x = FXint(scale * GetScreenFromHexX(block.x(), block.y())) + scr_offset_x;
+            FXint scr_y = FXint(scale * GetScreenFromHexY(block.x(), block.y())) + scr_offset_y;
 
             // clip regions outside of view
             if (scr_x < -regionSize || scr_y < -regionSize || scr_x > w || scr_y > h)
@@ -1575,8 +1576,8 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 
 		for (std::vector<FXCSMap::arrow>::const_iterator arrow = arrows.begin(); arrow != arrows.end(); arrow++)
 		{
-			FXint scr_x = GetScreenFromHexX(arrow->x, arrow->y) + scr_offset_x + FXint(arrow_offset_x[arrow->dir]*scale);
-			FXint scr_y = GetScreenFromHexY(arrow->x, arrow->y) + scr_offset_y + FXint(arrow_offset_y[arrow->dir]*scale);
+			FXint scr_x = scr_offset_x + FXint(scale * (arrow_offset_x[arrow->dir] + GetScreenFromHexX(arrow->x, arrow->y)));
+			FXint scr_y = scr_offset_y + FXint(scale * (arrow_offset_y[arrow->dir] + GetScreenFromHexY(arrow->x, arrow->y)));
 
 			FXIcon **iconSet = nullptr;
 			if (arrow->color == arrow::ARROW_RED)
@@ -1588,15 +1589,15 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 			else /*if (arrow->color == arrow::ARROW_GREY)*/ // catch-all
 				iconSet = greyarrows;
 
-			dc.drawIcon(iconSet[arrow->dir], scr_x,scr_y);
+			dc.drawIcon(iconSet[arrow->dir], scr_x, scr_y);
 		}
 	}
 
 	// draw selection mark
 	if ((selection.selected & (selection.REGION|selection.UNKNOWN_REGION)) && (sel_plane == visiblePlane))
 	{
-		FXint scr_x = GetScreenFromHexX(sel_x, sel_y) + scr_offset_x;
-		FXint scr_y = GetScreenFromHexY(sel_x, sel_y) + scr_offset_y;
+		FXint scr_x = scr_offset_x + FXint(scale * GetScreenFromHexX(sel_x, sel_y));
+		FXint scr_y = scr_offset_y + FXint(scale * GetScreenFromHexY(sel_x, sel_y));
 		dc.drawIcon(activeRegion, scr_x,scr_y);
 	}
 
@@ -1637,8 +1638,8 @@ void FXCSMap::paintMapLines(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br
 			continue;
 
 		// map coordinates to screen
-		FXint scr_x = GetScreenFromHexX(block.x(), block.y()) - tl.x;
-		FXint scr_y = GetScreenFromHexY(block.x(), block.y()) - tl.y;
+		FXint scr_x = FXint(scale * GetScreenFromHexX(block.x(), block.y())) - tl.x;
+		FXint scr_y = FXint(scale * GetScreenFromHexY(block.x(), block.y())) - tl.y;
 
 		// clip regions outside of view
 		if (scr_x < -regionSize || scr_y < -regionSize || scr_x > w || scr_y > h)
@@ -1715,8 +1716,8 @@ FXPoint FXCSMap::getMapLeftTop() const
 			block.info() != visiblePlane)
 			continue;
 
-        FXshort scr_x = (FXshort)GetScreenFromHexX(block.x(), block.y());
-        FXshort scr_y = (FXshort)GetScreenFromHexY(block.x(), block.y());
+        FXshort scr_x = FXshort(scale * GetScreenFromHexX(block.x(), block.y()));
+        FXshort scr_y = FXshort(scale * GetScreenFromHexY(block.x(), block.y()));
 
 		if (scr_x < min_x) min_x = scr_x;
 		if (scr_y < min_y) min_y = scr_y;
@@ -1747,8 +1748,8 @@ void FXCSMap::collectIslandNames(IslandInfo& islands) const
 			block.info() != visiblePlane)
 			continue;
 
-        FXint scr_x = GetScreenFromHexX(block.x(), block.y());
-        FXint scr_y = GetScreenFromHexY(block.x(), block.y());
+        FXint scr_x = FXint(scale * GetScreenFromHexX(block.x(), block.y()));
+        FXint scr_y = FXint(scale * GetScreenFromHexY(block.x(), block.y()));
 
         updateIslands(islands, block, scr_x, scr_y, regionSize);
 	}

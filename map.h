@@ -36,7 +36,7 @@ public:
 	void paintMapLines(FXDCWindow& dc, FXPoint const& tl, FXPoint const& br) const;
     void drawSlice(FXImage &image, const FXRectangle &rect, const IslandInfo *islands = nullptr) const;
 
-	virtual void moveContents(FXint x,FXint y);
+	virtual void moveContents(FXint x,FXint y) override;
 
 	FXbool paintMap(FXDrawable* buffer /*, FXRectangle& rect*/);
 	void setMapFile(std::shared_ptr<datafile>& f);
@@ -61,8 +61,8 @@ public:
 
 	FXint sendRouteCmds(const FXString& str, int which);
 
-	FXint getImageWidth() const { return image_w; }
-	FXint getImageHeight() const { return image_h; }
+	FXint getImageWidth() const { return FXint(scale * image_w); }
+	FXint getImageHeight() const { return FXint(scale * image_h); }
 
     virtual FXint getContentWidth() override { return getImageWidth(); }
     virtual FXint getContentHeight() override { return getImageHeight(); }
