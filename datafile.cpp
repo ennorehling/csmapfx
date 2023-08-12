@@ -6,6 +6,7 @@
 #include "fxhelper.h"
 #include "terrain.h"
 
+#include <climits>
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -1521,8 +1522,8 @@ const FXRectangle& datafile::getContentSize(int visiblePlane)
 
     auto ins = contentSizes.insert(std::map<int, FXRectangle>::value_type(visiblePlane, FXRectangle{
         min_x, min_y,
-        max_x - min_x,
-        max_y - min_y }));
+        FXshort(max_x - min_x),
+        FXshort(max_y - min_y) }));
     return (*ins.first).second;
 }
 
