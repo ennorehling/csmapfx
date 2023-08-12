@@ -9,7 +9,14 @@
       "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
-      "cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      "cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "variables": [
+        {
+          "name": "VCPKG_TARGET_TRIPLET",
+          "value": "x86-windows-static",
+          "type": "STRING"
+        }
+      ]
     },
     {
       "name": "x86-Release",
@@ -20,7 +27,14 @@
       "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
-      "cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      "cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "variables": [
+        {
+          "name": "VCPKG_TARGET_TRIPLET",
+          "value": "x86-windows-static",
+          "type": "STRING"
+        }
+      ]
     }
   ]
 }
