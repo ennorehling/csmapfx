@@ -145,9 +145,11 @@ public:
     void createHashTables();
     void parseMessages();
 
-    FXRectangle getContentSize(int visiblePlane);
+    const FXRectangle &getContentSize(int visiblePlane);
 
 protected:
+    std::map<int, FXRectangle> contentSizes;
+
     static bool isEphemeral(block_type type);
     datablock::itor eraseRegion(const datablock::itor& region);
     datablock::itor eraseBlocks(const datablock::itor& begin, const datablock::itor& end);

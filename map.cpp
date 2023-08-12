@@ -301,9 +301,6 @@ long FXCSMap::onSetVisiblePlane(FXObject* sender, FXSelector, void* ptr)
 
 	visiblePlane = plane;
 
-	if (!minimap)
-		layout();
-
 	if (minimap)
 	{
         FXint w = getWidth();
@@ -319,15 +316,17 @@ long FXCSMap::onSetVisiblePlane(FXObject* sender, FXSelector, void* ptr)
 		}
 
         // resize (& layout() & calculateContentSize())
-		float sc = scale;
-		scale = 0;
-
-		scaleChange(sc);
+        image_w = image_h = 0;
+		scaleChange(scale);
 
 		// paint map into buffer
 		imagebuffer->resize(getImageWidth(), getImageHeight());
 		paintMap(imagebuffer.get());	// minimap paints map only when changed data
 	}
+    else {
+        layout();
+    }
+
 
 	scrollTo(sel_x, sel_y);
 
