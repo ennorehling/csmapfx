@@ -28,7 +28,7 @@
 #include <sstream>
 #include <string>
 #include <fx.h>
-#ifdef WIN32
+#if defined(WIN32) && !defined(HAVE_PNG)
 #include <gdiplus.h>
 #endif
 #ifdef HAVE_PHYSFS
@@ -37,6 +37,7 @@
 #ifdef HAVE_CURL
 #include <curl/curl.h>
 #endif
+
 void showHelpText()
 {
 	std::ostringstream help;
@@ -153,7 +154,7 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
 
 int main(int argc, char *argv[])
 {
-#ifdef WIN32
+#if defined(WIN32) && !defined(HAVE_PNG)
     // Initialize GDI+.
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     ULONG_PTR gdiplusToken;
@@ -209,7 +210,7 @@ int main(int argc, char *argv[])
 #ifdef HAVE_PHYSFS
     PHYSFS_deinit();
 #endif
-#ifdef WIN32
+#if defined(WIN32) && !defined(HAVE_PNG)
     Gdiplus::GdiplusShutdown(gdiplusToken);
 #endif
     return exitcode;

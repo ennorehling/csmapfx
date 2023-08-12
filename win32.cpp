@@ -1,23 +1,23 @@
-#include "platform.h"
-#include "version.h"
-#include "map.h"
 #ifndef WIN32
 #error "This code only for use with Windows targets"
 #endif
 
+#include "platform.h"
+#include "version.h"
+#include "map.h"
 #include <windows.h>
+#include <shlwapi.h>
 #include <wininet.h>
-#ifdef WITH_PNG_EXPORT
+#pragma comment(lib, "wininet.lib")
+
+#if defined(WITH_PNG_EXPORT) && !defined(HAVE_PNG)
+#pragma comment(lib, "gdiplus.lib")
 #include <gdiplus.h>
 #include <gdiplusimagecodec.h>
 #include <gdiplusimaging.h>
 #endif
-#include <shlwapi.h>
 
 #include <memory>
-
-#pragma comment(lib, "wininet.lib")
-#pragma comment(lib, "gdiplus.lib")
 
 long UploadFile(const FXString &filename, const FXString &username, const FXString &password, FXString &outBody)
 {
@@ -136,7 +136,7 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
     return dwStatusCode;
 }
 
-#ifdef WITH_PNG_EXPORT
+#if defined(WITH_PNG_EXPORT) && !defined(HAVE_PNG)
 int GetEncoderClsid(const WCHAR *format, CLSID *pClsid)
 {
     UINT  num = 0;          // number of image encoders
