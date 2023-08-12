@@ -1486,8 +1486,12 @@ bool datafile::isConfirmed(const datablock& block) const
     return true;
 }
 
-FXRectangle datafile::getContentSize(int visiblePlane)
+const FXRectangle& datafile::getContentSize(int visiblePlane)
 {
+    auto it = contentSizes.find(visiblePlane);
+    if (it != contentSizes.end()) {
+        return (*it).second;
+    }
     // auf 'unmoegliche' Werte initialisieren
     FXshort min_x = SHRT_MAX;
     FXshort max_x = SHRT_MIN;
@@ -1515,10 +1519,11 @@ FXRectangle datafile::getContentSize(int visiblePlane)
         if (scr_y + 1 > max_y)	max_y = scr_y + 1;
     }
 
-    return FXRectangle{
+    auto ins = contentSizes.insert(std::map<int, FXRectangle>::value_type(visiblePlane, FXRectangle{
         min_x, min_y,
         max_x - min_x,
-        max_y - min_y };
+        max_y - min_y }));
+    return (*ins.first).second;
 }
 
 void datafile::createHierarchy()
@@ -2051,6 +2056,7 @@ void datafile::updateHashTables(const datablock::itor& start)
 
 void datafile::createHashTables()
 {
+    contentSizes.clear();
     createHierarchy();
     updateHashTables(m_blocks.begin());
     floodIslandNames();
