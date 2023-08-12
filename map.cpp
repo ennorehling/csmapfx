@@ -146,40 +146,19 @@ void FXCSMap::calculateContentSize()
 		return;
 	}
 
-	// auf 'unmoegliche' Werte initialisieren
-	FXint min_x = INT_MAX;
-	FXint max_x = INT_MIN;
+    FXRectangle contentSize = mapFile->getContentSize(visiblePlane);
 
-	FXint min_y = INT_MAX;
-	FXint max_y = INT_MIN;
+	FXint min_x = contentSize.x;
+	FXint max_x = contentSize.x + contentSize.w;
 
-	FXint regionSize = 64;
+	FXint min_y = contentSize.y;
+	FXint max_y = contentSize.y + contentSize.h;
 
-	for (const datablock& block : mapFile->blocks())
-	{
-		// handle only regions
-		if (block.type() != block_type::TYPE_REGION)
-			continue;
+	offset_x = -FXint(scale * 32 * min_x);
+	offset_y = -FXint(scale * 48 * min_y);
 
-		// handle only the actually visible plane
-		if (block.info() != visiblePlane)
-			continue;
-
-		FXint scr_x = GetScreenFromHexX(block.x(), block.y());
-		FXint scr_y = GetScreenFromHexY(block.x(), block.y());
-
-		if (scr_x < min_x)	min_x = scr_x;
-		if (scr_y < min_y)	min_y = scr_y;
-
-		if (scr_x+regionSize > max_x)	max_x = scr_x+regionSize;
-		if (scr_y+regionSize > max_y)	max_y = scr_y+regionSize;
-	}
-
-	offset_x = -FXint(scale * min_x);
-	offset_y = -FXint(scale * min_y);
-
-	image_w = max_x-min_x;
-	image_h = max_y-min_y;
+	image_w = 32 * (max_x - min_x);
+	image_h = 48 * (max_y - min_y) + 16;
     if (image_w > 0 && image_h > 0) {
         map->enable();
     }
@@ -430,7 +409,7 @@ void FXCSMap::setMapFile(std::shared_ptr<datafile>& f)
     if (!f) {
         sel_x = sel_y = offset_x = offset_y = 0;
     }
-    calculateContentSize();
+    layout();
 }
 
 void FXCSMap::connectMap(FXCSMap* a_map)
@@ -1938,13 +1917,10 @@ void FXCSMap::updateMap()
         while (scale >= 2 / 64.0f && (getImageWidth() > getWidth() || getImageHeight() > getHeight()))
         {
             scale /= 2;
-            image_w /= 2;
-            image_h /= 2;
         }
-
-        float sc = scale;
-        scale = 0;
-        scaleChange(sc);	// sc must be != scale
+        image_h = image_w = 0;
+        scaleChange(scale);
+        calculateContentSize();
 
         // paint map into buffer
         imagebuffer->resize(getImageWidth(), getImageHeight());

@@ -145,6 +145,8 @@ public:
     void createHashTables();
     void parseMessages();
 
+    FXRectangle getContentSize(int visiblePlane);
+
 protected:
     static bool isEphemeral(block_type type);
     datablock::itor eraseRegion(const datablock::itor& region);
