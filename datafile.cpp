@@ -1486,6 +1486,41 @@ bool datafile::isConfirmed(const datablock& block) const
     return true;
 }
 
+FXRectangle datafile::getContentSize(int visiblePlane)
+{
+    // auf 'unmoegliche' Werte initialisieren
+    FXshort min_x = SHRT_MAX;
+    FXshort max_x = SHRT_MIN;
+
+    FXshort min_y = SHRT_MAX;
+    FXshort max_y = SHRT_MIN;
+
+    for (const datablock &block : m_blocks)
+    {
+        // handle only regions
+        if (block.type() != block_type::TYPE_REGION)
+            continue;
+
+        // handle only the actually visible plane
+        if (block.info() != visiblePlane)
+            continue;
+
+        FXint scr_x = block.x() * 2 + block.y();
+        FXint scr_y = -block.y();
+
+        if (scr_x < min_x)	min_x = scr_x;
+        if (scr_y < min_y)	min_y = scr_y;
+
+        if (scr_x + 2 > max_x) max_x = scr_x + 2;
+        if (scr_y + 1 > max_y)	max_y = scr_y + 1;
+    }
+
+    return FXRectangle{
+        min_x, min_y,
+        max_x - min_x,
+        max_y - min_y };
+}
+
 void datafile::createHierarchy()
 {
 	typedef std::vector<block_type> stack;
@@ -1739,7 +1774,6 @@ void datafile::updateHashTables(const datablock::itor& start)
     m_factionId = 0;
     m_recruitment = 0;
     m_turn = 0;
-
 
     datablock::itor insertFaction = m_blocks.end();
     for (block = m_blocks.begin(); block != m_blocks.end(); block++)
