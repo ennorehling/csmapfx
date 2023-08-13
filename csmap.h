@@ -245,9 +245,9 @@ public:
         exportIslands = 0x02,
         exportCoordinates = 0x04,
     };
-    bool savePNG(const FXString &filename, FXint scale, FXColor color, FXint options, FXProgressDialog *progress = nullptr);
+    bool savePNG(const FXString &filename, const FXString &mimeType, FXint scale, FXColor color, FXint options, FXProgressDialog *progress = nullptr);
 private:
-    bool exportMapFile(const FXString &filename, FXint scale, FXColor color, FXint options);
+    bool exportMapFile(const FXString &filename, const FXString &mimeType, FXint scale, FXColor color, FXint options);
 
     typedef enum class reload_type { RELOAD_NEVER, RELOAD_AUTO, RELOAD_ASK } reload_type;
     reload_type reload_mode = reload_type::RELOAD_ASK;

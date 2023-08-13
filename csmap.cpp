@@ -4,8 +4,6 @@
 #include <windows.h>
 #include <shlobj_core.h>
 #include <gdiplus.h>
-#include <gdiplusimagecodec.h>
-#include <gdiplusimaging.h>
 
 #include "win32.h"
 #else
@@ -1462,69 +1460,35 @@ bool CSMap::checkCommands()
     return true;
 }
 
-bool CSMap::exportMapFile(const FXString &filename, FXint scale, FXColor bgColor, FXint options)
+bool CSMap::exportMapFile(const FXString &filename, const FXString &mimeType, FXint scale, FXColor bgColor, FXint options)
 {
     FXProgressDialog progress(this, "Karte exportieren...", "Erzeuge Abbild der Karte...", PROGRESSDIALOG_NORMAL | PROGRESSDIALOG_CANCEL);
     progress.setIcon(icon);
     progress.create();
     getApp()->refresh(); // TODO: why?
     progress.show(PLACEMENT_SCREEN);
-    return savePNG(filename, scale, bgColor, options, &progress);
+    return savePNG(filename, mimeType, scale, bgColor, options, &progress);
 }
 
-#ifdef WIN32
-static int GetEncoderClsid(const WCHAR *format, CLSID *pClsid)
-{
-    UINT  num = 0;          // number of image encoders
-    UINT  size = 0;         // size of the image encoder array in bytes
-
-    Gdiplus::ImageCodecInfo *pImageCodecInfo = NULL;
-
-    Gdiplus::GetImageEncodersSize(&num, &size);
-    if (size == 0)
-        return -1;  // Failure
-
-    pImageCodecInfo = (Gdiplus::ImageCodecInfo *)new char[size];
-    if (pImageCodecInfo == NULL)
-        return -1;  // Failure
-
-    if (GetImageEncoders(num, size, pImageCodecInfo) != Gdiplus::Ok)
-        return -1;  // Failure
-
-    for (UINT j = 0; j < num; ++j)
-    {
-        if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
-        {
-            *pClsid = pImageCodecInfo[j].Clsid;
-            delete[] pImageCodecInfo;
-            return j;  // Success
-        }
-    }
-
-    delete[] pImageCodecInfo;
-    return -1;  // Failure
-}
-#endif
-
-bool SavePNG(const FXString &filename, const FXCSMap &map, FXApp *app, FXProgressDialog *win)
+bool SavePNG(const FXString &filename, const FXString &mimeType, const FXCSMap &map, FXApp *app, FXProgressDialog *win)
 {
     FXCSMap::IslandInfo islands;
     map.collectIslandNames(islands);
-    FXString ext = FXPath::extension(filename);
+    bool bSuccess = false;
 #ifdef HAVE_PNG
-    if (ext == "png") {
+    if (mimeType == "image/png") {
         return SaveMapPNG(filename, map, islands, app, win);
     }
 #elif defined(WIN32)
     CLSID encoderClsid;
-    bool bSuccess = GetEncoderClsid(L"image/png", &encoderClsid) >= 0;
+    bSuccess = GetEncoderClsid(mimeType, &encoderClsid) >= 0;
     if (bSuccess)
         bSuccess = SaveMapImage(filename, map, islands, encoderClsid, app, win);
-    return bSuccess;
 #endif
+    return bSuccess;
 }
 
-bool CSMap::savePNG(const FXString &filename, FXint scale, FXColor color, FXint options, FXProgressDialog *progress)
+bool CSMap::savePNG(const FXString &filename, const FXString &mimeType, FXint scale, FXColor color, FXint options, FXProgressDialog *progress)
 {
     if (filename.empty())
         return false;
@@ -1543,7 +1507,7 @@ bool CSMap::savePNG(const FXString &filename, FXint scale, FXColor color, FXint 
     csmap.setShowIslands(options & exportIslands);
     csmap.setBackColor(color);
 
-    return SavePNG(filename, csmap, csmap.getApp(), progress);
+    return SavePNG(filename, mimeType, csmap, csmap.getApp(), progress);
 }
 
 long CSMap::onViewMapOnly(FXObject*, FXSelector, void*)
@@ -3079,7 +3043,11 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
 
     FXFileDialog dlg(this, "Karte exportieren unter...", DLGEX_SAVE);
     dlg.setIcon(icon);
-    dlg.setPatternList("PNG Datei (*.png)\nAlle Dateien (*)");
+    FXString patterns("PNG Datei (*.png)\nAlle Dateien (*.*)");
+#ifdef WIN32
+    patterns = GetImagePatternList() + "Alle Dateien (*.*)";
+#endif
+    dlg.setPatternList(patterns);
     /*FXint*/ res = dlg.execute(PLACEMENT_SCREEN);
     if (res)
     {
@@ -3087,32 +3055,25 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
         if (filename.empty() || !allowReplaceFile(filename)) {
             return 0;
         }
-        FXString pattern = dlg.getPattern();
-
-        // Pr\u00fcft, ob Dateiname bereits Endung enth\u00e4lt.
-        FXString ext = filename.rafter('.');
-        for (int i = 0; ; i++)
-        {
-            FXString patt = pattern.section(',',i);
-            if (patt.empty())
-            {
-                // Der Dateiname endet nicht mit ".cr" o.\u00e4., deshalb wird Endung angehangen.
-                ext = pattern.section(',', 0).after('.');
-                if (!ext.empty())
-                    filename += "." + ext;
-                break;
-            }
-
-            // Dateiname endet auf ".cr" o.\u00e4.
-            if (ext == patt.after('.'))
-                break;
-        }
-
         getApp()->beginWaitCursor();
         FXColor rgb = FXRGB(0, 0, 0);
         if (color == 1)    // white background
             rgb = FXRGB(255, 255, 255);
-        exportMapFile(filename, scale, rgb, options);
+        // Prueft, ob Dateiname bereits Endung enthaelt.
+        FXString ext = FXPath::extension(filename).lower();
+        if (ext.empty()) {
+            ext = FXPath::extension(dlg.getPattern().section(';', 0)).lower();
+            if (ext != "*") {
+                filename += "." + ext;
+            }
+        }
+        FXString wildcard("*.");
+        wildcard += ext;
+        FXString mimeType = "image/png";
+#ifdef WIN32
+        mimeType = GetMimeType(ext);
+#endif
+        exportMapFile(filename, mimeType, scale, rgb, options);
         getApp()->endWaitCursor();
     }
     return 0;

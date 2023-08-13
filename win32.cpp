@@ -9,9 +9,12 @@
 #include "version.h"
 #include "map.h"
 #include <windows.h>
-#include <gdiplus.h>
 #include <shlwapi.h>
 #include <wininet.h>
+
+#include <gdiplus.h>
+#include <gdiplusimagecodec.h>
+#include <gdiplusimaging.h>
 
 #include <memory>
 
@@ -218,3 +221,90 @@ bool SaveMapImage(const FXString &filename, const FXCSMap &map, const FXCSMap::I
     image.create();
     return SaveImage(filename, map, &islands, image, mapOffset, mapHeight, encoderClsid);
 }
+
+#ifdef WIN32
+
+FXString GetMimeType(const FXString &extension)
+{
+    UINT num, size;
+    Gdiplus::ImageCodecInfo *pImageCodecInfo = NULL;
+
+    Gdiplus::GetImageEncodersSize(&num, &size);
+    FXString result;
+    if (size > 0) {
+        pImageCodecInfo = (Gdiplus::ImageCodecInfo *)new char[size];
+        if (pImageCodecInfo) {
+            if (GetImageEncoders(num, size, pImageCodecInfo) == Gdiplus::Ok) {
+                for (UINT j = 0; j != num; ++j)
+                {
+                    FXString extensions(pImageCodecInfo[j].FilenameExtension);
+                    extensions.lower();
+                    if (extensions.contains(extension)) {
+                        return pImageCodecInfo[j].MimeType;
+                    }
+                }
+            }
+        }
+    }
+    return FXString("image/png");
+}
+
+FXString GetImagePatternList()
+{
+    UINT num, size;
+    Gdiplus::ImageCodecInfo *pImageCodecInfo = NULL;
+
+    Gdiplus::GetImageEncodersSize(&num, &size);
+    FXString result;
+    if (size > 0) {
+        pImageCodecInfo = (Gdiplus::ImageCodecInfo *)new char[size];
+        if (pImageCodecInfo) {
+            if (GetImageEncoders(num, size, pImageCodecInfo) == Gdiplus::Ok) {
+                for (UINT j = 0; j != num; ++j)
+                {
+                    FXString label(pImageCodecInfo[j].FormatDescription);
+                    label += " Datei (";
+                    label += pImageCodecInfo[j].FilenameExtension;
+                    label += ")\n";
+                    result += label;
+                }
+            }
+        }
+    }
+    return result;
+}
+
+int GetEncoderClsid(const FXString &format, CLSID *pClsid)
+{
+    UINT  num = 0;          // number of image encoders
+    UINT  size = 0;         // size of the image encoder array in bytes
+
+    Gdiplus::ImageCodecInfo *pImageCodecInfo = NULL;
+
+    Gdiplus::GetImageEncodersSize(&num, &size);
+    if (size == 0)
+        return -1;  // Failure
+
+    pImageCodecInfo = (Gdiplus::ImageCodecInfo *)new char[size];
+    if (pImageCodecInfo == NULL)
+        return -1;  // Failure
+
+    if (GetImageEncoders(num, size, pImageCodecInfo) != Gdiplus::Ok)
+        return -1;  // Failure
+
+    for (UINT j = 0; j < num; ++j)
+    {
+        FXString type(pImageCodecInfo[j].MimeType);
+        if (type == format)
+        {
+            *pClsid = pImageCodecInfo[j].Clsid;
+            delete[] pImageCodecInfo;
+            return j;  // Success
+        }
+    }
+
+    delete[] pImageCodecInfo;
+    return -1;  // Failure
+}
+#endif
+
