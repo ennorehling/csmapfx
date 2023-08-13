@@ -25,6 +25,7 @@
 #include "calc.h"
 
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <fx.h>
@@ -143,7 +144,12 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
             scale = FXIntVal(param.value);
         }
         else if (param.key == "png") {
-            csmap->savePNG(param.value, scale, color, options);
+            try {
+                csmap->savePNG(param.value, scale, color, options);
+            }
+            catch (std::runtime_error e) {
+                std::cerr << e.what() << std::endl;
+            }
         }
 #endif
     }

@@ -172,7 +172,7 @@ int GetEncoderClsid(const WCHAR *format, CLSID *pClsid)
 #define MAX_BITMAP_SIZE (16 * 16 * 1024 * 1024)
 #define MAX_IMAGE_SIZE (32 * 1024 * 1024)
 
-static bool SavePNG_Internal(const FXString &filename, const FXCSMap &map, const FXCSMap::IslandInfo *islands, FXImage &image, const FXPoint &mapOffset, FXint bmpHeight, CLSID encoderClsid, FXProgressDialog *dlg = nullptr)
+static bool SaveImage(const FXString &filename, const FXCSMap &map, const FXCSMap::IslandInfo *islands, FXImage &image, const FXPoint &mapOffset, FXint bmpHeight, CLSID encoderClsid, FXProgressDialog *dlg = nullptr)
 {
     bool bSuccess = true;
     FXint bmpWidth = map.getImageWidth();
@@ -241,41 +241,24 @@ bool WinApi_SavePNG(const FXString &filename, const FXCSMap &map, const FXCSMap:
 {
     FXival mapWidth = map.getImageWidth();
     FXival mapHeight = map.getImageHeight();
-    FXival sliceHeight = mapHeight;
-    if (mapHeight * mapWidth > MAX_BITMAP_SIZE) {
-        sliceHeight = MAX_BITMAP_SIZE / mapWidth;
-    }
-
-    bool bSuccess;
     // Get the CLSID of the PNG encoder.
     CLSID encoderClsid;
-    bSuccess = GetEncoderClsid(L"image/png", &encoderClsid) >= 0;
+    bool bSuccess = GetEncoderClsid(L"image/png", &encoderClsid) >= 0;
 
     if (bSuccess) {
-        FXint tileHeight = sliceHeight;
+        FXint tileHeight = mapHeight;
         if (tileHeight > 512)
             tileHeight = 512;
         FXint tileWidth = mapWidth;
         if (tileWidth * tileHeight > MAX_IMAGE_SIZE)
             tileWidth = MAX_IMAGE_SIZE / tileHeight;
         if (dlg) {
-            dlg->setTotal(sliceHeight);
+            dlg->setTotal(mapHeight);
         }
         FXPoint mapOffset = map.getMapLeftTop();
         FXImage image(app, nullptr, 0, tileWidth, tileHeight);
         image.create();
-        if (sliceHeight == mapHeight) {
-            bSuccess = SavePNG_Internal(filename, map, &islands, image, mapOffset, sliceHeight, encoderClsid);
-        }
-        else {
-            FXString basename = FXPath::stripExtension(filename);
-            FXint slice = 1;
-            for (FXint sliceOffset = 0; sliceOffset < mapHeight; sliceOffset += sliceHeight, ++slice) {
-                mapOffset.y += sliceOffset;
-                FXString sliceFile = basename + "_" + FXStringVal(slice) + ".png";
-                bSuccess &= SavePNG_Internal(sliceFile, map, &islands, image, mapOffset, sliceHeight, encoderClsid);
-            }
-        }
+        bSuccess = SaveImage(filename, map, &islands, image, mapOffset, mapHeight, encoderClsid);
     }
     return bSuccess;
 }
