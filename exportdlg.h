@@ -13,7 +13,7 @@ class FXExportDlg : public FXDialogBox
 	FXDECLARE(FXExportDlg)
 
 public:
-    FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint opts = DECOR_TITLE | DECOR_BORDER, FXint x = 0, FXint y = 0, FXint w = 0, FXint h = 0);
+    FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint opts = DECOR_TITLE | DECOR_BORDER, FXuval limitScale = 128, FXint x = 0, FXint y = 0, FXint w = 0, FXint h = 0);
 
 	void create();
 	virtual ~FXExportDlg();
@@ -34,6 +34,7 @@ public:
 	bool getShowIslands() const;
 
 protected:
+    FXuval maxScale = 64;
 	FXComboBox*		scalebox = nullptr;
 	FXComboBox*		colorbox = nullptr;
 

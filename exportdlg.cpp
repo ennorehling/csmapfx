@@ -13,8 +13,8 @@ FXDEFMAP(FXExportDlg) MessageMap[]=
 
 FXIMPLEMENT(FXExportDlg,FXDialogBox,MessageMap, ARRAYNUMBER(MessageMap))
 
-FXExportDlg::FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint opts, FXint x,FXint y,FXint w,FXint h)
-		: FXDialogBox(owner, name, opts, x,y,w,h, 10,10,10,10, 10,10)
+FXExportDlg::FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint opts, FXuval limitScale, FXint x,FXint y,FXint w,FXint h)
+		: FXDialogBox(owner, name, opts, x,y,w,h, 10,10,10,10, 10,10), maxScale(limitScale)
 {
 	setIcon(icon);
 
@@ -33,7 +33,7 @@ FXExportDlg::FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	new FXLabel(regionsize, FXString(L"Regionsgr\u00f6\u00dfe"));
 
 	scalebox = new FXComboBox(regionsize, 0, NULL,0, COMBOBOX_STATIC|FRAME_NORMAL);
-    for (FXint i = 1; i <= 128; i *= 2) {
+    for (FXint i = 1; i <= maxScale; i *= 2) {
         scalebox->appendItem(FXStringVal(i), (void*)(FXival)i);
     }
 	scalebox->setCurrentItem(4);
@@ -99,14 +99,15 @@ FXuval FXExportDlg::getScale() const
 
 void FXExportDlg::setScale(FXuval scale)
 {
+    if (scale > maxScale) scale = maxScale;
+
     for (FXint i = 0; i != scalebox->getNumItems(); ++i) {
         FXuval val = (FXuval)scalebox->getItemData(i);
         if (val == scale) {
             scalebox->setCurrentItem(i);
             break;
         }
-    }
-    
+    }    
 }
 
 FXuval FXExportDlg::getColor() const

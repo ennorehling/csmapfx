@@ -3051,9 +3051,19 @@ long CSMap::onFilePreferences(FXObject*, FXSelector, void*)
 
 long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
 {
-#ifdef WITH_PNG_EXPORT
+#ifdef WITH_MAP_EXPORT
     FXRegistry &reg = getApp()->reg();
-    FXExportDlg exp(this, "Karte exportieren...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100, 100, 400, 250);
+    FXuval maxScale = 128;
+    FXival visiblePlane = map->getVisiblePlane();
+    if (!report) return 0;
+#ifdef MAX_BITMAP_SIZE
+    FXRectangle unitSize = report->getContentSize(visiblePlane);
+    FXuval pixels = FXuval(unitSize.w) * FXuval(unitSize.h);
+    while (pixels > MAX_BITMAP_SIZE / maxScale / maxScale) {
+        maxScale /= 2;
+    } 
+#endif
+    FXExportDlg exp(this, "Karte exportieren...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), maxScale, 100, 100, 400, 250);
     exp.loadState(reg);
     FXint res = exp.execute(PLACEMENT_SCREEN);
     if (!res)
