@@ -139,7 +139,6 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
         else if (param.key == "export") {
             csmap->saveFile(param.value, map_type::MAP_MINIMAL);
         }
-#ifdef WITH_PNG_EXPORT
         else if (param.key == "scale") {
             scale = FXIntVal(param.value);
         }
@@ -151,7 +150,6 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
                 std::cerr << e.what() << std::endl;
             }
         }
-#endif
     }
     if (quit) {
         exit(0);

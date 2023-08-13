@@ -1,4 +1,4 @@
-#include "platform.h"
+#include "imageio.h"
 #include "map.h"
 
 #include "png.h"
@@ -37,7 +37,7 @@ static void user_warning_fn(png_structp, png_const_charp message){
   }
 
 // Save a PNG image
-bool LibPng_SavePNG(const FXString& filename, const FXCSMap& map, const FXCSMap::IslandInfo &islands, FXApp * app, FXProgressDialog * dlg)
+bool SaveMapPNG(const FXString& filename, const FXCSMap& map, const FXCSMap::IslandInfo &islands, FXApp * app, FXProgressDialog * dlg)
 {
     FXint width = map.getImageWidth();
     FXint height = map.getImageHeight();

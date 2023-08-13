@@ -239,7 +239,6 @@ private:
     bool checkCommands();
     void updateFileNames();
 
-#ifdef WITH_PNG_EXPORT
 public:
     enum ExportOptions {
         exportNames = 0x01,
@@ -249,7 +248,6 @@ public:
     bool savePNG(const FXString &filename, FXint scale, FXColor color, FXint options, FXProgressDialog *progress = nullptr);
 private:
     bool exportMapFile(const FXString &filename, FXint scale, FXColor color, FXint options);
-#endif
 
     typedef enum class reload_type { RELOAD_NEVER, RELOAD_AUTO, RELOAD_ASK } reload_type;
     reload_type reload_mode = reload_type::RELOAD_ASK;

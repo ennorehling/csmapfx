@@ -3,19 +3,25 @@
 #ifdef WIN32
 #include <windows.h>
 #include <shlobj_core.h>
+#include <gdiplus.h>
+#include <gdiplusimagecodec.h>
+#include <gdiplusimaging.h>
+
+#include "win32.h"
+#else
+#include "unix.h"
 #endif
 #ifdef HAVE_PHYSFS
 #include <physfs.h>
 #endif
 #ifdef HAVE_PNG
 #include <png.h>
+#include "imageio.h"
 #endif
 #ifdef HAVE_CURL
 #include <curl/curl.h>
 #endif
 #include <sys/stat.h>
-
-#include "platform.h"
 
 #ifndef PATH_MAX
 #define PATH_MAX 260
@@ -371,12 +377,10 @@ CSMap::CSMap(FXApp *app) :
         mapmenu,
         L"E&xportieren...\t\tKarte ohne Details speichern.",
         icons.save, this, ID_FILE_EXPORT_MAP);
-#ifdef WITH_PNG_EXPORT
     new FXMenuCommand(
         mapmenu,
-        L"Als &PNG exportieren...\t\tDie Karte als PNG speichern.",
+        L"Als &PNG exportieren...\t\tDie Karte als Bild speichern.",
         nullptr, this, ID_FILE_EXPORT_IMAGE);
-#endif
 
     new FXMenuCommand(
         filemenu,
@@ -1458,7 +1462,6 @@ bool CSMap::checkCommands()
     return true;
 }
 
-#ifdef WITH_PNG_EXPORT
 bool CSMap::exportMapFile(const FXString &filename, FXint scale, FXColor bgColor, FXint options)
 {
     FXProgressDialog progress(this, "Karte exportieren...", "Erzeuge Abbild der Karte...", PROGRESSDIALOG_NORMAL | PROGRESSDIALOG_CANCEL);
@@ -1469,25 +1472,57 @@ bool CSMap::exportMapFile(const FXString &filename, FXint scale, FXColor bgColor
     return savePNG(filename, scale, bgColor, options, &progress);
 }
 
-#ifdef WITH_PNG_EXPORT
 #ifdef WIN32
-bool WinApi_SavePNG(const FXString &filename, const class FXCSMap &map, const FXCSMap::IslandInfo &islands, FXApp *app, FXProgressDialog *progress = nullptr);
-#endif
-#ifdef HAVE_PNG
-bool LibPng_SavePNG(const FXString &filename, const class FXCSMap &map, const FXCSMap::IslandInfo &islands, FXApp *app, FXProgressDialog *progress = nullptr);
+static int GetEncoderClsid(const WCHAR *format, CLSID *pClsid)
+{
+    UINT  num = 0;          // number of image encoders
+    UINT  size = 0;         // size of the image encoder array in bytes
+
+    Gdiplus::ImageCodecInfo *pImageCodecInfo = NULL;
+
+    Gdiplus::GetImageEncodersSize(&num, &size);
+    if (size == 0)
+        return -1;  // Failure
+
+    pImageCodecInfo = (Gdiplus::ImageCodecInfo *)new char[size];
+    if (pImageCodecInfo == NULL)
+        return -1;  // Failure
+
+    if (GetImageEncoders(num, size, pImageCodecInfo) != Gdiplus::Ok)
+        return -1;  // Failure
+
+    for (UINT j = 0; j < num; ++j)
+    {
+        if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
+        {
+            *pClsid = pImageCodecInfo[j].Clsid;
+            delete[] pImageCodecInfo;
+            return j;  // Success
+        }
+    }
+
+    delete[] pImageCodecInfo;
+    return -1;  // Failure
+}
 #endif
 
 bool SavePNG(const FXString &filename, const FXCSMap &map, FXApp *app, FXProgressDialog *win)
 {
     FXCSMap::IslandInfo islands;
     map.collectIslandNames(islands);
+    FXString ext = FXPath::extension(filename);
 #ifdef HAVE_PNG
-    return LibPng_SavePNG(filename, map, islands, app, win);
-#else
-    return WinApi_SavePNG(filename, map, islands, app, win);
+    if (ext == "png") {
+        return SaveMapPNG(filename, map, islands, app, win);
+    }
+#elif defined(WIN32)
+    CLSID encoderClsid;
+    bool bSuccess = GetEncoderClsid(L"image/png", &encoderClsid) >= 0;
+    if (bSuccess)
+        bSuccess = SaveMapImage(filename, map, islands, encoderClsid, app, win);
+    return bSuccess;
 #endif
 }
-#endif
 
 bool CSMap::savePNG(const FXString &filename, FXint scale, FXColor color, FXint options, FXProgressDialog *progress)
 {
@@ -1510,7 +1545,6 @@ bool CSMap::savePNG(const FXString &filename, FXint scale, FXColor color, FXint 
 
     return SavePNG(filename, csmap, csmap.getApp(), progress);
 }
-#endif
 
 long CSMap::onViewMapOnly(FXObject*, FXSelector, void*)
 {

@@ -2,20 +2,16 @@
 #error "This code only for use with Windows targets"
 #endif
 
-#include "platform.h"
+#pragma comment(lib, "wininet.lib")
+#pragma comment(lib, "gdiplus.lib")
+
+#include "win32.h"
 #include "version.h"
 #include "map.h"
 #include <windows.h>
+#include <gdiplus.h>
 #include <shlwapi.h>
 #include <wininet.h>
-#pragma comment(lib, "wininet.lib")
-
-#if defined(WITH_PNG_EXPORT) && !defined(HAVE_PNG)
-#pragma comment(lib, "gdiplus.lib")
-#include <gdiplus.h>
-#include <gdiplusimagecodec.h>
-#include <gdiplusimaging.h>
-#endif
 
 #include <memory>
 
@@ -136,40 +132,6 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
     return dwStatusCode;
 }
 
-#if defined(WITH_PNG_EXPORT) && !defined(HAVE_PNG)
-int GetEncoderClsid(const WCHAR *format, CLSID *pClsid)
-{
-    UINT  num = 0;          // number of image encoders
-    UINT  size = 0;         // size of the image encoder array in bytes
-
-    Gdiplus::ImageCodecInfo *pImageCodecInfo = NULL;
-
-    Gdiplus::GetImageEncodersSize(&num, &size);
-    if (size == 0)
-        return -1;  // Failure
-
-    pImageCodecInfo = (Gdiplus::ImageCodecInfo *)new char[size];
-    if (pImageCodecInfo == NULL)
-        return -1;  // Failure
-
-    if (GetImageEncoders(num, size, pImageCodecInfo) != Gdiplus::Ok)
-        return -1;  // Failure
-
-    for (UINT j = 0; j < num; ++j)
-    {
-        if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
-        {
-            *pClsid = pImageCodecInfo[j].Clsid;
-            delete [] pImageCodecInfo;
-            return j;  // Success
-        }
-    }
-
-    delete [] pImageCodecInfo;
-    return -1;  // Failure
-}
-
-#define MAX_BITMAP_SIZE (16 * 16 * 1024 * 1024)
 #define MAX_IMAGE_SIZE (32 * 1024 * 1024)
 
 static bool SaveImage(const FXString &filename, const FXCSMap &map, const FXCSMap::IslandInfo *islands, FXImage &image, const FXPoint &mapOffset, FXint bmpHeight, CLSID encoderClsid, FXProgressDialog *dlg = nullptr)
@@ -237,29 +199,22 @@ static bool SaveImage(const FXString &filename, const FXCSMap &map, const FXCSMa
     return bSuccess;
 }
 
-bool WinApi_SavePNG(const FXString &filename, const FXCSMap &map, const FXCSMap::IslandInfo &islands, FXApp *app, FXProgressDialog * dlg = nullptr)
+bool SaveMapImage(const FXString &filename, const FXCSMap &map, const FXCSMap::IslandInfo &islands, CLSID encoderClsid, FXApp *app, FXProgressDialog * dlg)
 {
     FXival mapWidth = map.getImageWidth();
     FXival mapHeight = map.getImageHeight();
     // Get the CLSID of the PNG encoder.
-    CLSID encoderClsid;
-    bool bSuccess = GetEncoderClsid(L"image/png", &encoderClsid) >= 0;
-
-    if (bSuccess) {
-        FXint tileHeight = mapHeight;
-        if (tileHeight > 512)
-            tileHeight = 512;
-        FXint tileWidth = mapWidth;
-        if (tileWidth * tileHeight > MAX_IMAGE_SIZE)
-            tileWidth = MAX_IMAGE_SIZE / tileHeight;
-        if (dlg) {
-            dlg->setTotal(mapHeight);
-        }
-        FXPoint mapOffset = map.getMapLeftTop();
-        FXImage image(app, nullptr, 0, tileWidth, tileHeight);
-        image.create();
-        bSuccess = SaveImage(filename, map, &islands, image, mapOffset, mapHeight, encoderClsid);
+    FXint tileHeight = mapHeight;
+    if (tileHeight > 512)
+        tileHeight = 512;
+    FXint tileWidth = mapWidth;
+    if (tileWidth * tileHeight > MAX_IMAGE_SIZE)
+        tileWidth = MAX_IMAGE_SIZE / tileHeight;
+    if (dlg) {
+        dlg->setTotal(mapHeight);
     }
-    return bSuccess;
+    FXPoint mapOffset = map.getMapLeftTop();
+    FXImage image(app, nullptr, 0, tileWidth, tileHeight);
+    image.create();
+    return SaveImage(filename, map, &islands, image, mapOffset, mapHeight, encoderClsid);
 }
-#endif
