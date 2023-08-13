@@ -138,7 +138,7 @@ endif ()
 if (WIN32)
 find_path(FOX_INCLUDE_DIRS "fxkeys.h" REQUIRED)
 find_library(FOX_LIBRARY NAMES FOX-1.6 REQUIRED)
-set (FOX_LIBRARIES ${FOX_LIBRARY})
+set (FOX_LINK_LIBRARIES ${FOX_LIBRARY})
 add_compile_definitions(FLOAT_MATH_FUNCTIONS)
 else (WIN32)
 include (FindPkgConfig)
@@ -152,7 +152,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	CXX_STANDARD_REQUIRED 11)
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  ${FOX_LIBRARIES}
+  ${FOX_LINK_LIBRARIES}
   ${CMAKE_DL_LIBS} 
 )
 include_directories(
