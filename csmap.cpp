@@ -7,7 +7,7 @@
 
 #include "win32.h"
 #else
-#include "unix.h"
+#include "upload.h"
 #endif
 #ifdef HAVE_PHYSFS
 #include <physfs.h>
