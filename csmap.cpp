@@ -377,7 +377,7 @@ CSMap::CSMap(FXApp *app) :
         icons.save, this, ID_FILE_EXPORT_MAP);
     new FXMenuCommand(
         mapmenu,
-        L"Als &PNG exportieren...\t\tDie Karte als Bild speichern.",
+        L"Als &Bild exportieren...\t\tDie Karte als Bild speichern.",
         nullptr, this, ID_FILE_EXPORT_IMAGE);
 
     new FXMenuCommand(
@@ -1467,10 +1467,10 @@ bool CSMap::exportMapFile(const FXString &filename, const FXString &mimeType, FX
     progress.create();
     getApp()->refresh(); // TODO: why?
     progress.show(PLACEMENT_SCREEN);
-    return savePNG(filename, mimeType, scale, bgColor, options, &progress);
+    return saveMapImage(filename, mimeType, scale, bgColor, options, &progress);
 }
 
-bool SavePNG(const FXString &filename, const FXString &mimeType, const FXCSMap &map, FXApp *app, FXProgressDialog *win)
+bool SaveImage(const FXString &filename, const FXString &mimeType, const FXCSMap &map, FXApp *app, FXProgressDialog *win)
 {
     FXCSMap::IslandInfo islands;
     map.collectIslandNames(islands);
@@ -1488,7 +1488,7 @@ bool SavePNG(const FXString &filename, const FXString &mimeType, const FXCSMap &
     return bSuccess;
 }
 
-bool CSMap::savePNG(const FXString &filename, const FXString &mimeType, FXint scale, FXColor color, FXint options, FXProgressDialog *progress)
+bool CSMap::saveMapImage(const FXString &filename, const FXString &mimeType, FXint scale, FXColor color, FXint options, FXProgressDialog *progress)
 {
     if (filename.empty())
         return false;
@@ -1507,7 +1507,7 @@ bool CSMap::savePNG(const FXString &filename, const FXString &mimeType, FXint sc
     csmap.setShowIslands(options & exportIslands);
     csmap.setBackColor(color);
 
-    return SavePNG(filename, mimeType, csmap, csmap.getApp(), progress);
+    return SaveImage(filename, mimeType, csmap, csmap.getApp(), progress);
 }
 
 long CSMap::onViewMapOnly(FXObject*, FXSelector, void*)
@@ -3020,27 +3020,6 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
     FXuval maxScale = 128;
     FXival visiblePlane = map->getVisiblePlane();
     if (!report) return 0;
-#ifdef MAX_BITMAP_SIZE
-    FXRectangle unitSize = report->getContentSize(visiblePlane);
-    FXuval pixels = FXuval(unitSize.w) * FXuval(unitSize.h);
-    while (pixels > MAX_BITMAP_SIZE / maxScale / maxScale) {
-        maxScale /= 2;
-    } 
-#endif
-    FXExportDlg exp(this, "Karte exportieren...", icon, DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), maxScale, 100, 100, 400, 250);
-    exp.loadState(reg);
-    FXint res = exp.execute(PLACEMENT_SCREEN);
-    if (!res)
-        return 0;
-
-    exp.saveState(reg);
-    FXint scale = exp.getScale();
-    FXint color = exp.getColor();
-    FXint options = 0;
-    if (exp.getShowNames()) options |= exportNames;
-    if (exp.getShowKoords()) options |= exportCoordinates;
-    if (exp.getShowIslands()) options |= exportIslands;
-
     FXFileDialog dlg(this, "Karte exportieren unter...", DLGEX_SAVE);
     dlg.setIcon(icon);
     FXString patterns("PNG Datei (*.png)\nAlle Dateien (*.*)");
@@ -3048,17 +3027,12 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
     patterns = GetImagePatternList() + "Alle Dateien (*.*)";
 #endif
     dlg.setPatternList(patterns);
-    /*FXint*/ res = dlg.execute(PLACEMENT_SCREEN);
-    if (res)
+    if (dlg.execute(PLACEMENT_SCREEN))
     {
         FXString filename = dlg.getFilename();
         if (filename.empty() || !allowReplaceFile(filename)) {
             return 0;
         }
-        getApp()->beginWaitCursor();
-        FXColor rgb = FXRGB(0, 0, 0);
-        if (color == 1)    // white background
-            rgb = FXRGB(255, 255, 255);
         // Prueft, ob Dateiname bereits Endung enthaelt.
         FXString ext = FXPath::extension(filename).lower();
         if (ext.empty()) {
@@ -3073,6 +3047,37 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
 #ifdef WIN32
         mimeType = GetMimeType(ext);
 #endif
+
+#ifdef MAX_BITMAP_SIZE
+        FXuval maxSize = MAX_BITMAP_SIZE;
+#ifdef HAVE_PNG
+        if (mimeType == "image/png") maxSize = 0;
+#endif
+        if (maxSize > 0) {
+            FXRectangle unitSize = report->getContentSize(visiblePlane);
+            FXuval pixels = FXuval(unitSize.w) * FXuval(unitSize.h);
+            while (pixels > maxSize / maxScale / maxScale) {
+                maxScale /= 2;
+            }
+        }
+#endif
+        FXExportDlg exp(this, "Karte exportieren...", icon, DECOR_ALL & ~(DECOR_MENU | DECOR_MAXIMIZE), maxScale, 100, 100, 400, 250);
+        exp.loadState(reg);
+        if (!exp.execute(PLACEMENT_SCREEN))
+            return 0;
+
+        exp.saveState(reg);
+        FXint scale = exp.getScale();
+        FXint color = exp.getColor();
+        FXint options = 0;
+        if (exp.getShowNames()) options |= exportNames;
+        if (exp.getShowKoords()) options |= exportCoordinates;
+        if (exp.getShowIslands()) options |= exportIslands;
+
+        FXColor rgb = FXRGB(0, 0, 0);
+        if (color == 1)    // white background
+            rgb = FXRGB(255, 255, 255);
+        getApp()->beginWaitCursor();
         exportMapFile(filename, mimeType, scale, rgb, options);
         getApp()->endWaitCursor();
     }

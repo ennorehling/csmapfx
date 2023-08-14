@@ -245,7 +245,7 @@ public:
         exportIslands = 0x02,
         exportCoordinates = 0x04,
     };
-    bool savePNG(const FXString &filename, const FXString &mimeType, FXint scale, FXColor color, FXint options, FXProgressDialog *progress = nullptr);
+    bool saveMapImage(const FXString &filename, const FXString &mimeType, FXint scale, FXColor color, FXint options, FXProgressDialog *progress = nullptr);
 private:
     bool exportMapFile(const FXString &filename, const FXString &mimeType, FXint scale, FXColor color, FXint options);
 
