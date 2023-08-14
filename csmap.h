@@ -243,7 +243,7 @@ public:
     enum ExportOptions {
         exportNames = 0x01,
         exportIslands = 0x02,
-        exportCoordinates = 0x04,
+        exportCoordinates = 0x04
     };
     bool saveMapImage(const FXString &filename, const FXString &mimeType, FXint scale, FXColor color, FXint options, FXProgressDialog *progress = nullptr);
 private:

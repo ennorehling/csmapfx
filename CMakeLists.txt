@@ -4,7 +4,7 @@ project (csmapfx CXX C)
 
 if (WIN32)
 ## set to FALSE to prefer the WinAPI PNG encoder:
-set(USE_LIBPNG FALSE)
+set(USE_LIBPNG TRUE)
 add_compile_definitions(-DUNICODE)
 add_compile_definitions(WITH_MAP_EXPORT)
 set(PLATFORM_SOURCES win32.cpp)

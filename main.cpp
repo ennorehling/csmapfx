@@ -29,7 +29,7 @@
 #include <sstream>
 #include <string>
 #include <fx.h>
-#if defined(WIN32) && !defined(HAVE_PNG)
+#if defined(WIN32) && defined(WITH_MAP_EXPORT)
 #include <gdiplus.h>
 #endif
 #ifdef HAVE_PHYSFS
@@ -158,7 +158,7 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
 
 int main(int argc, char *argv[])
 {
-#if defined(WIN32) && !defined(HAVE_PNG)
+#if defined(WIN32) && defined(WITH_MAP_EXPORT)
     // Initialize GDI+.
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     ULONG_PTR gdiplusToken;
@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
 #ifdef HAVE_PHYSFS
     PHYSFS_deinit();
 #endif
-#if defined(WIN32) && !defined(HAVE_PNG)
+#if defined(WIN32) && defined(WITH_MAP_EXPORT)
     Gdiplus::GdiplusShutdown(gdiplusToken);
 #endif
     return exitcode;
