@@ -3022,11 +3022,16 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
     if (!report) return 0;
     FXFileDialog dlg(this, "Karte exportieren unter...", DLGEX_SAVE);
     dlg.setIcon(icon);
-    FXString patterns("PNG Datei (*.png)\nAlle Dateien (*.*)");
+    FXString patterns;
+    FXString mimeType = "image/png";
 #ifdef WIN32
-    patterns = GetImagePatternList() + "Alle Dateien (*.*)";
-#endif
+    int defaultIndex = GetImagePatternList(mimeType, patterns);
+    patterns += "Alle Dateien (*.*)";
+    dlg.setCurrentPattern(defaultIndex);
     dlg.setPatternList(patterns);
+#else
+    dlg.setPatternList("PNG Datei (*.png)\nAlle Dateien (*.*)");
+#endif
     if (dlg.execute(PLACEMENT_SCREEN))
     {
         FXString filename = dlg.getFilename();
@@ -3043,7 +3048,6 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
         }
         FXString wildcard("*.");
         wildcard += ext;
-        FXString mimeType = "image/png";
 #ifdef WIN32
         mimeType = GetMimeType(ext);
 #endif

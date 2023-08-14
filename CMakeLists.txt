@@ -120,7 +120,7 @@ include_directories(
 )
 endif(PHYSFS_FOUND)
 
-if (USE_LIBPNG)
+if (PNG_FOUND)
 add_compile_definitions(HAVE_PNG)
 target_link_libraries(${PROJECT_NAME} PRIVATE
   PNG::PNG
@@ -128,7 +128,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 include_directories(
   ${PNG_INCLUDE_DIRS}
 )
-endif(USE_LIBPNG)
+endif(PNG_FOUND)
 
 find_library(LEGACY_STDIO_LIBRARY NAMES legacy_stdio_definitions)
 if (LEGACY_STDIO_LIBRARY)

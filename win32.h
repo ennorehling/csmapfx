@@ -14,4 +14,4 @@ bool SaveMapImage(const FXString &filename, const FXCSMap &map, const FXCSMap::I
 
 FXString GetMimeType(const FXString &extension);
 int GetEncoderClsid(const FXString &format, CLSID *pClsid);
-FXString GetImagePatternList();
+int GetImagePatternList(const FXString &defaultType, FXString& patterns);

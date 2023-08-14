@@ -249,13 +249,14 @@ FXString GetMimeType(const FXString &extension)
     return FXString("image/png");
 }
 
-FXString GetImagePatternList()
+int GetImagePatternList(const FXString& defaultType, FXString &result)
 {
+    int index = 0;
     UINT num, size;
     Gdiplus::ImageCodecInfo *pImageCodecInfo = NULL;
 
     Gdiplus::GetImageEncodersSize(&num, &size);
-    FXString result;
+    result.clear();
     if (size > 0) {
         pImageCodecInfo = (Gdiplus::ImageCodecInfo *)new char[size];
         if (pImageCodecInfo) {
@@ -267,11 +268,14 @@ FXString GetImagePatternList()
                     label += pImageCodecInfo[j].FilenameExtension;
                     label += ")\n";
                     result += label;
+                    if (defaultType == pImageCodecInfo[j].MimeType) {
+                        index = j;
+                    }
                 }
             }
         }
     }
-    return result;
+    return index;
 }
 
 int GetEncoderClsid(const FXString &format, CLSID *pClsid)
