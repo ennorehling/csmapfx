@@ -54,7 +54,6 @@
 #include "searchdlg.h"
 #include "prefsdlg.h"
 
-#include <png.h>
 #include "fxkeys.h"
 #include "FXMenuSeparatorEx.h"
 #include "FXSplitterEx.h"
