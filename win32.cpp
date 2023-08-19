@@ -24,6 +24,7 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
     DWORD dwDownloaded = 0;
     BOOL  bResults = FALSE;
     HINTERNET hConnect = NULL, hRequest = NULL;
+    DWORD dwError = 0;
 
     // Use InternetOpen to obtain a session handle.
     HINTERNET hSession = InternetOpen(TEXT(CSMAP_APP_TITLE_VERSION),
@@ -101,7 +102,7 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
             dwSize = 0;
             // Check for available data.
             if (!InternetQueryDataAvailable(hRequest, &dwSize, 0, NULL)) {
-                dwStatusCode = GetLastError() | 0x10000;
+                dwError = GetLastError();
                 break;
             }
 
@@ -114,18 +115,23 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
                 ZeroMemory(szOutBuffer, dwBytes + 1);
                 if (!InternetReadFile(hRequest, (LPVOID)szOutBuffer, dwBytes, &dwDownloaded))
                 {
-                    dwStatusCode = GetLastError() | 0x10000;
+                    dwError = GetLastError();
                     break;
                 }
                 outBody.append(szOutBuffer, dwBytes);
                 dwRemain -= dwBytes;
-            } while (dwRemain > 0);
-        } while (dwSize > 0);
+            } while (dwError == 0 && dwRemain > 0);
+        } while (dwError == 0 && dwSize > 0);
+    }
+    else {
+        dwError = GetLastError();
     }
 
-    // Report any errors.
-    if (!bResults) {
-        dwStatusCode = GetLastError() | 0x10000;
+    if (dwError) {
+        WCHAR wszMessage[256];
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwError, 0, wszMessage, 256, NULL);
+        outBody.assign(wszMessage);
+        dwStatusCode = dwError + 0x10000;
     }
     // Close any open handles.
     if (hRequest) InternetCloseHandle(hRequest);

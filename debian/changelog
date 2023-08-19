@@ -2,8 +2,10 @@ csmapfx (1.7.20-1) stable; urgency=low
 
   * statistics: put own faction at the top of the list
   * statistics: better remember selected faction when changing regions.
+  * fix some messages containing encoded umlauts.
+  * windows: extended upload error reporting.
 
-  -- Enno Rehling <enno@eressea.de>  Sat, 19 Aug 2023 11:00:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Sat, 19 Aug 2023 19:10:00 +0200
 
 csmapfx (1.7.19-1) stable; urgency=low
 

@@ -266,22 +266,22 @@ CSMap::CSMap(FXApp *app) :
     }
     // Buttons
     new FXButton(toolbar,
-        FXString(L"\tDatei \u00f6ffnen...\tEine neue Datei \u00f6ffnen."),
+        L"\tDatei \u00f6ffnen...\tEine neue Datei \u00f6ffnen.",
         icons.open,
         this,
         ID_FILE_OPEN, BUTTON_TOOLBAR);
     new FXButton(toolbar,
-        FXString(L"\tDatei hinzuf\u00fcgen...\tL\u00e4dt einen Karten-Report in den aktuellen Report."),
+        L"\tDatei hinzuf\u00fcgen...\tL\u00e4dt einen Karten-Report in den aktuellen Report.",
         icons.merge,
         this,
         ID_FILE_MERGE, BUTTON_TOOLBAR);
     new FXButton(toolbar,
-        FXString(L"\tBefehle speichern\tBefehlsdatei speichern."),
+        L"\tBefehle speichern\tBefehlsdatei speichern.",
         icons.save,
         this,
         ID_FILE_SAVE_ORDERS, BUTTON_TOOLBAR);
     new FXButton(toolbar,
-        FXString(L"\tDatei schliessen\tDie aktuelle Datei schliessen."),
+        L"\tDatei schliessen\tDie aktuelle Datei schliessen.",
         icons.close,
         this,
         ID_FILE_CLOSE, BUTTON_TOOLBAR);
@@ -321,13 +321,13 @@ CSMap::CSMap(FXApp *app) :
     }
 
     new FXMenuSeparatorEx(terrainPopup);
-    FXMenuCommand *cmd = new FXMenuCommand(terrainPopup, FXString(L"L\u00f6schen\t\tZeichnen-Modus: L\u00f6sche Regionen"), icons.terrain[0], this, ID_MAP_SETMODUS);
+    FXMenuCommand *cmd = new FXMenuCommand(terrainPopup, L"L\u00f6schen\t\tZeichnen-Modus: L\u00f6sche Regionen", icons.terrain[0], this, ID_MAP_SETMODUS);
     cmd->setUserData((void*)(FXCSMap::MODUS_SETTERRAIN));
 
     FXHorizontalFrame *terrainFrame = new FXHorizontalFrame(toolbar, LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-    terrainSelect = new FXButton(terrainFrame, FXString(L"\tZeichnen-Modus: Erstelle oder L\u00f6sche Regionen"), icons.terrain[0], this, ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
+    terrainSelect = new FXButton(terrainFrame, L"\tZeichnen-Modus: Erstelle oder L\u00f6sche Regionen", icons.terrain[0], this, ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
     terrainSelect->setUserData((void*)FXCSMap::MODUS_SETTERRAIN);
-    new FXMenuButton(terrainFrame, FXString(L"\tZeichnen-Modus: Erstelle oder L\u00f6sche Regionen"), nullptr, terrainPopup, FRAME_RAISED|BUTTON_TOOLBAR|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|MENUBUTTON_DOWN, 0, 0,12, 0);
+    new FXMenuButton(terrainFrame, L"\tZeichnen-Modus: Erstelle oder L\u00f6sche Regionen", nullptr, terrainPopup, FRAME_RAISED|BUTTON_TOOLBAR|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|MENUBUTTON_DOWN, 0, 0,12, 0);
 
     // Recent file list
     recentFiles.setTarget(this);
@@ -422,14 +422,14 @@ CSMap::CSMap(FXApp *app) :
     menu.show_left = new FXMenuCheck(viewmenu, "&Regionsliste\tCtrl-Shift-R\tRegionsliste ein- bzw. ausblenden.", this, ID_VIEW_REGIONLIST);
     menu.show_right = new FXMenuCheck(viewmenu, "&Eigenschaften\tCtrl-Shift-E\tEinheiten- und Regionsdetails ein- bzw. ausblenden.", this, ID_VIEW_PROPERTIES);
     menu.calc = new FXMenuCheck(viewmenu, "&Taschenrechner\tCtrl-Shift-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
-    menu.minimap = new FXMenuCheck(viewmenu, FXString(L"\u00dcber&sichtskarte\tCtrl-Shift-M\t\u00dcbersichtskarte ein- bzw. ausblenden."), this, ID_VIEW_MINIMAP);
+    menu.minimap = new FXMenuCheck(viewmenu, L"\u00dcber&sichtskarte\tCtrl-Shift-M\t\u00dcbersichtskarte ein- bzw. ausblenden.", this, ID_VIEW_MINIMAP);
     menu.infodlg = new FXMenuCheck(viewmenu, "&Informationen\tCtrl-Shift-I\tRegel-Informationen ein- bzw. ausblenden.", this, ID_VIEW_INFODLG);
     new FXMenuSeparatorEx(viewmenu, "Liste");
     menu.ownFactionGroup = new FXMenuCheck(viewmenu, "&Gruppe aktiver Partei\tCtrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
-    menu.colorizeUnits = new FXMenuCheck(viewmenu, "Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
+    menu.colorizeUnits = new FXMenuCheck(viewmenu, L"Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
     new FXMenuSeparatorEx(viewmenu, "Karte");
     menu.streets = new FXMenuCheck(viewmenu, "S&trassen zeigen\tCtrl-F1\tStrassen auf der Karte anzeigen.");
-    menu.visibility = new FXMenuCheck(viewmenu, FXString(L"Si&chtbarkeit zeigen\tCtrl-F2\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise)."));
+    menu.visibility = new FXMenuCheck(viewmenu, L"Si&chtbarkeit zeigen\tCtrl-F2\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise).");
     menu.shiptravel = new FXMenuCheck(viewmenu, "&Durchschiffung\tCtrl-F3\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
     menu.shadowRegions = new FXMenuCheck(viewmenu, "Regionen ab&dunkeln\tCtrl-F4\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.");
     menu.islands = new FXMenuCheck(viewmenu, "Insel&namen zeigen\tCtrl-F5\tInselnamen auf der Karte zeigen.");
@@ -440,9 +440,9 @@ CSMap::CSMap(FXApp *app) :
     radio->setCheck();
     new FXMenuCascade(viewmenu, "&Ebene", nullptr, planemenu, 0);
     zoommenu = new FXMenuPane(this);
-    new FXMenuCommand(zoommenu, FXString(L"Vergr\u00f6\u00dfern\tCtrl-+\tKarte vergr\u00f6\u00dfern."), nullptr, this, ID_MAP_ZOOM, 0);
+    new FXMenuCommand(zoommenu, L"Vergr\u00f6\u00dfern\tCtrl-+\tKarte vergr\u00f6\u00dfern.", nullptr, this, ID_MAP_ZOOM, 0);
     new FXMenuCommand(zoommenu, "Verkleinern\tCtrl--\tKarte verkleinern.", nullptr, this, ID_MAP_ZOOM, 0);
-    new FXMenuSeparatorEx(zoommenu, FXString(L"Gr\u00f6\u00dfe"));
+    new FXMenuSeparatorEx(zoommenu, L"Gr\u00f6\u00dfe");
     new FXMenuRadio(zoommenu, "&1 Pixel\tCtrl-8\t1.6%", this, ID_MAP_ZOOM, 0);
     new FXMenuRadio(zoommenu, "&2 Pixel\tCtrl-7\t3.1%", this, ID_MAP_ZOOM, 0);
     new FXMenuRadio(zoommenu, "&4 Pixel\tCtrl-6\t6.3%", this, ID_MAP_ZOOM, 0);
@@ -451,7 +451,7 @@ CSMap::CSMap(FXApp *app) :
     new FXMenuRadio(zoommenu, "&32 Pixel\tCtrl-3\t50%", this, ID_MAP_ZOOM, 0);
     new FXMenuRadio(zoommenu, "&64 Pixel\tCtrl-2\t100%", this, ID_MAP_ZOOM, 0);
     new FXMenuRadio(zoommenu, "128 Pixel\tCtrl-1\t200%", this, ID_MAP_ZOOM, 0);
-    new FXMenuCascade(viewmenu, FXString(L"&Gr\u00f6\u00dfe"), nullptr, zoommenu, 0);
+    new FXMenuCascade(viewmenu, L"&Gr\u00f6\u00dfe", nullptr, zoommenu, 0);
 
     // Region menu
     regionmenu = new FXMenuPane(this);
@@ -459,19 +459,19 @@ CSMap::CSMap(FXApp *app) :
     new FXMenuCommand(regionmenu, "&Suchen...\tCtrl-F\tEine Region, Einheit, Schiff, etc. suchen.", nullptr, this, ID_VIEW_SEARCHDLG);
     new FXMenuCommand(regionmenu, "&Ursprung setzen\t\tDen Kartenursprung (0/0) auf die markierte Region setzen.", nullptr, this, ID_MAP_SETORIGIN, 0);
     new FXMenuSeparatorEx(regionmenu, "Regionen");
-    new FXMenuCommand(regionmenu,FXString(L"&Alle markieren\tCtrl-Shift-A\tAlle Regionen ausw\u00e4hlen."), nullptr,this, ID_REGION_SELALL);
-    new FXMenuCommand(regionmenu,FXString(L"Alle &Inseln ausw\u00e4hlen\t\tAlle Landregionen ausw\u00e4hlen (Ozean, Feuerwand und Eisberg z\u00e4hlen nicht als Land)."), nullptr, this, ID_REGION_SELALLISLANDS);
-    new FXMenuCommand(regionmenu, FXString(L"&Sichtbare markieren\t\tSichtbare Regionen ausw\u00e4hlen."), nullptr, this, ID_REGION_SELVISIBLE);
-    new FXMenuCommand(regionmenu,FXString(L"&Keine markieren\tEscape\tKeine Region ausw\u00e4hlen."), nullptr, this, ID_REGION_UNSEL);
-    new FXMenuCommand(regionmenu,FXString(L"Auswahl &invertieren\tCtrl-Shift-N\tAusgew\u00e4hlte Regionen abw\u00e4hlen und umgekehrt."), nullptr, this, ID_REGION_INVERTSEL);
+    new FXMenuCommand(regionmenu,L"&Alle markieren\tCtrl-Shift-A\tAlle Regionen ausw\u00e4hlen.", nullptr,this, ID_REGION_SELALL);
+    new FXMenuCommand(regionmenu,L"Alle &Inseln ausw\u00e4hlen\t\tAlle Landregionen ausw\u00e4hlen (Ozean, Feuerwand und Eisberg z\u00e4hlen nicht als Land).", nullptr, this, ID_REGION_SELALLISLANDS);
+    new FXMenuCommand(regionmenu, L"&Sichtbare markieren\t\tSichtbare Regionen ausw\u00e4hlen.", nullptr, this, ID_REGION_SELVISIBLE);
+    new FXMenuCommand(regionmenu, L"&Keine markieren\tEscape\tKeine Region ausw\u00e4hlen.", nullptr, this, ID_REGION_UNSEL);
+    new FXMenuCommand(regionmenu, L"Auswahl &invertieren\tCtrl-Shift-N\tAusgew\u00e4hlte Regionen abw\u00e4hlen und umgekehrt.", nullptr, this, ID_REGION_INVERTSEL);
 
     selectionmenu = new FXMenuPane(this);
     new FXMenuCascade(regionmenu, "&Erweitern", nullptr, selectionmenu);
     new FXMenuCommand(selectionmenu, "Auswahl &erweitern\tCtrl-F7\tAuswahl mit dem Radius von einer Region erweitern.", nullptr, this, ID_REGION_EXTENDSEL);
-    new FXMenuCommand(selectionmenu,FXString(L"&Inseln ausw\u00e4hlen\tCtrl-F9\tAuswahl auf komplette Inseln erweitern."), nullptr, this, ID_REGION_SELISLANDS);
+    new FXMenuCommand(selectionmenu,L"&Inseln ausw\u00e4hlen\tCtrl-F9\tAuswahl auf komplette Inseln erweitern.", nullptr, this, ID_REGION_SELISLANDS);
 
     new FXMenuCommand(regionmenu, L"Markierte &ausw\u00e4hlen\tCtrl-Space\tMarkierte Region ausw\u00e4hlen.", nullptr, this, ID_MAP_SELECTMARKED, 0);
-    new FXMenuCommand(regionmenu, FXString(L"Markierte &l\u00f6schen\t\t"), nullptr, this, ID_REGION_REMOVESEL);
+    new FXMenuCommand(regionmenu, L"Markierte &l\u00f6schen\t\t", nullptr, this, ID_REGION_REMOVESEL);
 
     // Faction menu
     factionmenu = new FXMenuPane(this);
@@ -480,8 +480,8 @@ CSMap::CSMap(FXApp *app) :
 
     new FXMenuSeparatorEx(factionmenu, "Parteiinfo");
     menu.name = new FXMenuCommand(factionmenu, "Parteiname\t\tName der Partei");
-    menu.type = new FXMenuCommand(factionmenu, FXString(L"Rasse (Silber)\t\tRasse und Typpr\u00e4fix der Partei, Rekrutierungskosten"));
-    menu.magic = new FXMenuCommand(factionmenu, FXString(L"Magiegebiet\t\tgew\u00e4hltes Magiegebiet"));
+    menu.type = new FXMenuCommand(factionmenu, L"Rasse (Silber)\t\tRasse und Typpr\u00e4fix der Partei, Rekrutierungskosten");
+    menu.magic = new FXMenuCommand(factionmenu, L"Magiegebiet\t\tgew\u00e4hltes Magiegebiet");
     menu.email = new FXMenuCommand(factionmenu, "eMail\t\teMail-Adresse der Partei");
 
     new FXMenuSeparatorEx(factionmenu, "Statistik");
@@ -489,9 +489,9 @@ CSMap::CSMap(FXApp *app) :
     menu.points = new FXMenuCommand(factionmenu, "Punkte (Durchschnitt)\t\tPunkte der Partei und Durchschnitt gleichaltriger Parteien");
     menu.age = new FXMenuCommand(factionmenu, "Parteialter\t\tAlter der Partei in Runden");
 
-    new FXMenuSeparatorEx(factionmenu, FXString(L"Gegenst\u00e4nde"));
+    new FXMenuSeparatorEx(factionmenu, L"Gegenst\u00e4nde");
         menu.factionpool = new FXMenuPane(this);
-        menu.poolnoitems = new FXMenuCommand(menu.factionpool,FXString(L"Keine Gegenst\u00e4nde\t\tDer Parteipool enth\u00e4lt keine Gegenst\u00e4nde."), nullptr);
+        menu.poolnoitems = new FXMenuCommand(menu.factionpool,L"Keine Gegenst\u00e4nde\t\tDer Parteipool enth\u00e4lt keine Gegenst\u00e4nde.", nullptr);
         menu.poolnoitems->disable();
     new FXMenuCascade(factionmenu, "&Parteipool", nullptr, menu.factionpool, 0);
 
@@ -574,7 +574,7 @@ CSMap::CSMap(FXApp *app) :
     searchResults = new FXSearchResults(outputTabs, this, ID_RESULT_SELECTED, FOLDINGLIST_BROWSESELECT | LAYOUT_FILL_X | LAYOUT_FILL_Y);
     searchResults->getHeader()->setHeaderStyle(HEADER_RESIZE | HEADER_TRACKING);
     searchResults->appendHeader("Region");
-    searchResults->appendHeader(FXString(L"Einheit/Geb\u00e4ude/Schiff"));
+    searchResults->appendHeader(L"Einheit/Geb\u00e4ude/Schiff");
     searchResults->appendHeader("Partei");
 
     // Calculator bar
@@ -646,18 +646,18 @@ CSMap::CSMap(FXApp *app) :
     FXHorizontalFrame *cmdOptFrame = new FXHorizontalFrame(cmdBottomFrame,LAYOUT_FILL_X|FRAME_LINE, 0, 0, 0, 0, 3,3,1,1);
     cmdOptFrame->setBorderColor(getApp()->getShadowColor());
     FXCheckButton *chk = new FXCheckButton(cmdOptFrame,
-        FXString(L"&best\u00e4tigt\tBefehle best\u00e4tigen\tBefehle f\u00fcr diese Einheit best\u00e4tigen"),
+        L"&best\u00e4tigt\tBefehle best\u00e4tigen\tBefehle f\u00fcr diese Einheit best\u00e4tigen",
         commands, FXCommands::ID_UNIT_CONFIRM, CHECKBUTTON_NORMAL);
     chk->addHotKey(FXHotKey(MKUINT(KEY_b, CONTROLMASK)));
     FXButton* btn;
     btn = new FXButton(cmdOptFrame,
-        FXString(L"<\tVorherige Einheit\tZur vorhergehenden unbest\u00e4tigten Einheit"), nullptr,
+        L"<\tVorherige Einheit\tZur vorhergehenden unbest\u00e4tigten Einheit", nullptr,
         this, ID_UNIT_PREV, BUTTON_TOOLBAR);
     btn->addHotKey(FXHotKey(MKUINT(KEY_comma, CONTROLMASK)));
     btn->addHotKey(FXHotKey(MKUINT(KEY_p, CONTROLMASK)));
 
     btn = new FXButton(cmdOptFrame,
-        FXString(L">\tN\u00e4chste Einheit\tZur n\u00e4chsten unbest\u00e4tigten Einheit"), nullptr,
+        L">\tN\u00e4chste Einheit\tZur n\u00e4chsten unbest\u00e4tigten Einheit", nullptr,
         this, ID_UNIT_NEXT, BUTTON_TOOLBAR);
     btn->addHotKey(FXHotKey(MKUINT(KEY_period, CONTROLMASK)));
     btn->addHotKey(FXHotKey(MKUINT(KEY_n, CONTROLMASK)));
@@ -672,7 +672,7 @@ CSMap::CSMap(FXApp *app) :
     rowcol->setTextColor(getApp()->getShadowColor());
 
     // minimap
-    minimap_frame = new FXDialogBox(this, FXString(L"\u00dcbersichtskarte"), DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100,100, 640,480, 0, 0, 0, 0);
+    minimap_frame = new FXDialogBox(this, L"\u00dcbersichtskarte", DECOR_ALL&~(DECOR_MENU|DECOR_MAXIMIZE), 100,100, 640,480, 0, 0, 0, 0);
     minimap_frame->setIcon(icon);
     minimap_frame->getAccelTable()->addAccel(MKUINT(KEY_M, CONTROLMASK | SHIFTMASK), this, FXSEL(SEL_COMMAND, ID_VIEW_MINIMAP));
 
@@ -2901,12 +2901,15 @@ long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
             FXString body;
             code = UploadFile(filename, id, passwd, body);
             remove(infile);
-            if (code == 401) {
+            if (code > 0x10000) {
+                FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Interner Fehler %ld: %s", code - 0x10000, body.text());
+            }
+            else if (code == 401) {
                 settings.password.clear();
                 FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: Falsches Passwort.", code);
             }
             else if (code >= 500) {
-                FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Serverfehler %ld: Bitte sp\u00e4ter noch einmal versuchen.", code);
+                FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, FXString(L"Serverfehler %ld: Bitte sp\u00e4ter noch einmal versuchen.").text(), code);
             }
             else if (code < 200 || code >= 300) {
                 FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: %s (Befehle nicht akzeptiert).", code, body.text());
@@ -2924,7 +2927,7 @@ FXString CSMap::askPasswordDlg(const FXString &faction_id) {
     if (passwd.empty() || faction_id != settings.faction_id)
     {
         FXInputDialog dlg(this, "Passwort eingeben",
-            FXString(L"Geben Sie das Passwort f\u00fcr die Partei " + faction_id + " ein:"),
+            L"Geben Sie das Passwort f\u00fcr die Partei " + faction_id + " ein:",
             nullptr, INPUTDIALOG_STRING | INPUTDIALOG_PASSWORD);
         FXint res = dlg.execute(PLACEMENT_SCREEN);
         if (res)
@@ -2987,7 +2990,7 @@ void CSMap::saveCommandsDlg(bool stripped, bool replace)
     if (stripped || filename.empty()) {
         filename = askFileName(
             stripped ? "Versandbefehle speichern unter..." : "Befehle speichern unter...",
-            FXString(L"Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nM\u00f6gliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
+            L"Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nM\u00f6gliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)");
     }
     if (!filename.empty()) {
         if (!replace && FXStat::exists(filename)) {
