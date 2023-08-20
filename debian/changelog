@@ -1,3 +1,9 @@
+csmapfx (1.7.22-1) stable; urgency=low
+
+  * force Authorization header on web uploads
+
+  -- Enno Rehling <enno@eressea.de>  Sun, 20 Aug 2023 19:15:00 +0200
+
 csmapfx (1.7.21-1) stable; urgency=low
 
   * fix a bug in report merge

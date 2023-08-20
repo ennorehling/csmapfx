@@ -4,6 +4,7 @@
 
 #pragma comment(lib, "wininet.lib")
 #pragma comment(lib, "gdiplus.lib")
+#pragma comment(lib, "crypt32.lib")
 
 #include "win32.h"
 #include "version.h"
@@ -17,6 +18,31 @@
 #include <gdiplusimaging.h>
 
 #include <memory>
+
+static BOOL ForceAuthenticationHeader(HINTERNET hRequest, LPCSTR pszAuthUserName, LPCSTR pszAuthPassword)
+{
+    BOOL bSuccess = FALSE;
+    std::string credentials(pszAuthUserName);
+    credentials += ":";
+    credentials += pszAuthPassword;
+    DWORD nDestinationSize = 0;
+    LPCSTR pszSource = credentials.c_str();
+    if (CryptBinaryToString(reinterpret_cast<const BYTE *>(pszSource), credentials.length(), CRYPT_STRING_BASE64, nullptr, &nDestinationSize)) {
+        LPTSTR pszDestination = static_cast<LPTSTR> (HeapAlloc(GetProcessHeap(), HEAP_NO_SERIALIZE, nDestinationSize * sizeof(TCHAR)));
+        if (pszDestination)
+        {
+            if (CryptBinaryToString(reinterpret_cast<const BYTE *> (pszSource), strlen(pszSource), CRYPT_STRING_BASE64, pszDestination, &nDestinationSize))
+            {
+                std::wstring header(TEXT("Authorization: Basic "));
+                header += pszDestination;
+                header += TEXT("\r\n");
+                bSuccess = HttpAddRequestHeaders(hRequest, header.c_str(), -1, HTTP_ADDREQ_FLAG_REPLACE);
+            }
+            HeapFree(GetProcessHeap(), HEAP_NO_SERIALIZE, pszDestination);
+        }
+    }
+    return bSuccess;
+}
 
 long UploadFile(const FXString &filename, const FXString &username, const FXString &password, FXString &outBody)
 {
@@ -34,13 +60,9 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
 
     // Specify an HTTP server.
     if (hSession) {
-        WCHAR wszUserName[MAX_PATH];
-        WCHAR wszPassword[MAX_PATH];
-        MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, username.text(), -1, wszUserName, MAX_PATH);
-        MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, password.text(), -1, wszPassword, MAX_PATH);
         hConnect = InternetConnect(hSession, TEXT("www.eressea.kn-bremen.de"),
             INTERNET_DEFAULT_HTTPS_PORT,
-            wszUserName, wszPassword,
+            NULL, NULL,
             INTERNET_SERVICE_HTTP, 0, NULL);
     }
     // Create an HTTPS request handle.
@@ -76,8 +98,8 @@ long UploadFile(const FXString &filename, const FXString &username, const FXStri
         if (hMap) {
             LPVOID lpvFile = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
             DWORD dwFileSize = GetFileSize(hFile, NULL);
-
             bResults = HttpAddRequestHeaders(hRequest, TEXT("Content-Type: application/octet-stream\r\n"), -1, HTTP_ADDREQ_FLAG_REPLACE);
+            bResults &= ForceAuthenticationHeader(hRequest, username.text(), password.text());
             if (bResults) {
                 bResults = HttpSendRequest(
                     hRequest,
