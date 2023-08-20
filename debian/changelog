@@ -1,3 +1,10 @@
+csmapfx (1.7.21-1) stable; urgency=low
+
+  * fix a bug in report merge
+  * fix another merge bug when reports have different origin
+
+  -- Enno Rehling <enno@eressea.de>  Sun, 20 Aug 2023 14:30:00 +0200
+
 csmapfx (1.7.20-1) stable; urgency=low
 
   * statistics: put own faction at the top of the list

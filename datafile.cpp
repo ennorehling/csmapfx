@@ -514,7 +514,7 @@ void datafile::mergeBlock(datablock::itor& block, const datablock::itor& parent,
     }
     if (!found) {
         // we do not have this kind of block
-        m_blocks.insert(std::next(insert), *block);
+        m_blocks.insert(insert, *block);
     }
 }
 
@@ -587,7 +587,7 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
             }
 
             datablock::itor new_r;
-            if (getRegion(new_r, *old_r))            // add some info to old cr (island names)
+            if (getRegion(new_r, x, y, old_r->info()))            // add some info to old cr (island names)
             {
                 bool is_seen = !new_r->hasKey(TYPE_VISIBILITY);
                 copy_children = false;
