@@ -105,11 +105,10 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 {
 	bool unitInFaction = false;
 	int unitId = 0, personsInUnit = 0;
-    FXint selected_faction = select.faction;
 
     if (!mapFile) return;
     FXint item = factionBox->getCurrentItem();
-    selected_faction = (FXint)factionBox->getItemData(item);
+    FXival selected_faction = (FXival)factionBox->getItemData(item);
     datablock::itor end = mapFile->blocks().end();
 	for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
 	{
