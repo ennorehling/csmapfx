@@ -1373,7 +1373,6 @@ bool CSMap::checkCommands()
     }
 #endif
     errorList->clearItems();
-    searchResults->clearItems();
     if (cmdline.empty()) {
         errorList->appendItem("Could not find the echeck executable.");
     }
