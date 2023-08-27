@@ -385,7 +385,7 @@ long FXStatistics::onChangeFaction(FXObject*, FXSelector, void*)
 	int item = factionBox->getCurrentItem();
     if (item >= 0) {
         FXival factionId = (FXival)factionBox->getItemData(item);
-        if (factionId > 0) {
+        if (factionId >= 0) {
             select.faction = factionId;
         }
     }
