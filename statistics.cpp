@@ -105,9 +105,11 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 {
 	bool unitInFaction = false;
 	int unitId = 0, personsInUnit = 0;
+    FXint selected_faction = select.faction;
 
     if (!mapFile) return;
-    
+    FXint item = factionBox->getCurrentItem();
+    selected_faction = (FXint)factionBox->getItemData(item);
     datablock::itor end = mapFile->blocks().end();
 	for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
 	{
@@ -118,7 +120,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 			if (fac.length())
 				faction = atoi(fac.text());
 
-			if (faction == select.faction || select.faction == 0)
+			if (faction == selected_faction || selected_faction == 0)
 			{
 				int size = atoi(block->value("Groesse").text());
 
@@ -135,7 +137,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 			if (fac.length())
 				faction = atoi(fac.text());
 
-			if (faction == select.faction || select.faction == 0)
+			if (faction == selected_faction || selected_faction == 0)
 			{
 				int size = atoi(block->value("Groesse").text());
 
@@ -154,7 +156,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 			if (fac.length())
 				faction = atoi(fac.text());
 
-			if (faction == select.faction || select.faction == 0)
+			if (faction == selected_faction || selected_faction == 0)
 				unitInFaction = true;
 			else
 				unitInFaction = false;

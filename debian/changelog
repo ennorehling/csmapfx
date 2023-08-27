@@ -1,8 +1,9 @@
 csmapfx (1.7.22-1) stable; urgency=low
 
   * force Authorization header on web uploads
+  * fix bug when showing statistic for all factions
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 20 Aug 2023 19:15:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Sun, 27 Aug 2023 09:15:00 +0200
 
 csmapfx (1.7.21-1) stable; urgency=low
 
