@@ -4,7 +4,7 @@ csmapfx (1.7.22-1) stable; urgency=low
   * statistics: display all if selected faction not in region
   * statistics: remember that user chose to see all factions
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 27 Aug 2023 09:15:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Sun, 27 Aug 2023 08:30:00 +0200
 
 csmapfx (1.7.21-1) stable; urgency=low
 
