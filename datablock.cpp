@@ -1,6 +1,5 @@
 #include "datafile.h"
 
-#include "main.h"
 #include "fxhelper.h"
 #include "terrain.h"
 

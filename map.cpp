@@ -1,5 +1,4 @@
 #include "version.h"
-#include "main.h"
 #include "fxhelper.h"
 #include "map.h"
 #include "symbols.h"

@@ -1,5 +1,4 @@
 #include <vector>
-#include "main.h"
 #include "fxhelper.h"
 #include "building_props.h"
 

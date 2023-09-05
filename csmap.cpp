@@ -29,7 +29,6 @@
 #endif
 
 #include "version.h"
-#include "main.h"
 #include "fxhelper.h"
 #include "csmap.h"
 #include "reportinfo.h"

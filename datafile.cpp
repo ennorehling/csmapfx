@@ -2,7 +2,6 @@
 #include "datafile.h"
 
 #include "version.h"
-#include "main.h"
 #include "fxhelper.h"
 #include "terrain.h"
 
@@ -1466,8 +1465,6 @@ void datafile::setConfirmed(datablock::itor& unit, bool confirmed)
         else {
             unit->removeKey(TYPE_ORDERS_CONFIRMED);
             if (stats) ++stats->unconfirmed;
-        }
-        if (getParent(region, unit)) {
         }
     }
 }

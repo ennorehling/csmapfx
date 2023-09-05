@@ -1,5 +1,4 @@
 #include "version.h"
-#include "main.h"
 #include "csmap.h"
 #include "fxhelper.h"
 #include "searchdlg.h"

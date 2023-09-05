@@ -1,4 +1,3 @@
-#include "main.h"
 #include "fxhelper.h"
 #include "statistics.h"
 #include "FXMenuSeparatorEx.h"

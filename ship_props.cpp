@@ -1,5 +1,4 @@
 #include <vector>
-#include "main.h"
 #include "fxhelper.h"
 #include "ship_props.h"
 

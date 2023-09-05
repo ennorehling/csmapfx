@@ -1,6 +1,5 @@
 #include <vector>
 #include <algorithm>
-#include "main.h"
 #include "fxhelper.h"
 #include "unitlist.h"
 

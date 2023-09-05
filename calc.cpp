@@ -1,7 +1,6 @@
 #include <sstream>
 
 #include "fxkeys.h"
-#include "main.h"
 #include "fxhelper.h"
 #include "calc.h"
 #include "symbols.h"

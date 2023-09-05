@@ -17,7 +17,6 @@
 #include "fxwin.h"
 
 #include "version.h"
-#include "main.h"
 #include "fxhelper.h"
 #include "translator.h"
 #include "csmap.h"

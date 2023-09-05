@@ -1,4 +1,3 @@
-#include "main.h"
 #include "fxhelper.h"
 #include "regionpanel.h"
 #include "symbols.h"
