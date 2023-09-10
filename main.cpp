@@ -28,9 +28,6 @@
 #include <sstream>
 #include <string>
 #include <fx.h>
-#if defined(WIN32) && defined(WITH_MAP_EXPORT)
-#include <gdiplus.h>
-#endif
 #ifdef HAVE_PHYSFS
 #include <physfs.h>
 #endif
@@ -157,11 +154,14 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
 
 int main(int argc, char *argv[])
 {
-#if defined(WIN32) && defined(WITH_MAP_EXPORT)
+#ifdef WIN32
+    HRESULT hr = SetCurrentProcessExplicitAppUserModelID(g_wszAppID);
+#ifdef WITH_MAP_EXPORT
     // Initialize GDI+.
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     ULONG_PTR gdiplusToken;
     GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+#endif
 #endif
 #ifdef HAVE_PHYSFS
     PHYSFS_init(argv[0]);

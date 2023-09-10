@@ -1,14 +1,17 @@
 #define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+
+#include "fxwin.h"
+#include "version.h"
 
 #ifdef WIN32
-#include <windows.h>
-#include <shlobj_core.h>
-#include <gdiplus.h>
-
+#include <atlbase.h>
+LPCWSTR g_wszAppID = CSMAP_APP_ID;
 #include "win32.h"
 #else
 #include "upload.h"
 #endif
+
 #ifdef HAVE_PHYSFS
 #include <physfs.h>
 #endif
@@ -28,7 +31,6 @@
 #include <unistd.h>
 #endif
 
-#include "version.h"
 #include "fxhelper.h"
 #include "csmap.h"
 #include "reportinfo.h"
@@ -2468,6 +2470,26 @@ void CSMap::addRecentFile(const FXString& filename)
 {
     FXString path = FXPath::convert(FXPath::simplify(filename));
     recentFiles.appendFile(path);
+#ifdef WIN32
+    FXString ext = FXPath::extension(path);
+    if (ext == "cr") {
+        SHARDAPPIDINFO info;
+        HRESULT hr;
+        CComPtr<IShellItem> pItem;
+        WCHAR szFilePath[MAX_PATH];
+        MultiByteToWideChar(CP_UTF8, 0, path.text(), -1, szFilePath, MAX_PATH);
+        hr = SHCreateItemFromParsingName(szFilePath, NULL,
+            IID_PPV_ARGS(&pItem));
+
+        if (SUCCEEDED(hr))
+        {
+            info.psi = pItem;
+            info.pszAppID = g_wszAppID;  // our AppID
+
+            SHAddToRecentDocs(SHARD_APPIDINFO, &info);
+        }
+    }
+#endif
 }
 
 void CSMap::loadFiles(const std::vector<FXString> &filenames, std::vector<FXString> & errorMessages)
@@ -3026,11 +3048,11 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
     FXString mimeType = "image/png";
 #ifdef WIN32
     int defaultIndex = GetImagePatternList(mimeType, patterns);
-    patterns += "Alle Dateien (*.*)";
+    patterns += "Alle Dateien (*)";
     dlg.setCurrentPattern(defaultIndex);
     dlg.setPatternList(patterns);
 #else
-    dlg.setPatternList("PNG Datei (*.png)\nAlle Dateien (*.*)");
+    dlg.setPatternList("PNG Datei (*.png)\nAlle Dateien (*)");
 #endif
     if (dlg.execute(PLACEMENT_SCREEN))
     {
@@ -3105,12 +3127,12 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
             loadReport = false;
         }
     }
-    recentFiles.removeFile(filename);
     getApp()->beginWaitCursor();
     beginLoading(filename);
     if (loadReport) {
         if (closeFile()) {
             FXString errorMessage;
+            recentFiles.removeFile(filename);
             loadFile(filename);
             mapChange();
             updateFileNames();
@@ -3120,7 +3142,8 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
             }
         }
     }
-    else {
+    else if (report && report->hasActiveFaction()) {
+        recentFiles.removeFile(filename);
         if (loadCommands(filename)) {
             addRecentFile(filename);
             checkCommands();

@@ -2,20 +2,15 @@
 #error "This code only for use with Windows targets"
 #endif
 
+#pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "wininet.lib")
 #pragma comment(lib, "gdiplus.lib")
 #pragma comment(lib, "crypt32.lib")
 
+#include "fxwin.h"
 #include "win32.h"
 #include "version.h"
 #include "map.h"
-#include <windows.h>
-#include <shlwapi.h>
-#include <wininet.h>
-
-#include <gdiplus.h>
-#include <gdiplusimagecodec.h>
-#include <gdiplusimaging.h>
 
 #include <memory>
 

@@ -72,15 +72,20 @@ class FXAPI FXFileDialogEx : public FXObject {
   FXDECLARE(FXFileDialogEx)
 
 protected:
-  OPENFILENAMEW	*m_ofn;   // low-level access to OPENFILENAMEW
-  FXuint         m_opts;
-  FXchar       **m_pszFoxPats;
-  FXchar        *m_pszFoxCustomPat;
-  FXint          m_nFoxPats;
+    FXString m_title;
+    IFileOpenDialog *m_pfod = NULL;
+    IFileDialog *m_pfd = NULL;
+    COMDLG_FILTERSPEC *m_rgFilterSpec = NULL;
 
-  FXString		*m_filenames;
+    OPENFILENAMEW *m_ofn = NULL;   // low-level access to OPENFILENAMEW
+    FXuint         m_opts = 0;
+    FXchar **m_pszFoxPats = NULL;
+    FXchar *m_pszFoxCustomPat = NULL;
+    FXint          m_nFoxPats = 0;
 
-  FXWindow		*m_owner;
+    FXString *m_filenames = NULL;
+
+    FXWindow *m_owner = NULL;
 
 private:
   FXFileDialogEx(const FXFileDialogEx&);
@@ -88,7 +93,7 @@ private:
 
   // get FOX patterns into Win32 patterns
   void getWinPattern(FXchar*& pszWinPat, const FXchar* pszFoxPat) const;
-
+  void deleteFilters(void);
 protected:
   FXFileDialogEx();
 
