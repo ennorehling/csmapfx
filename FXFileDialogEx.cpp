@@ -387,7 +387,7 @@ namespace FXEX {
         MultiByteToWideChar(CP_UTF8, 0, m_title.text(), -1, szFilePath, MAX_PATH);
         HRESULT hr = m_pfd->SetTitle(szFilePath);
         if (SUCCEEDED(hr)) {
-            hr = m_pfod->SetOptions(m_options);
+            hr = m_pfd->SetOptions(m_options);
         }
         if (SUCCEEDED(hr)) {
             hr = m_pfd->SetFileTypes(m_cFileTypes, m_rgFilterSpec);

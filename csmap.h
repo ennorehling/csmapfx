@@ -230,7 +230,7 @@ private:
     bool mergeFile(const FXString& filename, FXString& errorMessage);
     bool closeFile();
     void saveCommandsDlg(bool stripped, bool replace);
-    FXString askFileName(const FXString& title, const FXString& patterns);
+    FXString askFileName(const FXString& title, const FXString& patterns, FXint opts);
     FXString askPasswordDlg(const FXString& faction_id);
     bool confirmOverwrite();
     bool loadCommands(const FXString& filename);

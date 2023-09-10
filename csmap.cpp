@@ -2470,7 +2470,7 @@ void CSMap::addRecentFile(const FXString& filename)
 {
     FXString path = FXPath::convert(FXPath::simplify(filename));
     recentFiles.appendFile(path);
-#ifdef WIN32
+#if 0
     FXString ext = FXPath::extension(path);
     if (ext == "cr") {
         SHARDAPPIDINFO info;
@@ -2640,9 +2640,8 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
 
 long CSMap::onFileMerge(FXObject *, FXSelector, void *r)
 {
-    FXFileDialog dlg(this, FXString(L"Karte hinzuf\u00fcgen..."));
+    FXFileDialog dlg(this, FXString(L"Karte hinzuf\u00fcgen..."), DLGEX_ALLOWMULTISELECT|DLGEX_DONTADDTORECENT);
     dlg.setIcon(icons.merge);
-    dlg.setSelectMode(SELECTFILE_MULTIPLE);
     dlg.setDirectory(dialogDirectory);
     dlg.setPatternList(FXString(L"Eressea Computer Report (*.cr)\nAlle Dateien (*)"));
     FXint res = dlg.execute(PLACEMENT_SCREEN);
@@ -2709,7 +2708,7 @@ bool CSMap::saveReport(const FXString& filename, map_type mode, bool merge_comma
 
 FXString CSMap::askSaveFileName(const FXString &dlgTitle)
 {
-    return askFileName(dlgTitle, "Eressea Computer Report (*.cr)\nAlle Dateien (*)");
+    return askFileName(dlgTitle, "Eressea Computer Report (*.cr)\nAlle Dateien (*)", DLGEX_SAVE);
 }
 
 void CSMap::updateModificationTime()
@@ -2849,7 +2848,7 @@ long CSMap::onFileOpenCommands(FXObject *, FXSelector, void *)
     if (!confirmOverwrite()) {
         return 0;
     }
-    FXFileDialog dlg(this, FXString(L"Befehle laden..."));
+    FXFileDialog dlg(this, FXString(L"Befehle laden..."), DLGEX_DONTADDTORECENT);
     dlg.setIcon(icons.open);
     dlg.setDirectory(dialogDirectory);
     dlg.setPatternList(FXString(L"Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nM\u00f6gliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
@@ -2875,7 +2874,7 @@ long CSMap::onFileSaveCommands(FXObject*, FXSelector, void* ptr)
         FXString filename = report->cmdfilename();
         if (filename.empty()) {
             FXString patterns(L"Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nM\u00f6gliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)");
-            filename = askFileName("Befehle speichern unter...", patterns);
+            filename = askFileName("Befehle speichern unter...", patterns, DLGEX_SAVE | DLGEX_DONTADDTORECENT);
             if (filename.empty()) return 0;
             if (FXStat::exists(filename)) {
                 FXString text;
@@ -2962,8 +2961,8 @@ FXString CSMap::askPasswordDlg(const FXString &faction_id) {
     return passwd;
 }
 
-FXString CSMap::askFileName(const FXString &dlgTitle, const FXString &patterns) {
-    FXFileDialog dlg(this, dlgTitle, DLGEX_SAVE);
+FXString CSMap::askFileName(const FXString &dlgTitle, const FXString &patterns, FXint opts) {
+    FXFileDialog dlg(this, dlgTitle, opts);
     dlg.setIcon(icons.save);
     dlg.setDirectory(dialogDirectory);
     dlg.setPatternList(patterns);
@@ -3010,7 +3009,8 @@ void CSMap::saveCommandsDlg(bool stripped, bool replace)
     if (stripped || filename.empty()) {
         filename = askFileName(
             stripped ? "Versandbefehle speichern unter..." : "Befehle speichern unter...",
-            L"Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nM\u00f6gliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)");
+            L"Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nM\u00f6gliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)",
+            DLGEX_SAVE | DLGEX_DONTADDTORECENT);
     }
     if (!filename.empty()) {
         if (!replace && FXStat::exists(filename)) {
@@ -3042,7 +3042,7 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
     FXuval maxScale = 128;
     FXival visiblePlane = map->getVisiblePlane();
     if (!report) return 0;
-    FXFileDialog dlg(this, "Karte exportieren unter...", DLGEX_SAVE);
+    FXFileDialog dlg(this, "Karte exportieren unter...", DLGEX_SAVE|DLGEX_DONTADDTORECENT);
     dlg.setIcon(icon);
     FXString patterns;
     FXString mimeType = "image/png";
