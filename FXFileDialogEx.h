@@ -57,12 +57,12 @@ namespace FXEX {
 
 /// File dialog options
 #define DLGEX_SAVE              0x00100000  // "Save" dialog box
-#define DLGEX_CREATEPROMPT      0x00400000  // -> OFN_CREATEPROMPT
-#define DLGEX_READONLY          0x00800000  // -> OFN_READONLY
-#define DLGEX_PATHMUSTEXIST     0x01000000  // -> OFN_PATHMUSTEXIST
-#define DLGEX_FILEMUSTEXIST     0x02000000  // -> OFN_FILEMUSTEXIST
-#define DLGEX_HIDEREADONLY      0x04000000  // -> OFN_HIDEREADONLY
-#define DLGEX_OVERWRITEPROMPT   0x08000000  // -> OFN_OVERWRITEPROMPT
+#define DLGEX_OVERWRITEPROMPT   0x00200000
+#define DLGEX_CREATEPROMPT      0x00400000
+#define DLGEX_DONTADDTORECENT   0x00800000
+#define DLGEX_PATHMUSTEXIST     0x01000000
+#define DLGEX_FILEMUSTEXIST     0x02000000
+#define DLGEX_ALLOWMULTISELECT  0x04000000
 
 /**
  * Use comctl32 dialog under WIN32 for file dialog cases
@@ -73,26 +73,22 @@ class FXAPI FXFileDialogEx : public FXObject {
 
 protected:
     FXString m_title;
+    FILEOPENDIALOGOPTIONS m_options = 0;
     IFileOpenDialog *m_pfod = NULL;
     IFileDialog *m_pfd = NULL;
+    UINT m_cFileTypes = 0;
     COMDLG_FILTERSPEC *m_rgFilterSpec = NULL;
-
-    OPENFILENAMEW *m_ofn = NULL;   // low-level access to OPENFILENAMEW
-    FXuint         m_opts = 0;
-    FXchar **m_pszFoxPats = NULL;
-    FXchar *m_pszFoxCustomPat = NULL;
-    FXint          m_nFoxPats = 0;
+    FXString *m_filterNames = NULL;
+    FXString *m_filterPatterns = NULL;
+    CLSID m_clsid = CLSID_NULL;
 
     FXString *m_filenames = NULL;
-
     FXWindow *m_owner = NULL;
 
 private:
   FXFileDialogEx(const FXFileDialogEx&);
-  FXFileDialogEx& operator=(const FXFileDialogEx&);
+  FXFileDialogEx& operator=(const FXFileDialogEx&) = delete;
 
-  // get FOX patterns into Win32 patterns
-  void getWinPattern(FXchar*& pszWinPat, const FXchar* pszFoxPat) const;
   void deleteFilters(void);
 protected:
   FXFileDialogEx();
