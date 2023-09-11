@@ -1,15 +1,10 @@
-csmapfx (1.7.24-1) stable; urgency=low
-
-  * windows: use IFileDialog, populate Recent Files jumplist.
-
-  -- Enno Rehling <enno@eressea.de>  Sun, 10 Sep 2023 21:00:00 +0200
-
 csmapfx (1.7.23-1) stable; urgency=low
 
   * bug: syntax check was clearing search results
   * don't try loading orders from recent files without active report.
+  * windows: use IFileDialog, populate Recent Files jumplist.
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 27 Aug 2023 21:00:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Sun, 10 Sep 2023 21:00:00 +0200
 
 csmapfx (1.7.22-1) stable; urgency=low
 

@@ -38,9 +38,12 @@
 // use commctl32 dialog on Win32, or normal FXFileDialog for other platforms
 #if !defined(WIN32)
 #include <fx.h>
-#define FXFileDialogEx FXFileDialog
 #define DLGEX_SAVE              0
+#define DLGEX_OVERWRITEPROMPT   0
+#define DLGEX_CREATEPROMPT      0
 #define DLGEX_DONTADDTORECENT   0
+#define DLGEX_PATHMUSTEXIST     0
+#define DLGEX_FILEMUSTEXIST     0
 #define DLGEX_ALLOWMULTISELECT  0
 #else
 #include <FXObject.h>
