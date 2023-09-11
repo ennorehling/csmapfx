@@ -69,8 +69,6 @@ LPCWSTR g_wszAppID = CSMAP_APP_ID;
 #include <stdexcept>
 #include <string>
 
-using namespace FXEX;
-
 FXDEFMAP(CSMap) MessageMap[]=
 {
     //________Message_Type_____________________ID_______________Message_Handler_______

@@ -39,7 +39,9 @@
 #if !defined(WIN32)
 #include <fx.h>
 #define FXFileDialogEx FXFileDialog
-#define DLGEX_SAVE			0
+#define DLGEX_SAVE              0
+#define DLGEX_DONTADDTORECENT   0
+#define DLGEX_ALLOWMULTISELECT  0
 #else
 #include <FXObject.h>
 using namespace FX;
@@ -149,6 +151,7 @@ public:
   virtual ~FXFileDialogEx();
   };
 
-} // namespace FXEX
+} 
+using namespace FXEX;
 #endif /* use commctl32 dialog */
 #endif /* FXFILEDIALOGEX_H */
