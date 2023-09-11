@@ -8,6 +8,12 @@ Name "CsMapFX"
 !ifdef MUI_VERSION
 !define MAIN_SECTION "CsMapFX ${MUI_VERSION}"
 OutFile "..\csmapinst-${MUI_VERSION}.exe"
+VIProductVersion ${MUI_VERSION}.0
+VIAddVersionKey /LANG=0 "CompanyName" "Eressea"
+VIAddVersionKey /LANG=0 "ProductName" "Coast and Sea Mapper"
+VIAddVersionKey /LANG=0 "FileDescription" "CsMapFX Application"
+VIAddVersionKey /LANG=0 "FileVersion" ${MUI_VERSION}
+VIAddVersionKey /LANG=0 "LegalCopyright" "Enno Rehling"
 !else
 !define MAIN_SECTION "CsMapFX"
 OutFile "..\csmapinst.exe"
@@ -81,6 +87,11 @@ Section "Start Menu Shortcuts"
 
 SectionEnd
 
+Section "Register File Types"
+WriteRegStr HKCU 'Software\Classes\.cr\OpenWithProgIDs' 'Eressea.Tools.CsMapFX' ''
+WriteRegStr HKCU 'Software\Classes\.cr\DefaultIcon' '' '$INSTDIR\CsMapFX.exe'
+WriteRegStr HKCU 'Software\Classes\Eressea.Tools.CsMapFX\shell\open\command' '' '"$INSTDIR\CsMapFX.exe" "%1"'
+SectionEnd
 ;--------------------------------
 
 ; Uninstaller
@@ -90,6 +101,8 @@ Section "Uninstall"
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CsMapFX"
   DeleteRegKey HKLM SOFTWARE\CsMapFX
+  DeleteRegKey HKCU 'Software\Classes\.cr'
+  DeleteRegKey HKCU 'Software\Classes\Eressea.Tools.CsMapFX'
 
   ; Remove files and uninstaller
   Delete $INSTDIR\CsMapFX.exe
