@@ -44,9 +44,6 @@
 #include <FXObject.h>
 using namespace FX;
 
-namespace FXEX {}
-using namespace FXEX;
-
 #ifndef _INC_COMMDLG
 struct OPENFILENAMEW;
 #endif
