@@ -3,8 +3,9 @@ csmapfx (1.7.23-1) stable; urgency=low
   * bug: syntax check was clearing search results
   * don't try loading orders from recent files without active report.
   * windows: use IFileDialog, populate Recent Files jumplist.
+  * windows: installer registers CR file type.
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 10 Sep 2023 21:00:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Tue, 12 Sep 2023 07:15:00 +0200
 
 csmapfx (1.7.22-1) stable; urgency=low
 
