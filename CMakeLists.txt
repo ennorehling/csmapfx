@@ -59,46 +59,44 @@ set (CPARSE_SOURCES
   cparse/builtin-features.cpp
 )
 
-set (SOURCES
+if (WIN32)
+set (APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/version.rc")
+set (PLATFORM_SOURCES ${PLATFORM_SOURCES} ${APP_ICON_RESOURCE_WINDOWS})
+set (PLATFORM WIN32)
+endif (WIN32)
+add_executable (${PROJECT_NAME} ${PLATFORM}
   ${PLATFORM_SOURCES}
   ${CPARSE_SOURCES}
-	calc.cpp
-	commands.cpp
-	csmap.cpp
-	datablock.cpp
-	datafile.cpp
-	exportdlg.cpp
-	FXFileDialogEx.cpp
-	fxhelper.cpp
-	FXMenuSeparatorEx.cpp
-	FXSplitterEx.cpp
-	infodlg.cpp
-	main.cpp
-	mapcanvas.cpp
-	map.cpp
-	messagelist.cpp
-	regioninfo.cpp
-	prefsdlg.cpp
-	properties.cpp
-	building_props.cpp
-	ship_props.cpp
-	regionpanel.cpp
-	regionlist.cpp
-	reportinfo.cpp
-	searchdlg.cpp
-	statistics.cpp
-	statspanel.cpp
-	symbols.cpp
-	tradepanel.cpp
-	unitlist.cpp
+  calc.cpp
+  commands.cpp
+  csmap.cpp
+  datablock.cpp
+  datafile.cpp
+  exportdlg.cpp
+  FXFileDialogEx.cpp
+  fxhelper.cpp
+  FXMenuSeparatorEx.cpp
+  FXSplitterEx.cpp
+  infodlg.cpp
+  main.cpp
+  mapcanvas.cpp
+  map.cpp
+  messagelist.cpp
+  regioninfo.cpp
+  prefsdlg.cpp
+  properties.cpp
+  building_props.cpp
+  ship_props.cpp
+  regionpanel.cpp
+  regionlist.cpp
+  reportinfo.cpp
+  searchdlg.cpp
+  statistics.cpp
+  statspanel.cpp
+  symbols.cpp
+  tradepanel.cpp
+  unitlist.cpp
 )
-
-if (WIN32)
-set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/version.rc")
-add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${APP_ICON_RESOURCE_WINDOWS})
-else (WIN32)
-add_executable(${PROJECT_NAME} ${SOURCES})
-endif (WIN32)
 
 if (CURL_FOUND)
 add_compile_definitions(HAVE_CURL)
