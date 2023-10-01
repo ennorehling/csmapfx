@@ -36,7 +36,9 @@ public:
 	bool modifiedCmds() const { return m_cmds.modified; }
 	void modifiedCmds(bool mod) { m_cmds.modified = mod; }
 
-    int turn() const;
+    FXString getVersion();
+    static int compareVersions(const FXString &lhs, const FXString &rhs);
+    int turn();
 	int recruitment() const { return m_recruitment; }
     int getFactionId() const { return m_factionId; }
 
@@ -222,7 +224,8 @@ protected:
     FXString m_password;
     int m_factionId;
     int m_recruitment;
-	mutable int m_turn;
+	int m_turn;
+    FXString m_version;
 	datablock::itor m_activefaction;
 
 	// hash tables

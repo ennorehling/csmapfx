@@ -5,16 +5,18 @@
 
 #define NGETTEXT(a, b, n) ((n==1) ? (a) : (b))
 
-#define WEIGHT_PERSON    1000
-#define WEIGHT_TROLL     2000
-#define WEIGHT_GOBLIN     600
-#define WEIGHT_HORSE     5000
-#define WEIGHT_CART      4000
-#define CAPACITY_PERSON   540
-#define CAPACITY_TROLL   1080
-#define CAPACITY_GOBLIN   440
-#define CAPACITY_HORSE   2000
-#define CAPACITY_CART   10000
+#define WEIGHT_PERSON      1000
+#define WEIGHT_TROLL       2000
+#define WEIGHT_GOBLIN       600
+#define WEIGHT_HORSE       5000
+#define WEIGHT_CART        4000
+#define WEIGHT_CATAPULT   10000
+#define CAPACITY_PERSON     540
+#define CAPACITY_TROLL     1080
+#define CAPACITY_GOBLIN     440
+#define CAPACITY_HORSE     2000
+#define CAPACITY_CART     10000
+#define CAPACITY_CATAPULT     0
 
 // *********************************************************************************************************
 // *** FXStatistics implementation
@@ -376,6 +378,7 @@ void FXUnitList::makeItems()
         FXint riding_skill = 0;
         FXint horses = 0;
         FXint carts = 0;
+        FXint catapults = 0;
         if (talents != end)		// does a TALENTE block exist?
         {
             FXTreeItem* node = appendItem(unititem, "Talente");
@@ -422,6 +425,9 @@ void FXUnitList::makeItems()
                 else if (info == "Wagen") {
                     carts += value;
                 }
+                else if (info == "Katapult") {
+                    catapults += value;
+                }
             }
             std::sort(properties.begin(), properties.end(), CompareProperties);
             for (const UnitProperty& item : properties) {
@@ -439,6 +445,12 @@ void FXUnitList::makeItems()
         FXint troll_carts = 0;
         FXint carry = CAPACITY_PERSON;
         FXint self = WEIGHT_PERSON;
+        FXint vehicles = carts;
+        FXbool catapult_is_vehicle = datafile::compareVersions(mapFile->getVersion(), "28.4") >= 0;
+        if (!catapult_is_vehicle) {
+            // catapults are vehicles, too!
+            catapults = 0;
+        }
         if (race == "Goblins") {
             carry = CAPACITY_GOBLIN;
             self = WEIGHT_GOBLIN;
@@ -449,14 +461,20 @@ void FXUnitList::makeItems()
             troll_carts = count / 4;
         }
         max_carts += troll_carts;
+        int max_catapults = 0;
         if (max_carts > carts) {
+            max_catapults = max_carts - carts;
             max_carts = carts;
         }
+        if (max_catapults > catapults) {
+            max_catapults = catapults;
+        }
 
-        FXint walk_cap = max_carts * CAPACITY_CART + max_horses * CAPACITY_HORSE;
+        FXint walk_cap = max_carts * CAPACITY_CART + max_horses * CAPACITY_HORSE + max_catapults * CAPACITY_CATAPULT;
         walk_cap += carry * count;
         walk_cap -= weight;
         /* the following are included in weight, but we don't have to carry them: */
+        walk_cap += max_catapults * WEIGHT_CATAPULT;
         walk_cap += max_carts * WEIGHT_CART;
         walk_cap += horses * WEIGHT_HORSE;
         walk_cap += self * count;
@@ -480,12 +498,18 @@ void FXUnitList::makeItems()
                 max_horses = horses;
             }
             max_carts = max_horses / 2;
+            int max_catapults = 0;
             if (max_carts > carts) {
+                max_catapults = max_carts - carts;
                 max_carts = carts;
             }
-            FXint ride_cap = max_carts * CAPACITY_CART + max_horses * CAPACITY_HORSE;
+            if (max_catapults > catapults) {
+                max_catapults = catapults;
+            }
+            FXint ride_cap = max_carts * CAPACITY_CART + max_horses * CAPACITY_HORSE + max_catapults * CAPACITY_CATAPULT;;
             ride_cap -= weight;
             /* the following are included in weight, but we don't have to carry them: */
+            ride_cap += max_catapults * WEIGHT_CATAPULT;
             ride_cap += max_carts * WEIGHT_CART;
             ride_cap += horses * WEIGHT_HORSE;
             if (max_horses > 0) {

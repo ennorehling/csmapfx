@@ -56,7 +56,28 @@ static inline char* getNextLine(char* str)
 	return next;
 }
 
-int datafile::turn() const
+FXString datafile::getVersion()
+{
+    if (m_version.empty()) {
+        datablock::citor block;
+        for (block = m_blocks.begin(); block != m_blocks.end(); block++)
+        {
+            // set turn number to that found in version block
+            if (block->type() == block_type::TYPE_VERSION) {
+                m_version = block->value("Build");
+                break;
+            }
+        }
+    }
+    return m_version;
+}
+
+int datafile::compareVersions(const FXString &lhs, const FXString &rhs)
+{
+    return strcmp(lhs.text(), rhs.text());
+}
+
+int datafile::turn()
 {
     if (m_turn < 0) {
         datablock::citor block;
