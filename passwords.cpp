@@ -1,3 +1,7 @@
+#ifdef WIN32
+#include "win32.h"
+#endif
+
 #include "passwords.h"
 #include "fxhelper.h"
 
@@ -23,8 +27,16 @@ bool Passwords::get(int factionId, FXString &out) {
 
 void Passwords::loadState(FXRegistry &reg)
 {
-    FXString stream = reg.readStringEntry("settings", "passwords");
-    FXint i = 0;
+    FXString stream;
+#ifdef ENCRYPTED_PASSWORDS
+    stream = reg.readStringEntry("settings", "crypted_passwords");
+    if (!stream.empty()) {
+        stream = DecryptString(stream);
+    }
+#endif
+    if (stream.empty()) {
+        stream = reg.readStringEntry("settings", "passwords");
+    }
     for (FXint i = 0;;++i) {
         FXString item = stream.section(' ', i);
         if (item.empty()) break;
@@ -49,5 +61,12 @@ void Passwords::saveState(FXRegistry &reg)
         }
         stream += FXStringValEx(factionId, 36) + ":" + FXStringVal(turn) + ":" + password;
     }
-    reg.writeStringEntry("settings", "passwords", stream.text());
+#ifdef ENCRYPTED_PASSWORDS
+    FXString encrypted = EncryptString(stream);
+    if (!encrypted.empty()) {
+        reg.writeStringEntry("settings", "crypted_passwords", encrypted.text());
+        return;
+    }
+#endif
+    reg.writeStringEntry("settings", "crypted_passwords", stream.text());
 }
