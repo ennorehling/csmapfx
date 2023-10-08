@@ -301,6 +301,62 @@ int GetImagePatternList(const FXString& defaultType, FXString &result)
     return index;
 }
 
+FXString EncryptString(const FXString &input)
+{
+    FXString output;
+    DATA_BLOB DataIn;
+    DATA_BLOB DataOut;
+    DataOut.cbData = 0;
+    DataIn.pbData = (BYTE *)const_cast<FXchar *>(input.text());
+    DataIn.cbData = input.length();
+    if (CryptProtectData(&DataIn, NULL, NULL, NULL, NULL, 0, &DataOut)) {
+        DWORD cDestSize = 0;
+        if (CryptBinaryToString(DataOut.pbData, DataOut.cbData, CRYPT_STRING_BASE64, NULL, &cDestSize)) {
+            LPTSTR pszDestination = static_cast<LPTSTR> (LocalAlloc(0, cDestSize * sizeof(TCHAR)));
+            if (pszDestination) {
+                if (CryptBinaryToString(DataOut.pbData, DataOut.cbData, CRYPT_STRING_BASE64, pszDestination, &cDestSize)) {
+                    output.assign(pszDestination);
+                }
+                LocalFree(pszDestination);
+            }
+        }
+        LocalFree(DataOut.pbData);
+    }
+    return output;
+}
+
+FXString DecryptString(const FXString &input)
+{
+    FXString output;
+    DWORD cchString = 0;
+    cchString = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, input.text(), input.length(), NULL, 0);
+    if (cchString > 0) {
+        LPTSTR pszString = static_cast<LPTSTR> (LocalAlloc(0, cchString * sizeof(TCHAR)));
+        if (pszString) {
+            DWORD cbBinary = 0;
+            cchString = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, input.text(), input.length(), pszString, cchString);
+            if (CryptStringToBinary(pszString, cchString, CRYPT_STRING_BASE64, NULL, &cbBinary, NULL, NULL)) {
+                BYTE * pbBinary = static_cast<BYTE *> (LocalAlloc(0, cbBinary));
+                if (pbBinary) {
+                    if (CryptStringToBinary(pszString, cchString, CRYPT_STRING_BASE64, pbBinary, &cbBinary, NULL, NULL)) {
+                        DATA_BLOB DataIn;
+                        DATA_BLOB DataOut;
+                        DataOut.cbData = 0;
+                        DataIn.cbData = cbBinary;
+                        DataIn.pbData = pbBinary;
+                        if (CryptUnprotectData(&DataIn, NULL, NULL, NULL, NULL, 0, &DataOut)) {
+                            output.assign((FXchar *)DataOut.pbData, (FXint)DataOut.cbData);
+                        }
+                    }
+                    LocalFree(pbBinary);
+                }
+            }
+            LocalFree(pszString);
+        }
+    }
+    return output;
+}
+
 int GetEncoderClsid(const FXString &format, CLSID *pClsid)
 {
     UINT  num = 0;          // number of image encoders
