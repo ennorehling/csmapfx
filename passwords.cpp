@@ -11,6 +11,12 @@ void Passwords::erase(int factionId) {
 
 void Passwords::set(int factionId, int turn, const FXString &password) {
     if (!password.empty()) {
+        FXString lopass = password;
+        lopass.lower();
+        if (lopass == "passwort" || lopass == "password" || lopass == "hier-passwort") {
+            // bogus password, do not remember
+            return;
+        }
         std::map<int, Password>::iterator iPassword = m_data.find(factionId);
         if (iPassword == m_data.end() || turn >= (*iPassword).second.turn) {
             m_data[factionId] = Password{ turn, password };
