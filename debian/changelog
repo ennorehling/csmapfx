@@ -3,7 +3,7 @@ csmapfx (1.7.24-1) stable; urgency=low
   * remember passwords for more than one faction
   * windows: encrypt stored passwords
 
-  -- Enno Rehling <enno@eressea.de>  Tue, 08 Oct 2023 16:45:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Sun, 08 Oct 2023 16:45:00 +0200
 
 csmapfx (1.7.23-1) stable; urgency=low
 
