@@ -3,6 +3,7 @@
 
 #include "terrain.h"
 #include "datafile.h"
+#include "passwords.h"
 
 #include <fx.h>
 
@@ -231,7 +232,7 @@ private:
     bool closeFile();
     void saveCommandsDlg(bool stripped, bool replace);
     FXString askFileName(const FXString& title, const FXString& patterns, FXint opts);
-    FXString askPasswordDlg(const FXString& faction_id);
+    FXString askPasswordDlg(int factionId);
     bool confirmOverwrite();
     bool loadCommands(const FXString& filename);
     bool updateCommands(const FXString& filename);
@@ -377,11 +378,9 @@ private:
     };
 
     struct {
-        // password for active faction
-        FXString faction_id;
-        FXString password;
         FXString echeck_dir;
     } settings;
+    Passwords passwords;
 
 	// icons for toolbar
 	struct
