@@ -21,7 +21,7 @@
 #include "version.h"
 #include "fxhelper.h"
 
-FX::FXString FXString_Empty("");
+FX::FXString FXString_Empty(FX::FXString::null);
 
 FX::FXString utf2iso(const FX::FXString& s)
 {

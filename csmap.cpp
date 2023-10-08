@@ -783,8 +783,11 @@ void CSMap::create()
 #endif
     const FXchar *passwd = reg.readStringEntry("settings", "password", nullptr);
     if (passwd) {
-        settings.password.assign(passwd);
-        settings.faction_id = reg.readStringEntry("settings", "faction", "");
+        FXString faction = reg.readStringEntry("settings", "faction", nullptr);
+        if (!faction.empty()) {
+            int factionId = FXIntVal(faction, 36);
+            passwords.set(factionId, 0, passwd);
+        }
     }
     FXint x = reg.readUnsignedEntry("WINDOW", "XPOS", 100);
     FXint y = reg.readUnsignedEntry("WINDOW", "YPOS", 100);
@@ -814,6 +817,7 @@ void CSMap::create()
     msgBorder->setHeight(msgHeight);
     commandframe->setHeight(cmdHeight);
 
+    passwords.loadState(reg);
     // reload InfoDlg/SearchDlg window size
     searchdlg->loadState(reg);
     infodlg->loadState(reg);
@@ -887,10 +891,9 @@ FXbool CSMap::close(FXbool notify)
     if (!settings.echeck_dir.empty()) {
         reg.writeStringEntry("settings", "echeck_dir", settings.echeck_dir.text());
     }
-    if (!settings.password.empty()) {
-        reg.writeStringEntry("settings", "password", settings.password.text());
-        reg.writeStringEntry("settings", "faction", settings.faction_id.text());
-    }
+    passwords.saveState(reg);
+    reg.deleteEntry("settings", "password");
+    reg.deleteEntry("settings", "faction");
 
     // save configuration
     if (!isMaximized() && !isMinimized())
@@ -1191,8 +1194,8 @@ void CSMap::loadFile(const FXString& filename)
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", errorMessage.text());
     }
     if (report) {
-        report->createHashTables();
         report->parseMessages();
+        passwords.set(report->getActiveFactionId(), report->turn(), report->getPassword());
     }
 }
 
@@ -1299,12 +1302,9 @@ bool CSMap::loadCommands(const FXString& filename)
             return false;
         }
         FXString password = report->getPassword();
-        if (!password.empty()) {
-            settings.password = password;
-        }
         int factionId = report->getFactionId();
-        if (factionId > 0) {
-            settings.faction_id = FXStringValEx(factionId, 36);
+        if (!password.empty() && factionId > 0) {
+            passwords.set(factionId, report->turn(), password.text());
         }
         updateModificationTime();
     }
@@ -1330,7 +1330,11 @@ bool CSMap::saveCommands(const FXString &filename, bool stripped)
     if (!haveActiveFaction())
         return false;
 
-    FXint res = report->saveCmds(filename.text(), settings.password, stripped);    // nicht \u00fcberschreiben
+    int factionId = report->getFactionId();
+    if (factionId == 0)
+        return 0;
+    FXString passwd = askPasswordDlg(factionId);
+    FXint res = report->saveCmds(filename.text(), passwd, stripped);    // nicht \u00fcberschreiben
     if (res < 0) {
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
         return false;
@@ -2518,6 +2522,7 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames, std::vector<FXStri
     }
     if (report) {
         report->parseMessages();
+        passwords.set(report->getActiveFactionId(), report->turn(), report->getPassword());
     }
 }
 
@@ -2911,20 +2916,19 @@ long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
     int factionId = report->getFactionId();
     if (factionId == 0)
         return 0;
-    FXString id = FXStringValEx(factionId, 36);
-    FXString passwd = askPasswordDlg(id);
+    FXString passwd = askPasswordDlg(factionId);
     if (u_mkstemp(infile)) {
         FXString filename(infile);
         if (report->saveCmds(filename, passwd, true) == 0) {
             long code;
             FXString body;
-            code = UploadFile(filename, id, passwd, body);
+            code = UploadFile(filename, FXStringValEx(factionId, 36), passwd, body);
             remove(infile);
             if (code > 0x10000) {
                 FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Interner Fehler %ld: %s", code - 0x10000, body.text());
             }
             else if (code == 401) {
-                settings.password.clear();
+                passwords.erase(factionId);
                 FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Fehler %ld: Falsches Passwort.", code);
             }
             else if (code >= 500) {
@@ -2941,24 +2945,22 @@ long CSMap::onFileUploadCommands(FXObject*, FXSelector, void* ptr)
     return 0;
 }
 
-FXString CSMap::askPasswordDlg(const FXString &faction_id) {
-    FXString passwd = settings.password;
-    if (passwd.empty() || faction_id != settings.faction_id)
-    {
+FXString CSMap::askPasswordDlg(int factionId) {
+    FXString password;
+    if (!passwords.get(factionId, password)) {
         FXInputDialog dlg(this, "Passwort eingeben",
-            L"Geben Sie das Passwort f\u00fcr die Partei " + faction_id + " ein:",
+            L"Geben Sie das Passwort f\u00fcr die Partei " + FXStringValEx(factionId, 36) + " ein:",
             nullptr, INPUTDIALOG_STRING | INPUTDIALOG_PASSWORD);
         FXint res = dlg.execute(PLACEMENT_SCREEN);
         if (res)
         {
-            passwd = dlg.getText();
-            if (!passwd.empty()) {
-                settings.faction_id = faction_id;
-                settings.password = passwd;
+            password = dlg.getText();
+            if (!password.empty()) {
+                passwords.set(factionId, report->turn(), password);
             }
         }
     }
-    return passwd;
+    return password;
 }
 
 FXString CSMap::askFileName(const FXString &dlgTitle, const FXString &patterns, FXint opts) {
@@ -3002,9 +3004,8 @@ void CSMap::saveCommandsDlg(bool stripped, bool replace)
     int factionId = report->getFactionId();
     if (factionId == 0)
         return;
-    FXString id = FXStringValEx(factionId, 36);
     FXString filename = report->cmdfilename();
-    FXString passwd = askPasswordDlg(id);
+    FXString passwd = askPasswordDlg(factionId);
 
     if (stripped || filename.empty()) {
         filename = askFileName(

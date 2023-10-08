@@ -188,7 +188,7 @@ static FXString evaluate(const char* expr)
             return format_double(f);
         }
     }
-    return FXString_Empty;
+    return FXString::null;
 }
 #else
 static FXString evaluate(const char* expr)
@@ -214,7 +214,7 @@ static FXString evaluate(const char* expr)
             return FXString("Fehler");
         }
     }
-    return FXString_Empty;
+    return FXString::null;
 }
 #endif
 

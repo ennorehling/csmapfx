@@ -662,6 +662,11 @@ void datafile::merge(datafile * old_cr, int x_offset, int y_offset)
         ++old_r;
     }
     createHashTables(); 
+    if (old_cr->getActiveFactionId() != getActiveFactionId()) {
+        if (m_password.empty()) {
+            m_password = old_cr->m_password;
+        }
+    }
 }
 
 const char* datafile::getConfigurationName(map_type type)
@@ -936,10 +941,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 	
 	out << " " << FXStringValEx(m_factionId, 36) << " ";
 	
-	if (password.empty())	
-		out << "\"HIER-PASSWORT\"" << "\n";
-	else
-		out << "\"" << password << "\"\n";
+	out << "\"" << password << "\"\n";
     
 	// output prefix lines
 	if (!stripped && !m_cmds.prefix_lines.empty())
@@ -1870,7 +1872,8 @@ void datafile::updateHashTables(const datablock::itor& start)
 
         // generate list of units that got a "got taxes" message (E3 only)
         else if (block->type() == block_type::TYPE_MESSAGE) {
-            if (block->value("type") == "1264208711")
+            int type = block->valueInt(TYPE_MSG_TYPE);
+            if (type == 1264208711)
             {
                 //std::set<int> unit_got_taxes;
                 int unitId = block->valueInt("unit", -1);
@@ -2075,7 +2078,11 @@ void datafile::parseMessages()
             do {
                 datablock& block = *it++;
                 int type = block.valueInt(TYPE_MSG_TYPE);
-                if (type != 771334452 && type != 443066738) {
+                if (type == 1784377885) {
+                    // Passwort wurde geändert
+                    m_password = block.value("value");
+                }
+                else if (type != 771334452 && type != 443066738) {
                     continue;
                 }
                 const datakey::list_type& list = block.data();

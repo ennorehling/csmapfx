@@ -96,7 +96,7 @@ add_executable (${PROJECT_NAME} ${PLATFORM}
   symbols.cpp
   tradepanel.cpp
   unitlist.cpp
-)
+  passwords.cpp)
 
 if (CURL_FOUND)
 add_compile_definitions(HAVE_CURL)
