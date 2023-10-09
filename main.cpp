@@ -203,6 +203,7 @@ int main(int argc, char *argv[])
         return -1;
     }
     csmap->mapChange();
+    csmap->checkCommands();
     csmap->show(PLACEMENT_DEFAULT);
 
     // Run 

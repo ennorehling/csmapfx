@@ -237,10 +237,10 @@ private:
     bool loadCommands(const FXString& filename);
     bool updateCommands(const FXString& filename);
     bool saveCommands(const FXString& filename, bool stripped);
-    bool checkCommands();
     void updateFileNames();
 
 public:
+    bool checkCommands();
     enum ExportOptions {
         exportNames = 0x01,
         exportIslands = 0x02,

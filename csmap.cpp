@@ -1153,9 +1153,6 @@ void CSMap::mapChange()
     regionInfo->setMapFile(report);
     map->setMapFile(report);
     regions->setMapFile(report);
-    if (report) {
-        checkCommands();
-    }
 }
 
 long CSMap::updOpenFile(FXObject *sender, FXSelector, void *)
@@ -1382,7 +1379,10 @@ bool CSMap::checkCommands()
         errorList->appendItem("Could not find the echeck executable.");
     }
     else {
-        if (!u_mkstemp(infile) || report->saveCmds(infile, "", true) != 0) {
+        FXint factionId = report->getActiveFactionId();
+        FXString password;
+        passwords.get(factionId, password);
+        if (!u_mkstemp(infile) || report->saveCmds(infile, password, true) != 0) {
             errorList->appendItem("Could not save commands for analysis.");
         }
         else {
