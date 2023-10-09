@@ -1,3 +1,9 @@
+csmapfx (1.7.25-1) stable; urgency=low
+
+  * eliminate bogus echeck password warning
+
+  -- Enno Rehling <enno@eressea.de>  Mon, 09 Oct 2023 19:45:00 +0200
+
 csmapfx (1.7.24-1) stable; urgency=low
 
   * remember passwords for more than one faction
