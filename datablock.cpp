@@ -776,7 +776,7 @@ void datablock::attachment(::attachment* attach)
 }
 
 const char* datablock::UNITKEYS[] = {
-    "target", "unit", "mage", "spy", "teacher", nullptr
+    "target", "unit", "mage", "spy", "teacher", "student", nullptr
 };
 
 bool datablock::hasReference(const datablock& target) const

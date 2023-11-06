@@ -1364,6 +1364,7 @@ bool CSMap::checkCommands()
     char infile[PATH_MAX];
     char outfile[PATH_MAX];
     FXString cmdline("echeck");
+
 #ifdef WIN32
     cmdline += "w.exe";
     if (!settings.echeck_dir.empty()) {
@@ -1378,7 +1379,7 @@ bool CSMap::checkCommands()
     if (cmdline.empty()) {
         errorList->appendItem("Could not find the echeck executable.");
     }
-    else {
+    else if (report.get()) {
         FXint factionId = report->getActiveFactionId();
         FXString password;
         passwords.get(factionId, password);

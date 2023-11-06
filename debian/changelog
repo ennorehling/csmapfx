@@ -1,8 +1,10 @@
 csmapfx (1.7.25-1) stable; urgency=low
 
-  * eliminate bogus echeck password warning
+  * eliminate bogus echeck password warning.
+  * show teaching message on student units.
+  * fix an occasional crash at startup.
 
-  -- Enno Rehling <enno@eressea.de>  Mon, 09 Oct 2023 19:45:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Mon, 06 Nov 2023 18:15:00 +0200
 
 csmapfx (1.7.24-1) stable; urgency=low
 
