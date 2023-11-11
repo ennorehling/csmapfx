@@ -973,6 +973,7 @@ void CSMap::mapChange()
         if (name_of_game.empty())
             name_of_game = "default";
 
+        checkCommands();
         infodlg->setGame(name_of_game);
 
         // get info about active faction
@@ -2634,7 +2635,6 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
             loadFile(filename);
             if (report) {
                 addRecentFile(filename);
-                checkCommands();
             }
             mapChange();
             updateFileNames();
@@ -2866,7 +2866,6 @@ long CSMap::onFileOpenCommands(FXObject *, FXSelector, void *)
         if (loadCommands(filename)) {
             addRecentFile(filename);
             updateFileNames();
-            checkCommands();
         }
         getApp()->endWaitCursor();
         return 1;
@@ -3140,7 +3139,6 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
             updateFileNames();
             if (report) {
                 addRecentFile(filename);
-                checkCommands();
             }
         }
     }
@@ -3148,7 +3146,6 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
         recentFiles.removeFile(filename);
         if (loadCommands(filename)) {
             addRecentFile(filename);
-            checkCommands();
         }
         updateFileNames();
     }

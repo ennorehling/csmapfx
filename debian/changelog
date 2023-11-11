@@ -1,3 +1,10 @@
+csmapfx (1.7.26-1) stable; urgency=low
+
+  * map merge was clearing error list.
+  * check errors after reloading order file.
+
+  -- Enno Rehling <enno@eressea.de>  Sat, 11 Nov 2023 12:30:00 +0200
+
 csmapfx (1.7.25-1) stable; urgency=low
 
   * eliminate bogus echeck password warning.
