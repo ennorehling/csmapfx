@@ -261,6 +261,13 @@ long FXCalculator::onChanged(FXObject*, FXSelector, void*)
         }
     }
 
+    // HACK: https://bugs.eressea.de/view.php?id=2962
+    // https://github.com/cparse/cparse/issues/104 
+    FXint pos = 0;
+    while ((pos = exp.find(':', pos)) >= 0) {
+        exp.erase(pos);
+    }
+
     FXString resultstr = evaluate(exp.text());
     if (resultstr.length() > 15)
     {
