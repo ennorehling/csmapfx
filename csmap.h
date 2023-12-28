@@ -36,6 +36,7 @@ public:		// this functions are slots for menu commands
 	long onFileSaveAll(FXObject*, FXSelector, void*);
     long onFileExportMap(FXObject*, FXSelector, void*);
     long onFileExportImage(FXObject*, FXSelector, void*);
+    long onLocateECheck(FXObject*, FXSelector, void*);
     long onFileClose(FXObject*, FXSelector, void*);
     long onFilePreferences(FXObject*, FXSelector, void*);
 	long onFileOpenCommands(FXObject*, FXSelector, void* ptr);
@@ -152,6 +153,7 @@ public:		// this functions are slots for menu commands
         ID_FILE_LOAD_ORDERS,
         ID_FILE_SAVE_ORDERS,
         ID_FILE_CHECK_ORDERS,
+        ID_FILE_LOCATE_ECHECK,
         ID_FILE_EXPORT_ORDERS,
         ID_FILE_MODIFY_CHECK,
         ID_FILE_QUIT,
@@ -263,9 +265,10 @@ private:
     class FXIcon* appIcon = nullptr;
 
 	// Menubar
-    class FXMenuBar		*menubar = nullptr;
-    class FXMenuPane	*filemenu = nullptr, *recentmenu = nullptr, *viewmenu = nullptr, *regionmenu = nullptr, *factionmenu = nullptr;
-    class FXMenuPane	*mapmenu = nullptr, *selectionmenu = nullptr, *planemenu = nullptr, *zoommenu = nullptr, *helpmenu = nullptr;
+    class FXMenuBar *menubar = nullptr;
+    class FXMenuPane *filemenu = nullptr, *recentmenu = nullptr, *viewmenu = nullptr, *regionmenu = nullptr, *factionmenu = nullptr;
+    class FXMenuPane *mapmenu = nullptr, *selectionmenu = nullptr, *planemenu = nullptr, *zoommenu = nullptr, *helpmenu = nullptr;
+    class FXMenuPane *optionsmenu = nullptr;
 
 	// Toolbar
     class FXToolBar		*toolbar = nullptr;

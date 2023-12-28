@@ -92,6 +92,7 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_MAP,          CSMap::updOpenFile),
 
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_EXPORT_IMAGE,        CSMap::onFileExportImage),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_LOCATE_ECHECK,       CSMap::onLocateECheck),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_IMAGE,        CSMap::updOpenFile),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_UPLOAD_ORDERS,       CSMap::onFileUploadCommands),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_UPLOAD_ORDERS,       CSMap::updOpenFile),
@@ -398,8 +399,6 @@ CSMap::CSMap(FXApp *app) :
         filemenu,
         L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",
         nullptr, this, ID_FILE_EXPORT_ORDERS);
-    menu.modifycheck = new FXMenuCheck(filemenu, 
-        L"\u00c4nderungserkennung\t\tAutomatische \u00c4nderungserkennung.", this, ID_FILE_MODIFY_CHECK);
 
     FXString noText;
     new FXMenuSeparatorEx(filemenu);
@@ -456,7 +455,7 @@ CSMap::CSMap(FXApp *app) :
 
     // Region menu
     regionmenu = new FXMenuPane(this);
-    new FXMenuTitle(menubar, "B&earbeiten", nullptr,regionmenu);
+    new FXMenuTitle(menubar, "B&earbeiten", nullptr, regionmenu);
     new FXMenuCommand(regionmenu, "&Suchen...\tCtrl-F\tEine Region, Einheit, Schiff, etc. suchen.", nullptr, this, ID_VIEW_SEARCHDLG);
     new FXMenuCommand(regionmenu, "&Ursprung setzen\t\tDen Kartenursprung (0/0) auf die markierte Region setzen.", nullptr, this, ID_MAP_SETORIGIN, 0);
     new FXMenuSeparatorEx(regionmenu, "Regionen");
@@ -473,6 +472,13 @@ CSMap::CSMap(FXApp *app) :
 
     new FXMenuCommand(regionmenu, L"Markierte &ausw\u00e4hlen\tCtrl-Space\tMarkierte Region ausw\u00e4hlen.", nullptr, this, ID_MAP_SELECTMARKED, 0);
     new FXMenuCommand(regionmenu, L"Markierte &l\u00f6schen\t\t", nullptr, this, ID_REGION_REMOVESEL);
+
+    // Options menu
+    optionsmenu = new FXMenuPane(this);
+    new FXMenuTitle(menubar, "&Optionen", nullptr, optionsmenu);
+    menu.modifycheck = new FXMenuCheck(optionsmenu,
+        L"\u00c4nderungserkennung\t\tAutomatische \u00c4nderungserkennung.", this, ID_FILE_MODIFY_CHECK);
+    new FXMenuCommand(optionsmenu, L"ECheck finden...\t\t", nullptr, this, ID_FILE_LOCATE_ECHECK);
 
     // Faction menu
     factionmenu = new FXMenuPane(this);
@@ -3113,6 +3119,11 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
     return FXMessageBox::error(this, MBOX_OK, "Not Implemented",
         "Sorry, this version of CsMap was compiled without PNG support");
 #endif
+}
+
+long CSMap::onLocateECheck(FXObject *, FXSelector, void *)
+{
+    return 0;
 }
 
 long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
