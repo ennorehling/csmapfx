@@ -57,6 +57,7 @@ public:
     void merge(datafile* old_cr, int x_offset = 0, int y_offset = 0);
 
     int loadCmds(const FXString &filename);
+	void saveCmds(std::ostream &out, const att_commands * cmds);
 	int saveCmds(const FXString &filename, const FXString &passwd, bool stripped);
 
     FXString getPassword() const { return m_password; }
