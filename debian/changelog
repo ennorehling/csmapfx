@@ -1,15 +1,16 @@
 csmapfx (1.7.27-1) stable; urgency=low
 
   * fix the calculator crash (bug 2962)
+  * detect origin mismatch in order files
 
-  -- Enno Rehling <enno@eressea.de>  Sat, 28 Dec 2023 19:45:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Fri, 29 Dec 2023 21:00:00 +0100
 
 csmapfx (1.7.26-1) stable; urgency=low
 
   * map merge was clearing error list.
   * check errors after reloading order file.
 
-  -- Enno Rehling <enno@eressea.de>  Sat, 11 Nov 2023 12:30:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Sat, 11 Nov 2023 12:30:00 +0100
 
 csmapfx (1.7.25-1) stable; urgency=low
 
@@ -17,7 +18,7 @@ csmapfx (1.7.25-1) stable; urgency=low
   * show teaching message on student units.
   * fix an occasional crash at startup.
 
-  -- Enno Rehling <enno@eressea.de>  Mon, 06 Nov 2023 18:15:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Mon, 06 Nov 2023 18:15:00 +0100
 
 csmapfx (1.7.24-1) stable; urgency=low
 
