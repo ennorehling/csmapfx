@@ -911,7 +911,7 @@ int datafile::loadCmds(const FXString& filename)
     return true;
 }
 
-void datafile::saveCmds(std::ostream &out, const att_commands *cmds)
+void datafile::writeCmds(std::ostream &out, const att_commands *cmds)
 {
     out << cmds->header.text() << "\n";
 
@@ -978,7 +978,6 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 		out << "\n";
 	}
 
-	// loop through regions and units and complete the ordering lists
 	std::vector<int> *unit_order = nullptr;
 	for (datablock::itor region = m_blocks.end(), block = m_blocks.begin(); block != m_blocks.end(); block++)
 	{
@@ -990,7 +989,8 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
             if (it != m_cmds.region_lines.end())
             {
                 att_commands &cmds = (*it).second;
-                saveCmds(out, &cmds);
+                writeCmds(out, &cmds);
+                region = m_blocks.end();
             }
         }
         else if (block->type() == block_type::TYPE_UNIT)
@@ -1004,6 +1004,24 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
                 out << "  ; Einheit " << block->id() << " hat keinen Befehlsblock!\n";
                 continue;
             }
+
+            if (region != m_blocks.end()) {
+                // did not write a REGION header yet
+                out << "REGION " << region->x() << "," << region->y();
+                if (region->info()) {
+                    out << "," << region->info();
+                }
+                out << " ; " << region->value(TYPE_NAME);
+                out << " (" << region->terrainString() << ")" << std::endl;
+
+                if (int salary = region->valueInt("Lohn")) {
+                    out << "; ECheck Lohn " << salary << std::endl << std::endl;
+                }
+
+
+                region = m_blocks.end();
+            }
+
             // unit has command block
             //  EINHEIT wz5t;  Botschafter des Konzils [1,146245$,Beqwx(1/3)] kaempft nicht
 
