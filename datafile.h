@@ -203,16 +203,13 @@ protected:
 	{
 		bool modified;
 
-        // command lines before any units
+        // command lines before any orders
 		std::vector<FXString> prefix_lines;
 
 		// command lines in REGIONs
 		typedef std::map<Coordinates, att_commands> region_map_t;
-		typedef std::list< std::pair<Coordinates, std::vector<int> > > region_list_t;
 
 		region_map_t region_lines;
-		region_list_t region_order;		// keeps the correct order of regions and units in it
-
 	} m_cmds;
 
 	// the data blocks

@@ -765,7 +765,6 @@ int datafile::loadCmds(const FXString& filename)
     // consider command file as correct, read in commands
 	m_cmds.prefix_lines.clear();
 	m_cmds.region_lines.clear();
-	m_cmds.region_order.clear();
 
     int headerindent = 0, indent = 0;
 	// process lines
@@ -853,14 +852,6 @@ int datafile::loadCmds(const FXString& filename)
                     if (!getRegion(region, x, y, z))
                     {
                         throw std::runtime_error(("Region nicht gefunden: " + param).text());
-                    }
-                    if (region != m_blocks.end()) {
-                        Coordinates coor(region->x(), region->y(), region->info());
-                        // add to order list if not already in it
-                        if (m_cmds.region_lines.find(coor) == m_cmds.region_lines.end())
-                        {
-                            m_cmds.region_order.push_back(std::make_pair(coor, unit_order));
-                        }
                     }
                     unit_order.clear();
                     cmds_list = &region_list;
