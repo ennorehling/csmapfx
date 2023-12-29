@@ -796,8 +796,8 @@ int datafile::loadCmds(const FXString& filename)
 		throw std::runtime_error("Keine Befehle gefunden.");
 
 	att_commands* cmds_list = NULL;
-	std::vector<int> *unit_order = NULL;
-    datablock::itor block;
+	std::vector<int> * unit_order = NULL;
+    datablock::itor block, region = m_blocks.end();
     int unitId = 0;
 
     while (file.good())
@@ -811,13 +811,18 @@ int datafile::loadCmds(const FXString& filename)
             {
                 unitId = strtol(param.text(), nullptr, 36);
 
-                // add to order list for units of this region
-                if (unit_order)
-                    unit_order->push_back(unitId);
-
                 if (!getUnit(block, unitId))
                 {
                     throw std::runtime_error(("Einheit nicht gefunden: " + str).text());
+                }
+                if (region != m_blocks.end()) {
+                    if (!hasChild(region, block)) {
+                        throw std::runtime_error(("Einheit in falscher Region: " + str).text());
+                    }
+                    // add to order list for units of this region
+                    if (unit_order) {
+                        unit_order->push_back(unitId);
+                    }
                 }
                 setConfirmed(block, false); // TODO: cumbersome, but reading orders without a `; bestaetigt` comment must do this.
                 cmds_list = nullptr;
@@ -844,6 +849,10 @@ int datafile::loadCmds(const FXString& filename)
                     int y = strtol(ystr.text(), nullptr, 10);
                     int z = strtol(zstr.text(), nullptr, 10);
 
+                    if (!getRegion(region, x, y, z))
+                    {
+                        throw std::runtime_error(("Region nicht gefunden: " + param).text());
+                    }
                     // add to order list if not already in it
                     if (m_cmds.region_lines.find(Coordinates(x, y, z)) == m_cmds.region_lines.end())
                     {
@@ -1281,6 +1290,18 @@ bool datafile::getParent(datablock::itor& out, const datablock::itor& child)
     for (datablock::itor parent = child; parent != m_blocks.begin(); --parent) {
         if (parent->depth() < child->depth()) {
             out = parent;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool datafile::hasChild(const datablock::itor &parent, const datablock::itor &child)
+{
+    int depth = parent->depth();
+    for (datablock::itor itor = std::next(parent); itor != m_blocks.end() && itor->depth() > depth; ++itor)
+    {
+        if (itor == child) {
             return true;
         }
     }

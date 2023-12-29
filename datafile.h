@@ -67,6 +67,7 @@ public:
 
     bool hasUnits() const { return !m_units.empty(); }
     bool getParent(datablock::itor& out, const datablock::itor& child);
+    bool hasChild(const datablock::itor& parent, const datablock::itor &child);
     bool getChild(datablock::itor& out, const datablock::itor& parent, block_type type);
     bool getCommands(datablock::itor& out, const datablock::itor& unit);
     bool getUnit(datablock::itor& out, int id);
