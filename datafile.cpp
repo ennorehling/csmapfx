@@ -795,6 +795,7 @@ int datafile::loadCmds(const FXString& filename)
     if (!file.good())
 		throw std::runtime_error("Keine Befehle gefunden.");
 
+	att_commands region_list;
 	att_commands* cmds_list = NULL;
 	std::vector<int> * unit_order = NULL;
     datablock::itor block, region = m_blocks.end();
@@ -816,6 +817,8 @@ int datafile::loadCmds(const FXString& filename)
                     throw std::runtime_error(("Einheit nicht gefunden: " + str).text());
                 }
                 if (region != m_blocks.end()) {
+                    Coordinates coor(region->x(), region->y(), region->info());
+                    m_cmds.region_lines[coor] = region_list;
                     if (!hasChild(region, block)) {
                         throw std::runtime_error(("Einheit in falscher Region: " + str).text());
                     }
@@ -862,7 +865,7 @@ int datafile::loadCmds(const FXString& filename)
                     else
                         unit_order = NULL;
 
-                    cmds_list = &m_cmds.region_lines[Coordinates(x, y, z)];
+                    cmds_list = &region_list;
                 }
             }
             if (cmds_list) {
