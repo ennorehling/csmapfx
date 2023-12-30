@@ -697,6 +697,17 @@ FXString decodeLine(const std::string& line, bool& checkUTF8, bool& utf8)
     return FXString(line.c_str());
 }
 
+static FXString regionCommand(const datablock &region)
+{
+    FXString result = "REGION " + FXStringVal(region.x()) + "," + FXStringVal(region.y());
+    if (region.info()) {
+        result += "," + FXStringVal(region.info());
+    }
+    result += " ; " + region.value(TYPE_NAME);
+    result += " (" + region.terrainString() + ")";
+    return result;
+}
+
 // loads command file and attaches the commands to the units
 int datafile::loadCmds(const FXString& filename)
 {
@@ -817,12 +828,19 @@ int datafile::loadCmds(const FXString& filename)
                 }
                 if (region != m_blocks.end()) {
                     Coordinates coor(region->x(), region->y(), region->info());
-                    m_cmds.region_lines[coor] = region_list;
                     if (!hasChild(region, block)) {
-                        throw std::runtime_error(("Einheit in falscher Region: " + str).text());
+                        if (!getParent(region, block)) {
+                            throw std::runtime_error(("Einheit in falscher Region: " + str).text());
+                        }
+                        coor = Coordinates(region->x(), region->y(), region->info());
+                        region_list.header = regionCommand(*region);
                     }
+                    m_cmds.region_lines[coor] = region_list;
+                    region_list.clear();
+
                     // add to order list for units of this region
                     unit_order.push_back(unitId);
+                    region = m_blocks.end();
                 }
                 setConfirmed(block, false); // TODO: cumbersome, but reading orders without a `; bestaetigt` comment must do this.
                 cmds_list = nullptr;
@@ -984,14 +1002,6 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
         if (block->type() == block_type::TYPE_REGION)
         {
             region = block;
-            Coordinates koord(region->x(), region->y(), region->info());
-            auto it = m_cmds.region_lines.find(koord);
-            if (it != m_cmds.region_lines.end())
-            {
-                att_commands &cmds = (*it).second;
-                writeCmds(out, &cmds);
-                region = m_blocks.end();
-            }
         }
         else if (block->type() == block_type::TYPE_UNIT)
 		{
@@ -1006,19 +1016,21 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
             }
 
             if (region != m_blocks.end()) {
-                // did not write a REGION header yet
-                out << "REGION " << region->x() << "," << region->y();
-                if (region->info()) {
-                    out << "," << region->info();
+                Coordinates koord(region->x(), region->y(), region->info());
+                auto it = m_cmds.region_lines.find(koord);
+                if (it != m_cmds.region_lines.end())
+                {
+                    att_commands &cmds = (*it).second;
+                    writeCmds(out, &cmds);
                 }
-                out << " ; " << region->value(TYPE_NAME);
-                out << " (" << region->terrainString() << ")" << std::endl;
+                else {
+                    // did not write a REGION header yet
+                    out << regionCommand(*region) << std::endl;
 
-                if (int salary = region->valueInt("Lohn")) {
-                    out << "; ECheck Lohn " << salary << std::endl << std::endl;
+                    if (int salary = region->valueInt("Lohn")) {
+                        out << "; ECheck Lohn " << salary << std::endl << std::endl;
+                    }
                 }
-
-
                 region = m_blocks.end();
             }
 

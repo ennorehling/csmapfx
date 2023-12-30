@@ -2,8 +2,9 @@ csmapfx (1.7.27-1) stable; urgency=low
 
   * fix the calculator crash (bug 2962)
   * detect origin mismatch in order files
+  * read order files with origin offset
 
-  -- Enno Rehling <enno@eressea.de>  Fri, 29 Dec 2023 21:00:00 +0100
+  -- Enno Rehling <enno@eressea.de>  Sat, 30 Dec 2023 12:00:00 +0100
 
 csmapfx (1.7.26-1) stable; urgency=low
 
