@@ -57,6 +57,7 @@ public:
     void merge(datafile* old_cr, int x_offset = 0, int y_offset = 0);
 
     int loadCmds(const FXString &filename);
+	void writeCmds(std::ostream &out, const att_commands * cmds);
 	int saveCmds(const FXString &filename, const FXString &passwd, bool stripped);
 
     FXString getPassword() const { return m_password; }
@@ -67,6 +68,7 @@ public:
 
     bool hasUnits() const { return !m_units.empty(); }
     bool getParent(datablock::itor& out, const datablock::itor& child);
+    bool hasChild(const datablock::itor& parent, const datablock::itor &child);
     bool getChild(datablock::itor& out, const datablock::itor& parent, block_type type);
     bool getCommands(datablock::itor& out, const datablock::itor& unit);
     bool getUnit(datablock::itor& out, int id);
@@ -201,16 +203,13 @@ protected:
 	{
 		bool modified;
 
-        // command lines before any units
+        // command lines before any orders
 		std::vector<FXString> prefix_lines;
 
 		// command lines in REGIONs
 		typedef std::map<Coordinates, att_commands> region_map_t;
-		typedef std::list< std::pair<Coordinates, std::vector<int> > > region_list_t;
 
 		region_map_t region_lines;
-		region_list_t region_order;		// keeps the correct order of regions and units in it
-
 	} m_cmds;
 
 	// the data blocks

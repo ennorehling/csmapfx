@@ -697,6 +697,17 @@ FXString decodeLine(const std::string& line, bool& checkUTF8, bool& utf8)
     return FXString(line.c_str());
 }
 
+static FXString regionCommand(const datablock &region)
+{
+    FXString result = "REGION " + FXStringVal(region.x()) + "," + FXStringVal(region.y());
+    if (region.info()) {
+        result += "," + FXStringVal(region.info());
+    }
+    result += " ; " + region.value(TYPE_NAME);
+    result += " (" + region.terrainString() + ")";
+    return result;
+}
+
 // loads command file and attaches the commands to the units
 int datafile::loadCmds(const FXString& filename)
 {
@@ -765,7 +776,6 @@ int datafile::loadCmds(const FXString& filename)
     // consider command file as correct, read in commands
 	m_cmds.prefix_lines.clear();
 	m_cmds.region_lines.clear();
-	m_cmds.region_order.clear();
 
     int headerindent = 0, indent = 0;
 	// process lines
@@ -795,9 +805,10 @@ int datafile::loadCmds(const FXString& filename)
     if (!file.good())
 		throw std::runtime_error("Keine Befehle gefunden.");
 
+	att_commands region_list;
 	att_commands* cmds_list = NULL;
-	std::vector<int> *unit_order = NULL;
-    datablock::itor block;
+	std::vector<int> unit_order;
+    datablock::itor block, region = m_blocks.end();
     int unitId = 0;
 
     while (file.good())
@@ -811,13 +822,25 @@ int datafile::loadCmds(const FXString& filename)
             {
                 unitId = strtol(param.text(), nullptr, 36);
 
-                // add to order list for units of this region
-                if (unit_order)
-                    unit_order->push_back(unitId);
-
                 if (!getUnit(block, unitId))
                 {
                     throw std::runtime_error(("Einheit nicht gefunden: " + str).text());
+                }
+                if (region != m_blocks.end()) {
+                    Coordinates coor(region->x(), region->y(), region->info());
+                    if (!hasChild(region, block)) {
+                        if (!getParent(region, block)) {
+                            throw std::runtime_error(("Einheit in falscher Region: " + str).text());
+                        }
+                        coor = Coordinates(region->x(), region->y(), region->info());
+                        region_list.header = regionCommand(*region);
+                    }
+                    m_cmds.region_lines[coor] = region_list;
+                    region_list.clear();
+
+                    // add to order list for units of this region
+                    unit_order.push_back(unitId);
+                    region = m_blocks.end();
                 }
                 setConfirmed(block, false); // TODO: cumbersome, but reading orders without a `; bestaetigt` comment must do this.
                 cmds_list = nullptr;
@@ -844,16 +867,12 @@ int datafile::loadCmds(const FXString& filename)
                     int y = strtol(ystr.text(), nullptr, 10);
                     int z = strtol(zstr.text(), nullptr, 10);
 
-                    // add to order list if not already in it
-                    if (m_cmds.region_lines.find(Coordinates(x, y, z)) == m_cmds.region_lines.end())
+                    if (!getRegion(region, x, y, z))
                     {
-                        m_cmds.region_order.push_back(std::make_pair(Coordinates(x, y, z), std::vector<int>()));
-                        unit_order = &m_cmds.region_order.back().second;
+                        throw std::runtime_error(("Region nicht gefunden: " + param).text());
                     }
-                    else
-                        unit_order = NULL;
-
-                    cmds_list = &m_cmds.region_lines[Coordinates(x, y, z)];
+                    unit_order.clear();
+                    cmds_list = &region_list;
                 }
             }
             if (cmds_list) {
@@ -910,6 +929,25 @@ int datafile::loadCmds(const FXString& filename)
     return true;
 }
 
+void datafile::writeCmds(std::ostream &out, const att_commands *cmds)
+{
+    out << cmds->header.text() << "\n";
+
+    // output prefix lines
+    for (const FXString &itor : cmds->prefix_lines)
+        out << itor.text() << "\n";
+
+    // output changed commands
+    for (const FXString &itor : cmds->commands)
+        out << "    " << itor.text() << "\n";
+
+    // output postfix lines
+    out << "\n";
+    for (const FXString &itor : cmds->postfix_lines)
+        out << itor.text() << "\n";
+
+}
+
 // saves command file
 int datafile::saveCmds(const FXString& filename, const FXString& password, bool stripped)
 {
@@ -958,175 +996,102 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 		out << "\n";
 	}
 
-	// loop through regions and units and complete the ordering lists
 	std::vector<int> *unit_order = nullptr;
 	for (datablock::itor region = m_blocks.end(), block = m_blocks.begin(); block != m_blocks.end(); block++)
 	{
-		if (block->type() == block_type::TYPE_REGION)
-			region = block;
-		else if (block->type() == block_type::TYPE_UNIT)
+        if (block->type() == block_type::TYPE_REGION)
+        {
+            region = block;
+        }
+        else if (block->type() == block_type::TYPE_UNIT)
 		{
 			if (block->valueInt(TYPE_FACTION) != m_factionId)
 				continue;
 
-			// add region to list when first unit of active faction occurs
-			if (region != m_blocks.end())
-			{
-				Coordinates koord(region->x(), region->y(), region->info());
-
-				if (m_cmds.region_lines.find(koord) == m_cmds.region_lines.end())
-				{
-					// not in list yet, create header
-					att_commands* cmds = &m_cmds.region_lines[koord];
-
-					cmds->header = "REGION " + FXStringVal(region->x()) + "," + FXStringVal(region->y());
-					if (region->info())
-						cmds->header += "," + FXStringVal(region->info());
-
-                    cmds->header += " ; " + region->value(TYPE_NAME);
-					cmds->header += " (" + region->terrainString() + ")";
-
-					//  ; ECheck Lohn 13
-					if (int salary = region->valueInt("Lohn"))
-						cmds->prefix_lines.push_back("; ECheck Lohn " + FXStringVal(salary));
-
-					// put into the list
-					m_cmds.region_order.push_back(std::make_pair(koord, std::vector<int>()));
-
-					unit_order = &m_cmds.region_order.back().second;
-				}
-				else
-				{
-					cmds_t::region_list_t::iterator end = m_cmds.region_order.end();
-					for (cmds_t::region_list_t::iterator itor = m_cmds.region_order.begin(); itor != end; itor++)
-						if (itor->first == koord)
-						{
-							unit_order = &itor->second;
-							break;
-						}
-				}
-
-				region = m_blocks.end();		// add region only before the first unit
-			}
-
-			// add unit
-			int id = block->info();
-
-			if (unit_order) {
-				size_t i;
-				for (i = 0; i < unit_order->size(); i++) {
-					if ((*unit_order)[i] == id) {
-						break;
-					}
-				}
-				// when not found, add it
-				if (i == unit_order->size()) {
-					unit_order->push_back(id);
-				}
-			}
-		}
-	}
-
-	// loop through the ordering lists and print out the commands
-	for (cmds_t::region_list_t::iterator regord = m_cmds.region_order.begin(); regord != m_cmds.region_order.end(); regord++)
-	{
-		// REGION -144,142 ; Olymp-Vorgebirge (Hochland, 3 Personen, 146245$ Silber) [Draconis]
-
-		// output region header + text lines
-		att_commands* cmds = &m_cmds.region_lines[regord->first];
-
-		out << cmds->header.text() << "\n";
-
-		// output prefix lines
-		for (const FXString& itor : cmds->prefix_lines)
-			out << itor.text() << "\n";
-
-		// output changed commands
-        for (const FXString& itor : cmds->commands)
-			out << "    " << itor.text() << "\n";
-
-		// output postfix lines
-        out << "\n";
-        for (const FXString& itor : cmds->postfix_lines)
-			out << itor.text() << "\n";
-
-		// output units in order
-		std::vector<int>& order = regord->second;
-
-		for (std::vector<int>::const_iterator uid = order.begin(); uid != order.end(); uid++)
-		{
-			datablock::itor unit = this->unit(*uid);
-			if (unit == m_blocks.end())
-			{
-				// no unit there is. problem we have.
-				out << "  ; Einheit " << *uid << " (base10) nicht gefunden!\n";
-				continue;
-			}
-
             datablock::itor cmdb;
-            if (!getCommands(cmdb, unit))
+            if (!getCommands(cmdb, block))
             {
-				out << "  ; Einheit " << unit->id() << " hat keinen Befehlsblock!\n";
-				continue;
+                out << "  ; Einheit " << block->id() << " hat keinen Befehlsblock!\n";
+                continue;
             }
-			// unit has command block
-			//  EINHEIT wz5t;  Botschafter des Konzils [1,146245$,Beqwx(1/3)] kaempft nicht
 
-			att_commands* attcmds = static_cast<att_commands*>(cmdb->attachment());
-			if (attcmds && !attcmds->header.empty())
-				out << attcmds->header.text() << "\n";
-			else
-			{
-				// get amount of silber from GEGENSTAENDE block
-				int silver = 0;
-		
-				datablock::itor items = unit;
-				for (items++; items != m_blocks.end() && items->depth() > unit->depth(); items++)
-					if (items->type() == block_type::TYPE_ITEMS)
-					{
-						silver = items->valueInt(TYPE_SILVER);
-						break;
-					}
+            if (region != m_blocks.end()) {
+                Coordinates koord(region->x(), region->y(), region->info());
+                auto it = m_cmds.region_lines.find(koord);
+                if (it != m_cmds.region_lines.end())
+                {
+                    att_commands &cmds = (*it).second;
+                    writeCmds(out, &cmds);
+                }
+                else {
+                    // did not write a REGION header yet
+                    out << regionCommand(*region) << std::endl;
 
-				// output unit header
-				out << "EINHEIT " << unit->id();
+                    if (int salary = region->valueInt("Lohn")) {
+                        out << "; ECheck Lohn " << salary << std::endl << std::endl;
+                    }
+                }
+                region = m_blocks.end();
+            }
 
-				out << ";  " << unit->getName();
-			
-				out << " " << "[" << unit->valueInt(TYPE_NUMBER) << "," << silver << "$]";
+            // unit has command block
+            //  EINHEIT wz5t;  Botschafter des Konzils [1,146245$,Beqwx(1/3)] kaempft nicht
 
-				out << "\n";
-			}
+            att_commands *attcmds = static_cast<att_commands *>(cmdb->attachment());
+            if (attcmds && !attcmds->header.empty())
+                out << attcmds->header.text() << "\n";
+            else
+            {
+                // get amount of silber from GEGENSTAENDE block
+                int silver = 0;
 
-			// output attachment (changed) or default commands
-			if (attcmds)
-			{
-				if (isConfirmed(*unit))
-					out << "; bestaetigt\n";
+                datablock::itor items = block;
+                for (items++; items != m_blocks.end() && items->depth() > block->depth(); items++)
+                    if (items->type() == block_type::TYPE_ITEMS)
+                    {
+                        silver = items->valueInt(TYPE_SILVER);
+                        break;
+                    }
 
-				// output prefix lines
-				for (const FXString& itor : attcmds->prefix_lines)
-					out << itor.text() << "\n";
+                // output unit header
+                out << "EINHEIT " << block->id();
 
-				// output changed commands
-				{
-					for (const FXString& itor : attcmds->commands)
-						out << "    " << itor.text() << "\n";
-				}
+                out << ";  " << block->getName();
+
+                out << " " << "[" << block->valueInt(TYPE_NUMBER) << "," << silver << "$]";
+
+                out << "\n";
+            }
+
+            // output attachment (changed) or default commands
+            if (attcmds)
+            {
+                if (isConfirmed(*block))
+                    out << "; bestaetigt\n";
+
+                // output prefix lines
+                for (const FXString &itor : attcmds->prefix_lines)
+                    out << itor.text() << "\n";
+
+                // output changed commands
+                {
+                    for (const FXString &itor : attcmds->commands)
+                        out << "    " << itor.text() << "\n";
+                }
 
                 out << "\n";
                 // output postfix lines
-				for (const FXString& itor : attcmds->postfix_lines)
-					out << itor.text() << "\n";
-			}		
-			else
-			{
-				// output default commands
-				const datakey::list_type &list = cmdb->data();
+                for (const FXString &itor : attcmds->postfix_lines)
+                    out << itor.text() << "\n";
+            }
+            else
+            {
+                // output default commands
+                const datakey::list_type &list = cmdb->data();
 
-				for (const datakey &itor : list)
-					out << "    " << itor.value() << "\n";
-			}
+                for (const datakey &itor : list)
+                    out << "    " << itor.value() << "\n";
+            }
 		}
 	}
 
@@ -1281,6 +1246,18 @@ bool datafile::getParent(datablock::itor& out, const datablock::itor& child)
     for (datablock::itor parent = child; parent != m_blocks.begin(); --parent) {
         if (parent->depth() < child->depth()) {
             out = parent;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool datafile::hasChild(const datablock::itor &parent, const datablock::itor &child)
+{
+    int depth = parent->depth();
+    for (datablock::itor itor = std::next(parent); itor != m_blocks.end() && itor->depth() > depth; ++itor)
+    {
+        if (itor == child) {
             return true;
         }
     }

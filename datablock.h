@@ -214,6 +214,12 @@ public:
     att_commands(const class datablock& source);
 
     void addCommand(const FXString &line);
+    void clear() {
+        header.clear();
+        prefix_lines.clear();
+        commands.clear();
+        postfix_lines.clear();
+    }
 	typedef std::vector<FXString> cmdlist_t;
 
 	FXString	header;
