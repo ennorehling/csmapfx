@@ -220,7 +220,7 @@ static FXString evaluate(const char* expr)
 
 long FXCalculator::onChanged(FXObject*, FXSelector, void*)
 {
-    FXString exp = formula->getText();
+    FXString exp = formula->getText().trim();
 
     bool changed = false;
     for (int pos = exp.find_first_of("\t\r\n"); pos != -1; pos = exp.find_first_of("\t\r\n"))
