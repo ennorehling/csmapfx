@@ -146,8 +146,7 @@ datablock* datafile::getMessageTarget(const datablock& msg)
             return &*select;
         }
     }
-    return nullptr;
-    return nullptr;
+    return &*m_blocks.begin();
 }
 
 void datafile::openFile(const char* filename, std::ifstream& file, std::ios::openmode mode)

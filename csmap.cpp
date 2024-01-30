@@ -76,6 +76,9 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_CLIPBOARD_LOST,       SEL_NONE,                   CSMap::onClipboardLost),
     FXMAPFUNC(SEL_CLIPBOARD_REQUEST,    FXWindow::ID_SETSTRINGVALUE,   CSMap::onSetClipboard),
 
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_BOOKMARK_ADD,             CSMap::onBookmarkAdd),
+    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_BOOKMARK_NEXT,            CSMap::onBookmarkNext),
+
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_OPEN,                CSMap::onFileOpen),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_MERGE,               CSMap::onFileMerge),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_LOAD_ORDERS,         CSMap::onFileOpenCommands),
@@ -199,6 +202,7 @@ CSMap::CSMap(FXApp *app) :
     report(nullptr)
 {
     fontFixed = new FXFont(app, "courier", 10);
+    m_lastBookmark = m_bookmarks.end();
 
     // set "singleton"
     CSMap_instance = this;
@@ -429,11 +433,11 @@ CSMap::CSMap(FXApp *app) :
     menu.ownFactionGroup = new FXMenuCheck(viewmenu, "&Gruppe aktiver Partei\tCtrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
     menu.colorizeUnits = new FXMenuCheck(viewmenu, L"Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
     new FXMenuSeparatorEx(viewmenu, "Karte");
-    menu.streets = new FXMenuCheck(viewmenu, "S&trassen zeigen\tCtrl-F1\tStrassen auf der Karte anzeigen.");
-    menu.visibility = new FXMenuCheck(viewmenu, L"Si&chtbarkeit zeigen\tCtrl-F2\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise).");
-    menu.shiptravel = new FXMenuCheck(viewmenu, "&Durchschiffung\tCtrl-F3\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
-    menu.shadowRegions = new FXMenuCheck(viewmenu, "Regionen ab&dunkeln\tCtrl-F4\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.");
-    menu.islands = new FXMenuCheck(viewmenu, "Insel&namen zeigen\tCtrl-F5\tInselnamen auf der Karte zeigen.");
+    menu.streets = new FXMenuCheck(viewmenu, "S&trassen zeigen\tShift-F1\tStrassen auf der Karte anzeigen.");
+    menu.visibility = new FXMenuCheck(viewmenu, L"Si&chtbarkeit zeigen\tShift-F2\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise).");
+    menu.shiptravel = new FXMenuCheck(viewmenu, "&Durchschiffung\tShift-F3\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
+    menu.shadowRegions = new FXMenuCheck(viewmenu, "Regionen ab&dunkeln\tShift-F4\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.");
+    menu.islands = new FXMenuCheck(viewmenu, "Insel&namen zeigen\tShift-F5\tInselnamen auf der Karte zeigen.");
     menu.minimap_islands = new FXMenuCheck(viewmenu, "In&seln auf Minikarte\t\tInselnamen auf der Minikarte zeigen.");
     planemenu = new FXMenuPane(this);
     planemenu->disable();
@@ -508,6 +512,9 @@ CSMap::CSMap(FXApp *app) :
     getAccelTable()->addAccel(MKUINT(KEY_L,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_MARKEREAST));
     getAccelTable()->addAccel(MKUINT(KEY_J,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_MARKERSOUTHWEST));
     getAccelTable()->addAccel(MKUINT(KEY_K,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_MARKERNORTHEAST));
+
+    getAccelTable()->addAccel(MKUINT(KEY_F2,CONTROLMASK), this, FXSEL(SEL_COMMAND, ID_BOOKMARK_ADD));
+    getAccelTable()->addAccel(MKUINT(KEY_F2,0), this, FXSEL(SEL_COMMAND, ID_BOOKMARK_NEXT));
 
     // jump to calculator on ESCAPE
     // getAccelTable()->addAccel(MKUINT(KEY_R, CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_CALCULATOR));
@@ -1172,6 +1179,32 @@ long CSMap::updActiveFaction(FXObject *sender, FXSelector, void *)
 {
     FXWindow *wnd = (FXWindow *)sender;
     haveActiveFaction() ? wnd->enable() : wnd->disable();
+    return 1;
+}
+
+long CSMap::onBookmarkAdd(FXObject *, FXSelector, void *)
+{
+    m_bookmarks.push_back(selection);
+    return 1;
+}
+
+long CSMap::onBookmarkNext(FXObject *, FXSelector, void *)
+{
+    if (m_bookmarks.empty()) {
+        getApp()->beep();
+        return 0;
+    }
+    if (m_lastBookmark == m_bookmarks.end()) {
+        m_lastBookmark = m_bookmarks.begin();
+    }
+    else {
+        if (++m_lastBookmark == m_bookmarks.end()) {
+            m_lastBookmark = m_bookmarks.begin();
+        }
+    }
+    auto &bookmark = *m_lastBookmark;
+    handle(this, FXSEL(SEL_COMMAND, ID_UPDATE),
+        const_cast<void *>(static_cast<const void *>(&bookmark)));
     return 1;
 }
 

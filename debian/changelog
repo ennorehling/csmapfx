@@ -1,8 +1,9 @@
 csmapfx (1.7.28-1) stable; urgency=low
 
   * trim calculator expressions
+  * fix the context menu on messages without a target
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 07 Jan 2024 12:00:00 +0100
+  -- Enno Rehling <enno@eressea.de>  Sun, 30 Jan 2024 21:00:00 +0100
 
 csmapfx (1.7.27-1) stable; urgency=low
 

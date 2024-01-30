@@ -30,6 +30,9 @@ public:		// this functions are slots for menu commands
     long updOpenFile(FXObject *sender, FXSelector, void *);
 	long updActiveFaction(FXObject *sender, FXSelector, void *);
 
+    long onBookmarkAdd(FXObject *, FXSelector, void *);
+    long onBookmarkNext(FXObject *, FXSelector, void *);
+
     long onFileOpen(FXObject*, FXSelector, void*);
     long onFileMerge(FXObject*, FXSelector, void*);
 	long onFileSaveMap(FXObject*, FXSelector, void*);
@@ -217,6 +220,9 @@ public:		// this functions are slots for menu commands
         ID_POPUP_COPY_NAME,
         ID_POPUP_COPY_TEXT,
         
+        ID_BOOKMARK_ADD,
+        ID_BOOKMARK_NEXT,
+
         ID_LAST
 	};
 
@@ -397,6 +403,8 @@ private:
 	std::shared_ptr<datafile> report;
     std::list<MessageInfo *> output;
     datafile::SelectionState selection;			// selected region,faction,unit...
+    std::list <datafile::SelectionState> m_bookmarks;
+    std::list <datafile::SelectionState>::const_iterator m_lastBookmark;
 
 protected: 
 	CSMap() {}
