@@ -796,7 +796,6 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
                 selection.selected &= ~selection.REGION;
 			}
 
-            onMapChange(this, 0, &selection);
 			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 		}
 		return 1;
@@ -1856,14 +1855,9 @@ long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
 {
 	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
-    bool datachanged = false, scroll = false;
+    bool datachanged = true, scroll = false;
 
-	if (selection.fileChange != pstate->fileChange)
-	{
-		selection = *pstate;
-		datachanged = true;
-	}
-	else if (sender == this || selection.selChange != pstate->selChange)
+	if (sender == this || selection.selChange != pstate->selChange)
 	{
         selection = *pstate;
 		selection.regionsSelected = pstate->regionsSelected;
@@ -1879,13 +1873,18 @@ long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
 			if (visiblePlane != sel_plane)
 			{
 				visiblePlane = sel_plane;
-				datachanged = true;
 			}
 
 			scroll = true;
 		}
 		map->update();
 	}
+    else if (selection.fileChange != pstate->fileChange)
+    {
+        selection = *pstate;
+    } else {
+        datachanged = false;
+    }
 
     // things changed
     if (datachanged) updateMap();
