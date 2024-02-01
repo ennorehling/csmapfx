@@ -518,9 +518,9 @@ void datafile::mergeBlock(datablock::itor& block, const datablock::itor& parent,
 
 void datafile::findOffset(datafile* new_cr, int* x_offset, int* y_offset) const
 {
-    // first, create an index of all regions with an Id in new_cr:
+    // first, create an index of all regions with an Id in this report:
     std::map<int, datablock::itor> regionIndex;
-    for (regions_map::const_iterator it = new_cr->m_regions.begin(); it != new_cr->m_regions.end(); ++it)
+    for (regions_map::const_iterator it = m_regions.begin(); it != m_regions.end(); ++it)
     {
         const datablock::itor& block = (*it).second;
         int plane = block->info();
@@ -534,22 +534,23 @@ void datafile::findOffset(datafile* new_cr, int* x_offset, int* y_offset) const
     }
 
     // second, try finding a region from this report in the index:
-    for (regions_map::const_iterator it = m_regions.begin(); it != m_regions.end(); ++it)
+    for (auto &block : new_cr->m_blocks)
     {
-        const datablock::itor& block = (*it).second;
-        int id = block->valueInt(TYPE_ID, -1);
-        int plane = block->info();
-        if (plane == 0) {
-            std::map<int, datablock::itor>::const_iterator match = regionIndex.find(id);
-            if (match != regionIndex.end()) {
-                const datablock::itor& other = (*match).second;
-                int xo = block->x() - other->x();
-                int yo = block->y() - other->y();
-                if (xo != 0 || yo != 0) {
-                    if (x_offset) *x_offset = xo;
-                    if (y_offset) *y_offset = yo;
+        if (block.type() == block_type::TYPE_REGION) {
+            int id = block.valueInt(TYPE_ID, -1);
+            int plane = block.info();
+            if (plane == 0) {
+                std::map<int, datablock::itor>::const_iterator match = regionIndex.find(id);
+                if (match != regionIndex.end()) {
+                    const datablock::itor &other = (*match).second;
+                    int xo = other->x() - block.x();
+                    int yo = other->y() - block.y();
+                    if (xo != 0 || yo != 0) {
+                        if (x_offset) *x_offset = xo;
+                        if (y_offset) *y_offset = yo;
+                    }
+                    return;
                 }
-                return;
             }
         }
     }

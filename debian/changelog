@@ -3,6 +3,7 @@ csmapfx (1.7.28-1) stable; urgency=low
   * trim calculator expressions
   * fix the context menu on messages without a target
   * origin change was confusing the map widget
+  * fix merging maps with different origins
 
   -- Enno Rehling <enno@eressea.de>  Thu, 01 Feb 2024 21:00:00 +0100
 
