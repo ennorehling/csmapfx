@@ -262,8 +262,19 @@ long FXCommands::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 		int begin = lineStart(curs);
 		int end = lineEnd(curs);
 
-		FXString line;
-		extractText(line, begin, curs-begin);
+        FXString line;
+        extractText(line, begin, curs - begin);
+
+        if (event->state) {
+            if (event->state == SHIFTMASK) {
+                if (curs > begin) {
+                    if (getChar(curs - 1) == '\t') {
+                        removeText(curs - 1, 1, 0);
+                    }
+                }
+            }
+            return 1;
+        }
 
 		if (line.find_first_not_of(" \t") != -1)
 		{
