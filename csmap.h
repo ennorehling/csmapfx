@@ -116,8 +116,6 @@ public:		// this functions are slots for menu commands
 	
     long onMessageSelected(FXObject*, FXSelector, void* ptr);
     
-    long onCalculator(FXObject*, FXSelector, void* ptr);
-
     long onPopupCopyText(FXObject* sender, FXSelector sel, void* ptr);
     long onPopupCopySpecial(FXObject* sender, FXSelector sel, void* ptr);
     long onPopupShowInfo(FXObject* sender, FXSelector sel, void* ptr);
@@ -140,7 +138,6 @@ public:		// this functions are slots for menu commands
 	{
 		ID_REGIONS = FXMainWindow::ID_LAST,
 		ID_SELECTION,
-		ID_CALCULATOR,
 
 		// File menu
 		ID_FILE_PREFERENCES,

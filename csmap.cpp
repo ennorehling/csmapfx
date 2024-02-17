@@ -175,8 +175,6 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_UPDATE,                   CSMap::onMapChange),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_SELECTION,                CSMap::onQueryMap),
 
-    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_CALCULATOR,               CSMap::onCalculator),
-
     FXMAPFUNC(SEL_QUERY_HELP, CSMap::ID_SETSTRINGVALUE,         CSMap::onSearchInfo),
 
 
@@ -515,9 +513,6 @@ CSMap::CSMap(FXApp *app) :
 
     getAccelTable()->addAccel(MKUINT(KEY_F2,CONTROLMASK), this, FXSEL(SEL_COMMAND, ID_BOOKMARK_ADD));
     getAccelTable()->addAccel(MKUINT(KEY_F2,0), this, FXSEL(SEL_COMMAND, ID_BOOKMARK_NEXT));
-
-    // jump to calculator on ESCAPE
-    // getAccelTable()->addAccel(MKUINT(KEY_R, CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_CALCULATOR));
 
     // Help menu
     helpmenu = new FXMenuPane(this);
@@ -2316,20 +2311,6 @@ long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
 long CSMap::onMessageSelected(FXObject* sender, FXSelector sel, void* ptr)
 {
     return 0;
-}
-
-long CSMap::onCalculator(FXObject*, FXSelector, void*)
-{
-    if (!mathbar->shown())
-    {
-        mathbar->show();
-        mathbar->recalc();
-    }
-
-    if (!mathbar->hasFocus())
-        mathbar->setFocus();
-
-    return 1;
 }
 
 long CSMap::onPopupCopyText(FXObject* sender, FXSelector sel, void* ptr)
