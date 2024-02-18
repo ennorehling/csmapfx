@@ -13,7 +13,6 @@ public:
     FXString info;
 };
 
-
 FXProperties::FXProperties(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x, FXint y, FXint w, FXint h)
     : FXTreeList(p, tgt, sel, opts | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES, x, y, w, h)
 {
@@ -90,6 +89,19 @@ long FXProperties::onMapChange(FXObject*, FXSelector, void* ptr)
         makeItems();
     }
     return 0;
+}
+
+long FXProperties::onDoubleClicked(FXObject *sender, FXSelector sel, void *ptr)
+{
+    if (!mapFile)
+        return 0;
+
+    FXProperty *item = static_cast<FXProperty *>(ptr);
+    if (item && item->block) {
+        return getShell()->handle(this, FXSEL(SEL_COMMAND, ID_SETVALUE), item->block);
+    }
+
+    return FXTreeList::onDoubleClicked(this, sel, ptr);
 }
 
 FXString FXProperties::weightToString(int prop)

@@ -8,12 +8,13 @@
 FXDEFMAP(FXBuildingProperties) MessageMap[]=
 { 
 	//________Message_Type_____________________ID_______________Message_Handler_______ 
-	FXMAPFUNC(SEL_COMMAND,			FXBuildingProperties::ID_UPDATE,				FXBuildingProperties::onMapChange), 
-    FXMAPFUNC(SEL_QUERY_HELP,		0,									FXBuildingProperties::onQueryHelp),
-    FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,	0,								FXBuildingProperties::onPopup),
+    FXMAPFUNC(SEL_DOUBLECLICKED,	    0,                                  FXBuildingProperties::onDoubleClicked),
+    FXMAPFUNC(SEL_COMMAND,              FXBuildingProperties::ID_UPDATE,    FXBuildingProperties::onMapChange),
+    FXMAPFUNC(SEL_QUERY_HELP,           0,                                  FXBuildingProperties::onQueryHelp),
+    FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,   0,                                  FXBuildingProperties::onPopup),
 };
 
-FXIMPLEMENT(FXBuildingProperties, FXTreeList, MessageMap, ARRAYNUMBER(MessageMap))
+FXIMPLEMENT(FXBuildingProperties, FXProperties, MessageMap, ARRAYNUMBER(MessageMap))
 
 FXBuildingProperties::FXBuildingProperties(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x, FXint y, FXint w, FXint h)
 		: FXProperties(p, tgt, sel, opts, x, y, w, h)

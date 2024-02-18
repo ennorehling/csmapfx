@@ -15,6 +15,7 @@ public:
 
     long onPopup(FXObject*, FXSelector, void*);
     long onMapChange(FXObject*, FXSelector, void*);
+    long onDoubleClicked(FXObject *sender, FXSelector sel, void *ptr);
 
     static FXString weightToString(int prop);
     static FXString coastToString(int prop);
