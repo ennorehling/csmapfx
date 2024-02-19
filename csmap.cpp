@@ -392,10 +392,6 @@ CSMap::CSMap(FXApp *app) :
     new FXMenuSeparatorEx(pane);
     new FXMenuCommand(
         pane,
-        L"Befehle pr\u00fcfen\t\tPr\u00fct die Befehle.",
-        nullptr, this, ID_FILE_CHECK_ORDERS);
-    new FXMenuCommand(
-        pane,
         L"Befehle einsenden...\t\tDie Befehle an den Server versenden.",
         nullptr, this, ID_FILE_UPLOAD_ORDERS);
     new FXMenuCommand(
@@ -463,6 +459,8 @@ CSMap::CSMap(FXApp *app) :
     new FXMenuTitle(menubar, "B&earbeiten", nullptr, pane);
     new FXMenuCommand(pane, "&Suchen...\tCtrl-F\tEine Region, Einheit, Schiff, etc. suchen.", nullptr, this, ID_VIEW_SEARCHDLG);
     new FXMenuCommand(pane, "&Ursprung setzen\t\tDen Kartenursprung (0/0) auf die markierte Region setzen.", nullptr, this, ID_MAP_SETORIGIN, 0);
+    new FXMenuCommand(pane, L"Befehle pr\u00fcfen\t\tPr\u00fct die Befehle.", nullptr, this, ID_FILE_CHECK_ORDERS);
+
     new FXMenuSeparatorEx(pane, "Regionen");
     new FXMenuCommand(pane,L"&Alle markieren\tCtrl-Shift-A\tAlle Regionen ausw\u00e4hlen.", nullptr,this, ID_REGION_SELALL);
     new FXMenuCommand(pane,L"Alle &Inseln ausw\u00e4hlen\t\tAlle Landregionen ausw\u00e4hlen (Ozean, Feuerwand und Eisberg z\u00e4hlen nicht als Land).", nullptr, this, ID_REGION_SELALLISLANDS);
