@@ -339,110 +339,113 @@ CSMap::CSMap(FXApp *app) :
     recentFiles.setMaxFiles(6);
 
     // File menu
-    filemenu = new FXMenuPane(this);
-    new FXMenuTitle(menubar, "&Datei", nullptr,filemenu);
+    FXMenuPane *pane, *subPane;
+    menuPanes.push_back(pane = new FXMenuPane(this));
+    new FXMenuTitle(menubar, "&Datei", nullptr, pane);
     new FXMenuCommand(
-        filemenu,
+        pane,
         L"\u00d6&ffnen...\tCtrl-O\tEinen Report \u00f6ffnen.",
         icons.open,
         this,
         ID_FILE_OPEN);
     new FXMenuCommand(
-        filemenu,
+        pane,
         L"Speichern...\tCtrl-Shift-S\tAktuellen Zustand speichern.",
         icons.open,
         this,
         ID_FILE_SAVE_ALL);
     new FXMenuCommand(
-        filemenu,
+        pane,
         L"Befehle &laden...\tCtrl-Shift-O\tBefehle aus einer Textdatei laden.",
         icons.open, this, ID_FILE_LOAD_ORDERS);
     new FXMenuCommand(
-        filemenu,
+        pane,
         L"Befehle &speichern\tCtrl-S\tBefehlsdatei speichern.",
         icons.save, this, ID_FILE_SAVE_ORDERS);
 
     // Map menu
-    mapmenu = new FXMenuPane(this);
-    new FXMenuCascade(filemenu, "&Karte", nullptr, mapmenu, 0);
+    menuPanes.push_back(subPane = new FXMenuPane(this));
+    subPane = new FXMenuPane(this);
+    new FXMenuCascade(pane, "&Karte", nullptr, subPane, 0);
     new FXMenuCommand(
-        mapmenu,
+        subPane,
         L"H&inzuf\u00fcgen...\tCtrl-I\tL\u00e4dt einen Karten-Report in den aktuellen Report.",
         icons.merge, this, ID_FILE_MERGE);
     new FXMenuCommand(
-        mapmenu,
+        subPane,
         L"Sp&eichern...\t\tDetailierten Karten-Report speichern.",
         icons.save, this, ID_FILE_SAVE_MAP);
     new FXMenuCommand(
-        mapmenu,
+        subPane,
         L"E&xportieren...\t\tKarte ohne Details speichern.",
         icons.save, this, ID_FILE_EXPORT_MAP);
     new FXMenuCommand(
-        mapmenu,
+        subPane,
         L"Als &Bild exportieren...\t\tDie Karte als Bild speichern.",
         nullptr, this, ID_FILE_EXPORT_IMAGE);
 
     new FXMenuCommand(
-        filemenu,
+        pane,
         L"Sch&liessen\t\tDie aktuelle Datei schliessen.",
         icons.close, this, ID_FILE_CLOSE);
 
-    new FXMenuSeparatorEx(filemenu);
+    new FXMenuSeparatorEx(pane);
     new FXMenuCommand(
-        filemenu,
+        pane,
         L"Befehle pr\u00fcfen\t\tPr\u00fct die Befehle.",
         nullptr, this, ID_FILE_CHECK_ORDERS);
     new FXMenuCommand(
-        filemenu,
+        pane,
         L"Befehle einsenden...\t\tDie Befehle an den Server versenden.",
         nullptr, this, ID_FILE_UPLOAD_ORDERS);
     new FXMenuCommand(
-        filemenu,
+        pane,
         L"Befehle exportieren...\t\tDie Befehle versandfertig exportieren.",
         nullptr, this, ID_FILE_EXPORT_ORDERS);
-    menu.modifycheck = new FXMenuCheck(filemenu, 
+    menu.modifycheck = new FXMenuCheck(pane,
         L"\u00c4nderungserkennung\t\tAutomatische \u00c4nderungserkennung.", this, ID_FILE_MODIFY_CHECK);
 
     FXString noText;
-    new FXMenuSeparatorEx(filemenu);
-    recentmenu = new FXMenuPane(this);
+    new FXMenuSeparatorEx(pane);
+    menuPanes.push_back(subPane = new FXMenuPane(this));
     for (int i = 0; i != 6; ++i)
-        new FXMenuCommand(recentmenu, noText, nullptr, &recentFiles, FXRecentFiles::ID_FILE_1 + i);
+        new FXMenuCommand(subPane, noText, nullptr, &recentFiles, FXRecentFiles::ID_FILE_1 + i);
 
-    new FXMenuCascade(filemenu, L"&Zuletzt ge\u00f6ffnet", nullptr, recentmenu, 0);
+    new FXMenuCascade(pane, L"&Zuletzt ge\u00f6ffnet", nullptr, subPane, 0);
 
-    new FXMenuSeparatorEx(filemenu);
-    new FXMenuCommand(filemenu,
+    new FXMenuSeparatorEx(pane);
+    new FXMenuCommand(pane,
         L"B&eenden\tCtrl-Q\tDas Programm beenden.", nullptr,
         this, ID_FILE_QUIT);
 
     // View menu
-    viewmenu = new FXMenuPane(this);
-    new FXMenuTitle(menubar, "&Ansicht", nullptr,viewmenu);
-    menu.toolbar = new FXMenuCheck(viewmenu, "Tool&bar\t\tToolbar ein- bzw. ausblenden.", toolbar, ID_TOGGLESHOWN);
-    menu.maponly = new FXMenuCheck(viewmenu, "Nur &Karte anzeigen\tCtrl-Shift-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this, ID_VIEW_MAPONLY, 0);
-    menu.messages = new FXMenuCheck(viewmenu, "&Meldungen\tCtrl-Shift-V\tRegionsmeldungen ein- bzw. ausblenden.", this, ID_VIEW_MESSAGES);
-    menu.show_left = new FXMenuCheck(viewmenu, "&Regionsliste\tCtrl-Shift-R\tRegionsliste ein- bzw. ausblenden.", this, ID_VIEW_REGIONLIST);
-    menu.show_right = new FXMenuCheck(viewmenu, "&Eigenschaften\tCtrl-Shift-E\tEinheiten- und Regionsdetails ein- bzw. ausblenden.", this, ID_VIEW_PROPERTIES);
-    menu.calc = new FXMenuCheck(viewmenu, "&Taschenrechner\tCtrl-Shift-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
-    menu.minimap = new FXMenuCheck(viewmenu, L"\u00dcber&sichtskarte\tCtrl-Shift-M\t\u00dcbersichtskarte ein- bzw. ausblenden.", this, ID_VIEW_MINIMAP);
-    menu.infodlg = new FXMenuCheck(viewmenu, "&Informationen\tCtrl-Shift-I\tRegel-Informationen ein- bzw. ausblenden.", this, ID_VIEW_INFODLG);
-    new FXMenuSeparatorEx(viewmenu, "Liste");
-    menu.ownFactionGroup = new FXMenuCheck(viewmenu, "&Gruppe aktiver Partei\tCtrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
-    menu.colorizeUnits = new FXMenuCheck(viewmenu, L"Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
-    new FXMenuSeparatorEx(viewmenu, "Karte");
-    menu.streets = new FXMenuCheck(viewmenu, "S&trassen zeigen\tShift-F1\tStrassen auf der Karte anzeigen.");
-    menu.visibility = new FXMenuCheck(viewmenu, L"Si&chtbarkeit zeigen\tShift-F2\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise).");
-    menu.shiptravel = new FXMenuCheck(viewmenu, "&Durchschiffung\tShift-F3\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
-    menu.shadowRegions = new FXMenuCheck(viewmenu, "Regionen ab&dunkeln\tShift-F4\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.");
-    menu.islands = new FXMenuCheck(viewmenu, "Insel&namen zeigen\tShift-F5\tInselnamen auf der Karte zeigen.");
-    menu.minimap_islands = new FXMenuCheck(viewmenu, "In&seln auf Minikarte\t\tInselnamen auf der Minikarte zeigen.");
-    planemenu = new FXMenuPane(this);
+    menuPanes.push_back(pane = new FXMenuPane(this));
+    new FXMenuTitle(menubar, "&Ansicht", nullptr, pane);
+    menu.toolbar = new FXMenuCheck(pane, "Tool&bar\t\tToolbar ein- bzw. ausblenden.", toolbar, ID_TOGGLESHOWN);
+    menu.maponly = new FXMenuCheck(pane, "Nur &Karte anzeigen\tCtrl-Shift-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this, ID_VIEW_MAPONLY, 0);
+    menu.messages = new FXMenuCheck(pane, "&Meldungen\tCtrl-Shift-V\tRegionsmeldungen ein- bzw. ausblenden.", this, ID_VIEW_MESSAGES);
+    menu.show_left = new FXMenuCheck(pane, "&Regionsliste\tCtrl-Shift-R\tRegionsliste ein- bzw. ausblenden.", this, ID_VIEW_REGIONLIST);
+    menu.show_right = new FXMenuCheck(pane, "&Eigenschaften\tCtrl-Shift-E\tEinheiten- und Regionsdetails ein- bzw. ausblenden.", this, ID_VIEW_PROPERTIES);
+    menu.calc = new FXMenuCheck(pane, "&Taschenrechner\tCtrl-Shift-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
+    menu.minimap = new FXMenuCheck(pane, L"\u00dcber&sichtskarte\tCtrl-Shift-M\t\u00dcbersichtskarte ein- bzw. ausblenden.", this, ID_VIEW_MINIMAP);
+    menu.infodlg = new FXMenuCheck(pane, "&Informationen\tCtrl-Shift-I\tRegel-Informationen ein- bzw. ausblenden.", this, ID_VIEW_INFODLG);
+    new FXMenuSeparatorEx(pane, "Liste");
+    menu.ownFactionGroup = new FXMenuCheck(pane, "&Gruppe aktiver Partei\tCtrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
+    menu.colorizeUnits = new FXMenuCheck(pane, L"Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
+    new FXMenuSeparatorEx(pane, "Karte");
+    menu.streets = new FXMenuCheck(pane, "S&trassen zeigen\tShift-F1\tStrassen auf der Karte anzeigen.");
+    menu.visibility = new FXMenuCheck(pane, L"Si&chtbarkeit zeigen\tShift-F2\tSymbole f\u00fcr Sichtbarkeit der Regionen anzeigen (Leuchtturm und Durchreise).");
+    menu.shiptravel = new FXMenuCheck(pane, "&Durchschiffung\tShift-F3\tEin kleines Schiffsymbol anzeigen, falls Schiffe durch eine Region gereist sind.");
+    menu.shadowRegions = new FXMenuCheck(pane, "Regionen ab&dunkeln\tShift-F4\tRegionen abdunkeln, wenn nicht von eigenen Personen gesehen.");
+    menu.islands = new FXMenuCheck(pane, "Insel&namen zeigen\tShift-F5\tInselnamen auf der Karte zeigen.");
+    menu.minimap_islands = new FXMenuCheck(pane, "In&seln auf Minikarte\t\tInselnamen auf der Minikarte zeigen.");
+
+    new FXMenuCascade(pane, "&Ebene", nullptr, planemenu = new FXMenuPane(this), 0);
     planemenu->disable();
     FXMenuRadio* radio = new FXMenuRadio(planemenu, "Standardebene (0)", this, ID_MAP_VISIBLEPLANE, 0);
     radio->setCheck();
-    new FXMenuCascade(viewmenu, "&Ebene", nullptr, planemenu, 0);
-    zoommenu = new FXMenuPane(this);
+
+    new FXMenuCascade(pane, L"&Gr\u00f6\u00dfe", nullptr, zoommenu = new FXMenuPane(this), 0);
     new FXMenuCommand(zoommenu, L"Vergr\u00f6\u00dfern\tCtrl-+\tKarte vergr\u00f6\u00dfern.", nullptr, this, ID_MAP_ZOOM, 0);
     new FXMenuCommand(zoommenu, "Verkleinern\tCtrl--\tKarte verkleinern.", nullptr, this, ID_MAP_ZOOM, 0);
     new FXMenuSeparatorEx(zoommenu, L"Gr\u00f6\u00dfe");
@@ -454,49 +457,48 @@ CSMap::CSMap(FXApp *app) :
     new FXMenuRadio(zoommenu, "&32 Pixel\tCtrl-3\t50%", this, ID_MAP_ZOOM, 0);
     new FXMenuRadio(zoommenu, "&64 Pixel\tCtrl-2\t100%", this, ID_MAP_ZOOM, 0);
     new FXMenuRadio(zoommenu, "128 Pixel\tCtrl-1\t200%", this, ID_MAP_ZOOM, 0);
-    new FXMenuCascade(viewmenu, L"&Gr\u00f6\u00dfe", nullptr, zoommenu, 0);
 
-    // Region menu
-    regionmenu = new FXMenuPane(this);
-    new FXMenuTitle(menubar, "B&earbeiten", nullptr,regionmenu);
-    new FXMenuCommand(regionmenu, "&Suchen...\tCtrl-F\tEine Region, Einheit, Schiff, etc. suchen.", nullptr, this, ID_VIEW_SEARCHDLG);
-    new FXMenuCommand(regionmenu, "&Ursprung setzen\t\tDen Kartenursprung (0/0) auf die markierte Region setzen.", nullptr, this, ID_MAP_SETORIGIN, 0);
-    new FXMenuSeparatorEx(regionmenu, "Regionen");
-    new FXMenuCommand(regionmenu,L"&Alle markieren\tCtrl-Shift-A\tAlle Regionen ausw\u00e4hlen.", nullptr,this, ID_REGION_SELALL);
-    new FXMenuCommand(regionmenu,L"Alle &Inseln ausw\u00e4hlen\t\tAlle Landregionen ausw\u00e4hlen (Ozean, Feuerwand und Eisberg z\u00e4hlen nicht als Land).", nullptr, this, ID_REGION_SELALLISLANDS);
-    new FXMenuCommand(regionmenu, L"&Sichtbare markieren\t\tSichtbare Regionen ausw\u00e4hlen.", nullptr, this, ID_REGION_SELVISIBLE);
-    new FXMenuCommand(regionmenu, L"&Keine markieren\tEscape\tKeine Region ausw\u00e4hlen.", nullptr, this, ID_REGION_UNSEL);
-    new FXMenuCommand(regionmenu, L"Auswahl &invertieren\tCtrl-Shift-N\tAusgew\u00e4hlte Regionen abw\u00e4hlen und umgekehrt.", nullptr, this, ID_REGION_INVERTSEL);
+    // Edit menu
+    menuPanes.push_back(pane = new FXMenuPane(this));
+    new FXMenuTitle(menubar, "B&earbeiten", nullptr, pane);
+    new FXMenuCommand(pane, "&Suchen...\tCtrl-F\tEine Region, Einheit, Schiff, etc. suchen.", nullptr, this, ID_VIEW_SEARCHDLG);
+    new FXMenuCommand(pane, "&Ursprung setzen\t\tDen Kartenursprung (0/0) auf die markierte Region setzen.", nullptr, this, ID_MAP_SETORIGIN, 0);
+    new FXMenuSeparatorEx(pane, "Regionen");
+    new FXMenuCommand(pane,L"&Alle markieren\tCtrl-Shift-A\tAlle Regionen ausw\u00e4hlen.", nullptr,this, ID_REGION_SELALL);
+    new FXMenuCommand(pane,L"Alle &Inseln ausw\u00e4hlen\t\tAlle Landregionen ausw\u00e4hlen (Ozean, Feuerwand und Eisberg z\u00e4hlen nicht als Land).", nullptr, this, ID_REGION_SELALLISLANDS);
+    new FXMenuCommand(pane, L"&Sichtbare markieren\t\tSichtbare Regionen ausw\u00e4hlen.", nullptr, this, ID_REGION_SELVISIBLE);
+    new FXMenuCommand(pane, L"&Keine markieren\tEscape\tKeine Region ausw\u00e4hlen.", nullptr, this, ID_REGION_UNSEL);
+    new FXMenuCommand(pane, L"Auswahl &invertieren\tCtrl-Shift-N\tAusgew\u00e4hlte Regionen abw\u00e4hlen und umgekehrt.", nullptr, this, ID_REGION_INVERTSEL);
 
-    selectionmenu = new FXMenuPane(this);
-    new FXMenuCascade(regionmenu, "&Erweitern", nullptr, selectionmenu);
-    new FXMenuCommand(selectionmenu, "Auswahl &erweitern\tCtrl-F7\tAuswahl mit dem Radius von einer Region erweitern.", nullptr, this, ID_REGION_EXTENDSEL);
-    new FXMenuCommand(selectionmenu,L"&Inseln ausw\u00e4hlen\tCtrl-F9\tAuswahl auf komplette Inseln erweitern.", nullptr, this, ID_REGION_SELISLANDS);
+    menuPanes.push_back(subPane = new FXMenuPane(this));
+    new FXMenuCascade(pane, "&Erweitern", nullptr, subPane);
+    new FXMenuCommand(subPane, "Auswahl &erweitern\tCtrl-F7\tAuswahl mit dem Radius von einer Region erweitern.", nullptr, this, ID_REGION_EXTENDSEL);
+    new FXMenuCommand(subPane,L"&Inseln ausw\u00e4hlen\tCtrl-F9\tAuswahl auf komplette Inseln erweitern.", nullptr, this, ID_REGION_SELISLANDS);
 
-    new FXMenuCommand(regionmenu, L"Markierte &ausw\u00e4hlen\tCtrl-Space\tMarkierte Region ausw\u00e4hlen.", nullptr, this, ID_MAP_SELECTMARKED, 0);
-    new FXMenuCommand(regionmenu, L"Markierte &l\u00f6schen\t\t", nullptr, this, ID_REGION_REMOVESEL);
+    new FXMenuCommand(pane, L"Markierte &ausw\u00e4hlen\tCtrl-Space\tMarkierte Region ausw\u00e4hlen.", nullptr, this, ID_MAP_SELECTMARKED, 0);
+    new FXMenuCommand(pane, L"Markierte &l\u00f6schen\t\t", nullptr, this, ID_REGION_REMOVESEL);
 
     // Faction menu
-    factionmenu = new FXMenuPane(this);
-    menu.faction = new FXMenuTitle(menubar, "&Partei", nullptr,factionmenu);
+    menuPanes.push_back(pane = new FXMenuPane(this));
+    menu.faction = new FXMenuTitle(menubar, "&Partei", nullptr, pane);
     menu.faction->disable();
 
-    new FXMenuSeparatorEx(factionmenu, "Parteiinfo");
-    menu.name = new FXMenuCommand(factionmenu, "Parteiname\t\tName der Partei");
-    menu.type = new FXMenuCommand(factionmenu, L"Rasse (Silber)\t\tRasse und Typpr\u00e4fix der Partei, Rekrutierungskosten");
-    menu.magic = new FXMenuCommand(factionmenu, L"Magiegebiet\t\tgew\u00e4hltes Magiegebiet");
-    menu.email = new FXMenuCommand(factionmenu, "eMail\t\teMail-Adresse der Partei");
+    new FXMenuSeparatorEx(pane, "Parteiinfo");
+    menu.name = new FXMenuCommand(pane, "Parteiname\t\tName der Partei");
+    menu.type = new FXMenuCommand(pane, L"Rasse (Silber)\t\tRasse und Typpr\u00e4fix der Partei, Rekrutierungskosten");
+    menu.magic = new FXMenuCommand(pane, L"Magiegebiet\t\tgew\u00e4hltes Magiegebiet");
+    menu.email = new FXMenuCommand(pane, "eMail\t\teMail-Adresse der Partei");
 
-    new FXMenuSeparatorEx(factionmenu, "Statistik");
-    menu.number = new FXMenuCommand(factionmenu, "Personen, Einheiten (und Helden)\t\tAnzahl Personen, Einheiten und Helden");
-    menu.points = new FXMenuCommand(factionmenu, "Punkte (Durchschnitt)\t\tPunkte der Partei und Durchschnitt gleichaltriger Parteien");
-    menu.age = new FXMenuCommand(factionmenu, "Parteialter\t\tAlter der Partei in Runden");
+    new FXMenuSeparatorEx(pane, "Statistik");
+    menu.number = new FXMenuCommand(pane, "Personen, Einheiten (und Helden)\t\tAnzahl Personen, Einheiten und Helden");
+    menu.points = new FXMenuCommand(pane, "Punkte (Durchschnitt)\t\tPunkte der Partei und Durchschnitt gleichaltriger Parteien");
+    menu.age = new FXMenuCommand(pane, "Parteialter\t\tAlter der Partei in Runden");
 
-    new FXMenuSeparatorEx(factionmenu, L"Gegenst\u00e4nde");
+    new FXMenuSeparatorEx(pane, L"Gegenst\u00e4nde");
         menu.factionpool = new FXMenuPane(this);
         menu.poolnoitems = new FXMenuCommand(menu.factionpool,L"Keine Gegenst\u00e4nde\t\tDer Parteipool enth\u00e4lt keine Gegenst\u00e4nde.", nullptr);
         menu.poolnoitems->disable();
-    new FXMenuCascade(factionmenu, "&Parteipool", nullptr, menu.factionpool, 0);
+    new FXMenuCascade(pane, "&Parteipool", nullptr, menu.factionpool, 0);
 
     getAccelTable()->addAccel(MKUINT(KEY_KP_5,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_SELECTMARKED));
     getAccelTable()->addAccel(MKUINT(KEY_KP_7,CONTROLMASK), this,FXSEL(SEL_COMMAND, ID_MAP_MARKERNORTHWEST));
@@ -515,9 +517,9 @@ CSMap::CSMap(FXApp *app) :
     getAccelTable()->addAccel(MKUINT(KEY_F2,0), this, FXSEL(SEL_COMMAND, ID_BOOKMARK_NEXT));
 
     // Help menu
-    helpmenu = new FXMenuPane(this);
-    new FXMenuTitle(menubar, "&?", nullptr,helpmenu);
-    new FXMenuCommand(helpmenu, "Wer mich schuf...\t\tKontaktinformationen", nullptr,this, ID_HELP_ABOUT);
+    menuPanes.push_back(pane = new FXMenuPane(this));
+    new FXMenuTitle(menubar, "&?", nullptr, pane);
+    new FXMenuCommand(pane, "Wer mich schuf...\t\tKontaktinformationen", nullptr,this, ID_HELP_ABOUT);
 
     // tooltip
     new FXToolTip(app);
@@ -707,16 +709,11 @@ CSMap::~CSMap()
     output.clear();
     
     // delete menus
-    delete filemenu;
-    delete recentmenu;
-    delete viewmenu;
-    delete regionmenu;
-    delete selectionmenu;
-    delete mapmenu;
+    for (FXMenuPane * pane : menuPanes) {
+        delete pane;
+    }
     delete planemenu;
     delete zoommenu;
-    delete factionmenu;
-    delete helpmenu;
 
     // toolbar
     delete terrainPopup;

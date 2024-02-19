@@ -1,9 +1,9 @@
 #ifndef _CSMAP
 #define _CSMAP
 
-#include "terrain.h"
 #include "datafile.h"
 #include "passwords.h"
+#include "terrain.h"
 
 #include <fx.h>
 
@@ -267,8 +267,8 @@ private:
 
 	// Menubar
     class FXMenuBar		*menubar = nullptr;
-    class FXMenuPane	*filemenu = nullptr, *recentmenu = nullptr, *viewmenu = nullptr, *regionmenu = nullptr, *factionmenu = nullptr;
-    class FXMenuPane	*mapmenu = nullptr, *selectionmenu = nullptr, *planemenu = nullptr, *zoommenu = nullptr, *helpmenu = nullptr;
+    std::vector<class FXMenuPane *> menuPanes;
+    class FXMenuPane *planemenu = nullptr, *zoommenu;
 
 	// Toolbar
     class FXToolBar		*toolbar = nullptr;
