@@ -235,6 +235,26 @@ long FXCommands::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 	FXEvent* event=(FXEvent*)ptr;
 	if (!isEnabled())
 		return FXText::onKeyPress(sender, sel, ptr);
+	else if (event->code == KEY_Tab || event->code == KEY_KP_Tab)
+	{
+		int curs = getCursorPos();
+		int begin = lineStart(curs);
+		int end = lineEnd(curs);
+
+        FXString line;
+        extractText(line, begin, curs - begin);
+
+        if (event->state) {
+            if (event->state == SHIFTMASK) {
+                if (curs > begin) {
+                    if (getChar(curs - 1) == '\t') {
+                        removeText(curs - 1, 1, 0);
+                    }
+                }
+            }
+            return 1;
+        }
+    }
 	return FXText::onKeyPress(sender, sel, ptr);
 }
 
