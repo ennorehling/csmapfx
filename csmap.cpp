@@ -635,7 +635,7 @@ CSMap::CSMap(FXApp *app) :
     // Befehlseditor
     commandframe = new FXVerticalFrame(commandsplitter,LAYOUT_FILL_X|FRAME_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
     commandframe->setBorderColor(getApp()->getShadowColor());
-    commands = new FXCommands(commandframe, this, ID_SELECTION, LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    commands = new FXCommands(commandframe, this, ID_SELECTION, TEXT_AUTOINDENT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     commands->connectMap(map);
     if (fontFixed) {
         commands->setFont(fontFixed);
