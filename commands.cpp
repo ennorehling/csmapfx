@@ -20,10 +20,10 @@ FXDEFMAP(FXCommands) MessageMap[]=
     FXMAPFUNC(SEL_UPDATE,			FXCommands::ID_ROWCOL,			FXCommands::updRowCol),
 };
 
-FXIMPLEMENT(FXCommands,FXText,MessageMap, ARRAYNUMBER(MessageMap))
+FXIMPLEMENT(FXCommands,FXEditor,MessageMap, ARRAYNUMBER(MessageMap))
 
 FXCommands::FXCommands(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h)
-		: FXText(p, tgt,sel, opts, x,y,w,h)
+		: FXEditor(p, tgt,sel, opts, x,y,w,h)
 {
 	// initial visible rows & tab stop
 	setVisibleRows(6);
@@ -42,7 +42,7 @@ FXCommands::FXCommands(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 		textStyles[i].selectForeColor = getApp()->getSelforeColor();
 		textStyles[i].selectBackColor = getApp()->getSelbackColor();
 		textStyles[i].hiliteForeColor = getApp()->getHiliteColor();
-		textStyles[i].hiliteBackColor = FXRGB(255, 128, 128); // from FXText.cpp
+		textStyles[i].hiliteBackColor = FXRGB(255, 128, 128); // from FXEditor.cpp
 		textStyles[i].activeBackColor = getApp()->getBackColor();
 		textStyles[i].style = 0; // no underline, italic, bold
 	}
@@ -79,7 +79,7 @@ FXCommands::FXCommands(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts
 
 void FXCommands::create()
 {
-	FXText::create();
+	FXEditor::create();
 	disable();
 	setBackColor(getApp()->getBaseColor());
 }
@@ -234,7 +234,28 @@ long FXCommands::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 {
 	FXEvent* event=(FXEvent*)ptr;
 	if (!isEnabled())
-		return FXText::onKeyPress(sender, sel, ptr);
+		return FXEditor::onKeyPress(sender, sel, ptr);
+	else if (event->code == KEY_Return || event->code == KEY_KP_Enter)
+	{
+		// Keeps the indentation level, when you go to the next line
+		int curs = getCursorPos();
+		int begin = lineStart(curs);
+
+		FXString line;
+		extractText(line, begin, curs-begin);
+
+		int pos = line.find_first_not_of(" \t");
+		if (pos != -1)
+			line.erase(pos, line.length() - pos);
+
+		if (!line.empty())
+		{
+			long res = FXEditor::onKeyPress(sender, sel, ptr);
+			if (res)
+				insertText(lineStart(getCursorPos()), line);
+			return res;
+		}
+	}
 	else if (event->code == KEY_Tab || event->code == KEY_KP_Tab)
 	{
 		int curs = getCursorPos();
@@ -255,7 +276,7 @@ long FXCommands::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
             return 1;
         }
     }
-	return FXText::onKeyPress(sender, sel, ptr);
+	return FXEditor::onKeyPress(sender, sel, ptr);
 }
 
 long FXCommands::onUpdate(FXObject* sender,FXSelector sel,void* ptr)
@@ -266,7 +287,7 @@ long FXCommands::onUpdate(FXObject* sender,FXSelector sel,void* ptr)
 		saveCommands();
 	}
 	mapShowRoute();
-	return FXText::onUpdate(sender, sel, ptr);
+	return FXEditor::onUpdate(sender, sel, ptr);
 }
 
 long FXCommands::updConfirmed(FXObject* sender, FXSelector, void*) {
