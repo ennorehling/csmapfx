@@ -6,9 +6,11 @@
 
 #include <fx.h>
 
+#include "FXEditor.h"
+
 #include <vector>
 
-class FXCommands : public FXText
+class FXCommands : public FXEditor
 {
 	FXDECLARE(FXCommands)
 
@@ -42,7 +44,7 @@ public:
 public: 
 	enum
 	{
-		ID_ROWCOL = FXText::ID_LAST,
+		ID_ROWCOL = FXEditor::ID_LAST,
         ID_UNIT_CONFIRM,
         ID_UNIT_ADD,
         ID_LAST
