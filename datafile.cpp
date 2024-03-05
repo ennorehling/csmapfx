@@ -564,13 +564,20 @@ void datafile::findOffset(datafile* new_cr, int* x_offset, int* y_offset) const
                 std::map<int, datablock::itor>::const_iterator match = regionIndex.find(id);
                 if (match != regionIndex.end()) {
                     const datablock::itor &other = (*match).second;
-                    int xo = other->x() - block.x();
-                    int yo = other->y() - block.y();
-                    if (xo != 0 || yo != 0) {
-                        if (x_offset) *x_offset = xo;
-                        if (y_offset) *y_offset = yo;
+                    /**
+                     * NB: drifting icebergs move around the map and keep their ID!
+                     **/
+                    const datakey *k1 = block.valueKey(TYPE_TERRAIN);
+                    const datakey *k2 = other->valueKey(TYPE_TERRAIN);
+                    if (k1->value() == k2->value()) {
+                        int xo = other->x() - block.x();
+                        int yo = other->y() - block.y();
+                        if (xo != 0 || yo != 0) {
+                            if (x_offset) *x_offset = xo;
+                            if (y_offset) *y_offset = yo;
+                        }
+                        return;
                     }
-                    return;
                 }
             }
         }
