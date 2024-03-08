@@ -569,7 +569,7 @@ void datafile::findOffset(datafile* new_cr, int* x_offset, int* y_offset) const
                      **/
                     const datakey *k1 = block.valueKey(TYPE_TERRAIN);
                     const datakey *k2 = other->valueKey(TYPE_TERRAIN);
-                    if (k1->value() == k2->value()) {
+                    if (k1 && k2 && k1->value() == k2->value()) {
                         int xo = other->x() - block.x();
                         int yo = other->y() - block.y();
                         if (xo != 0 || yo != 0) {
