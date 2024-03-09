@@ -418,7 +418,7 @@ CSMap::CSMap(FXApp *app) :
     menuPanes.push_back(pane = new FXMenuPane(this));
     new FXMenuTitle(menubar, "&Ansicht", nullptr, pane);
     menu.toolbar = new FXMenuCheck(pane, "Tool&bar\t\tToolbar ein- bzw. ausblenden.", toolbar, ID_TOGGLESHOWN);
-    menu.maponly = new FXMenuCheck(pane, "Nur &Karte anzeigen\tCtrl-Shift-M\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this, ID_VIEW_MAPONLY, 0);
+    menu.maponly = new FXMenuCheck(pane, "Nur &Karte anzeigen\tCtrl-Shift-K\tNur die Karte anzeigen, Regionsliste und -infos ausblenden.", this, ID_VIEW_MAPONLY, 0);
     menu.messages = new FXMenuCheck(pane, "&Meldungen\tCtrl-Shift-V\tRegionsmeldungen ein- bzw. ausblenden.", this, ID_VIEW_MESSAGES);
     menu.show_left = new FXMenuCheck(pane, "&Regionsliste\tCtrl-Shift-R\tRegionsliste ein- bzw. ausblenden.", this, ID_VIEW_REGIONLIST);
     menu.show_right = new FXMenuCheck(pane, "&Eigenschaften\tCtrl-Shift-E\tEinheiten- und Regionsdetails ein- bzw. ausblenden.", this, ID_VIEW_PROPERTIES);

@@ -221,7 +221,6 @@ protected:
 
     void updateMap();
 
-protected:
     FXCSMap() {}
     FXCSMap(const FXCSMap &) {}
 
