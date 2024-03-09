@@ -745,6 +745,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 			cursor_y = -int(cursor_y * fscale) - main_map->offset_y + main_map->getHeight()/2;
 
 			main_map->setPosition(cursor_x, cursor_y);
+            map->update();
 			return 1;
 		}
 
@@ -1855,47 +1856,41 @@ long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
 {
 	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
-    bool datachanged = true, scroll = false;
+    bool datachanged = false;
 
-	if (sender == this || selection.selChange != pstate->selChange)
-	{
+    if (selection.fileChange != pstate->fileChange)
+    {
         selection = *pstate;
+        datachanged = true;
+    }
+    if (selection.selChange != pstate->selChange)
+	{
+        if (!datachanged) {
+            selection = *pstate;
+        }
 		selection.regionsSelected = pstate->regionsSelected;
 
 		// does state->region contain valid informaion?
-		if (selection.selected & (selection.REGION|selection.UNKNOWN_REGION))
-		{
-			if (selection.selected & selection.REGION)
-				sel_x = selection.region->x(), sel_y = selection.region->y(), sel_plane = selection.region->info();
-			else
-				sel_x = selection.sel_x, sel_y = selection.sel_y, sel_plane = selection.sel_plane;
+        if (selection.selected & (selection.REGION | selection.UNKNOWN_REGION))
+        {
+            if (selection.selected & selection.REGION)
+                sel_x = selection.region->x(), sel_y = selection.region->y(), sel_plane = selection.region->info();
+            else
+                sel_x = selection.sel_x, sel_y = selection.sel_y, sel_plane = selection.sel_plane;
 
-			if (visiblePlane != sel_plane)
-			{
-				visiblePlane = sel_plane;
-			}
+            if (visiblePlane != sel_plane)
+            {
+                visiblePlane = sel_plane;
+            }
 
-			scroll = true;
-		}
+            scrollTo(sel_x, sel_y);
+        }
 		map->update();
 	}
-    else if (selection.fileChange != pstate->fileChange)
-    {
-        selection = *pstate;
-    } else {
-        datachanged = false;
-    }
 
     // things changed
-    if (datachanged) updateMap();
-
-	if (scroll)
-		scrollTo(sel_x, sel_y);
-
-	if (minimap && shown())
-	{
-        map->update();
-	}
+    if (datachanged)
+        updateMap();
 
     return 1;
 }
@@ -1903,8 +1898,7 @@ long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
 void FXCSMap::updateMap()
 {
     if (!minimap) {
-        layout();
-        scrollTo(sel_x, sel_y);
+        // layout();
     }
     else
     {
