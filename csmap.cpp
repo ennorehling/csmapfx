@@ -442,9 +442,6 @@ CSMap::CSMap(FXApp *app) :
     radio->setCheck();
 
     new FXMenuCascade(pane, L"&Gr\u00f6\u00dfe", nullptr, zoommenu = new FXMenuPane(this), 0);
-    new FXMenuCommand(zoommenu, L"Vergr\u00f6\u00dfern\tCtrl-+\tKarte vergr\u00f6\u00dfern.", nullptr, this, ID_MAP_ZOOM, 0);
-    new FXMenuCommand(zoommenu, "Verkleinern\tCtrl--\tKarte verkleinern.", nullptr, this, ID_MAP_ZOOM, 0);
-    new FXMenuSeparatorEx(zoommenu, L"Gr\u00f6\u00dfe");
     new FXMenuRadio(zoommenu, "&1 Pixel\tCtrl-8\t1.6%", this, ID_MAP_ZOOM, 0);
     new FXMenuRadio(zoommenu, "&2 Pixel\tCtrl-7\t3.1%", this, ID_MAP_ZOOM, 0);
     new FXMenuRadio(zoommenu, "&4 Pixel\tCtrl-6\t6.3%", this, ID_MAP_ZOOM, 0);
@@ -459,7 +456,7 @@ CSMap::CSMap(FXApp *app) :
     new FXMenuTitle(menubar, "B&earbeiten", nullptr, pane);
     new FXMenuCommand(pane, "&Suchen...\tCtrl-F\tEine Region, Einheit, Schiff, etc. suchen.", nullptr, this, ID_VIEW_SEARCHDLG);
     new FXMenuCommand(pane, "&Ursprung setzen\t\tDen Kartenursprung (0/0) auf die markierte Region setzen.", nullptr, this, ID_MAP_SETORIGIN, 0);
-    new FXMenuCommand(pane, L"Befehle pr\u00fcfen\t\tPr\u00fct die Befehle.", nullptr, this, ID_FILE_CHECK_ORDERS);
+    new FXMenuCommand(pane, L"Befehle pr\u00fcfen\tF7\tPr\u00fct die Befehle.", nullptr, this, ID_FILE_CHECK_ORDERS);
 
     new FXMenuSeparatorEx(pane, "Regionen");
     new FXMenuCommand(pane,L"&Alle markieren\tCtrl-Shift-A\tAlle Regionen ausw\u00e4hlen.", nullptr,this, ID_REGION_SELALL);
@@ -1699,36 +1696,12 @@ long CSMap::onChangeZoom(FXObject* sender, FXSelector, void*)
     if (txt.empty())
         return 0;
 
-    FXfloat scale = map->getScale();
+    FXfloat scale;
 
-    if (txt == FXString(L"Vergr\u00f6\u00dfern"))
-    {
-        FXfloat jump = 1.2f;
-
-        FXint pixel = FXint(scale*64.0f), altpixel = pixel;
-
-        pixel = FXint(pixel*jump);
-        if (pixel == altpixel)
-            pixel++;
-
-        scale = pixel/64.0f;
-    }
-    else if (txt == "Verkleinern")
-    {
-        FXfloat jump = 1.2f;
-
-        FXint pixel = FXint(scale*64.0f);
-
-        pixel = FXint(pixel/jump);
-        scale = pixel/64.0f;
-    }
+    if (txt[0] == '&')
+        scale = 1/64.0f * atoi(txt.after('&').text());
     else
-    {
-        if (txt[0] == '&')
-            scale = 1/64.0f * atoi(txt.after('&').text());
-        else
-            scale = 1/64.0f * atoi(txt.text());
-    }
+        scale = 1/64.0f * atoi(txt.text());
 
     map->scaleChange(scale);
     return 1;
