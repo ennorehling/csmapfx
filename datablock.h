@@ -128,6 +128,7 @@ public:
 	~datakey() {}
 
 	const FXString& value() const { return m_value; }
+    const FXint valueInt(FXint section = 0) const;
     enum key_type type() const {
         return (enum key_type)(m_type & TYPE_MASK);
     }
@@ -295,6 +296,7 @@ public:
         addKey(datakey(type, value));
     }
     const FXString& value(const FXString& key) const;
+    int valueSkill(const FXString& skill) const;
 	const FXString& value(key_type key) const;
 	int valueInt(const FXString& key, int def = 0) const;
 	int valueInt(key_type key, int def = 0) const;

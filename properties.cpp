@@ -2,23 +2,12 @@
 #include "csmap.h"
 #include "FXMenuSeparatorEx.h"
 
-class FXProperty : public FXTreeItem
-{
-public:
-    FXProperty(const FXString& text, FXIcon* oi = NULL, FXIcon* ci = NULL, void* ptr = NULL)
-        : FXTreeItem(text, oi, ci, ptr)
-    {
-    }
-    datablock* block = nullptr;
-    FXString info;
-};
-
 FXProperties::FXProperties(FXComposite* p, FXObject* tgt, FXSelector sel, FXuint opts, FXint x, FXint y, FXint w, FXint h)
     : FXTreeList(p, tgt, sel, opts | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES, x, y, w, h)
 {
 }
 
-FXTreeItem* FXProperties::makeItem(const FXString& label, datablock* block, const FXString* info)
+FXProperty * FXProperties::makeItem(const FXString& label, datablock* block, const FXString* info)
 {
     FXProperty* popup = new FXProperty(label);
     popup->block = block;
