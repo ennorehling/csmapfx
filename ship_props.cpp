@@ -132,7 +132,31 @@ void FXShipProperties::makeItems()
             }
         }
         // List units, if any:
-        makeUnitList(root, "Einheiten", unit, end, TYPE_SHIP, ship->info());
+        FXTreeItem *unitList = makeUnitList(root, "Einheiten", unit, end, TYPE_SHIP, ship->info());
+        if (unitList) {
+            int totalSkill = 0;
+            for (FXTreeItem *item = unitList->getFirst(); item; item = item->getNext())
+            {
+                FXProperty *prop = static_cast<FXProperty *>(item);
+                if (prop->block)
+                {
+                    int id = prop->block->info();
+                    datablock::itor unit;
+                    if (mapFile->getUnit(unit, id)) {
+                        datablock::itor block;
+                        int number = unit->valueInt(key_type::TYPE_NUMBER);
+                        if (number > 0 && mapFile->getChild(block, unit, block_type::TYPE_TALENTS))
+                        {
+                            int skill = block->valueSkill("Segeln");
+                            totalSkill += skill * number;
+                        }
+                    }
+                }
+            }
+            if (totalSkill > 0) {
+                insertItem(unitList, root, label.format("Segeltalent: %d", totalSkill));
+            }
+        }
     }
 }
 

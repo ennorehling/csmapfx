@@ -187,6 +187,11 @@ int datakey::parseType(const FXString& type, enum block_type btype)
 	return TYPE_UNKNOWN;
 }
 
+const FXint datakey::valueInt(FXint section) const
+{
+    return FXIntVal(m_value.section(' ', section));
+}
+
 FXString datakey::key() const
 {
     switch (type()) {
@@ -855,6 +860,17 @@ const FXString& datablock::value(const FXString& key) const
         }
     }
 	return FXString_Empty;
+}
+
+int datablock::valueSkill(const FXString &skill) const
+{
+    for (datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
+    {
+        if (skill == srch->key()) {
+            return srch->valueInt(1);
+        }
+    }
+    return 0;
 }
 
 const FXString& datablock::value(key_type key) const

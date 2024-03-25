@@ -1,3 +1,9 @@
+csmapfx (1.7.31-dev) stable; urgency=low
+
+  * display ship's total sailing skill
+
+  -- Enno Rehling <enno@eressea.de>  Mon, 25 Mar 2024 22:00:00 +0100
+
 csmapfx (1.7.30-1) stable; urgency=low
 
   * start rearranging menus

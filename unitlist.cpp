@@ -387,7 +387,7 @@ void FXUnitList::makeItems()
             for (datakey::list_type::const_iterator key = talents->data().begin(); key != talents->data().end(); ++key)
             {
                 FXString info = key->key();
-                FXint value = FXIntVal(key->value().section(' ', 1));
+                FXint value = key->valueInt(1);
                 properties.push_back({ info, value });
 
                 // Talent, f�r Transportkapazit�t

@@ -6,6 +6,17 @@
 
 #include <memory>
 
+class FXProperty : public FXTreeItem
+{
+public:
+    FXProperty(const FXString &text, FXIcon *oi = NULL, FXIcon *ci = NULL, void *ptr = NULL)
+        : FXTreeItem(text, oi, ci, ptr)
+    {
+    }
+    datablock *block = nullptr;
+    FXString info;
+};
+
 class FXProperties : public FXTreeList
 {
 public:
@@ -22,7 +33,7 @@ public:
 
 protected:
     virtual void makeItems() = 0;
-    FXTreeItem* makeItem(const FXString& label, datablock* block, const FXString* info = nullptr);
+    FXProperty* makeItem(const FXString& label, datablock* block, const FXString* info = nullptr);
     FXTreeItem* makeStringList(FXTreeItem* parent, const FXString& label, const datablock& block);
     FXTreeItem* makeUnitList(FXTreeItem* parent, const FXString& label, datablock::itor begin, datablock::itor end, key_type matchKey, int matchValue);
 
