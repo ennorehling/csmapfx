@@ -540,7 +540,7 @@ void datafile::mergeBlock(datablock::itor& block, const datablock::itor& parent,
 void datafile::findOffset(datafile* new_cr, int* x_offset, int* y_offset) const
 {
     // first, create an index of all regions with an Id in this report:
-    std::map<int, datablock::itor> regionIndex;
+    blockhash_t regionIndex;
     for (regions_map::const_iterator it = m_regions.begin(); it != m_regions.end(); ++it)
     {
         const datablock::itor& block = (*it).second;
@@ -561,7 +561,7 @@ void datafile::findOffset(datafile* new_cr, int* x_offset, int* y_offset) const
             int id = block.valueInt(TYPE_ID, -1);
             int plane = block.info();
             if (plane == 0) {
-                std::map<int, datablock::itor>::const_iterator match = regionIndex.find(id);
+                blockhash_t::const_iterator match = regionIndex.find(id);
                 if (match != regionIndex.end()) {
                     const datablock::itor &other = (*match).second;
                     /**
@@ -1131,7 +1131,7 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 // -----------------
 datablock::itor datafile::region(int x, int y, int plane)
 { 
-	std::map<Coordinates, datablock::itor>::const_iterator region;
+	regions_map::const_iterator region;
 	region = m_regions.find(Coordinates(x, y, plane));
 
 	if (region == m_regions.end())
@@ -1142,7 +1142,7 @@ datablock::itor datafile::region(int x, int y, int plane)
 
 datablock::itor datafile::battle(int x, int y, int plane)
 { 
-	std::map<Coordinates, datablock::itor>::const_iterator block;
+	regions_map::const_iterator block;
     block = m_battles.find(Coordinates(x, y, plane));
 
 	if (block == m_battles.end())
@@ -1169,14 +1169,14 @@ bool datafile::getBattle(datablock::itor &out, int x, int y, int plane)
 
 bool datafile::hasBattle(int x, int y, int plane) const
 {
-    std::map<Coordinates, datablock::itor>::const_iterator block;
+    regions_map::const_iterator block;
     block  = m_battles.find(Coordinates(x, y, plane));
     return (block != m_battles.end());
 }
 
 bool datafile::hasRegion(int x, int y, int plane) const
 {
-    std::map<Coordinates, datablock::itor>::const_iterator region;
+    regions_map::const_iterator region;
     region = m_regions.find(Coordinates(x, y, plane));
     return (region != m_regions.end());
 }
@@ -1212,7 +1212,7 @@ void datafile::deleteRegions(std::set<datablock*>& regions)
 
 datablock::itor datafile::group(int id)
 { 
-	std::map<int, datablock::itor>::iterator unit = m_groups.find(id);
+    blockhash_t::const_iterator unit = m_groups.find(id);
 
 	if (unit == m_groups.end()) {
         return m_blocks.end();
@@ -1233,7 +1233,7 @@ bool datafile::getGroup(datablock::itor& out, int id)
 
 datablock::itor datafile::unit(int id)
 { 
-	std::map<int, datablock::itor>::iterator unit = m_units.find(id);
+    blockhash_t::const_iterator unit = m_units.find(id);
 
 	if (unit == m_units.end()) {
         return m_blocks.end();
@@ -1323,7 +1323,7 @@ bool datafile::getUnit(datablock::itor& out, int id)
 
 datablock::itor datafile::faction(int id)
 {
-	std::map<int, datablock::itor>::iterator faction = m_factions.find(id);
+    blockhash_t::const_iterator faction = m_factions.find(id);
 
 	if (faction == m_factions.end())
 		return m_blocks.end();
@@ -1333,7 +1333,7 @@ datablock::itor datafile::faction(int id)
 
 bool datafile::getFaction(datablock::itor& out, int id)
 {
-    std::map<int, datablock::itor>::iterator faction = m_factions.find(id);
+    blockhash_t::const_iterator faction = m_factions.find(id);
     if (faction != m_factions.end()) {
         out = faction->second;
         return true;
@@ -1343,13 +1343,13 @@ bool datafile::getFaction(datablock::itor& out, int id)
 
 bool datafile::hasFaction(int id)
 {
-    std::map<int, datablock::itor>::iterator faction = m_factions.find(id);
+    blockhash_t::const_iterator faction = m_factions.find(id);
     return faction != m_factions.end();
 }
 
 datablock::itor datafile::building(int id)
 {
-    std::map<int, datablock::itor>::iterator building = m_buildings.find(id);
+    blockhash_t::const_iterator building = m_buildings.find(id);
 
     if (building == m_buildings.end()) {
         return m_blocks.end();
@@ -1370,7 +1370,7 @@ bool datafile::getBuilding(datablock::itor& out, int id)
 
 datablock::itor datafile::ship(int id)
 { 
-	std::map<int, datablock::itor>::iterator ship = m_ships.find(id);
+    blockhash_t::const_iterator ship = m_ships.find(id);
 
     if (ship == m_ships.end()) {
         return m_blocks.end();
@@ -1391,7 +1391,7 @@ bool datafile::getShip(datablock::itor& out, int id)
 
 datablock::itor datafile::island(int id)
 { 
-	std::map<int, datablock::itor>::iterator island = m_islands.find(id);
+    blockhash_t::const_iterator island = m_islands.find(id);
 
 	if (island == m_islands.end())
 		return m_blocks.end();
@@ -1740,7 +1740,7 @@ datablock::itor datafile::eraseBlocks(const datablock::itor& begin, const databl
     for (datablock::itor block = begin; block != end; ++block) {
         if (block->type() == block_type::TYPE_REGION) {
             Coordinates coor(block->x(), block->y(), block->info());
-            regions_map::iterator it = m_regions.find(coor);
+            regions_map::const_iterator it = m_regions.find(coor);
             if (it != m_regions.end()) {
                 m_regions.erase(it);
             }
