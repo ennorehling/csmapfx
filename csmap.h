@@ -41,7 +41,6 @@ public:		// this functions are slots for menu commands
     long onFileExportImage(FXObject*, FXSelector, void*);
     long onFileClose(FXObject*, FXSelector, void*);
     long onFilePreferences(FXObject*, FXSelector, void*);
-	long onFileOpenCommands(FXObject*, FXSelector, void* ptr);
 	long onFileSaveCommands(FXObject*, FXSelector, void* ptr);
     long onFileExportCommands(FXObject*, FXSelector, void* ptr);
     long onFileCheckCommands(FXObject*, FXSelector, void* ptr);
@@ -127,6 +126,7 @@ public:		// this functions are slots for menu commands
     void addRecentFile(const FXString& filename);
     void loadFiles(const std::vector<FXString>& filenames, std::vector<FXString>& errorMessages);
     void loadFile(const FXString& filename);
+    void loadReport(const FXString& filename);
     int saveFile(const FXString& filename, map_type mode = map_type::MAP_FULL);
     void addClipboardPane(FXMenuPane* pane, datablock* block);
     void addPlane(int planeId);
@@ -228,7 +228,7 @@ private:
     void showInfo(const char* text);
     void gotoObject(class datablock* block);
 
-    datafile* loadFile(const FXString& filename, FXString& errorMessage);
+    datafile* loadReport(const FXString& filename, FXString& errorMessage);
     bool saveReport(const FXString& filename, map_type mode, bool merge_commands = false);
     bool haveActiveFaction() const;
     bool mergeFile(const FXString& filename, FXString& errorMessage);
