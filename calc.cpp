@@ -220,17 +220,12 @@ static FXString evaluate(const char* expr)
 
 long FXCalculator::onChanged(FXObject*, FXSelector, void*)
 {
-    FXString exp = formula->getText().trim();
+    FXString text = formula->getText();
+    FXString exp = text.trimBegin();
 
-    bool changed = false;
-    for (int pos = exp.find_first_of("\t\r\n"); pos != -1; pos = exp.find_first_of("\t\r\n"))
-    {
-        changed = true;
-        exp.replace(pos, 1, " ");
-    }
-
-    if (changed)
+    if (exp != text) {
         formula->setText(exp);
+    }
 
     // if ROUTE or NACH, send to map
     if (map)
