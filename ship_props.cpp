@@ -93,7 +93,7 @@ void FXShipProperties::makeItems()
             if (mapFile->getUnit(unit, captainId)) {
                 label.assign(L"Kapit\u00e4n: ");
                 label += mapFile->unitName(*unit, true);
-                appendItem(root, makeItem(label, &*unit));
+                FXTreeItem* item = appendItem(root, makeItem(label, &*unit));
             }
         }
 
@@ -137,8 +137,8 @@ void FXShipProperties::makeItems()
             int totalSkill = 0;
             for (FXTreeItem *item = unitList->getFirst(); item; item = item->getNext())
             {
-                FXProperty *prop = static_cast<FXProperty *>(item);
-                if (prop->block)
+                FXProperty *prop = static_cast<FXProperty *>(item->getData());
+                if (prop && prop->block)
                 {
                     int id = prop->block->info();
                     datablock::itor unit;
