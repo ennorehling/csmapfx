@@ -5,16 +5,31 @@
       "generator": "Ninja",
       "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x86" ],
-      "buildRoot": "${ProjectDir}/Debug",
+      "buildRoot": "${workspaceRoot}/Debug",
       "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
-      "cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "cmakeToolchain": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "variables": [
         {
           "name": "VCPKG_TARGET_TRIPLET",
           "value": "x86-windows-static",
           "type": "STRING"
+        },
+        {
+          "name": "_VCPKG_INSTALLED_DIR",
+          "value": "e:/vcpkg/installed",
+          "type": "PATH"
+        },
+        {
+          "name": "FOX_INCLUDE_DIRS",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows-static/include",
+          "type": "PATH"
+        },
+        {
+          "name": "FOX_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows-static/lib/FOX-1.6.lib",
+          "type": "FILEPATH"
         }
       ]
     },
@@ -23,11 +38,11 @@
       "generator": "Ninja",
       "configurationType": "Release",
       "inheritEnvironments": [ "msvc_x86" ],
-      "buildRoot": "${ProjectDir}/Release",
+      "buildRoot": "${workspaceRoot}/Release",
       "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
-      "cmakeToolchain": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "cmakeToolchain": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "variables": [
         {
           "name": "VCPKG_TARGET_TRIPLET",
