@@ -113,12 +113,13 @@ bool SaveMapPNG(const FXString& filename, const FXCSMap& map, const FXCSMap::Isl
 
                 FXColor *data = image.getData();
                 if (data) {
-                    tile.w = tileSize;
-                    if (x + tile.w > width)
-                        tile.w = width - x;
+                    int w = tileSize;
+                    if (x + tile.w > width) {
+                        w = width - x;
+                    }
                     // Set up row pointers
                     for (int i = 0; i < tile.h; ++i) {
-                        memcpy(row_pointers[i] + x * sizeof(FXColor), data + i * tileSize, tile.w * sizeof(FXColor));
+                        memcpy(row_pointers[i] + x * sizeof(FXColor), data + i * tileSize, w * sizeof(FXColor));
                     }
                 }
                 else {
