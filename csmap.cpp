@@ -103,7 +103,6 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_CLOSE,               CSMap::updOpenFile),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_ORDERS,       CSMap::updOpenFile),
 
-    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_LOAD_ORDERS,         CSMap::updActiveFaction),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ORDERS,         CSMap::updActiveFaction),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_CHECK_ORDERS,        CSMap::updActiveFaction),
 
@@ -2632,7 +2631,7 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
     FXFileDialog dlg(this, FXString(L"\u00d6ffnen..."));
     dlg.setIcon(icons.open);
     dlg.setDirectory(dialogDirectory);
-    dlg.setPatternList(FXString(L"Eressea Computer Report (*.cr)\nBefehlsdateien (*.txt)\nAlle Dateien (*)"));
+    dlg.setPatternList(FXString(L"Häufige Formate (*.cr;*.txt)\nEressea Computer Report (*.cr)\nBefehlsdateien (*.txt)\nAlle Dateien (*)"));
     FXint res = dlg.execute(PLACEMENT_SCREEN);
     dialogDirectory = dlg.getDirectory();
     if (res) {

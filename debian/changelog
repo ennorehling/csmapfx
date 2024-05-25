@@ -1,6 +1,7 @@
 csmapfx (1.8.0-dev) stable; urgency=low
 
-  * file menu reorganization
+  * unified file open dialog
+  * datafile, unordered_map optimization
 
   -- Enno Rehling <enno@eressea.de>
 
