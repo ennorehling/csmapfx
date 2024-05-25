@@ -108,7 +108,7 @@ public:		// this functions are slots for menu commands
 
 	long onClipboardRequest(FXObject*, FXSelector, void* ptr);	// somebody wants data from clipboard
 	long onClipboardLost(FXObject*, FXSelector, void* ptr);		// we lost ownership of clipboard
-	long onSetClipboard(FXObject*, FXSelector, void* ptr);		// a widget want to set clipboard text
+    long onSetClipboard(FXObject*, FXSelector, void* ptr);		// a widget want to set clipboard text
 
 	long onSearchInfo(FXObject*, FXSelector, void* ptr);		// a widget wants to open infodlg
 

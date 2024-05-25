@@ -1,4 +1,12 @@
-csmapfx (1.7.30) stable; urgency=low
+csmapfx (1.7.31-1) stable; urgency=low
+
+  * display ship's total sailing skill
+  * file menu reorganization
+  * fix PNG export
+
+  -- Enno Rehling <enno@eressea.de>  Sat, 25 May 2024 13:00:00 +0200
+
+csmapfx (1.7.30-1) stable; urgency=low
 
   * start rearranging menus
   * use Fox's built-in automatic indentation

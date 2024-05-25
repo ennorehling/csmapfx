@@ -19,7 +19,6 @@
 #define NOMINMAX
 
 #include <windows.h>
-#include <atlbase.h>
 #include <combaseapi.h>
 #include <commdlg.h>
 #include <shlobj_core.h>

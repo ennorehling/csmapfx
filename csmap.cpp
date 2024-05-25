@@ -5,7 +5,6 @@
 #include "version.h"
 
 #ifdef WIN32
-#include <atlbase.h>
 LPCWSTR g_wszAppID = CSMAP_APP_ID;
 #include "win32.h"
 #else
@@ -423,8 +422,8 @@ CSMap::CSMap(FXApp *app) :
     menu.show_left = new FXMenuCheck(pane, "&Regionsliste\tCtrl-Shift-R\tRegionsliste ein- bzw. ausblenden.", this, ID_VIEW_REGIONLIST);
     menu.show_right = new FXMenuCheck(pane, "&Eigenschaften\tCtrl-Shift-E\tEinheiten- und Regionsdetails ein- bzw. ausblenden.", this, ID_VIEW_PROPERTIES);
     menu.calc = new FXMenuCheck(pane, "&Taschenrechner\tCtrl-Shift-C\tTaschenrechner-Leiste ein- bzw. ausblenden.");
-    menu.minimap = new FXMenuCheck(pane, L"\u00dcber&sichtskarte\tCtrl-Shift-M\t\u00dcbersichtskarte ein- bzw. ausblenden.", this, ID_VIEW_MINIMAP);
-    menu.infodlg = new FXMenuCheck(pane, "&Informationen\tCtrl-Shift-I\tRegel-Informationen ein- bzw. ausblenden.", this, ID_VIEW_INFODLG);
+    menu.minimap = new FXMenuCheck(pane, L"\u00dcber&sichtskarte\tCtrl-M\t\u00dcbersichtskarte ein- bzw. ausblenden.", this, ID_VIEW_MINIMAP);
+    menu.infodlg = new FXMenuCheck(pane, "&Informationen\tCtrl-I\tRegel-Informationen ein- bzw. ausblenden.", this, ID_VIEW_INFODLG);
     new FXMenuSeparatorEx(pane, "Liste");
     menu.ownFactionGroup = new FXMenuCheck(pane, "&Gruppe aktiver Partei\tCtrl-Shift-G\tDie Einheiten der eigenen Partei stehen in einer Gruppe.");
     menu.colorizeUnits = new FXMenuCheck(pane, L"Einheiten ko&lorieren\t\tEinheiten in Geb\u00e4uden und Schiffen einf\u00e4rben.");
@@ -2038,7 +2037,9 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     showProperties(buildingProperties, pstate->selected& selection.BUILDING);
 
     selection = *pstate;
+    // FIXME: bullshit!
     ++selection.selChange;
+
     while (block != report->blocks().begin()) {
         --block;
         if (block->type() == block_type::TYPE_REGION)
