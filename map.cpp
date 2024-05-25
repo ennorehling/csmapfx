@@ -796,7 +796,8 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
                 selection.selected = selection.UNKNOWN_REGION;
                 selection.selected &= ~selection.REGION;
 			}
-
+            updateSelection();
+            ++selection.selChange;
 			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 		}
 		return 1;
@@ -1852,6 +1853,26 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 	return 1;
 }
 
+void FXCSMap::updateSelection()
+{
+    // does state->region contain valid informaion?
+    if (selection.selected & (selection.REGION | selection.UNKNOWN_REGION))
+    {
+        if (selection.selected & selection.REGION)
+            sel_x = selection.region->x(), sel_y = selection.region->y(), sel_plane = selection.region->info();
+        else
+            sel_x = selection.sel_x, sel_y = selection.sel_y, sel_plane = selection.sel_plane;
+
+        if (visiblePlane != sel_plane)
+        {
+            visiblePlane = sel_plane;
+        }
+
+        scrollTo(sel_x, sel_y);
+    }
+    map->update();
+}
+
 long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
 {
 	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
@@ -1869,23 +1890,7 @@ long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
             selection = *pstate;
         }
 		selection.regionsSelected = pstate->regionsSelected;
-
-		// does state->region contain valid informaion?
-        if (selection.selected & (selection.REGION | selection.UNKNOWN_REGION))
-        {
-            if (selection.selected & selection.REGION)
-                sel_x = selection.region->x(), sel_y = selection.region->y(), sel_plane = selection.region->info();
-            else
-                sel_x = selection.sel_x, sel_y = selection.sel_y, sel_plane = selection.sel_plane;
-
-            if (visiblePlane != sel_plane)
-            {
-                visiblePlane = sel_plane;
-            }
-
-            scrollTo(sel_x, sel_y);
-        }
-		map->update();
+        updateSelection();
 	}
 
     // things changed

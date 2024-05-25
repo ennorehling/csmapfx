@@ -452,6 +452,7 @@ long FXSearchDlg::onSelectResults(FXObject*, FXSelector, void*)
             selection.selected |= selection.SHIP;
         }
     }
+    ++selection.selChange;
     getOwner()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }

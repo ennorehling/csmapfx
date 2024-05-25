@@ -593,6 +593,7 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
                 selection.faction = iparent;
 			}			
 		}
+        ++selection.selChange;
         getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
         if (!clipboard.empty()) {
             getTarget()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void *)clipboard.text());

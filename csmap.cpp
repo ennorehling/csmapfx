@@ -2031,8 +2031,6 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     showProperties(buildingProperties, pstate->selected& selection.BUILDING);
 
     selection = *pstate;
-    // FIXME: bullshit!
-    ++selection.selChange;
 
     while (block != report->blocks().begin()) {
         --block;
