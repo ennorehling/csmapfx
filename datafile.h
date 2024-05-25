@@ -3,7 +3,7 @@
 
 #include <list>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <set>
 #include <fstream>
 
@@ -152,7 +152,7 @@ public:
     const FXRectangle &getContentSize(int visiblePlane);
 
 protected:
-    std::map<int, FXRectangle> contentSizes;
+    std::unordered_map<int, FXRectangle> contentSizes;
 
     static bool isEphemeral(block_type type);
     datablock::itor eraseRegion(const datablock::itor& region);
@@ -200,7 +200,19 @@ protected:
 		int x, y, z;
 	};
 
-	// command file stuff
+    struct CoordinatesHash
+    {
+        std::size_t operator()(const Coordinates &k) const
+        {
+            // Compute individual hash values for first,
+            // second and third and combine them using XOR
+            // and bit shifting:
+
+            return k.x ^ k.y ^ k.z;
+        }
+    };
+
+    // command file stuff
 	struct cmds_t
 	{
 		bool modified;
@@ -209,7 +221,7 @@ protected:
 		std::vector<FXString> prefix_lines;
 
 		// command lines in REGIONs
-		typedef std::map<Coordinates, att_commands> region_map_t;
+		typedef std::unordered_map<Coordinates, att_commands, CoordinatesHash> region_map_t;
 
 		region_map_t region_lines;
 	} m_cmds;
@@ -227,11 +239,12 @@ protected:
     FXString m_version;
 	datablock::itor m_activefaction;
 
-	// hash tables
-	std::map<int, datablock::itor> m_units, m_factions, m_buildings, m_ships, m_islands, m_groups;
-    typedef std::map<Coordinates, datablock::itor> regions_map;
+    // hash tables
+    typedef std::unordered_map<int, datablock::itor> blockhash_t;
+    blockhash_t m_units, m_factions, m_buildings, m_ships, m_islands, m_groups;
+    typedef std::unordered_map<Coordinates, datablock::itor, CoordinatesHash> regions_map;
     regions_map m_regions;
-	std::map<Coordinates, datablock::itor> m_battles;
+    regions_map m_battles;
 };
 
 #endif //_CSMAP_DATAFILE

@@ -80,7 +80,6 @@ FXDEFMAP(CSMap) MessageMap[]=
 
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_OPEN,                CSMap::onFileOpen),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_MERGE,               CSMap::onFileMerge),
-    FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_LOAD_ORDERS,         CSMap::onFileOpenCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_SAVE_ORDERS,         CSMap::onFileSaveCommands),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_CLOSE,               CSMap::onFileClose),
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_FILE_CHECK_ORDERS,        CSMap::onFileCheckCommands),
@@ -353,10 +352,6 @@ CSMap::CSMap(FXApp *app) :
         icons.open,
         this,
         ID_FILE_SAVE_ALL);
-    new FXMenuCommand(
-        pane,
-        L"Befehle &laden...\tCtrl-Shift-O\tBefehle aus einer Textdatei laden.",
-        icons.open, this, ID_FILE_LOAD_ORDERS);
     new FXMenuCommand(
         pane,
         L"Befehle &speichern\tCtrl-S\tBefehlsdatei speichern.",
@@ -1202,11 +1197,11 @@ bool CSMap::haveActiveFaction() const
     return report->getFactionId() != 0;
 }
 
-void CSMap::loadFile(const FXString& filename)
+void CSMap::loadReport(const FXString& filename)
 {
     FXString errorMessage;
     
-    report.reset(loadFile(filename, errorMessage));
+    report.reset(loadReport(filename, errorMessage));
     if (!errorMessage.empty()) {
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "%s", errorMessage.text());
     }
@@ -1216,7 +1211,7 @@ void CSMap::loadFile(const FXString& filename)
     }
 }
 
-datafile* CSMap::loadFile(const FXString& filename, FXString& errorMessage)
+datafile* CSMap::loadReport(const FXString& filename, FXString& errorMessage)
 {
     datafile* cr = new datafile();
 
@@ -2488,7 +2483,7 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames, std::vector<FXStri
         for (FXString const& filename : filenames) {
             FXString errorMessage;
             if (!report) {
-                report.reset(loadFile(filename, errorMessage));    // normal laden, wenn vorher keine Datei geladen ist.
+                report.reset(loadReport(filename, errorMessage));    // normal laden, wenn vorher keine Datei geladen ist.
                 if (!errorMessage.empty()) {
                     errorMessages.push_back(errorMessage);
                 }
@@ -2508,6 +2503,37 @@ void CSMap::loadFiles(const std::vector<FXString> &filenames, std::vector<FXStri
     if (report) {
         report->parseMessages();
         passwords.set(report->getActiveFactionId(), report->turn(), report->getPassword());
+    }
+}
+
+void CSMap::loadFile(const FXString &filename)
+{
+    FXint dotPos = filename.rfind('.');
+    bool isReport = true;
+    if (dotPos > 0) {
+        if ("cr" != filename.mid(dotPos + 1, 2)) {
+            isReport = false;
+        }
+    }
+    beginLoading(filename);
+    if (isReport) {
+        if (closeFile()) {
+            FXString errorMessage;
+            recentFiles.removeFile(filename);
+            loadReport(filename);
+            mapChange();
+            updateFileNames();
+            if (report) {
+                addRecentFile(filename);
+            }
+        }
+    }
+    else if (report && report->hasActiveFaction()) {
+        recentFiles.removeFile(filename);
+        if (loadCommands(filename)) {
+            addRecentFile(filename);
+        }
+        updateFileNames();
     }
 }
 
@@ -2606,22 +2632,13 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
     FXFileDialog dlg(this, FXString(L"\u00d6ffnen..."));
     dlg.setIcon(icons.open);
     dlg.setDirectory(dialogDirectory);
-    dlg.setPatternList(FXString(L"Eressea Computer Report (*.cr)\nAlle Dateien (*)"));
+    dlg.setPatternList(FXString(L"Eressea Computer Report (*.cr)\nBefehlsdateien (*.txt)\nAlle Dateien (*)"));
     FXint res = dlg.execute(PLACEMENT_SCREEN);
     dialogDirectory = dlg.getDirectory();
     if (res) {
+        FXString filename = dlg.getFilename();
         getApp()->beginWaitCursor();
-        // vorherige Dateien schliessen, Speicher frei geben
-        if (closeFile()) {
-            FXString filename = dlg.getFilename();
-            beginLoading(filename);
-            loadFile(filename);
-            if (report) {
-                addRecentFile(filename);
-            }
-            mapChange();
-            updateFileNames();
-        }
+        loadFile(filename);
         getApp()->endWaitCursor();
     }
     return 1;
@@ -2830,30 +2847,6 @@ bool CSMap::confirmOverwrite()
         return (res != MBOX_CLICKED_NO);
     }
     return true;
-}
-
-long CSMap::onFileOpenCommands(FXObject *, FXSelector, void *)
-{
-    if (!confirmOverwrite()) {
-        return 0;
-    }
-    FXFileDialog dlg(this, FXString(L"Befehle laden..."), DLGEX_DONTADDTORECENT);
-    dlg.setIcon(icons.open);
-    dlg.setDirectory(dialogDirectory);
-    dlg.setPatternList(FXString(L"Textdatei (*.txt)\nZug-Datei (*.zug)\nBefehlsdatei (*.bef)\nM\u00f6gliche Befehlsdateien (*.txt,*.bef,*.zug)\nAlle Dateien (*)"));
-    FXint res = dlg.execute(PLACEMENT_SCREEN);
-    dialogDirectory = dlg.getDirectory();
-    if (res) {
-        getApp()->beginWaitCursor();
-        FXString filename = dlg.getFilename();
-        if (loadCommands(filename)) {
-            addRecentFile(filename);
-            updateFileNames();
-        }
-        getApp()->endWaitCursor();
-        return 1;
-    }
-    return 0;
 }
 
 long CSMap::onFileSaveCommands(FXObject*, FXSelector, void* ptr)
@@ -3103,35 +3096,9 @@ long CSMap::onFileRecent(FXObject*, FXSelector, void* ptr)
     if (!confirmOverwrite()) {
         return 0;
     }
-    FXString filename((const char *)ptr);
-    FXint dotPos = filename.rfind('.');
-    bool loadReport = true;
-    if (dotPos > 0) {
-        if ("cr" != filename.mid(dotPos + 1, 2)) {
-            loadReport = false;
-        }
-    }
     getApp()->beginWaitCursor();
-    beginLoading(filename);
-    if (loadReport) {
-        if (closeFile()) {
-            FXString errorMessage;
-            recentFiles.removeFile(filename);
-            loadFile(filename);
-            mapChange();
-            updateFileNames();
-            if (report) {
-                addRecentFile(filename);
-            }
-        }
-    }
-    else if (report && report->hasActiveFaction()) {
-        recentFiles.removeFile(filename);
-        if (loadCommands(filename)) {
-            addRecentFile(filename);
-        }
-        updateFileNames();
-    }
+    FXString filename((const char *)ptr);
+    loadFile(filename);
     getApp()->endWaitCursor();
     return 1;
 }
