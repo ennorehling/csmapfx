@@ -1,6 +1,7 @@
 csmapfx (1.7.33-1) stable; urgency=low
 
   * fix crash in property page pop-ups
+  * resolve duplicate Ctrl+I hotkey
 
   -- Enno Rehling <enno@eressea.de>  Sat, 25 May 2024 20:00:00 +0200
 

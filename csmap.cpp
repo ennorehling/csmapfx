@@ -363,7 +363,7 @@ CSMap::CSMap(FXApp *app) :
     new FXMenuCascade(pane, "&Karte", nullptr, subPane, 0);
     new FXMenuCommand(
         subPane,
-        L"H&inzuf\u00fcgen...\tCtrl-I\tL\u00e4dt einen Karten-Report in den aktuellen Report.",
+        L"H&inzuf\u00fcgen...\tCtrl-H\tL\u00e4dt einen Karten-Report in den aktuellen Report.",
         icons.merge, this, ID_FILE_MERGE);
     new FXMenuCommand(
         subPane,
