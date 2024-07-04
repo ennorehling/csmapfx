@@ -721,8 +721,9 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 
 	if (flags&FLAG_SCROLLING)
 	{
-		setPosition(event->last_x-cursor_x, event->last_y-cursor_y);
-		map->update();
+        setPosition(event->last_x - cursor_x, event->last_y - cursor_y);
+        repaint = true;
+//        map->update();
 		return 1;
 	}
 
@@ -745,6 +746,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 			cursor_y = -int(cursor_y * fscale) - main_map->offset_y + main_map->getHeight()/2;
 
 			main_map->setPosition(cursor_x, cursor_y);
+            main_map->repaint = true;
             map->update();
 			return 1;
 		}
@@ -1324,11 +1326,11 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 	IslandInfo islands;
 
     if (mapFile) {
-        // iterate throu all datafiles and all regions
+        // iterate through all regions
         for (datablock &block : mapFile->blocks())
         {
             // handle only regions
-            // handle only the actually visible plain
+            // handle only the actually visible plane
             if (block.type() != block_type::TYPE_REGION ||
                 block.info() != visiblePlane)
                 continue;
@@ -1791,7 +1793,9 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 {
 	FXEvent *ev = (FXEvent*)ptr;
 
-	if (minimap)
+    FXint center_x = pos_x;
+    FXint center_y = pos_y;
+    if (minimap)
 	{
 		// on minimap, the complete map is painted at imagebuffer
 		// so copy imagebuffer to backbuffer
@@ -1799,9 +1803,6 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 		FXDCWindow dc(backbuffer.get());
 		dc.setForeground(map->getBackColor());
 		dc.fillRectangle(0, 0, backbuffer->getWidth(), backbuffer->getHeight());
-
-		FXint center_x = pos_x;
-		FXint center_y = pos_y;
 
 		if (getWidth() > getImageWidth())	center_x += (getWidth() - getImageWidth())/2;
 		if (getHeight() > getImageHeight())	center_y += (getHeight() - getImageHeight())/2;
@@ -1842,9 +1843,10 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 			dc.drawLines(points, 5);
 		}
 	}
-	else
-		paintMap(backbuffer.get());		// paint the map onto the backbuffer
-
+    else if (repaint) {
+        paintMap(backbuffer.get());		// paint the map onto the backbuffer
+        repaint = false;
+    }
 	// copy backbuffer to screen
 	FXDCWindow screendc(map, ev);
 	screendc.drawImage(backbuffer.get(), 0, 0);
@@ -1865,9 +1867,8 @@ long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
     }
     if (selection.selChange != pstate->selChange)
 	{
-        if (!datachanged) {
-            selection = *pstate;
-        }
+        selection = *pstate;
+        datachanged = true;
 		selection.regionsSelected = pstate->regionsSelected;
 
 		// does state->region contain valid informaion?
@@ -1885,13 +1886,19 @@ long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
 
             scrollTo(sel_x, sel_y);
         }
-		map->update();
 	}
 
     // things changed
-    if (datachanged)
+    if (datachanged) {
         updateMap();
+        repaint = true;
+    }
 
+    if (minimap && shown())
+    {
+        // this is important, redraws the minimap
+        map->update();
+    }
     return 1;
 }
 
