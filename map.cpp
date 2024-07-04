@@ -397,7 +397,7 @@ void FXCSMap::moveContents(FXint x,FXint y)
 	// set new position and update map
 	pos_x=x;
 	pos_y=y;
-
+    repaint = true;
 	map->update();
 }
 
