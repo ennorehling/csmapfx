@@ -71,8 +71,8 @@ LPCWSTR g_wszAppID = CSMAP_APP_ID;
 FXDEFMAP(CSMap) MessageMap[]=
 {
     //________Message_Type_____________________ID_______________Message_Handler_______
-    FXMAPFUNC(SEL_CLIPBOARD_REQUEST,    SEL_NONE,                   CSMap::onClipboardRequest),
-    FXMAPFUNC(SEL_CLIPBOARD_LOST,       SEL_NONE,                   CSMap::onClipboardLost),
+    FXMAPFUNC(SEL_CLIPBOARD_REQUEST,    SEL_NONE,               CSMap::onClipboardRequest),
+    FXMAPFUNC(SEL_CLIPBOARD_LOST,       SEL_NONE,               CSMap::onClipboardLost),
     FXMAPFUNC(SEL_CLIPBOARD_REQUEST,    FXWindow::ID_SETSTRINGVALUE,   CSMap::onSetClipboard),
 
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_BOOKMARK_ADD,             CSMap::onBookmarkAdd),
@@ -103,7 +103,6 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_CLOSE,               CSMap::updOpenFile),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_EXPORT_ORDERS,       CSMap::updOpenFile),
 
-    FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_LOAD_ORDERS,         CSMap::updActiveFaction),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_SAVE_ORDERS,         CSMap::updActiveFaction),
     FXMAPFUNC(SEL_UPDATE,   CSMap::ID_FILE_CHECK_ORDERS,        CSMap::updActiveFaction),
 
@@ -183,7 +182,7 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_GOTO,                CSMap::onPopupGotoObject),
     FXMAPFUNC(SEL_TIMEOUT, CSMap::ID_WATCH_FILES,               CSMap::onWatchFiles),
 
-    FXMAPFUNC(SEL_DOUBLECLICKED, 0,    CSMap::onMessageSelected),
+    FXMAPFUNC(SEL_DOUBLECLICKED, CSMap::ID_NONE,                CSMap::onMessageSelected),
 };
 
 FXIMPLEMENT(CSMap,FXMainWindow,MessageMap,ARRAYNUMBER(MessageMap))
@@ -2632,7 +2631,7 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
     FXFileDialog dlg(this, FXString(L"\u00d6ffnen..."));
     dlg.setIcon(icons.open);
     dlg.setDirectory(dialogDirectory);
-    dlg.setPatternList(FXString(L"Eressea Computer Report (*.cr)\nBefehlsdateien (*.txt)\nAlle Dateien (*)"));
+    dlg.setPatternList(FXString(L"Häufige Formate (*.cr;*.txt)\nEressea Computer Report (*.cr)\nBefehlsdateien (*.txt)\nAlle Dateien (*)"));
     FXint res = dlg.execute(PLACEMENT_SCREEN);
     dialogDirectory = dlg.getDirectory();
     if (res) {

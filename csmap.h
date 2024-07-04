@@ -149,7 +149,6 @@ public:		// this functions are slots for menu commands
         ID_FILE_EXPORT_MAP,
         ID_FILE_EXPORT_IMAGE,
         ID_FILE_CLOSE,
-        ID_FILE_LOAD_ORDERS,
         ID_FILE_SAVE_ORDERS,
         ID_FILE_CHECK_ORDERS,
         ID_FILE_EXPORT_ORDERS,
