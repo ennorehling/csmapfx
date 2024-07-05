@@ -1,3 +1,8 @@
+csmapfx (1.7.34-1) stable; urgency=low
+
+
+  -- Enno Rehling <enno@eressea.de>  Fri, 05 Jul 2024 18:00:00 +0200
+
 csmapfx (1.7.33-1) stable; urgency=low
 
   * unified file open dialog
@@ -6,7 +11,7 @@ csmapfx (1.7.33-1) stable; urgency=low
   * install csmapfx.Eressea.info in LOCALAPPDATA
   * fix minimap updates (issue #32)
 
-  -- Enno Rehling <enno@eressea.de>  Tue, 04 Jul 2024 17:00:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Thu, 04 Jul 2024 17:00:00 +0200
 
 csmapfx (1.7.32-1) stable; urgency=low * display ship's total sailing skill
     * file menu reorganization

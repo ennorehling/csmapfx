@@ -1923,11 +1923,13 @@ void datafile::updateHashTables(const datablock::itor& start)
                 datablock::itor cmd;
                 if (getCommands(cmd, block))
                 {
+                    /*
                     // add att_commands to command block
                     if (!cmd->attachment())
                     {
                         cmd->attachment(new att_commands(*cmd));
                     }
+                    */
                 }
             }
         }

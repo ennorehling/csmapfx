@@ -199,20 +199,7 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
             datablock::itor cmd;
             if (mapFile->getCommands(cmd, selection.unit))
 			{
-				att_commands* cmds = static_cast<att_commands*>(cmd->attachment());
-				if (!cmds)
-				{
-					// copy commands of selected unit
-					cmd->attachment(cmds = new att_commands(*cmd));
-				}
-
-				// show commands of selected unit
-				for (att_commands::cmdlist_t::iterator itor = cmds->commands.begin(); itor != cmds->commands.end(); itor++)
-				{
-					appendText(itor->text(), itor->length());
-					appendText("\n", 1);
-				}
-
+                loadCommands(cmd);
 				// parse & highlight text and enable the widget
 				highlightText();
 				mapShowRoute();
@@ -328,30 +315,33 @@ void FXCommands::saveCommands()
         datablock::itor cmd;
         if (mapFile->getCommands(cmd, selection.unit))
         {
-            if (att_commands* cmds = static_cast<att_commands*>(cmd->attachment()))
+            att_commands *cmds = static_cast<att_commands *>(cmd->attachment());
+            if (!cmds)
             {
-                cmds->commands.clear();
+                // copy commands of selected unit
+                cmd->attachment(cmds = new att_commands(*cmd));
+            }
+            cmds->commands.clear();
 
-                int begin = 0, end;
-                do
-                {
-                    end = lineEnd(begin);
+            int begin = 0, end;
+            do
+            {
+                end = lineEnd(begin);
 
-                    FXString str;
-                    extractText(str, begin, end - begin);
-                    cmds->commands.push_back(str);
+                FXString str;
+                extractText(str, begin, end - begin);
+                cmds->commands.push_back(str);
 
-                    begin = nextLine(end);
-                } while (begin != end);
+                begin = nextLine(end);
+            } while (begin != end);
 
-                // remove trailing empty lines
-                while (!cmds->commands.empty())
-                {
-                    FXString line = cmds->commands.back();
-                    if (line.simplify().length())
-                        break;
-                    cmds->commands.pop_back();
-                }
+            // remove trailing empty lines
+            while (!cmds->commands.empty())
+            {
+                FXString line = cmds->commands.back();
+                if (line.simplify().length())
+                    break;
+                cmds->commands.pop_back();
             }
             setModified(false);
             // notify application that commands were modified
@@ -363,6 +353,30 @@ void FXCommands::saveCommands()
             }
         }
     }
+}
+
+void FXCommands::loadCommands(const datablock::itor &block)
+{
+    att_commands *cmds = static_cast<att_commands *>(block->attachment());
+    if (cmds)
+    {
+        // show commands of selected unit
+        for (att_commands::cmdlist_t::iterator itor = cmds->commands.begin(); itor != cmds->commands.end(); itor++)
+        {
+            appendText(itor->text(), itor->length());
+            appendText("\n", 1);
+        }
+    }
+    else {
+        const datablock &source = *block;
+        const datakey::list_type &list = source.data();
+
+        for (datakey::list_type::const_iterator itor = list.begin(); itor != list.end(); itor++) {
+            appendText((*itor).value());
+            appendText("\n", 1);
+        }
+    }
+
 }
 
 void FXCommands::mapShowRoute()
