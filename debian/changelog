@@ -1,3 +1,9 @@
+csmapfx (1.7.35-1) stable; urgency=low
+
+  * bugfix: "Einheit hat keinen Befehlsblock"
+
+  -- Enno Rehling <enno@eressea.de>  Sat, 06 Jul 2024 11:30:00 +0200
+
 csmapfx (1.7.34-1) stable; urgency=low
 
   * fix patterns in FxFileDialogEx
