@@ -1949,7 +1949,7 @@ FXint FXCSMap::sendRouteCmds(const FXString& str, int which)
 	int y_offset[6] = { +1, +1,  0, -1, -1,  0 };
 
 	FXString line = str;
-	FXString cmd = line.before(' ').upper();
+	FXString cmd = line.upper().before(' ');
 
 	if (cmd != "NACH" && cmd != "ROUTE")
 	{
@@ -1968,12 +1968,8 @@ FXint FXCSMap::sendRouteCmds(const FXString& str, int which)
 
 	while (!(line = line.after(' ').trimBegin()).empty())
 	{
-		cmd = line.before(' ');
-		if (cmd.empty())
-			cmd = line;
-		cmd.upper();
-
-		int dir = -1;
+        int dir = -1;
+        cmd = line.before(' ');
 
 		if (cmd == "NW")
 			dir = 0;
