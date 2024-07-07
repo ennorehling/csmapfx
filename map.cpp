@@ -1535,9 +1535,6 @@ FXbool FXCSMap::paintMap(FXDCWindow &dc)
 		return true;			// minimap only draws regions and island names
 	}
 
-	// draw traveller arrows
-    paintArrows(dc);
-
     // draw selection mark
 	if ((selection.selected & (selection.REGION|selection.UNKNOWN_REGION)) && (sel_plane == visiblePlane))
 	{
@@ -1552,29 +1549,26 @@ FXbool FXCSMap::paintMap(FXDCWindow &dc)
 void FXCSMap::paintArrows(FXDCWindow &dc)
 {
     FXPoint scr_offset = GetScreenOffset();
-    if (!arrows.empty())
+    // NW, NO, O, SO, SW, W
+    int arrow_offset_x[6] = { 6, 36, 46, 22, -7, -18 };
+    int arrow_offset_y[6] = { -13, -5, 22, 40, 34, 8 };
+
+    for (std::vector<FXCSMap::arrow>::const_iterator arrow = arrows.begin(); arrow != arrows.end(); arrow++)
     {
-        // NW, NO, O, SO, SW, W
-        int arrow_offset_x[6] = { 6, 36, 46, 22, -7, -18 };
-        int arrow_offset_y[6] = { -13, -5, 22, 40, 34, 8 };
+        FXint scr_x = scr_offset.x + FXint(scale * (arrow_offset_x[arrow->dir] + GetScreenFromHexX(arrow->x, arrow->y)));
+        FXint scr_y = scr_offset.y + FXint(scale * (arrow_offset_y[arrow->dir] + GetScreenFromHexY(arrow->x, arrow->y)));
 
-        for (std::vector<FXCSMap::arrow>::const_iterator arrow = arrows.begin(); arrow != arrows.end(); arrow++)
-        {
-            FXint scr_x = scr_offset.x + FXint(scale * (arrow_offset_x[arrow->dir] + GetScreenFromHexX(arrow->x, arrow->y)));
-            FXint scr_y = scr_offset.y + FXint(scale * (arrow_offset_y[arrow->dir] + GetScreenFromHexY(arrow->x, arrow->y)));
+        FXIcon **iconSet = nullptr;
+        if (arrow->color == arrow::ARROW_RED)
+            iconSet = redarrows;
+        else if (arrow->color == arrow::ARROW_GREEN)
+            iconSet = greenarrows;
+        else if (arrow->color == arrow::ARROW_BLUE)
+            iconSet = bluearrows;
+        else /*if (arrow->color == arrow::ARROW_GREY)*/ // catch-all
+            iconSet = greyarrows;
 
-            FXIcon **iconSet = nullptr;
-            if (arrow->color == arrow::ARROW_RED)
-                iconSet = redarrows;
-            else if (arrow->color == arrow::ARROW_GREEN)
-                iconSet = greenarrows;
-            else if (arrow->color == arrow::ARROW_BLUE)
-                iconSet = bluearrows;
-            else /*if (arrow->color == arrow::ARROW_GREY)*/ // catch-all
-                iconSet = greyarrows;
-
-            dc.drawIcon(iconSet[arrow->dir], scr_x, scr_y);
-        }
+        dc.drawIcon(iconSet[arrow->dir], scr_x, scr_y);
     }
 }
 
@@ -1838,7 +1832,7 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 			dc.drawLines(points, 5);
 		}
 	}
-    else {
+    else if (repaint) {
         FXDCWindow dc(backbuffer.get());
         paintMap(dc);		// paint the map onto the backbuffer
         repaint = false;
@@ -1846,6 +1840,10 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 	// copy backbuffer to screen
 	FXDCWindow screendc(map, ev);
 	screendc.drawImage(backbuffer.get(), 0, 0);
+    if (!arrows.empty()) {
+        // draw traveller arrows
+        paintArrows(screendc);
+    }
 
 	return 1;
 }
