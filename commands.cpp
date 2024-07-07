@@ -423,7 +423,7 @@ void FXCommands::mapShowRoute()
 		}
 	}
 		
-	map->sendRouteCmds("", 0);
+	map->clearRoute(0);
 	routeLength = 0;
 }
 

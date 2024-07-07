@@ -59,6 +59,7 @@ public:
 
 	void terraform(FXint x, FXint y, FXint plane, FXint terrain);
 
+	void clearRoute(int which);
 	FXint sendRouteCmds(const FXString& str, int which);
 
 	FXint getImageWidth() const { return FXint(scale * image_w); }

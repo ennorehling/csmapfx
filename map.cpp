@@ -1843,7 +1843,7 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 			dc.drawLines(points, 5);
 		}
 	}
-    else if (repaint) {
+    else {
         paintMap(backbuffer.get());		// paint the map onto the backbuffer
         repaint = false;
     }
@@ -1890,8 +1890,12 @@ long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
 
     // things changed
     if (datachanged) {
-        updateMap();
-        repaint = true;
+        if (minimap) {
+            updateMap();
+        }
+        else {
+            repaint = true;
+        }
     }
 
     if (minimap && shown())
@@ -1904,11 +1908,7 @@ long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
 
 void FXCSMap::updateMap()
 {
-    if (!minimap) {
-        // layout();
-    }
-    else
-    {
+    if (minimap) {
         scale = 1.0f;
         calculateContentSize();
 
@@ -1926,6 +1926,15 @@ void FXCSMap::updateMap()
     }
 }
 
+
+void FXCSMap::clearRoute(int which)
+{
+    routeArrows[which].clear();
+    arrows.clear();
+    for (int i = 0; i < 2; i++)
+        arrows.insert(arrows.end(), routeArrows[i].begin(), routeArrows[i].end());
+    map->update();
+}
 
 FXint FXCSMap::sendRouteCmds(const FXString& str, int which)
 {
