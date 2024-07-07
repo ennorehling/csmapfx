@@ -38,7 +38,8 @@ public:
 
 	virtual void moveContents(FXint x,FXint y) override;
 
-	FXbool paintMap(FXDrawable* buffer /*, FXRectangle& rect*/);
+	FXbool paintMap(FXDCWindow &dc);
+	void paintArrows(FXDCWindow &dc);
 	void setMapFile(std::shared_ptr<datafile>& f);
 	void connectMap(FXCSMap* map);
 
@@ -221,6 +222,7 @@ protected:
 	FXint GetHexFromScreenX(FXint scrx, FXint scry) const;
 	FXint GetScreenFromHexY(FXint x, FXint y) const;
 	FXint GetScreenFromHexX(FXint x, FXint y) const;
+    FXPoint GetScreenOffset() const;
     void updateMap();
 
     FXCSMap() {}
