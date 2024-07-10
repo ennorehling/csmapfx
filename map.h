@@ -200,16 +200,16 @@ protected:
 		int x, y;		// coordinates of arrow origin
 		int dir;		// direction of arrow
 		
-		enum			// color of array
+		enum color_t   // color of arrow
 		{
 			ARROW_RED,
-			ARROW_GREEN,
-			ARROW_BLUE,
+            ARROW_BLUE,
+            ARROW_GREEN,
 			ARROW_GREY
 		} color;
 	};
-	std::vector<arrow> arrows;
-	std::vector<arrow> routeArrows[2];		// saved
+    std::vector<arrow> makeArrows(int which) const;
+    FXString routeString[2];
     
     std::shared_ptr<datafile> mapFile;
 

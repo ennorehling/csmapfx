@@ -400,8 +400,8 @@ void FXCommands::mapShowRoute()
 	
 	if (cmd == "NACH" || cmd == "ROUTE")
 	{
-		routeLength = map->sendRouteCmds(line, 0);
-		return;
+        routeLength = map->sendRouteCmds(line, 0);
+        return;
 	}
 
 	for (begin = 0, end = 1; begin != end; begin = nextLine(end))

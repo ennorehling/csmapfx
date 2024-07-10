@@ -125,6 +125,77 @@ FXCSMap::~FXCSMap()
 		delete (*it->icon);
 }
 
+std::vector<FXCSMap::arrow> FXCSMap::makeArrows(int which) const
+{
+    std::vector<arrow> arrows;
+    FXString line = routeString[which];
+    line.upper();
+
+    // NW, NO, O, SO, SW, W
+    int x_offset[6] = { -1,  0, +1, +1,  0, -1 };
+    int y_offset[6] = { +1, +1,  0, -1, -1,  0 };
+
+    FXCSMap::arrow arrow;
+    int x = selection.sel_x;
+    int y = selection.sel_y;
+    int paused = 0;
+
+    while (!(line = line.after(' ').trimBegin()).empty())
+    {
+        FXString cmd = line.before(' ');
+        int dir = -1;
+
+        if (cmd == "NW")
+            dir = 0;
+        else if (cmd == "NO")
+            dir = 1;
+        else if (cmd == "O")
+            dir = 2;
+        else if (cmd == "SO")
+            dir = 3;
+        else if (cmd == "SW")
+            dir = 4;
+        else if (cmd == "W")
+            dir = 5;
+        /*else if (!strncmp(cmd.text(), "NORDWESTEN", cmd.length()))
+            dir = 0;
+        else if (!strncmp(cmd.text(), "NORDOSTEN", cmd.length()))
+            dir = 1;*/
+        else if (!strncmp(cmd.text(), "OSTEN", cmd.length()))
+            dir = 2;
+        /*else if (!strncmp(cmd.text(), "S\u00dcDOSTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDOSTEN", cmd.length()))
+            dir = 3;
+        else if (!strncmp(cmd.text(), "S\u00dcDWESTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDWESTEN", cmd.length()))
+            dir = 4;*/
+        else if (!strncmp(cmd.text(), "WESTEN", cmd.length()))
+            dir = 5;
+        else if (!strncmp(cmd.text(), "PAUSE", cmd.length()))
+        {
+            paused++;
+            continue;
+        }
+        else if (cmd == "NACH" || cmd == "ROUTE")
+        {
+            x = selection.sel_x;
+            y = selection.sel_y;
+            paused = 0;
+            continue;
+        }
+        else
+            break;
+
+        arrow.x = x;
+        arrow.y = y;
+        arrow.dir = dir;
+        arrow.color = paused ? arrow::ARROW_GREY : (which ? arrow::ARROW_RED : arrow::ARROW_BLUE);
+        arrows.push_back(arrow);
+
+        x += x_offset[dir];
+        y += y_offset[dir];
+    }
+    return arrows;
+}
+
 // Get minimum window width/height for layout
 FXint FXCSMap::getDefaultWidth()
 {
@@ -1553,22 +1624,25 @@ void FXCSMap::paintArrows(FXDCWindow &dc)
     int arrow_offset_x[6] = { 6, 36, 46, 22, -7, -18 };
     int arrow_offset_y[6] = { -13, -5, 22, 40, 34, 8 };
 
-    for (std::vector<FXCSMap::arrow>::const_iterator arrow = arrows.begin(); arrow != arrows.end(); arrow++)
-    {
-        FXint scr_x = scr_offset.x + FXint(scale * (arrow_offset_x[arrow->dir] + GetScreenFromHexX(arrow->x, arrow->y)));
-        FXint scr_y = scr_offset.y + FXint(scale * (arrow_offset_y[arrow->dir] + GetScreenFromHexY(arrow->x, arrow->y)));
+    for (int i = 0; i != 2; ++i) {
+        const std::vector<arrow> arrows = makeArrows(i);
+        for (std::vector<FXCSMap::arrow>::const_iterator arrow = arrows.begin(); arrow != arrows.end(); arrow++)
+        {
+            FXint scr_x = scr_offset.x + FXint(scale * (arrow_offset_x[arrow->dir] + GetScreenFromHexX(arrow->x, arrow->y)));
+            FXint scr_y = scr_offset.y + FXint(scale * (arrow_offset_y[arrow->dir] + GetScreenFromHexY(arrow->x, arrow->y)));
 
-        FXIcon **iconSet = nullptr;
-        if (arrow->color == arrow::ARROW_RED)
-            iconSet = redarrows;
-        else if (arrow->color == arrow::ARROW_GREEN)
-            iconSet = greenarrows;
-        else if (arrow->color == arrow::ARROW_BLUE)
-            iconSet = bluearrows;
-        else /*if (arrow->color == arrow::ARROW_GREY)*/ // catch-all
-            iconSet = greyarrows;
+            FXIcon **iconSet = nullptr;
+            if (arrow->color == arrow::ARROW_RED)
+                iconSet = redarrows;
+            else if (arrow->color == arrow::ARROW_GREEN)
+                iconSet = greenarrows;
+            else if (arrow->color == arrow::ARROW_BLUE)
+                iconSet = bluearrows;
+            else /*if (arrow->color == arrow::ARROW_GREY)*/ // catch-all
+                iconSet = greyarrows;
 
-        dc.drawIcon(iconSet[arrow->dir], scr_x, scr_y);
+            dc.drawIcon(iconSet[arrow->dir], scr_x, scr_y);
+        }
     }
 }
 
@@ -1840,10 +1914,8 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 	// copy backbuffer to screen
 	FXDCWindow screendc(map, ev);
 	screendc.drawImage(backbuffer.get(), 0, 0);
-    if (!arrows.empty()) {
-        // draw traveller arrows
-        paintArrows(screendc);
-    }
+    // draw traveller arrows
+    paintArrows(screendc);
 
 	return 1;
 }
@@ -1924,112 +1996,19 @@ void FXCSMap::updateMap()
 
 void FXCSMap::clearRoute(int which)
 {
-    routeArrows[which].clear();
-    arrows.clear();
-    for (int i = 0; i < 2; i++)
-        arrows.insert(arrows.end(), routeArrows[i].begin(), routeArrows[i].end());
+    FXASSERT(which >= 0 && which < 2);
+    routeString[which].clear();
     map->update();
 }
 
-FXint FXCSMap::sendRouteCmds(const FXString& str, int which)
+FXint FXCSMap::sendRouteCmds(const FXString &str, int which)
 {
-	if (which > 1)
-		return 0;
-
-	// clear old arrows
-	routeArrows[which].clear();
-
-	if (!(selection.selected & (selection.REGION|selection.UNKNOWN_REGION)))
-	{
-		arrows.clear();
-		for (int i = 0; i < 2; i++)
-			arrows.insert(arrows.end(), routeArrows[i].begin(), routeArrows[i].end());
-		map->update();
-		return 0;
-	}
-
-	// NW, NO, O, SO, SW, W
-	int x_offset[6] = { -1,  0, +1, +1,  0, -1 };
-	int y_offset[6] = { +1, +1,  0, -1, -1,  0 };
-
-	FXString line = str;
-	FXString cmd = line.upper().before(' ');
-
-	if (cmd != "NACH" && cmd != "ROUTE")
-	{
-		arrows.clear();
-		for (int i = 0; i < 2; i++)
-			arrows.insert(arrows.end(), routeArrows[i].begin(), routeArrows[i].end());
-		map->update();
-		return 0;
-	}
-
-	FXCSMap::arrow arrow;
-	int x = selection.sel_x;
-	int y = selection.sel_y;
-	int length = 0;
-	int paused = 0;
-
-	while (!(line = line.after(' ').trimBegin()).empty())
-	{
-        int dir = -1;
-        cmd = line.before(' ');
-
-		if (cmd == "NW")
-			dir = 0;
-		else if (cmd == "NO")
-			dir = 1;
-		else if (cmd == "O")
-			dir = 2;
-		else if (cmd == "SO")
-			dir = 3;
-		else if (cmd == "SW")
-			dir = 4;
-		else if (cmd == "W")
-			dir = 5;
-		/*else if (!strncmp(cmd.text(), "NORDWESTEN", cmd.length()))
-			dir = 0;
-		else if (!strncmp(cmd.text(), "NORDOSTEN", cmd.length()))
-			dir = 1;*/
-		else if (!strncmp(cmd.text(), "OSTEN", cmd.length()))
-			dir = 2;
-		/*else if (!strncmp(cmd.text(), "S\u00dcDOSTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDOSTEN", cmd.length()))
-			dir = 3;
-		else if (!strncmp(cmd.text(), "S\u00dcDWESTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDWESTEN", cmd.length()))
-			dir = 4;*/
-		else if (!strncmp(cmd.text(), "WESTEN", cmd.length()))
-			dir = 5;
-		else if (!strncmp(cmd.text(), "PAUSE", cmd.length()))
-		{
-			paused++;
-			continue;
-		}
-		else if (cmd == "NACH" || cmd == "ROUTE")
-		{
-			x = selection.sel_x;
-			y = selection.sel_y;
-			paused = 0;
-			continue;
-		}
-		else
-			break;
-
-		arrow.x = x; arrow.y = y;
-		arrow.dir = dir;
-		arrow.color = paused ? arrow::ARROW_GREY : (which ? arrow::ARROW_RED : arrow::ARROW_BLUE);
-		routeArrows[which].push_back(arrow);
-
-		length++;
-
-		x += x_offset[dir]; y += y_offset[dir];
-	}
-
-	arrows.clear();
-	for (int i = 0; i < 2; i++)
-		arrows.insert(arrows.end(), routeArrows[i].begin(), routeArrows[i].end());
-	map->update();
-
-	return length;
+    FXASSERT(which >= 0 && which < 2);
+    if (str != routeString[which]) {
+        routeString[which] = str;
+        map->update();
+    }
+    return makeArrows(which).size();
 }
 
 long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)
