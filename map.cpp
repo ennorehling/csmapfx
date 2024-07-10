@@ -888,7 +888,6 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
                 selection.selected = selection.UNKNOWN_REGION;
                 selection.selected &= ~selection.REGION;
 			}
-
 			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 		}
 		return 1;
@@ -1934,7 +1933,7 @@ long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
     if (selection.selChange != pstate->selChange)
 	{
         selection = *pstate;
-        datachanged = true;
+        repaint = true;
 		selection.regionsSelected = pstate->regionsSelected;
 
 		// does state->region contain valid informaion?

@@ -143,7 +143,7 @@ protected:
     FXival  	modus = MODUS_NORMAL;			// mouse button modus
 	FXint		mouse_select = 0;	// select_set==1: select regions on mouse-over, select_set==2: unselect them
 
-	FXbool		minimap = FALSE;		// is this map a minimap?
+	bool		minimap = false;		// is this map a minimap?
 	FXCSMap		*main_map = nullptr;		// pointer to the normal map
 	
 	FXCanvas	*map = nullptr;			// the bitmap where the image data will be written to
