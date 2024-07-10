@@ -38,7 +38,8 @@ public:
 
 	virtual void moveContents(FXint x,FXint y) override;
 
-	FXbool paintMap(FXDrawable* buffer /*, FXRectangle& rect*/);
+	FXbool paintMap(FXDCWindow &dc);
+	void paintArrows(FXDCWindow &dc);
 	void setMapFile(std::shared_ptr<datafile>& f);
 	void connectMap(FXCSMap* map);
 
@@ -59,6 +60,7 @@ public:
 
 	void terraform(FXint x, FXint y, FXint plane, FXint terrain);
 
+	void clearRoute(int which);
 	FXint sendRouteCmds(const FXString& str, int which);
 
 	FXint getImageWidth() const { return FXint(scale * image_w); }
@@ -198,16 +200,16 @@ protected:
 		int x, y;		// coordinates of arrow origin
 		int dir;		// direction of arrow
 		
-		enum			// color of array
+		enum color_t   // color of arrow
 		{
 			ARROW_RED,
-			ARROW_GREEN,
-			ARROW_BLUE,
+            ARROW_BLUE,
+            ARROW_GREEN,
 			ARROW_GREY
 		} color;
 	};
-	std::vector<arrow> arrows;
-	std::vector<arrow> routeArrows[2];		// saved
+    std::vector<arrow> makeArrows(int which) const;
+    FXString routeString[2];
     
     std::shared_ptr<datafile> mapFile;
 
@@ -220,6 +222,7 @@ protected:
 	FXint GetHexFromScreenX(FXint scrx, FXint scry) const;
 	FXint GetScreenFromHexY(FXint x, FXint y) const;
 	FXint GetScreenFromHexX(FXint x, FXint y) const;
+    FXPoint GetScreenOffset() const;
     void updateMap();
 
     FXCSMap() {}
