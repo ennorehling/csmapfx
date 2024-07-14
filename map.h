@@ -83,6 +83,8 @@ public:
 	long onPopup(FXObject*,FXSelector,void*);
 	long onPopupClicked(FXObject*,FXSelector,void*);
 
+    long onConfigure(FXObject*,FXSelector,void*);
+
 	long onToggleStreets(FXObject*,FXSelector,void*);
 	long onUpdateStreets(FXObject*,FXSelector,void*);
 	long onToggleVisibility(FXObject*,FXSelector,void*);

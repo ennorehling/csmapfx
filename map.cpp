@@ -32,6 +32,8 @@ FXDEFMAP(FXCSMap) MessageMap[]=
 
 	FXMAPFUNC(SEL_KEYPRESS,				FXCSMap::ID_MAP,				FXCSMap::onKeyPress),
 
+    FXMAPFUNC(SEL_CONFIGURE,			FXCSMap::ID_MAP,				FXCSMap::onConfigure),
+
 	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_POPUP_CLICKED,		FXCSMap::onPopupClicked),
 
 	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_UPDATE,				FXCSMap::onMapChange),
@@ -1282,6 +1284,13 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 	return 0;
 }
 
+long FXCSMap::onConfigure(FXObject *, FXSelector, void *)
+{
+    // resize event
+    repaint = true;
+    return 0;
+}
+
 void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 {
 	if (!mapFile) {
@@ -1919,7 +1928,7 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 	return 1;
 }
 
-long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
+long FXCSMap::onMapChange(FXObject*sender, FXSelector sel, void* ptr)
 {
 	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 

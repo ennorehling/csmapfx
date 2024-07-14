@@ -1,8 +1,9 @@
 csmapfx (1.7.37-1) stable; urgency=low
 
   * bugfix: redraw minimap only when map data has changed
+  * bugfix: resize events must repaint the map
 
-  -- Enno Rehling <enno@eressea.de>  Wed, 10 Jul 2024 21:30:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Sun, 14 Jul 2024 16:45:00 +0200
 
 csmapfx (1.7.36-1) stable; urgency=low
 
