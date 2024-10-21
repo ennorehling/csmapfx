@@ -1,3 +1,12 @@
+csmapfx (1.7.38-1) stable; urgency=low
+
+  * prevent accidental overwrite of externally modified orders
+  * minor bugfix: replace a wrong loading icon with a save icon
+  * small menu tweaks
+  * display heroes in the statistics view
+
+  -- Enno Rehling <enno@eressea.de>  Sun, 21 Oct 2024 20:15:00 +0200
+
 csmapfx (1.7.37-1) stable; urgency=low
 
   * bugfix: redraw minimap only when map data has changed

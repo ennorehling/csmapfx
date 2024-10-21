@@ -146,7 +146,6 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
             if (popup->block) {
                 datablock* block = popup->block;
                 FXString label = block->getName();
-                csmap->addClipboardPane(&pane, block);
                 if (label.length() <= 20) {
                     new FXMenuSeparatorEx(&pane, label);
                 }
@@ -167,6 +166,7 @@ long FXProperties::onPopup(FXObject* sender, FXSelector sel, void* ptr)
                     FXMenuCommand* command = new FXMenuCommand(&pane, label, nullptr, csmap, CSMap::ID_POPUP_GOTO);
                     command->setUserData(block);
                 }
+                csmap->addClipboardPane(&pane, block);
             }
             else {
                 const FXString& label = item->getText();

@@ -115,7 +115,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 		{
 			FXString fac = block->value(TYPE_FACTION);
 			int faction = -1;
-			if (fac.length())
+			if (!fac.empty())
 				faction = atoi(fac.text());
 
 			if (faction == selected_faction || selected_faction == 0)
@@ -124,7 +124,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 
 				// <Shiptype>: <Size>
 				FXString type = block->value(TYPE_TYPE);
-				if (type.length())
+				if (!type.empty())
 					ships[type].list.push_back(std::make_pair(block->info(), size));
 			}
 		}
@@ -132,7 +132,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 		{
 			FXString fac = block->value(TYPE_FACTION);
 			int faction = -1;
-			if (fac.length())
+			if (!fac.empty())
 				faction = atoi(fac.text());
 
 			if (faction == selected_faction || selected_faction == 0)
@@ -141,7 +141,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 
 				// <Buildingtype>: <Size>
 				FXString type = block->value(TYPE_TYPE);
-				if (type.length())
+				if (!type.empty())
 					buildings[type].list.push_back(std::make_pair(block->info(), size));
 			}
 		}
@@ -151,7 +151,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 
 			FXString fac = block->value(TYPE_FACTION);
 			int faction = -1;
-			if (fac.length())
+			if (!fac.empty())
 				faction = atoi(fac.text());
 
 			if (faction == selected_faction || selected_faction == 0)
@@ -170,7 +170,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 
 			// <Race>: #
 			val = block->value(TYPE_NUMBER);
-			if (type.length() && val.length())
+			if (!type.empty() && !val.empty())
 			{
 				personsInUnit = atoi(val.text());
 				persons[type].list.push_back(std::make_pair(unitId, personsInUnit));
@@ -178,9 +178,14 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 			else	
 				personsInUnit = 0;
 
+            val = block->value(TYPE_HERO);
+            if (!val.empty()) {
+                persons["Helden"].list.push_back(std::make_pair(unitId, personsInUnit));
+            }
+
 			// Aura: #
 			val = block->value(TYPE_AURA);
-			if (val.length())
+			if (!val.empty())
 				items["Aura"].list.push_back(std::make_pair(unitId, atoi(val.text())));
 		}
 
@@ -189,7 +194,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 		{
 			// <Item>: #
             for (datakey::list_type::const_iterator itor = block->data().begin(); itor != block->data().end(); ++itor) {
-                if (itor->value().length())
+                if (!itor->value().empty())
                     items[itor->key()].list.push_back(std::make_pair(unitId, atoi(itor->value().text())));
             }
 		}

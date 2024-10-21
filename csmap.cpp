@@ -348,7 +348,7 @@ CSMap::CSMap(FXApp *app) :
     new FXMenuCommand(
         pane,
         L"Speichern...\tCtrl-Shift-S\tAktuellen Zustand speichern.",
-        icons.open,
+        icons.save,
         this,
         ID_FILE_SAVE_ALL);
     new FXMenuCommand(
@@ -607,7 +607,7 @@ CSMap::CSMap(FXApp *app) :
 
     FXHorizontalFrame* hFrame = new FXHorizontalFrame(frame, LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     FXToolBarTab * dTab = new FXToolBarTab(hFrame, nullptr, 0, TOOLBARTAB_HORIZONTAL, 0, 0, 0, 0);
-    dTab->setTipText("Handelsinformationen ein- und ausblenden");
+    dTab->setTipText("Beschreibung ein- und ausblenden");
     descriptionText = new FXText(hFrame, this, ID_SELECTION, LAYOUT_FILL_X|TEXT_READONLY|TEXT_WORDWRAP|HSCROLLER_NEVER);
     descriptionText->disable();
 
@@ -1343,7 +1343,21 @@ bool CSMap::saveCommands(const FXString &filename, bool stripped)
 
     int factionId = report->getFactionId();
     if (factionId == 0)
-        return 0;
+        return false;
+
+    if (FXStat::exists(filename)) {
+        struct stat buf;
+        if (stat(filename.text(), &buf) == 0) {
+            if (buf.st_mtime > last_save_time) {
+                FXString text;
+                text = filename + FXString(L" wurde von einem anderen Programm modifiziert.\n\nTrotzdem ersetzen?");
+                FXuint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
+                if (MBOX_CLICKED_YES != answ) {
+                    return false;
+                }
+            }
+        }
+    }
     FXString passwd = askPasswordDlg(factionId);
     FXint res = report->saveCmds(filename.text(), passwd, stripped);    // nicht \u00fcberschreiben
     if (res < 0) {
@@ -2022,6 +2036,11 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     {
         block = pstate->building;
         descriptionText->setText(descText(*block));
+    }
+    else if (pstate->selected & selection.FACTION)
+    {
+        block = pstate->faction;
+        descriptionText->setText(block->value(TYPE_BANNER));
     }
     else {
         descriptionText->setText("");
