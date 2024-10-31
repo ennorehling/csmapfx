@@ -754,6 +754,7 @@ void CSMap::create()
     const FXchar *echeck = reg.readStringEntry("ECheck", "WorkingDir", nullptr);
     if (!echeck) echeck = reg.readStringEntry("settings", "echeck_dir", nullptr);
     settings.echeck_warnings = reg.readUnsignedEntry("Echeck", "WarningLevel", 3);
+    settings.save_passwords = reg.readBoolEntry("settings", "SavePasswords", TRUE);
     if (echeck) {
         settings.echeck_dir.assign(echeck);
     }
