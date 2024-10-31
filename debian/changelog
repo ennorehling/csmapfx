@@ -1,3 +1,11 @@
+csmapfx (1.7.39-1) stable; urgency=low
+
+  * registry setting to stop passwords being saved
+  * registry setting to set echeck warning level
+  * relocate the echeck registry keys
+
+  -- Enno Rehling <enno@eressea.de>  Thu, 31 Oct 2024 21:30:00 +0100
+
 csmapfx (1.7.38-1) stable; urgency=low
 
   * prevent accidental overwrite of externally modified orders

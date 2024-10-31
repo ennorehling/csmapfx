@@ -751,7 +751,9 @@ void CSMap::create()
 
     // reload window position & size
     FXRegistry &reg = getApp()->reg();
-    const FXchar *echeck = reg.readStringEntry("settings", "echeck_dir", nullptr);
+    const FXchar *echeck = reg.readStringEntry("ECheck", "WorkingDir", nullptr);
+    if (!echeck) echeck = reg.readStringEntry("settings", "echeck_dir", nullptr);
+    settings.echeck_warnings = reg.readUnsignedEntry("Echeck", "WarningLevel", 3);
     if (echeck) {
         settings.echeck_dir.assign(echeck);
     }
@@ -876,9 +878,17 @@ FXbool CSMap::close(FXbool notify)
     FXRegistry &reg = getApp()->reg();
 
     if (!settings.echeck_dir.empty()) {
-        reg.writeStringEntry("settings", "echeck_dir", settings.echeck_dir.text());
+        reg.writeStringEntry("echeck", "WorkingDir", settings.echeck_dir.text());
     }
-    passwords.saveState(reg);
+    reg.deleteEntry("settings", "echeck_dir");
+    reg.writeUnsignedEntry("Echeck", "WarningLevel", settings.echeck_warnings);
+    reg.writeBoolEntry("settings", "SavePasswords", settings.save_passwords);
+    if (settings.save_passwords) {
+        passwords.saveState(reg);
+    }
+    else {
+        reg.deleteEntry("settings", "crypted_passwords");
+    }
     reg.deleteEntry("settings", "password");
     reg.deleteEntry("settings", "faction");
 
@@ -1388,99 +1398,95 @@ static char* u_mkstemp(char* buffer) {
 
 bool CSMap::checkCommands()
 {
+    errorList->clearItems();
+    if (settings.echeck_dir.empty()) {
+        errorList->appendItem("Could not find the echeck executable.");
+        return false;
+    }
+    if (!report.get()) {
+        return false;
+    }
     // save to a temporary file:
-    char infile[PATH_MAX];
-    char outfile[PATH_MAX];
-    FXString cmdline("echeck");
-
+    FXString cmdline("/echeck");
 #ifdef WIN32
     cmdline += "w.exe";
-    if (!settings.echeck_dir.empty()) {
-        cmdline = "\"" + settings.echeck_dir + "\\" + cmdline + "\"";
-    }
-#else
-    if (!settings.echeck_dir.empty()) {
-        cmdline = settings.echeck_dir + "/echeck";
-    }
 #endif
-    errorList->clearItems();
-    if (cmdline.empty()) {
-        errorList->appendItem("Could not find the echeck executable.");
+    cmdline = "\"" + settings.echeck_dir + cmdline + "\" -w" + FXStringVal(settings.echeck_warnings);
+
+    FXint factionId = report->getActiveFactionId();
+    FXString password;
+    passwords.get(factionId, password);
+    char infile[PATH_MAX];
+    if (!u_mkstemp(infile) || report->saveCmds(infile, password, true) != 0) {
+        errorList->appendItem("Could not save commands for analysis.");
     }
-    else if (report.get()) {
-        FXint factionId = report->getActiveFactionId();
-        FXString password;
-        passwords.get(factionId, password);
-        if (!u_mkstemp(infile) || report->saveCmds(infile, password, true) != 0) {
-            errorList->appendItem("Could not save commands for analysis.");
+    else {
+        char outfile[PATH_MAX];
+        if (!u_mkstemp(outfile)) {
+            errorList->appendItem("Could not create output file for analysis.");
         }
         else {
-            if (!u_mkstemp(outfile)) {
-                errorList->appendItem("Could not create output file for analysis.");
-            }
-            else {
-                // Echeck it:
-                cmdline.append(" -w3 -c1 -Lde -Re2 -O");
-                cmdline.append(outfile);
-                cmdline.append(" ");
-                cmdline.append(infile);
+            // Echeck it:
+            cmdline.append(" -c1 -Lde -Re2 -O");
+            cmdline.append(outfile);
+            cmdline.append(" ");
+            cmdline.append(infile);
 #ifdef WIN32
-                STARTUPINFOA si;
-                PROCESS_INFORMATION pi;
+            STARTUPINFOA si;
+            PROCESS_INFORMATION pi;
 
-                ZeroMemory(&si, sizeof(si));
-                si.cb = sizeof(si);
-                ZeroMemory(&pi, sizeof(pi));
-                // hack: set ECheck locale to German, since we don't support English CsMap yet:
-                if (!CreateProcessA(nullptr, (LPSTR)cmdline.text(), nullptr, nullptr, FALSE, 0, (LPVOID)"LC_MESSAGES=de\0",
-                    settings.echeck_dir.text(), &si, &pi)) {
-                    errorList->appendItem("CreateProcess failed: " + cmdline);
-                }
+            ZeroMemory(&si, sizeof(si));
+            si.cb = sizeof(si);
+            ZeroMemory(&pi, sizeof(pi));
+            // hack: set ECheck locale to German, since we don't support English CsMap yet:
+            if (!CreateProcessA(nullptr, (LPSTR)cmdline.text(), nullptr, nullptr, FALSE, 0, (LPVOID)"LC_MESSAGES=de\0",
+                settings.echeck_dir.text(), &si, &pi)) {
+                errorList->appendItem("CreateProcess failed: " + cmdline);
+            }
 
-                // Wait until child process exits.
-                WaitForSingleObject(pi.hProcess, INFINITE);
+            // Wait until child process exits.
+            WaitForSingleObject(pi.hProcess, INFINITE);
 
-                // Close process and thread handles. 
-                CloseHandle(pi.hProcess);
-                CloseHandle(pi.hThread);
+            // Close process and thread handles. 
+            CloseHandle(pi.hProcess);
+            CloseHandle(pi.hThread);
 #else
-                if (system(cmdline.text()) < 0) {
-                    errorList->appendItem("echeck system call failed: " + cmdline);
-                    return false;
-                }
+            if (system(cmdline.text()) < 0) {
+                errorList->appendItem("echeck system call failed: " + cmdline);
+                return false;
+            }
 #endif
-                for (auto error : output) delete error;
-                output.clear();
+            for (auto error : output) delete error;
+            output.clear();
 
-                std::ifstream results;
-                results.open(outfile, std::ios::in);
-                if (results.is_open()) {
-                    std::string line;
-                    while (std::getline(results, line)) {
-                        if (!line.empty()) {
-                            MessageInfo* error = new MessageInfo();
-                            if (error) {
-                                FXString str, display;
-                                FXString tok;
-                                str.assign(line.c_str());
-                                error->level = FXIntVal(str.section("|", 1));
-                                tok = str.section("|", 2);
-                                if (tok == "U") {
-                                    error->unit_id = FXIntVal(str.section("|", 3), 36);
-                                }
-                                else if (tok == "R") {
-                                    tok = str.section("|", 3);
-                                    error->region_x = FXIntVal(tok.section(", ", 0));
-                                    error->region_y = FXIntVal(tok.section(", ", 1));
-                                }
-                                output.push_back(error);
-                                display = str.section("|", 5);
-                                if (!display.empty()) {
-                                    display += ": ";
-                                }
-                                display += str.section("|", 4);
-                                errorList->appendItem(display, nullptr, error);
+            std::ifstream results;
+            results.open(outfile, std::ios::in);
+            if (results.is_open()) {
+                std::string line;
+                while (std::getline(results, line)) {
+                    if (!line.empty()) {
+                        MessageInfo *error = new MessageInfo();
+                        if (error) {
+                            FXString str, display;
+                            FXString tok;
+                            str.assign(line.c_str());
+                            error->level = FXIntVal(str.section("|", 1));
+                            tok = str.section("|", 2);
+                            if (tok == "U") {
+                                error->unit_id = FXIntVal(str.section("|", 3), 36);
                             }
+                            else if (tok == "R") {
+                                tok = str.section("|", 3);
+                                error->region_x = FXIntVal(tok.section(", ", 0));
+                                error->region_y = FXIntVal(tok.section(", ", 1));
+                            }
+                            output.push_back(error);
+                            display = str.section("|", 5);
+                            if (!display.empty()) {
+                                display += ": ";
+                            }
+                            display += str.section("|", 4);
+                            errorList->appendItem(display, nullptr, error);
                         }
                     }
                 }

@@ -381,6 +381,8 @@ private:
 
     struct {
         FXString echeck_dir;
+        FXuint echeck_warnings;
+        FXbool save_passwords;
     } settings;
     Passwords passwords;
 
