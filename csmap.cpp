@@ -1400,23 +1400,24 @@ static char* u_mkstemp(char* buffer) {
 bool CSMap::checkCommands()
 {
     errorList->clearItems();
-    if (settings.echeck_dir.empty()) {
-        errorList->appendItem("Could not find the echeck executable.");
-        return false;
-    }
+    FXString cmdline("echeck");
     if (!report.get()) {
         return false;
     }
-    // save to a temporary file:
-    FXString cmdline("/echeck");
 #ifdef WIN32
-    cmdline += "w.exe";
+    if (settings.echeck_dir.empty()) {
+        errorList->appendItem("Could not find the echeck executable.");
+        return false;
+    } else {
+        cmdline = "\"" + settings.echeck_dir + '\\' + "echeckw.exe\"";
+    }
 #endif
-    cmdline = "\"" + settings.echeck_dir + cmdline + "\" -w" + FXStringVal(settings.echeck_warnings);
+    cmdline = cmdline + " -w" + FXStringVal(settings.echeck_warnings);
 
     FXint factionId = report->getActiveFactionId();
     FXString password;
     passwords.get(factionId, password);
+    // save to a temporary file:
     char infile[PATH_MAX];
     if (!u_mkstemp(infile) || report->saveCmds(infile, password, true) != 0) {
         errorList->appendItem("Could not save commands for analysis.");
