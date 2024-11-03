@@ -71,8 +71,12 @@ void Passwords::saveState(FXRegistry &reg)
     FXString encrypted = EncryptString(stream);
     if (!encrypted.empty()) {
         reg.writeStringEntry("settings", "crypted_passwords", encrypted.text());
+        reg.deleteEntry("settings", "passwords");
         return;
     }
 #endif
-    reg.writeStringEntry("settings", "crypted_passwords", stream.text());
+    if (!stream.empty()) {
+        reg.writeStringEntry("settings", "passwords", stream.text());
+        reg.deleteEntry("settings", "crypted_passwords");
+    }
 }

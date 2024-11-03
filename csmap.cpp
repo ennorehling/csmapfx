@@ -889,6 +889,7 @@ FXbool CSMap::close(FXbool notify)
     }
     else {
         reg.deleteEntry("settings", "crypted_passwords");
+        reg.deleteEntry("settings", "passwords");
     }
     reg.deleteEntry("settings", "password");
     reg.deleteEntry("settings", "faction");
