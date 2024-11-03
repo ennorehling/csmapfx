@@ -1,3 +1,10 @@
+csmapfx (1.7.40-1) stable; urgency=low
+
+  * on Mac/Linux, we do not search for echeck
+  * clean up the registry password code
+
+  -- Enno Rehling <enno@eressea.de>  Sun, 3 Nov 2024 15:00:00 +0100
+
 csmapfx (1.7.39-1) stable; urgency=low
 
   * registry setting to stop passwords being saved
