@@ -1,3 +1,9 @@
+csmapfx (1.7.41-1) stable; urgency=low
+
+  * fix tracking file modification times
+
+  -- Enno Rehling <enno@eressea.de>  Sun, 17 Nov 2024 19:00:00 +0100
+
 csmapfx (1.7.40-1) stable; urgency=low
 
   * on Mac/Linux, we do not search for echeck

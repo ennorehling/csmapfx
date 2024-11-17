@@ -21,7 +21,6 @@ LPCWSTR g_wszAppID = CSMAP_APP_ID;
 #ifdef HAVE_CURL
 #include <curl/curl.h>
 #endif
-#include <sys/stat.h>
 
 #ifndef PATH_MAX
 #define PATH_MAX 260
@@ -1357,16 +1356,15 @@ bool CSMap::saveCommands(const FXString &filename, bool stripped)
     if (factionId == 0)
         return false;
 
-    if (FXStat::exists(filename)) {
-        struct stat buf;
-        if (stat(filename.text(), &buf) == 0) {
-            if (buf.st_mtime > last_save_time) {
-                FXString text;
-                text = filename + FXString(L" wurde von einem anderen Programm modifiziert.\n\nTrotzdem ersetzen?");
-                FXuint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
-                if (MBOX_CLICKED_YES != answ) {
-                    return false;
-                }
+    FXStat info;
+    if (FXStat::statFile(filename, info)) {
+        FXTime mtime = info.modified();
+        if (mtime > last_save_time) {
+            FXString text;
+            text = filename + FXString(L" wurde von einem anderen Programm modifiziert.\n\nTrotzdem ersetzen?");
+            FXuint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
+            if (MBOX_CLICKED_YES != answ) {
+                return false;
             }
         }
     }
@@ -1376,7 +1374,7 @@ bool CSMap::saveCommands(const FXString &filename, bool stripped)
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
         return false;
     }
-    last_save_time = 0;
+    last_save_time = FXStat::modified(filename);
     report->modifiedCmds(false);
     updateFileNames();
     return true;
@@ -2273,21 +2271,22 @@ long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
         if (hasFocus()) {
             FXString filename = report->cmdfilename();
             if (!filename.empty()) {
-                struct stat buf;
-                if (stat(filename.text(), &buf) == 0) {
-                    if (buf.st_mtime > last_save_time) {
+                FXStat info;
+                if (FXStat::statFile(filename, info)) {
+                    FXTime mtime = info.modified();
+                    if (mtime > last_save_time) {
                         if (last_save_time != 0) {
                             if (updateCommands(filename)) {
-                                last_save_time = buf.st_mtime;
-                                if (stat(filename.text(), &buf) == 0) {
-                                    last_save_time = buf.st_mtime;
+                                last_save_time = mtime;
+                                if (FXStat::statFile(filename, info)) {
+                                    last_save_time = info.modified();
                                 }
                                 loadCommands(filename);
                                 getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, nullptr);
                                 return 1;
                             }
                         }
-                        last_save_time = buf.st_mtime;
+                        last_save_time = mtime;
                     }
                 }
             }
@@ -2748,9 +2747,9 @@ void CSMap::updateModificationTime()
 {
     if (report) {
         FXString filename = report->cmdfilename();
-        struct stat buf;
-        if (stat(filename.text(), &buf) == 0) {
-            last_save_time = buf.st_mtime;
+        FXStat info;
+        if (FXStat::statFile(filename, info)) {
+            last_save_time = info.modified();
         }
     }
 }
