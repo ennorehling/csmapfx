@@ -1,3 +1,9 @@
+csmapfx (1.7.42-1) stable; urgency=low
+
+  * fix echeck not cleaning up temporary files.
+
+  -- Enno Rehling <enno@eressea.de>  Sun, 8 Dec 2024 19:00:00 +0100
+
 csmapfx (1.7.41-1) stable; urgency=low
 
   * fix tracking file modification times
