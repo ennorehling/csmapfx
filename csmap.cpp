@@ -478,7 +478,8 @@ CSMap::CSMap(FXApp *app) :
     menu.email = new FXMenuCommand(pane, "eMail\t\teMail-Adresse der Partei");
 
     new FXMenuSeparatorEx(pane, "Statistik");
-    menu.number = new FXMenuCommand(pane, "Personen, Einheiten (und Helden)\t\tAnzahl Personen, Einheiten und Helden");
+    menu.number = new FXMenuCommand(pane, "Personen, Einheiten (und Helden)\t\tAnzahl Personen und Helden");
+    menu.units = new FXMenuCommand(pane, "Einheiten\t\tAnzahl Einheiten der Partei");
     menu.points = new FXMenuCommand(pane, "Punkte (Durchschnitt)\t\tPunkte der Partei und Durchschnitt gleichaltriger Parteien");
     menu.age = new FXMenuCommand(pane, "Parteialter\t\tAlter der Partei in Runden");
 
@@ -954,6 +955,7 @@ void CSMap::mapChange()
         selection.selected = 0;
     }
     else {
+        int faction_id = report->getActiveFactionId();
         // notify info dialog of new game type
         FXString name_of_game;
         name_of_game = report->blocks().front().value("Spiel");
@@ -1102,8 +1104,17 @@ void CSMap::mapChange()
         // get all planes in report
         std::set<int> planeSet;        // what planes are in the report
         datablock::itor end = report->blocks().end();
+        int num_units = 0;
         for (datablock::itor block = report->blocks().begin(); block != end; block++)
         {
+            if (block->type() == block_type::TYPE_UNIT) {
+                int faction = block->valueInt(key_type::TYPE_FACTION);
+                if (faction == faction_id) {
+                    ++num_units;
+                }
+                continue;
+            }
+
             // handle only regions
             if (block->type() != block_type::TYPE_REGION)
                 continue;
@@ -1113,6 +1124,13 @@ void CSMap::mapChange()
             if (p != 0 && planeSet.insert(p).second) {
                 addPlane(p);
             }
+        }
+        if (num_units > 0) {
+            menu.units->setText("Einheiten: " + FXStringVal(num_units));
+            menu.units->show();
+        }
+        else {
+            menu.units->hide();
         }
         planes->setNumVisible(planes->getNumItems());
 
