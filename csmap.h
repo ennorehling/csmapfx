@@ -362,7 +362,7 @@ private:
         class FXMenuCommand *name = nullptr, *email = nullptr; // +banner?
         class FXMenuCommand *points = nullptr;
         class FXMenuCommand *age = nullptr;
-        class FXMenuCommand *type = nullptr, *number = nullptr;
+        class FXMenuCommand *type = nullptr, *number = nullptr, *units = nullptr;
         class FXMenuCommand *magic = nullptr;
 
         class FXMenuPane	  *factionpool = nullptr;
