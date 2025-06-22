@@ -1853,6 +1853,7 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
             if (info->unit_id) {
                 if (report->getUnit(selection.unit, info->unit_id)) {
                     selection.selected = selection.UNIT;
+                    ++selection.selChange;
                     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
                     return 1;
                 }
@@ -1860,6 +1861,7 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
             else {
                 if (report->getRegion(selection.region, info->region_x, info->region_y, 0)) {
                     selection.selected = selection.REGION;
+                    ++selection.selChange;
                     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
                     return 1;
                 }
@@ -2461,6 +2463,7 @@ long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)
         }
     }
     selection.selected = selected;
+    ++selection.selChange;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
