@@ -114,6 +114,7 @@ void FXCommands::makeTemp()
 	makePositionVisible(getCursorPos());
 	
 	highlightText();
+
 	setModified(true);
 	
 	setFocus();
@@ -214,11 +215,14 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 				}
 
 				// parse & highlight text and enable the widget
-				highlightText();
+                highlightText();
 				mapShowRoute();
 				setModified(false);
 				enable();
-			}
+                undo.text = getText();
+                undo.cursor = getCursorPos();
+                redo.cursor = -1;
+            }
             getApp()->endWaitCursor();
         }
 
@@ -230,7 +234,7 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
     return 1;
 }
 
-long FXCommands::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
+long FXCommands::onKeyPress(FXObject* sender, FXSelector sel, void* ptr)
 {
 	FXEvent* event=(FXEvent*)ptr;
 	if (!isEnabled())
@@ -255,13 +259,37 @@ long FXCommands::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
             return 1;
         }
     }
-	return FXText::onKeyPress(sender, sel, ptr);
+    else if (event->state & CONTROLMASK) {
+        if (event->code == KEY_z) {
+            if (undo.cursor >= 0) {
+                redo.cursor = getCursorPos();
+                redo.text = getText();
+                setText(undo.text);
+                saveCommands();
+                highlightText();
+                setCursorPos(undo.cursor);
+                undo.cursor = -1;
+            }
+        }
+        else if (event->code == KEY_y) {
+            if (redo.cursor >= 0) {
+                setText(redo.text);
+                saveCommands();
+                highlightText();
+                setCursorPos(redo.cursor);
+                undo.cursor = redo.cursor;
+                redo.cursor = -1;
+            }
+        }
+    }
+    return FXText::onKeyPress(sender, sel, ptr);
 }
 
 long FXCommands::onUpdate(FXObject* sender,FXSelector sel,void* ptr)
 {
 	if (isModified())
 	{
+        FXString text = getText();
 		highlightText();
 		saveCommands();
 	}
