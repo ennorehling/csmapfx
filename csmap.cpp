@@ -2373,6 +2373,7 @@ long CSMap::onNextUnit(FXObject*, FXSelector, void*)
         {
             selection.selected = selection.UNIT;
             selection.unit = unit;
+            ++selection.selChange;
             handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 
             return 1;
@@ -2418,6 +2419,7 @@ long CSMap::onPrevUnit(FXObject*, FXSelector, void*)
 
             selection.selected = selection.UNIT;
             selection.unit = unit;
+            ++selection.selChange;
             handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
             return 1;
         }
@@ -2829,7 +2831,7 @@ long CSMap::onFileClose(FXObject*, FXSelector, void*)
 
 bool CSMap::closeFile()
 {
-    // ask if modified commands should be safed
+    // ask if modified commands should be saved
     if (report && report->modifiedCmds())
     {
         FXuint res = FXMessageBox::question(this, (FXuint)MBOX_SAVE_CANCEL_DONTSAVE, CSMAP_APP_TITLE, "%s",
