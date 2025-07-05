@@ -3153,6 +3153,7 @@ long CSMap::onRegionSelAll(FXObject*, FXSelector, void*)
         selection.regionsSelected.insert(regionPtr);
     }
 
+    ++selection.selChange;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
@@ -3163,6 +3164,7 @@ long CSMap::onRegionUnSel(FXObject*, FXSelector, void*)
 
     // alle Regionen demarkieren
     selection.regionsSelected.clear();
+    ++selection.selChange;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
@@ -3194,6 +3196,7 @@ long CSMap::onRegionInvertSel(FXObject*, FXSelector, void*)
     }
 
     selection.regionsSelected = regionsSelected;
+    ++selection.selChange;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
@@ -3251,6 +3254,7 @@ long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
     }
     selection.regionsSelected = regionsSelected;
 
+    ++selection.selChange;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
@@ -3309,6 +3313,9 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
                     }
                 }
             }
+            if (changed) {
+                ++selection.selChange;
+            }
         }
     } while (changed);
 
@@ -3318,6 +3325,7 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
 
 long CSMap::onRegionSelVisible(FXObject*, FXSelector, void* ptr)
 {
+    bool changed = false;
     if (!report) return 1;
     // alle Regionen markieren
     selection.regionsSelected.clear();
@@ -3342,6 +3350,9 @@ long CSMap::onRegionSelVisible(FXObject*, FXSelector, void* ptr)
         selection.regionsSelected.insert(&block);
     }
 
+    if (!selection.regionsSelected.empty()) {
+        ++selection.selChange;
+    }
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
@@ -3371,6 +3382,9 @@ long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
             continue;
 
         selection.regionsSelected.insert(&*block);
+    }
+    if (!selection.regionsSelected.empty()) {
+        ++selection.selChange;
     }
 
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
