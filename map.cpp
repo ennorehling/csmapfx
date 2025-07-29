@@ -792,10 +792,10 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
             }
             else {
 				// mark unknown region (no region-block in report)
-                selection.sel_x = x, selection.sel_y = y, selection.sel_plane = visiblePlane;
                 selection.selected = selection.UNKNOWN_REGION;
                 selection.selected &= ~selection.REGION;
 			}
+            selection.sel_x = x, selection.sel_y = y, selection.sel_plane = visiblePlane;
             updateSelection();
             ++selection.selChange;
 			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
