@@ -72,6 +72,7 @@ add_executable (${PROJECT_NAME} ${PLATFORM}
   datablock.cpp
   datafile.cpp
   exportdlg.cpp
+  FXEditor.cpp
   FXFileDialogEx.cpp
   fxhelper.cpp
   FXMenuSeparatorEx.cpp
