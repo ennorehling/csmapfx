@@ -333,7 +333,7 @@ private:
     class FXDialogBox* minimap_frame = nullptr;
     class FXSearchResults* searchResults = nullptr;
     
-    time_t last_save_time = 0;
+    FXTime last_save_time = 0;
 
 	struct
 	{
@@ -381,6 +381,8 @@ private:
 
     struct {
         FXString echeck_dir;
+        FXuint echeck_warnings;
+        FXbool save_passwords;
     } settings;
     Passwords passwords;
 

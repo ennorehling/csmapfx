@@ -38,7 +38,8 @@ public:
 
 	virtual void moveContents(FXint x,FXint y) override;
 
-	FXbool paintMap(FXDrawable* buffer /*, FXRectangle& rect*/);
+	FXbool paintMap(FXDCWindow &dc);
+	void paintArrows(FXDCWindow &dc);
 	void setMapFile(std::shared_ptr<datafile>& f);
 	void connectMap(FXCSMap* map);
 
@@ -60,6 +61,7 @@ public:
 	void terraform(FXint x, FXint y, FXint plane, FXint terrain);
     void updateSelection();
 
+	void clearRoute(int which);
 	FXint sendRouteCmds(const FXString& str, int which);
 
 	FXint getImageWidth() const { return FXint(scale * image_w); }
@@ -81,6 +83,8 @@ public:
 
 	long onPopup(FXObject*,FXSelector,void*);
 	long onPopupClicked(FXObject*,FXSelector,void*);
+
+    long onConfigure(FXObject*,FXSelector,void*);
 
 	long onToggleStreets(FXObject*,FXSelector,void*);
 	long onUpdateStreets(FXObject*,FXSelector,void*);
@@ -137,13 +141,12 @@ protected:
 
 	datafile::SelectionState selection;
 	FXint sel_x = 0, sel_y = 0, sel_plane = 0;	// selected region koordinates
-	FXint popup_x, popup_y;			// which region is popup selected
-
+	FXint popup_x = 0, popup_y = 0;			// which region is popup selected
 	FXfloat		scale = 1.0f;		// paint map in this scale
     FXival  	modus = MODUS_NORMAL;			// mouse button modus
 	FXint		mouse_select = 0;	// select_set==1: select regions on mouse-over, select_set==2: unselect them
 
-	FXbool		minimap = FALSE;		// is this map a minimap?
+	bool		minimap = false;		// is this map a minimap?
 	FXCSMap		*main_map = nullptr;		// pointer to the normal map
 	
 	FXCanvas	*map = nullptr;			// the bitmap where the image data will be written to
@@ -153,9 +156,9 @@ protected:
 
 	FXButton	*button = nullptr;
 
-	FXIcon *terrain[data::TERRAIN_LAST];
-	FXIcon *terrainShadow[data::TERRAIN_LAST];
-	FXIcon *terrainIcons[data::TERRAIN_LAST];
+    FXIcon *terrain[data::TERRAIN_LAST] = {};
+	FXIcon *terrainShadow[data::TERRAIN_LAST] = {};
+	FXIcon *terrainIcons[data::TERRAIN_LAST] = {};
 	FXIcon *activeRegion = nullptr, *selectedRegion = nullptr;
 	FXIcon *troopsunknown = nullptr, *troopally = nullptr, *troopenemy = nullptr;
 	FXIcon *guardown = nullptr, *guardally = nullptr, *guardenemy = nullptr, *guardmixed = nullptr;
@@ -163,8 +166,9 @@ protected:
 	FXIcon *castleown = nullptr, *castleally = nullptr, *castleenemy = nullptr, *castlecoins = nullptr;
 	FXIcon *monster = nullptr, *seasnake = nullptr, *dragon = nullptr, *battle = nullptr;
 	FXIcon *wormhole = nullptr;
-	FXIcon *street[6], *street_undone[6];
-	FXIcon *redarrows[6], *greenarrows[6], *bluearrows[6], *greyarrows[6];
+	FXIcon *street[6] = {};
+    FXIcon *street_undone[6] = {};
+	FXIcon *redarrows[6] = {}, *greenarrows[6] = {}, *bluearrows[6] = {}, *greyarrows[6] = {};
 
 	std::vector< std::vector<FXIcon*> > overlays;		// terrain color overlays
 	std::vector< FXColor > overlayColors;
@@ -192,21 +196,23 @@ protected:
     bool show_ship_travel = false;
     bool show_shadow_regions = false;
 
-	struct arrow
+    bool repaint = false;
+
+    struct arrow
 	{
 		int x, y;		// coordinates of arrow origin
 		int dir;		// direction of arrow
 		
-		enum			// color of array
+		enum color_t   // color of arrow
 		{
 			ARROW_RED,
-			ARROW_GREEN,
-			ARROW_BLUE,
+            ARROW_BLUE,
+            ARROW_GREEN,
 			ARROW_GREY
 		} color;
 	};
-	std::vector<arrow> arrows;
-	std::vector<arrow> routeArrows[2];		// saved
+    std::vector<arrow> makeArrows(int which) const;
+    FXString routeString[2];
     
     std::shared_ptr<datafile> mapFile;
 
@@ -219,7 +225,7 @@ protected:
 	FXint GetHexFromScreenX(FXint scrx, FXint scry) const;
 	FXint GetScreenFromHexY(FXint x, FXint y) const;
 	FXint GetScreenFromHexX(FXint x, FXint y) const;
-
+    FXPoint GetScreenOffset() const;
     void updateMap();
 
     FXCSMap() {}

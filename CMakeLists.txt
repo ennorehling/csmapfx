@@ -22,7 +22,6 @@ add_compile_definitions(WITH_MAP_EXPORT)
 set(PLATFORM_SOURCES ${PLATFORM_SOURCES} imageio.cpp)
 else (PNG_FOUND)
 set (USE_LIBPNG FALSE)
-message(STATUS "LIBPNG ${PNG_LIBRARY}")
 endif (PNG_FOUND)
 endif (USE_LIBPNG)
 

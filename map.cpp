@@ -32,6 +32,8 @@ FXDEFMAP(FXCSMap) MessageMap[]=
 
 	FXMAPFUNC(SEL_KEYPRESS,				FXCSMap::ID_MAP,				FXCSMap::onKeyPress),
 
+    FXMAPFUNC(SEL_CONFIGURE,			FXCSMap::ID_MAP,				FXCSMap::onConfigure),
+
 	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_POPUP_CLICKED,		FXCSMap::onPopupClicked),
 
 	FXMAPFUNC(SEL_COMMAND,				FXCSMap::ID_UPDATE,				FXCSMap::onMapChange),
@@ -123,6 +125,77 @@ FXCSMap::~FXCSMap()
 	// delete all registered images
 	for (std::vector<IconRecord>::iterator it = iconRecords.begin(); it != iconRecords.end(); ++it)
 		delete (*it->icon);
+}
+
+std::vector<FXCSMap::arrow> FXCSMap::makeArrows(int which) const
+{
+    std::vector<arrow> arrows;
+    FXString line = routeString[which];
+    line.upper();
+
+    // NW, NO, O, SO, SW, W
+    int x_offset[6] = { -1,  0, +1, +1,  0, -1 };
+    int y_offset[6] = { +1, +1,  0, -1, -1,  0 };
+
+    FXCSMap::arrow arrow;
+    int x = selection.sel_x;
+    int y = selection.sel_y;
+    int paused = 0;
+
+    while (!(line = line.after(' ').trimBegin()).empty())
+    {
+        FXString cmd = line.before(' ');
+        int dir = -1;
+
+        if (cmd == "NW")
+            dir = 0;
+        else if (cmd == "NO")
+            dir = 1;
+        else if (cmd == "O")
+            dir = 2;
+        else if (cmd == "SO")
+            dir = 3;
+        else if (cmd == "SW")
+            dir = 4;
+        else if (cmd == "W")
+            dir = 5;
+        /*else if (!strncmp(cmd.text(), "NORDWESTEN", cmd.length()))
+            dir = 0;
+        else if (!strncmp(cmd.text(), "NORDOSTEN", cmd.length()))
+            dir = 1;*/
+        else if (!strncmp(cmd.text(), "OSTEN", cmd.length()))
+            dir = 2;
+        /*else if (!strncmp(cmd.text(), "S\u00dcDOSTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDOSTEN", cmd.length()))
+            dir = 3;
+        else if (!strncmp(cmd.text(), "S\u00dcDWESTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDWESTEN", cmd.length()))
+            dir = 4;*/
+        else if (!strncmp(cmd.text(), "WESTEN", cmd.length()))
+            dir = 5;
+        else if (!strncmp(cmd.text(), "PAUSE", cmd.length()))
+        {
+            paused++;
+            continue;
+        }
+        else if (cmd == "NACH" || cmd == "ROUTE")
+        {
+            x = selection.sel_x;
+            y = selection.sel_y;
+            paused = 0;
+            continue;
+        }
+        else
+            break;
+
+        arrow.x = x;
+        arrow.y = y;
+        arrow.dir = dir;
+        arrow.color = paused ? arrow::ARROW_GREY : (which ? arrow::ARROW_RED : arrow::ARROW_BLUE);
+        arrows.push_back(arrow);
+
+        x += x_offset[dir];
+        y += y_offset[dir];
+    }
+    return arrows;
 }
 
 // Get minimum window width/height for layout
@@ -242,8 +315,10 @@ long FXCSMap::onToggleIslands(FXObject* /* sender */, FXSelector, void*)
 {
 	show_islands = !show_islands;
 
-	if (imagebuffer)
-		paintMap(imagebuffer.get());
+    if (imagebuffer) {
+        FXDCWindow dc(imagebuffer.get());
+        paintMap(dc);
+    }
 
 	map->update();
 	return 1;
@@ -320,7 +395,8 @@ long FXCSMap::onSetVisiblePlane(FXObject* sender, FXSelector, void* ptr)
 
 		// paint map into buffer
 		imagebuffer->resize(getImageWidth(), getImageHeight());
-		paintMap(imagebuffer.get());	// minimap paints map only when changed data
+        FXDCWindow dc(imagebuffer.get());
+		paintMap(dc);	// minimap paints map only when changed data
 	}
     else {
         layout();
@@ -387,6 +463,22 @@ FXint FXCSMap::GetScreenFromHexX(FXint x, FXint y) const
 	return (FXint)(x*64+ y*32);
 }
 
+FXPoint FXCSMap::GetScreenOffset() const
+{
+    FXint scr_offset_x = offset_x;
+    FXint scr_offset_y = offset_y;
+
+    if (!minimap)
+    {
+        scr_offset_x += pos_x;
+        scr_offset_y += pos_y;
+
+        if (getWidth() > getImageWidth())	scr_offset_x += (getWidth() - getImageWidth()) / 2;
+        if (getHeight() > getImageHeight())	scr_offset_y += (getHeight() - getImageHeight()) / 2;
+    }
+    return FXPoint(scr_offset_x, scr_offset_y);
+}
+
 // Move content
 void FXCSMap::moveContents(FXint x,FXint y)
 {
@@ -397,7 +489,7 @@ void FXCSMap::moveContents(FXint x,FXint y)
 	// set new position and update map
 	pos_x=x;
 	pos_y=y;
-
+    repaint = true;
 	map->update();
 }
 
@@ -721,8 +813,9 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 
 	if (flags&FLAG_SCROLLING)
 	{
-		setPosition(event->last_x-cursor_x, event->last_y-cursor_y);
-		map->update();
+        setPosition(event->last_x - cursor_x, event->last_y - cursor_y);
+        repaint = true;
+//        map->update();
 		return 1;
 	}
 
@@ -745,6 +838,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 			cursor_y = -int(cursor_y * fscale) - main_map->offset_y + main_map->getHeight()/2;
 
 			main_map->setPosition(cursor_x, cursor_y);
+            main_map->repaint = true;
             map->update();
 			return 1;
 		}
@@ -794,7 +888,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 				// mark unknown region (no region-block in report)
                 selection.selected = selection.UNKNOWN_REGION;
                 selection.selected &= ~selection.REGION;
-			}
+            }
             selection.sel_x = x, selection.sel_y = y, selection.sel_plane = visiblePlane;
             updateSelection();
             ++selection.selChange;
@@ -1192,6 +1286,13 @@ long FXCSMap::onPopupClicked(FXObject* sender, FXSelector /*sel*/, void* /*ptr*/
 	return 0;
 }
 
+long FXCSMap::onConfigure(FXObject *, FXSelector, void *)
+{
+    // resize event
+    repaint = true;
+    return 0;
+}
+
 void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 {
 	if (!mapFile) {
@@ -1294,49 +1395,36 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 	map->update();
 }
 
-FXbool FXCSMap::paintMap(FXDrawable* buffer)
+FXbool FXCSMap::paintMap(FXDCWindow &dc)
 {
-	// create DC and empty buffer
-	FXDCWindow dc(buffer);
-
-	dc.setFont(font.get());
+    FXint w = dc.getClipWidth();
+    FXint h = dc.getClipHeight();
+    dc.setFont(font.get());
 	dc.setForeground(map->getBackColor());
-	dc.fillRectangle(0, 0, buffer->getWidth(), buffer->getHeight());
+	dc.fillRectangle(0, 0, w, h);
 
-	// init vars and set font
+    // init vars and set font
 	FXString label;
 	FXRectangle clip(0, 0, FXshort(64*scale), FXshort(64*scale));
-	FXint w = buffer->getWidth(), h = buffer->getHeight();
 
-	FXint regionSize = FXint(64*scale);
-
-	FXint scr_offset_x = offset_x;
-	FXint scr_offset_y = offset_y;
-
-	if (!minimap)
-	{
-		scr_offset_x += pos_x;
-		scr_offset_y += pos_y;
-
-		if (getWidth() > getImageWidth())	scr_offset_x += (getWidth() - getImageWidth())/2;
-		if (getHeight() > getImageHeight())	scr_offset_y += (getHeight() - getImageHeight())/2;
-	}
+    FXPoint scr_offset = GetScreenOffset();
 
 	IslandInfo islands;
 
     if (mapFile) {
-        // iterate throu all datafiles and all regions
+        FXint regionSize = FXint(64 * scale);
+        // iterate through all regions
         for (datablock &block : mapFile->blocks())
         {
             // handle only regions
-            // handle only the actually visible plain
+            // handle only the actually visible plane
             if (block.type() != block_type::TYPE_REGION ||
                 block.info() != visiblePlane)
                 continue;
 
             // map coordinates to screen
-            FXint scr_x = FXint(scale * GetScreenFromHexX(block.x(), block.y())) + scr_offset_x;
-            FXint scr_y = FXint(scale * GetScreenFromHexY(block.x(), block.y())) + scr_offset_y;
+            FXint scr_x = FXint(scale * GetScreenFromHexX(block.x(), block.y())) + scr_offset.x;
+            FXint scr_y = FXint(scale * GetScreenFromHexY(block.x(), block.y())) + scr_offset.y;
 
             // clip regions outside of view
             if (scr_x < -regionSize || scr_y < -regionSize || scr_x > w || scr_y > h)
@@ -1359,23 +1447,6 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
             // don't draw special icons on minimap
             if (minimap)
                 continue;
-
-            // draw region troop icon
-            /*if (block.flags() & datablock::FLAG_TROOPS)
-            {
-                dc.drawIcon(troopsunknown, scr_x+FXint(regionSize/1.7), scr_y+FXint(regionSize/2.3));
-
-                int number_ally = (block.flags() & (datablock::FLAG_ALLY1|datablock::FLAG_ALLY2|datablock::FLAG_ALLY3)) / datablock::FLAG_ALLY1;
-                int number_enemy = (block.flags() & (datablock::FLAG_ENEMY1|datablock::FLAG_ENEMY2|datablock::FLAG_ENEMY3)) / datablock::FLAG_ENEMY1;
-
-                int i = 0;
-                for (; i < number_ally && i < 4; i++)
-                    dc.drawIcon(troopally, scr_x+FXint(regionSize/1.7+i*regionSize/16), scr_y+FXint(regionSize/2.3));
-
-                int j = 0;
-                for (; j < number_enemy && (i+j) < 4; j++)
-                    dc.drawIcon(troopenemy, scr_x+FXint(regionSize/1.7+(i+j)*regionSize/16), scr_y+FXint(regionSize/2.3));
-            }//*/
 
             // draw diagramm
             if (block.flags() & datablock::FLAG_TROOPS && block.attachment())
@@ -1537,7 +1608,7 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
     }
 
     FXPoint tl(0, 0);
-    FXPoint br((FXshort)buffer->getWidth(), (FXshort)buffer->getHeight());
+    FXPoint br((FXshort)w, (FXshort)h);
     paintIslandNames(dc, tl, br, islands);
 
 	if (minimap)
@@ -1545,41 +1616,44 @@ FXbool FXCSMap::paintMap(FXDrawable* buffer)
 		return true;			// minimap only draws regions and island names
 	}
 
-	// draw traveller arrows
-	if (!arrows.empty())
-	{
-								// NW, NO, O, SO, SW, W
-		int arrow_offset_x[6] = { 6, 36, 46, 22, -7, -18 };
-		int arrow_offset_y[6] = { -13, -5, 22, 40, 34, 8 };
-
-		for (std::vector<FXCSMap::arrow>::const_iterator arrow = arrows.begin(); arrow != arrows.end(); arrow++)
-		{
-			FXint scr_x = scr_offset_x + FXint(scale * (arrow_offset_x[arrow->dir] + GetScreenFromHexX(arrow->x, arrow->y)));
-			FXint scr_y = scr_offset_y + FXint(scale * (arrow_offset_y[arrow->dir] + GetScreenFromHexY(arrow->x, arrow->y)));
-
-			FXIcon **iconSet = nullptr;
-			if (arrow->color == arrow::ARROW_RED)
-				iconSet = redarrows;
-			else if (arrow->color == arrow::ARROW_GREEN)
-				iconSet = greenarrows;
-			else if (arrow->color == arrow::ARROW_BLUE)
-				iconSet = bluearrows;
-			else /*if (arrow->color == arrow::ARROW_GREY)*/ // catch-all
-				iconSet = greyarrows;
-
-			dc.drawIcon(iconSet[arrow->dir], scr_x, scr_y);
-		}
-	}
-
-	// draw selection mark
+    // draw selection mark
 	if ((selection.selected & (selection.REGION|selection.UNKNOWN_REGION)) && (sel_plane == visiblePlane))
 	{
-		FXint scr_x = scr_offset_x + FXint(scale * GetScreenFromHexX(sel_x, sel_y));
-		FXint scr_y = scr_offset_y + FXint(scale * GetScreenFromHexY(sel_x, sel_y));
-		dc.drawIcon(activeRegion, scr_x,scr_y);
+		FXint scr_x = scr_offset.x + FXint(scale * GetScreenFromHexX(sel_x, sel_y));
+		FXint scr_y = scr_offset.y + FXint(scale * GetScreenFromHexY(sel_x, sel_y));
+		dc.drawIcon(activeRegion, scr_x, scr_y);
 	}
 
 	return true;
+}
+
+void FXCSMap::paintArrows(FXDCWindow &dc)
+{
+    FXPoint scr_offset = GetScreenOffset();
+    // NW, NO, O, SO, SW, W
+    int arrow_offset_x[6] = { 6, 36, 46, 22, -7, -18 };
+    int arrow_offset_y[6] = { -13, -5, 22, 40, 34, 8 };
+
+    for (int i = 0; i != 2; ++i) {
+        const std::vector<arrow> arrows = makeArrows(i);
+        for (std::vector<FXCSMap::arrow>::const_iterator arrow = arrows.begin(); arrow != arrows.end(); arrow++)
+        {
+            FXint scr_x = scr_offset.x + FXint(scale * (arrow_offset_x[arrow->dir] + GetScreenFromHexX(arrow->x, arrow->y)));
+            FXint scr_y = scr_offset.y + FXint(scale * (arrow_offset_y[arrow->dir] + GetScreenFromHexY(arrow->x, arrow->y)));
+
+            FXIcon **iconSet = nullptr;
+            if (arrow->color == arrow::ARROW_RED)
+                iconSet = redarrows;
+            else if (arrow->color == arrow::ARROW_GREEN)
+                iconSet = greenarrows;
+            else if (arrow->color == arrow::ARROW_BLUE)
+                iconSet = bluearrows;
+            else /*if (arrow->color == arrow::ARROW_GREY)*/ // catch-all
+                iconSet = greyarrows;
+
+            dc.drawIcon(iconSet[arrow->dir], scr_x, scr_y);
+        }
+    }
 }
 
 void FXCSMap::drawSlice(FXImage &image, const FXRectangle &rect, const IslandInfo *islands) const
@@ -1792,7 +1866,9 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 {
 	FXEvent *ev = (FXEvent*)ptr;
 
-	if (minimap)
+    FXint center_x = pos_x;
+    FXint center_y = pos_y;
+    if (minimap)
 	{
 		// on minimap, the complete map is painted at imagebuffer
 		// so copy imagebuffer to backbuffer
@@ -1800,9 +1876,6 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 		FXDCWindow dc(backbuffer.get());
 		dc.setForeground(map->getBackColor());
 		dc.fillRectangle(0, 0, backbuffer->getWidth(), backbuffer->getHeight());
-
-		FXint center_x = pos_x;
-		FXint center_y = pos_y;
 
 		if (getWidth() > getImageWidth())	center_x += (getWidth() - getImageWidth())/2;
 		if (getHeight() > getImageHeight())	center_y += (getHeight() - getImageHeight())/2;
@@ -1843,12 +1916,16 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 			dc.drawLines(points, 5);
 		}
 	}
-	else
-		paintMap(backbuffer.get());		// paint the map onto the backbuffer
-
+    else if (repaint) {
+        FXDCWindow dc(backbuffer.get());
+        paintMap(dc);		// paint the map onto the backbuffer
+        repaint = false;
+    }
 	// copy backbuffer to screen
 	FXDCWindow screendc(map, ev);
 	screendc.drawImage(backbuffer.get(), 0, 0);
+    // draw traveller arrows
+    paintArrows(screendc);
 
 	return 1;
 }
@@ -1873,7 +1950,7 @@ void FXCSMap::updateSelection()
     map->update();
 }
 
-long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
+long FXCSMap::onMapChange(FXObject*sender, FXSelector sel, void* ptr)
 {
 	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
 
@@ -1885,28 +1962,34 @@ long FXCSMap::onMapChange(FXObject*sender, FXSelector, void* ptr)
         datachanged = true;
     }
     if (selection.selChange != pstate->selChange)
-	{
-        if (!datachanged) {
-            selection = *pstate;
-        }
-		selection.regionsSelected = pstate->regionsSelected;
+    {
+        selection = *pstate;
+        repaint = true;
+        selection.regionsSelected = pstate->regionsSelected;
         updateSelection();
-	}
+    }
 
     // things changed
-    if (datachanged)
-        updateMap();
+    if (datachanged) {
+        if (minimap) {
+            updateMap();
+        }
+        else {
+            repaint = true;
+        }
+    }
 
+    if (minimap && shown())
+    {
+        // this is important, redraws the minimap
+        map->update();
+    }
     return 1;
 }
 
 void FXCSMap::updateMap()
 {
-    if (!minimap) {
-        // layout();
-    }
-    else
-    {
+    if (minimap) {
         scale = 1.0f;
         calculateContentSize();
 
@@ -1920,114 +2003,27 @@ void FXCSMap::updateMap()
 
         // paint map into buffer
         imagebuffer->resize(getImageWidth(), getImageHeight());
-        paintMap(imagebuffer.get());	// minimap paints map only when changed data
+        FXDCWindow dc(imagebuffer.get());
+        paintMap(dc);	// minimap paints map only when changed data
     }
 }
 
 
-FXint FXCSMap::sendRouteCmds(const FXString& str, int which)
+void FXCSMap::clearRoute(int which)
 {
-	if (which > 1)
-		return 0;
+    FXASSERT(which >= 0 && which < 2);
+    routeString[which].clear();
+    map->update();
+}
 
-	// clear old arrows
-	routeArrows[which].clear();
-
-	if (!(selection.selected & (selection.REGION|selection.UNKNOWN_REGION)))
-	{
-		arrows.clear();
-		for (int i = 0; i < 2; i++)
-			arrows.insert(arrows.end(), routeArrows[i].begin(), routeArrows[i].end());
-		map->update();
-		return 0;
-	}
-
-	// NW, NO, O, SO, SW, W
-	int x_offset[6] = { -1,  0, +1, +1,  0, -1 };
-	int y_offset[6] = { +1, +1,  0, -1, -1,  0 };
-
-	FXString line = str;
-	FXString cmd = line.before(' ').upper();
-
-	if (cmd != "NACH" && cmd != "ROUTE")
-	{
-		arrows.clear();
-		for (int i = 0; i < 2; i++)
-			arrows.insert(arrows.end(), routeArrows[i].begin(), routeArrows[i].end());
-		map->update();
-		return 0;
-	}
-
-	FXCSMap::arrow arrow;
-	int x = selection.sel_x;
-	int y = selection.sel_y;
-	int length = 0;
-	int paused = 0;
-
-	while (!(line = line.after(' ').trimBegin()).empty())
-	{
-		cmd = line.before(' ');
-		if (cmd.empty())
-			cmd = line;
-		cmd.upper();
-
-		int dir = -1;
-
-		if (cmd == "NW")
-			dir = 0;
-		else if (cmd == "NO")
-			dir = 1;
-		else if (cmd == "O")
-			dir = 2;
-		else if (cmd == "SO")
-			dir = 3;
-		else if (cmd == "SW")
-			dir = 4;
-		else if (cmd == "W")
-			dir = 5;
-		/*else if (!strncmp(cmd.text(), "NORDWESTEN", cmd.length()))
-			dir = 0;
-		else if (!strncmp(cmd.text(), "NORDOSTEN", cmd.length()))
-			dir = 1;*/
-		else if (!strncmp(cmd.text(), "OSTEN", cmd.length()))
-			dir = 2;
-		/*else if (!strncmp(cmd.text(), "S\u00dcDOSTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDOSTEN", cmd.length()))
-			dir = 3;
-		else if (!strncmp(cmd.text(), "S\u00dcDWESTEN", cmd.length()) || !strncmp(cmd.text(), "SUEDWESTEN", cmd.length()))
-			dir = 4;*/
-		else if (!strncmp(cmd.text(), "WESTEN", cmd.length()))
-			dir = 5;
-		else if (!strncmp(cmd.text(), "PAUSE", cmd.length()))
-		{
-			paused++;
-			continue;
-		}
-		else if (cmd == "NACH" || cmd == "ROUTE")
-		{
-			x = selection.sel_x;
-			y = selection.sel_y;
-			paused = 0;
-			continue;
-		}
-		else
-			break;
-
-		arrow.x = x; arrow.y = y;
-		arrow.dir = dir;
-		arrow.color = paused ? arrow::ARROW_GREY : (which ? arrow::ARROW_RED : arrow::ARROW_BLUE);
-		routeArrows[which].push_back(arrow);
-
-		length++;
-
-		x += x_offset[dir]; y += y_offset[dir];
-	}
-
-	arrows.clear();
-	for (int i = 0; i < 2; i++)
-		arrows.insert(arrows.end(), routeArrows[i].begin(), routeArrows[i].end());
-	map->update();
-
-	return length;
+FXint FXCSMap::sendRouteCmds(const FXString &str, int which)
+{
+    FXASSERT(which >= 0 && which < 2);
+    if (str != routeString[which]) {
+        routeString[which] = str;
+        map->update();
+    }
+    return makeArrows(which).size();
 }
 
 long FXCSMap::onKeyPress(FXObject*, FXSelector, void* ptr)

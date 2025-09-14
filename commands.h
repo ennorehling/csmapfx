@@ -62,6 +62,7 @@ protected:
 	FXCommands(const FXCommands&) {}
 
 	void saveCommands();		// save commands back to unit
+	void loadCommands(const datablock::itor &block);		// save commands back to unit
 	void highlightText();
 	void mapShowRoute();
     void updateSelection();

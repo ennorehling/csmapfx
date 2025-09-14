@@ -239,7 +239,7 @@ long FXCalculator::onChanged(FXObject*, FXSelector, void*)
             text = "Regionen: " + FXStringVal(length);
         }
         else
-            map->sendRouteCmds("", 1);
+            map->clearRoute(1);
 
         result->setText(text);
         longresult->setText("");

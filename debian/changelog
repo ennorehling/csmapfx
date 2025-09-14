@@ -1,9 +1,82 @@
-csmapfx (1.8.0-dev) stable; urgency=low
+csmapfx (1.8.0) stable; urgency=low
 
   * unified file open dialog
   * datafile, unordered_map optimization
+  * fix statistics for anonymous factions
 
   -- Enno Rehling <enno@eressea.de>
+
+smapfx (1.7.42-1) stable; urgency=low
+
+  * fix echeck not cleaning up temporary files.
+
+  -- Enno Rehling <enno@eressea.de>  Sun, 8 Dec 2024 19:00:00 +0100
+
+csmapfx (1.7.41-1) stable; urgency=low
+
+  * fix tracking file modification times
+
+  -- Enno Rehling <enno@eressea.de>  Sun, 17 Nov 2024 19:00:00 +0100
+
+csmapfx (1.7.40-1) stable; urgency=low
+
+  * on Mac/Linux, we do not search for echeck
+  * clean up the registry password code
+
+  -- Enno Rehling <enno@eressea.de>  Sun, 3 Nov 2024 15:00:00 +0100
+
+csmapfx (1.7.39-1) stable; urgency=low
+
+  * registry setting to stop passwords being saved
+  * registry setting to set echeck warning level
+  * relocate the echeck registry keys
+
+  -- Enno Rehling <enno@eressea.de>  Thu, 31 Oct 2024 21:30:00 +0100
+
+csmapfx (1.7.38-1) stable; urgency=low
+
+  * prevent accidental overwrite of externally modified orders
+  * minor bugfix: replace a wrong loading icon with a save icon
+  * small menu tweaks
+  * display heroes in the statistics view
+
+  -- Enno Rehling <enno@eressea.de>  Sun, 21 Oct 2024 20:15:00 +0200
+
+csmapfx (1.7.37-1) stable; urgency=low
+
+  * bugfix: redraw minimap only when map data has changed
+  * bugfix: resize events must repaint the map
+
+  -- Enno Rehling <enno@eressea.de>  Sun, 14 Jul 2024 16:45:00 +0200
+
+csmapfx (1.7.36-1) stable; urgency=low
+
+  * bugfix: update arrows when needed
+
+  -- Enno Rehling <enno@eressea.de>  Wed, 10 Jul 2024 18:00:00 +0200
+
+csmapfx (1.7.35-1) stable; urgency=low
+
+  * bugfix: "Einheit hat keinen Befehlsblock"
+
+  -- Enno Rehling <enno@eressea.de>  Sat, 06 Jul 2024 11:30:00 +0200
+
+csmapfx (1.7.34-1) stable; urgency=low
+
+  * fix patterns in FxFileDialogEx
+
+  -- Enno Rehling <enno@eressea.de>  Fri, 05 Jul 2024 19:00:00 +0200
+
+csmapfx (1.7.33-1) stable; urgency=low
+
+  * unified file open dialog
+  * datafile, unordered_map optimization
+  * fix crash in property page pop-ups
+  * install csmapfx.Eressea.info in LOCALAPPDATA
+  * fix minimap updates (issue #32)
+
+  -- Enno Rehling <enno@eressea.de>  Thu, 04 Jul 2024 17:00:00 +0200
+
 
 csmapfx (1.7.32-1) stable; urgency=low
 

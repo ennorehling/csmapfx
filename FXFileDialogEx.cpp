@@ -269,7 +269,7 @@ namespace FXEX {
             patterns = patterns.after('\n');
 
             m_filterNames[i] = pat.before('(').trimEnd();
-            m_filterPatterns[i] = FXFileSelector::patternFromText(pat);
+            m_filterPatterns[i] = FXFileSelector::patternFromText(pat).substitute(',', ';');
             if (m_filterPatterns[i] == "*") bHasAll = true;
         }
 

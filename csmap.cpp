@@ -21,7 +21,6 @@ LPCWSTR g_wszAppID = CSMAP_APP_ID;
 #ifdef HAVE_CURL
 #include <curl/curl.h>
 #endif
-#include <sys/stat.h>
 
 #ifndef PATH_MAX
 #define PATH_MAX 260
@@ -71,8 +70,8 @@ LPCWSTR g_wszAppID = CSMAP_APP_ID;
 FXDEFMAP(CSMap) MessageMap[]=
 {
     //________Message_Type_____________________ID_______________Message_Handler_______
-    FXMAPFUNC(SEL_CLIPBOARD_REQUEST,    SEL_NONE,                   CSMap::onClipboardRequest),
-    FXMAPFUNC(SEL_CLIPBOARD_LOST,       SEL_NONE,                   CSMap::onClipboardLost),
+    FXMAPFUNC(SEL_CLIPBOARD_REQUEST,    SEL_NONE,               CSMap::onClipboardRequest),
+    FXMAPFUNC(SEL_CLIPBOARD_LOST,       SEL_NONE,               CSMap::onClipboardLost),
     FXMAPFUNC(SEL_CLIPBOARD_REQUEST,    FXWindow::ID_SETSTRINGVALUE,   CSMap::onSetClipboard),
 
     FXMAPFUNC(SEL_COMMAND,  CSMap::ID_BOOKMARK_ADD,             CSMap::onBookmarkAdd),
@@ -182,7 +181,7 @@ FXDEFMAP(CSMap) MessageMap[]=
     FXMAPFUNC(SEL_COMMAND, CSMap::ID_POPUP_GOTO,                CSMap::onPopupGotoObject),
     FXMAPFUNC(SEL_TIMEOUT, CSMap::ID_WATCH_FILES,               CSMap::onWatchFiles),
 
-    FXMAPFUNC(SEL_DOUBLECLICKED, 0,    CSMap::onMessageSelected),
+    FXMAPFUNC(SEL_DOUBLECLICKED, CSMap::ID_NONE,                CSMap::onMessageSelected),
 };
 
 FXIMPLEMENT(CSMap,FXMainWindow,MessageMap,ARRAYNUMBER(MessageMap))
@@ -348,7 +347,7 @@ CSMap::CSMap(FXApp *app) :
     new FXMenuCommand(
         pane,
         L"Speichern...\tCtrl-Shift-S\tAktuellen Zustand speichern.",
-        icons.open,
+        icons.save,
         this,
         ID_FILE_SAVE_ALL);
     new FXMenuCommand(
@@ -362,7 +361,7 @@ CSMap::CSMap(FXApp *app) :
     new FXMenuCascade(pane, "&Karte", nullptr, subPane, 0);
     new FXMenuCommand(
         subPane,
-        L"H&inzuf\u00fcgen...\tCtrl-I\tL\u00e4dt einen Karten-Report in den aktuellen Report.",
+        L"H&inzuf\u00fcgen...\tCtrl-H\tL\u00e4dt einen Karten-Report in den aktuellen Report.",
         icons.merge, this, ID_FILE_MERGE);
     new FXMenuCommand(
         subPane,
@@ -608,7 +607,7 @@ CSMap::CSMap(FXApp *app) :
 
     FXHorizontalFrame* hFrame = new FXHorizontalFrame(frame, LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     FXToolBarTab * dTab = new FXToolBarTab(hFrame, nullptr, 0, TOOLBARTAB_HORIZONTAL, 0, 0, 0, 0);
-    dTab->setTipText("Handelsinformationen ein- und ausblenden");
+    dTab->setTipText("Beschreibung ein- und ausblenden");
     descriptionText = new FXText(hFrame, this, ID_SELECTION, LAYOUT_FILL_X|TEXT_READONLY|TEXT_WORDWRAP|HSCROLLER_NEVER);
     descriptionText->disable();
 
@@ -752,7 +751,10 @@ void CSMap::create()
 
     // reload window position & size
     FXRegistry &reg = getApp()->reg();
-    const FXchar *echeck = reg.readStringEntry("settings", "echeck_dir", nullptr);
+    const FXchar *echeck = reg.readStringEntry("ECheck", "WorkingDir", nullptr);
+    if (!echeck) echeck = reg.readStringEntry("settings", "echeck_dir", nullptr);
+    settings.echeck_warnings = reg.readUnsignedEntry("Echeck", "WarningLevel", 3);
+    settings.save_passwords = reg.readBoolEntry("settings", "SavePasswords", TRUE);
     if (echeck) {
         settings.echeck_dir.assign(echeck);
     }
@@ -877,9 +879,18 @@ FXbool CSMap::close(FXbool notify)
     FXRegistry &reg = getApp()->reg();
 
     if (!settings.echeck_dir.empty()) {
-        reg.writeStringEntry("settings", "echeck_dir", settings.echeck_dir.text());
+        reg.writeStringEntry("echeck", "WorkingDir", settings.echeck_dir.text());
     }
-    passwords.saveState(reg);
+    reg.deleteEntry("settings", "echeck_dir");
+    reg.writeUnsignedEntry("Echeck", "WarningLevel", settings.echeck_warnings);
+    reg.writeBoolEntry("settings", "SavePasswords", settings.save_passwords);
+    if (settings.save_passwords) {
+        passwords.saveState(reg);
+    }
+    else {
+        reg.deleteEntry("settings", "crypted_passwords");
+        reg.deleteEntry("settings", "passwords");
+    }
     reg.deleteEntry("settings", "password");
     reg.deleteEntry("settings", "faction");
 
@@ -1361,14 +1372,27 @@ bool CSMap::saveCommands(const FXString &filename, bool stripped)
 
     int factionId = report->getFactionId();
     if (factionId == 0)
-        return 0;
+        return false;
+
+    FXStat info;
+    if (FXStat::statFile(filename, info)) {
+        FXTime mtime = info.modified();
+        if (mtime > last_save_time) {
+            FXString text;
+            text = filename + FXString(L" wurde von einem anderen Programm modifiziert.\n\nTrotzdem ersetzen?");
+            FXuint answ = FXMessageBox::question(this, MBOX_YES_NO, "Datei ersetzen?", "%s", text.text());
+            if (MBOX_CLICKED_YES != answ) {
+                return false;
+            }
+        }
+    }
     FXString passwd = askPasswordDlg(factionId);
     FXint res = report->saveCmds(filename.text(), passwd, stripped);    // nicht \u00fcberschreiben
     if (res < 0) {
         FXMessageBox::error(this, MBOX_OK, CSMAP_APP_TITLE, "Die Datei konnte nicht geschrieben werden.");
         return false;
     }
-    last_save_time = 0;
+    last_save_time = FXStat::modified(filename);
     report->modifiedCmds(false);
     updateFileNames();
     return true;
@@ -1392,99 +1416,96 @@ static char* u_mkstemp(char* buffer) {
 
 bool CSMap::checkCommands()
 {
+    errorList->clearItems();
+    FXString cmdline("echeck");
+    if (!report.get()) {
+        return false;
+    }
+#ifdef WIN32
+    if (settings.echeck_dir.empty()) {
+        errorList->appendItem("Could not find the echeck executable.");
+        return false;
+    } else {
+        cmdline = "\"" + settings.echeck_dir + '\\' + "echeckw.exe\"";
+    }
+#endif
+    cmdline = cmdline + " -w" + FXStringVal(settings.echeck_warnings);
+
+    FXint factionId = report->getActiveFactionId();
+    FXString password;
+    passwords.get(factionId, password);
     // save to a temporary file:
     char infile[PATH_MAX];
-    char outfile[PATH_MAX];
-    FXString cmdline("echeck");
-
-#ifdef WIN32
-    cmdline += "w.exe";
-    if (!settings.echeck_dir.empty()) {
-        cmdline = "\"" + settings.echeck_dir + "\\" + cmdline + "\"";
+    if (!u_mkstemp(infile) || report->saveCmds(infile, password, true) != 0) {
+        errorList->appendItem("Could not save commands for analysis.");
     }
-#else
-    if (!settings.echeck_dir.empty()) {
-        cmdline = settings.echeck_dir + "/echeck";
-    }
-#endif
-    errorList->clearItems();
-    if (cmdline.empty()) {
-        errorList->appendItem("Could not find the echeck executable.");
-    }
-    else if (report.get()) {
-        FXint factionId = report->getActiveFactionId();
-        FXString password;
-        passwords.get(factionId, password);
-        if (!u_mkstemp(infile) || report->saveCmds(infile, password, true) != 0) {
-            errorList->appendItem("Could not save commands for analysis.");
+    else {
+        char outfile[PATH_MAX];
+        if (!u_mkstemp(outfile)) {
+            errorList->appendItem("Could not create output file for analysis.");
         }
         else {
-            if (!u_mkstemp(outfile)) {
-                errorList->appendItem("Could not create output file for analysis.");
-            }
-            else {
-                // Echeck it:
-                cmdline.append(" -w3 -c1 -Lde -Re2 -O");
-                cmdline.append(outfile);
-                cmdline.append(" ");
-                cmdline.append(infile);
+            // Echeck it:
+            cmdline.append(" -c1 -Lde -Re2 -O");
+            cmdline.append(outfile);
+            cmdline.append(" ");
+            cmdline.append(infile);
 #ifdef WIN32
-                STARTUPINFOA si;
-                PROCESS_INFORMATION pi;
+            STARTUPINFOA si;
+            PROCESS_INFORMATION pi;
 
-                ZeroMemory(&si, sizeof(si));
-                si.cb = sizeof(si);
-                ZeroMemory(&pi, sizeof(pi));
-                // hack: set ECheck locale to German, since we don't support English CsMap yet:
-                if (!CreateProcessA(nullptr, (LPSTR)cmdline.text(), nullptr, nullptr, FALSE, 0, (LPVOID)"LC_MESSAGES=de\0",
-                    settings.echeck_dir.text(), &si, &pi)) {
-                    errorList->appendItem("CreateProcess failed: " + cmdline);
-                }
+            ZeroMemory(&si, sizeof(si));
+            si.cb = sizeof(si);
+            ZeroMemory(&pi, sizeof(pi));
+            // hack: set ECheck locale to German, since we don't support English CsMap yet:
+            if (!CreateProcessA(nullptr, (LPSTR)cmdline.text(), nullptr, nullptr, FALSE, 0, (LPVOID)"LC_MESSAGES=de\0",
+                settings.echeck_dir.text(), &si, &pi)) {
+                errorList->appendItem("CreateProcess failed: " + cmdline);
+            }
 
-                // Wait until child process exits.
-                WaitForSingleObject(pi.hProcess, INFINITE);
+            // Wait until child process exits.
+            WaitForSingleObject(pi.hProcess, INFINITE);
 
-                // Close process and thread handles. 
-                CloseHandle(pi.hProcess);
-                CloseHandle(pi.hThread);
+            // Close process and thread handles. 
+            CloseHandle(pi.hProcess);
+            CloseHandle(pi.hThread);
 #else
-                if (system(cmdline.text()) < 0) {
-                    errorList->appendItem("echeck system call failed: " + cmdline);
-                    return false;
-                }
+            if (system(cmdline.text()) < 0) {
+                errorList->appendItem("echeck system call failed: " + cmdline);
+                return false;
+            }
 #endif
-                for (auto error : output) delete error;
-                output.clear();
+            for (auto error : output) delete error;
+            output.clear();
 
-                std::ifstream results;
-                results.open(outfile, std::ios::in);
-                if (results.is_open()) {
-                    std::string line;
-                    while (std::getline(results, line)) {
-                        if (!line.empty()) {
-                            MessageInfo* error = new MessageInfo();
-                            if (error) {
-                                FXString str, display;
-                                FXString tok;
-                                str.assign(line.c_str());
-                                error->level = FXIntVal(str.section("|", 1));
-                                tok = str.section("|", 2);
-                                if (tok == "U") {
-                                    error->unit_id = FXIntVal(str.section("|", 3), 36);
-                                }
-                                else if (tok == "R") {
-                                    tok = str.section("|", 3);
-                                    error->region_x = FXIntVal(tok.section(", ", 0));
-                                    error->region_y = FXIntVal(tok.section(", ", 1));
-                                }
-                                output.push_back(error);
-                                display = str.section("|", 5);
-                                if (!display.empty()) {
-                                    display += ": ";
-                                }
-                                display += str.section("|", 4);
-                                errorList->appendItem(display, nullptr, error);
+            std::ifstream results;
+            results.open(outfile, std::ios::in);
+            if (results.is_open()) {
+                std::string line;
+                while (std::getline(results, line)) {
+                    if (!line.empty()) {
+                        MessageInfo *error = new MessageInfo();
+                        if (error) {
+                            FXString str, display;
+                            FXString tok;
+                            str.assign(line.c_str());
+                            error->level = FXIntVal(str.section("|", 1));
+                            tok = str.section("|", 2);
+                            if (tok == "U") {
+                                error->unit_id = FXIntVal(str.section("|", 3), 36);
                             }
+                            else if (tok == "R") {
+                                tok = str.section("|", 3);
+                                error->region_x = FXIntVal(tok.section(", ", 0));
+                                error->region_y = FXIntVal(tok.section(", ", 1));
+                            }
+                            output.push_back(error);
+                            display = str.section("|", 5);
+                            if (!display.empty()) {
+                                display += ": ";
+                            }
+                            display += str.section("|", 4);
+                            errorList->appendItem(display, nullptr, error);
                         }
                     }
                 }
@@ -2043,6 +2064,11 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
         block = pstate->building;
         descriptionText->setText(descText(*block));
     }
+    else if (pstate->selected & selection.FACTION)
+    {
+        block = pstate->faction;
+        descriptionText->setText(block->value(TYPE_BANNER));
+    }
     else {
         descriptionText->setText("");
     }
@@ -2263,21 +2289,22 @@ long CSMap::onWatchFiles(FXObject *, FXSelector, void *ptr)
         if (hasFocus()) {
             FXString filename = report->cmdfilename();
             if (!filename.empty()) {
-                struct stat buf;
-                if (stat(filename.text(), &buf) == 0) {
-                    if (buf.st_mtime > last_save_time) {
+                FXStat info;
+                if (FXStat::statFile(filename, info)) {
+                    FXTime mtime = info.modified();
+                    if (mtime > last_save_time) {
                         if (last_save_time != 0) {
                             if (updateCommands(filename)) {
-                                last_save_time = buf.st_mtime;
-                                if (stat(filename.text(), &buf) == 0) {
-                                    last_save_time = buf.st_mtime;
+                                last_save_time = mtime;
+                                if (FXStat::statFile(filename, info)) {
+                                    last_save_time = info.modified();
                                 }
                                 loadCommands(filename);
                                 getApp()->addTimeout(this, CSMap::ID_WATCH_FILES, 1000, nullptr);
                                 return 1;
                             }
                         }
-                        last_save_time = buf.st_mtime;
+                        last_save_time = mtime;
                     }
                 }
             }
@@ -2741,9 +2768,9 @@ void CSMap::updateModificationTime()
 {
     if (report) {
         FXString filename = report->cmdfilename();
-        struct stat buf;
-        if (stat(filename.text(), &buf) == 0) {
-            last_save_time = buf.st_mtime;
+        FXStat info;
+        if (FXStat::statFile(filename, info)) {
+            last_save_time = info.modified();
         }
     }
 }

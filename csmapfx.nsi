@@ -72,7 +72,7 @@ SectionEnd
 Section "Additional Game Information"
 
   ; Set output path to the installation directory.
-  SetOutPath $APPDATA\Eressea\CsMapFX
+  SetOutPath $LOCALAPPDATA\Eressea\CsMapFX
   
   ; Put file there
   File csmapfx.Eressea.info
