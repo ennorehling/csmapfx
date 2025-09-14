@@ -4,20 +4,16 @@
 ; The name of the installer
 Name "CsMapFX"
 
+!searchparse /file version.h `#define CSMAP_APP_VERSIONSTR "v` APP_VERSION `"`
 ; The file to write
-!ifdef MUI_VERSION
-!define MAIN_SECTION "CsMapFX ${MUI_VERSION}"
-OutFile "..\csmapinst-${MUI_VERSION}.exe"
-VIProductVersion ${MUI_VERSION}.0
+!define MAIN_SECTION "CsMapFX ${APP_VERSION}"
+OutFile "..\csmapinst-${APP_VERSION}.exe"
+VIProductVersion ${APP_VERSION}.0
 VIAddVersionKey /LANG=0 "CompanyName" "Eressea"
 VIAddVersionKey /LANG=0 "ProductName" "Coast and Sea Mapper"
 VIAddVersionKey /LANG=0 "FileDescription" "CsMapFX Application"
-VIAddVersionKey /LANG=0 "FileVersion" ${MUI_VERSION}
+VIAddVersionKey /LANG=0 "FileVersion" ${APP_VERSION}
 VIAddVersionKey /LANG=0 "LegalCopyright" "Enno Rehling"
-!else
-!define MAIN_SECTION "CsMapFX"
-OutFile "..\csmapinst.exe"
-!endif
 
 ; Request application privileges for Windows Vista and higher
 RequestExecutionLevel admin
