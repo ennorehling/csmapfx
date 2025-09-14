@@ -113,13 +113,9 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 	{
 		if (block->type() == block_type::TYPE_SHIP)
 		{
-			FXString fac = block->value(TYPE_FACTION);
-			int faction = -1;
-			if (!fac.empty())
-				faction = atoi(fac.text());
-
-			if (faction == selected_faction || selected_faction == 0)
-			{
+            int faction = block->valueInt(TYPE_FACTION, 0);
+            if (selected_faction == 0 || faction == selected_faction)
+            {
 				int size = atoi(block->value("Groesse").text());
 
 				// <Shiptype>: <Size>
@@ -130,12 +126,8 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 		}
 		else if (block->type() == block_type::TYPE_BUILDING)
 		{
-			FXString fac = block->value(TYPE_FACTION);
-			int faction = -1;
-			if (!fac.empty())
-				faction = atoi(fac.text());
-
-			if (faction == selected_faction || selected_faction == 0)
+			int faction = block->valueInt(TYPE_FACTION, 0);
+			if (selected_faction == 0 || faction == selected_faction)
 			{
 				int size = atoi(block->value("Groesse").text());
 
@@ -598,6 +590,7 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
                 selection.faction = iparent;
 			}			
 		}
+        ++selection.selChange;
         getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
         if (!clipboard.empty()) {
             getTarget()->handle(this, FXSEL(SEL_CLIPBOARD_REQUEST, ID_SETSTRINGVALUE), (void *)clipboard.text());
@@ -623,7 +616,7 @@ bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 			if (!fac.empty())
 				factionId = atoi(fac.text());
 
-			if (factionId < 0 || factions.find(factionId) == factions.end())
+			if (factions.find(factionId) == factions.end())
 			{
 				factions.insert(factionId);
 

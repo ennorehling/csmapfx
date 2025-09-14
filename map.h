@@ -59,6 +59,7 @@ public:
 	void calculateContentSize();
 
 	void terraform(FXint x, FXint y, FXint plane, FXint terrain);
+    void updateSelection();
 
 	void clearRoute(int which);
 	FXint sendRouteCmds(const FXString& str, int which);

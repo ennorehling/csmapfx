@@ -886,10 +886,12 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
             }
             else {
 				// mark unknown region (no region-block in report)
-                selection.sel_x = x, selection.sel_y = y, selection.sel_plane = visiblePlane;
                 selection.selected = selection.UNKNOWN_REGION;
                 selection.selected &= ~selection.REGION;
-			}
+            }
+            selection.sel_x = x, selection.sel_y = y, selection.sel_plane = visiblePlane;
+            updateSelection();
+            ++selection.selChange;
 			getShell()->handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 		}
 		return 1;
@@ -1928,6 +1930,26 @@ long FXCSMap::onPaint(FXObject*, FXSelector, void* ptr)
 	return 1;
 }
 
+void FXCSMap::updateSelection()
+{
+    // does state->region contain valid informaion?
+    if (selection.selected & (selection.REGION | selection.UNKNOWN_REGION))
+    {
+        if (selection.selected & selection.REGION)
+            sel_x = selection.region->x(), sel_y = selection.region->y(), sel_plane = selection.region->info();
+        else
+            sel_x = selection.sel_x, sel_y = selection.sel_y, sel_plane = selection.sel_plane;
+
+        if (visiblePlane != sel_plane)
+        {
+            visiblePlane = sel_plane;
+        }
+
+        scrollTo(sel_x, sel_y);
+    }
+    map->update();
+}
+
 long FXCSMap::onMapChange(FXObject*sender, FXSelector sel, void* ptr)
 {
 	datafile::SelectionState *pstate = (datafile::SelectionState*)ptr;
@@ -1940,27 +1962,12 @@ long FXCSMap::onMapChange(FXObject*sender, FXSelector sel, void* ptr)
         datachanged = true;
     }
     if (selection.selChange != pstate->selChange)
-	{
+    {
         selection = *pstate;
         repaint = true;
-		selection.regionsSelected = pstate->regionsSelected;
-
-		// does state->region contain valid informaion?
-        if (selection.selected & (selection.REGION | selection.UNKNOWN_REGION))
-        {
-            if (selection.selected & selection.REGION)
-                sel_x = selection.region->x(), sel_y = selection.region->y(), sel_plane = selection.region->info();
-            else
-                sel_x = selection.sel_x, sel_y = selection.sel_y, sel_plane = selection.sel_plane;
-
-            if (visiblePlane != sel_plane)
-            {
-                visiblePlane = sel_plane;
-            }
-
-            scrollTo(sel_x, sel_y);
-        }
-	}
+        selection.regionsSelected = pstate->regionsSelected;
+        updateSelection();
+    }
 
     // things changed
     if (datachanged) {

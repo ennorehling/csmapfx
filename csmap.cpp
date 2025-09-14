@@ -1874,6 +1874,7 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
             if (info->unit_id) {
                 if (report->getUnit(selection.unit, info->unit_id)) {
                     selection.selected = selection.UNIT;
+                    ++selection.selChange;
                     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
                     return 1;
                 }
@@ -1881,6 +1882,7 @@ long CSMap::onErrorSelected(FXObject * sender, FXSelector, void *ptr)
             else {
                 if (report->getRegion(selection.region, info->region_x, info->region_y, 0)) {
                     selection.selected = selection.REGION;
+                    ++selection.selChange;
                     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
                     return 1;
                 }
@@ -2075,8 +2077,6 @@ long CSMap::onMapChange(FXObject*, FXSelector, void* ptr)
     showProperties(buildingProperties, pstate->selected& selection.BUILDING);
 
     selection = *pstate;
-    // FIXME: bullshit!
-    ++selection.selChange;
 
     while (block != report->blocks().begin()) {
         --block;
@@ -2400,6 +2400,7 @@ long CSMap::onNextUnit(FXObject*, FXSelector, void*)
         {
             selection.selected = selection.UNIT;
             selection.unit = unit;
+            ++selection.selChange;
             handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
 
             return 1;
@@ -2445,6 +2446,7 @@ long CSMap::onPrevUnit(FXObject*, FXSelector, void*)
 
             selection.selected = selection.UNIT;
             selection.unit = unit;
+            ++selection.selChange;
             handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
             return 1;
         }
@@ -2490,6 +2492,7 @@ long CSMap::onResultSelected(FXObject*, FXSelector, void* ptr)
         }
     }
     selection.selected = selected;
+    ++selection.selChange;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
@@ -2676,7 +2679,7 @@ long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
     FXFileDialog dlg(this, FXString(L"\u00d6ffnen..."));
     dlg.setIcon(icons.open);
     dlg.setDirectory(dialogDirectory);
-    dlg.setPatternList(FXString(L"H\u00e4ufige Formate (*.cr,*.txt)\nEressea Computer Report (*.cr)\nBefehlsdateien (*.txt)\nAlle Dateien (*)"));
+    dlg.setPatternList(FXString(L"H\u00e4ufige Formate (*.cr;*.txt)\nEressea Computer Report (*.cr)\nBefehlsdateien (*.txt)\nAlle Dateien (*)"));
     FXint res = dlg.execute(PLACEMENT_SCREEN);
     dialogDirectory = dlg.getDirectory();
     if (res) {
@@ -2855,7 +2858,7 @@ long CSMap::onFileClose(FXObject*, FXSelector, void*)
 
 bool CSMap::closeFile()
 {
-    // ask if modified commands should be safed
+    // ask if modified commands should be saved
     if (report && report->modifiedCmds())
     {
         FXuint res = FXMessageBox::question(this, (FXuint)MBOX_SAVE_CANCEL_DONTSAVE, CSMAP_APP_TITLE, "%s",
@@ -3177,6 +3180,7 @@ long CSMap::onRegionSelAll(FXObject*, FXSelector, void*)
         selection.regionsSelected.insert(regionPtr);
     }
 
+    ++selection.selChange;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
@@ -3187,6 +3191,7 @@ long CSMap::onRegionUnSel(FXObject*, FXSelector, void*)
 
     // alle Regionen demarkieren
     selection.regionsSelected.clear();
+    ++selection.selChange;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
@@ -3218,6 +3223,7 @@ long CSMap::onRegionInvertSel(FXObject*, FXSelector, void*)
     }
 
     selection.regionsSelected = regionsSelected;
+    ++selection.selChange;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
@@ -3275,6 +3281,7 @@ long CSMap::onRegionExtendSel(FXObject*, FXSelector, void*)
     }
     selection.regionsSelected = regionsSelected;
 
+    ++selection.selChange;
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
@@ -3333,6 +3340,9 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
                     }
                 }
             }
+            if (changed) {
+                ++selection.selChange;
+            }
         }
     } while (changed);
 
@@ -3342,6 +3352,7 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
 
 long CSMap::onRegionSelVisible(FXObject*, FXSelector, void* ptr)
 {
+    bool changed = false;
     if (!report) return 1;
     // alle Regionen markieren
     selection.regionsSelected.clear();
@@ -3366,6 +3377,9 @@ long CSMap::onRegionSelVisible(FXObject*, FXSelector, void* ptr)
         selection.regionsSelected.insert(&block);
     }
 
+    if (!selection.regionsSelected.empty()) {
+        ++selection.selChange;
+    }
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);
     return 1;
 }
@@ -3395,6 +3409,9 @@ long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
             continue;
 
         selection.regionsSelected.insert(&*block);
+    }
+    if (!selection.regionsSelected.empty()) {
+        ++selection.selChange;
     }
 
     handle(this, FXSEL(SEL_COMMAND, ID_UPDATE), &selection);

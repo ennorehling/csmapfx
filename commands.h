@@ -66,6 +66,14 @@ protected:
 	void highlightText();
 	void mapShowRoute();
     void updateSelection();
+
+    struct UndoState {
+        FXString text;
+        FXint cursor = -1;
+    };
+
+    UndoState undo;
+    UndoState redo;
 };
 
 #endif //_CSMAP_COMMANDS

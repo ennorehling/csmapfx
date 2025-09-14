@@ -386,21 +386,20 @@ long FXRegionPanel::onMapChange(FXObject*, FXSelector, void* ptr)
 	}
     else if (selection.selChange != pstate->selChange)
 	{
-		if ((selection.selected & selection.REGION) != (pstate->selected & selection.REGION)
-			|| (selection.selected & selection.REGION && selection.region != pstate->region))
-			needUpdate = true;				// ignore changes that don't change selected region
+        if ((selection.selected & selection.REGION) != (pstate->selected & selection.REGION)
+            || (selection.selected & selection.REGION && selection.region != pstate->region))
+            needUpdate = true;				// ignore changes that don't change selected region
 
-		else if ((selection.selected & selection.UNKNOWN_REGION) != (pstate->selected & selection.UNKNOWN_REGION))
-			needUpdate = true;				// ignore changes that don't change selected region
+        else if ((selection.selected & selection.UNKNOWN_REGION) != (pstate->selected & selection.UNKNOWN_REGION))
+            needUpdate = true;				// ignore changes that don't change selected region
 
-		else if (selection.selected & selection.UNKNOWN_REGION && (selection.sel_x != pstate->sel_x ||
-			selection.sel_y != pstate->sel_y || selection.sel_plane != pstate->sel_plane))
-			needUpdate = true;				// ignore changes that don't change selected region
+        else if (selection.selected & selection.UNKNOWN_REGION && (selection.sel_x != pstate->sel_x ||
+            selection.sel_y != pstate->sel_y || selection.sel_plane != pstate->sel_plane))
+            needUpdate = true;				// ignore changes that don't change selected region
 
         else if (selection.regionsSelected != pstate->regionsSelected) {
             needUpdate = true;
         }
-
 		selection = *pstate;
 	}
 
