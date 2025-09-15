@@ -14,9 +14,6 @@ jobs:
           - bullseye
         arch:
           - amd64
-          - i386
-          - arm64
-          - armhf
     steps:
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@latest
