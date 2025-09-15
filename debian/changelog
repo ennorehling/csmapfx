@@ -4,7 +4,7 @@ csmapfx (1.7.42) stable; urgency=low
   * fix display of calculator route arrows
   * show number of units in faction menu
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 15 Sep 2025 09:40:00 +0100
+  -- Enno Rehling <enno@eressea.de>  Mon, 15 Sep 2025 09:40:00 +0100
 
 csmapfx (1.7.41-1) stable; urgency=low
 
