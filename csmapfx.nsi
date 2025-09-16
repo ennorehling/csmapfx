@@ -4,11 +4,17 @@
 ; The name of the installer
 Name "CsMapFX"
 
-!searchparse /file version.h `#define CSMAP_APP_VERSIONSTR "v` APP_VERSION `"`
-; The file to write
+!searchparse /file version.h `#define CSMAP_APP_VERSIONSTR "v` APP_MAJOR `.` APP_MINOR `.` APP_PATCHSTR `"`
+
 !define MAIN_SECTION "CsMapFX ${APP_VERSION}"
+!define APP_VERSION "${APP_MAJOR}.${APP_MINOR}.${APP_PATCHSTR}"
+
+!getdllversion "Release\CsMapFX.exe" expv_
+!define PROD_VERSION "${expv_1}.${expv_2}.${expv_3}.${expv_4}"
+VIProductVersion ${PROD_VERSION}
+
+; The file to write
 OutFile "..\csmapinst-${APP_VERSION}.exe"
-VIProductVersion ${APP_VERSION}.0
 VIAddVersionKey /LANG=0 "CompanyName" "Eressea"
 VIAddVersionKey /LANG=0 "ProductName" "Coast and Sea Mapper"
 VIAddVersionKey /LANG=0 "FileDescription" "CsMapFX Application"
