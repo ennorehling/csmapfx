@@ -1,12 +1,13 @@
 csmapfx (1.7.43) stable; urgency=low
 
   * show guarding units
+  * show anonymous stateus for own units
 
-  -- Enno Rehling <enno@eressea.de>  Tue, 16 Sep 2025 19:00:00 +0100
+  -- Enno Rehling <enno@eressea.de>  Mon, 27 Oct 2025 15:00:00 +0100
 
 csmapfx (1.7.42) stable; urgency=low
 
-  * fix statisitcs for anonymous factions
+  * fix statistics for anonymous factions
   * fix display of calculator route arrows
   * show number of units in faction menu
 
