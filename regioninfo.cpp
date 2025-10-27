@@ -71,7 +71,8 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
             if (regionPtr) {
                 datablock::itor block;
                 datablock::itor end = mapFile->blocks().end();
-                std::set<FXint> guard_ids;
+                std::set<int> guard_ids;
+                std::map<int, std::vector<datablock *> > guard_units;
                 if (mapFile->getBattle(block, pstate->sel_x, pstate->sel_y, pstate->sel_plane)) {
                     datablock::itor message;
                     if (!battle) {
@@ -103,8 +104,9 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
                     else if (block->type() == block_type::TYPE_UNIT) {
                         int guard = block->valueInt("bewacht");
                         if (guard) {
-                            FXint faction = block->valueInt("Partei");
+                            int faction = block->valueInt("Partei");
                             guard_ids.insert(faction);
+                            guard_units[faction].push_back(&*block);
                         }
                     }
                     else if (block->type() == block_type::TYPE_EFFECTS)
@@ -188,12 +190,17 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
                         }
                     }
                 }
-                if (!guard_ids.empty()) {
-                    for (FXint id : guard_ids) {
+                if (!guard_units.empty()) {
+                    for (auto &it : guard_units) {
+                        int id = it.first;
                         datablock::itor faction;
                         if (mapFile->getFaction(faction, id)) {
                             FXString label = faction->getLabel();
-                            appendItem(guards, label);
+                            FXTreeItem *parent = appendItem(guards, label);
+                            for (auto &unit : it.second) {
+                                FXTreeItem *item = appendItem(parent, unit->getLabel());
+                                item->setData(unit);
+                            }
                         }
                     }
                 }

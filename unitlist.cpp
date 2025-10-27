@@ -84,6 +84,7 @@ void FXUnitList::makeItems()
         FXString hp, hungry, combatstatus, guards;
         FXint factionId = -1, familiarMage = -1, group = -1, weight = 0;
         FXint otherFactionId = -2;
+        bool anonymous = false;
 
         std::vector<datakey::list_type::const_iterator> unhandled;
 
@@ -95,6 +96,9 @@ void FXUnitList::makeItems()
                 break;
             case TYPE_FACTION:
                 factionId = FXIntVal(key->value());
+                break;
+            case TYPE_FACTIONSTEALTH:
+                anonymous = FXIntVal(key->value()) != 0;
                 break;
             case TYPE_OTHER_FACTION:
                 otherFactionId = FXIntVal(key->value());
@@ -145,7 +149,6 @@ void FXUnitList::makeItems()
                 hero = key->value();
                 break;
             case TYPE_ORDERS_CONFIRMED:
-            case TYPE_FACTIONSTEALTH:
             case TYPE_DESCRIPTION:
             case TYPE_NOTES:
                 // do not show
@@ -189,7 +192,6 @@ void FXUnitList::makeItems()
                     label.format("Unbekannt (%s)", FXStringValEx((FXulong)factionId, 36).text());
                 }
             }
-
             if (otherFactionId > 0) {
                 datablock::itor anotherfaction;
                 if (mapFile->getFaction(anotherfaction, otherFactionId)) {
@@ -208,6 +210,9 @@ void FXUnitList::makeItems()
                 else {
                     label.format("Unbekannt (%s)", FXStringValEx(otherFactionId, 36).text());
                 }
+            }
+            else if (anonymous) {
+                label += ", parteigetarnt";
             }
         }
         FXTreeItem* item = appendItem(unititem, makeItem(label, factionPtr));
