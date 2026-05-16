@@ -42,7 +42,7 @@ public:
 	int recruitment() const { return m_recruitment; }
     int getFactionId() const { return m_factionId; }
 
-    int getFactionIdForUnit(const datablock* unit) const;
+    static int getFactionIdForUnit(const datablock* unit);
     FXString getFactionName(int factionId);
 
     datablock* getMessageTarget(const datablock& msg);

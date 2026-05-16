@@ -93,7 +93,7 @@ int datafile::turn()
     return m_turn;
 }
 
-int datafile::getFactionIdForUnit(const datablock* unit) const
+int datafile::getFactionIdForUnit(const datablock* unit)
 {
     FXASSERT(unit->type() == block_type::TYPE_UNIT);
     if (unit->valueInt(TYPE_TRAITOR, 0) != 0) {

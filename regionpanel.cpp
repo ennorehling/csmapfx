@@ -223,7 +223,7 @@ void FXRegionPanel::collectData(std::vector<RegionInfo>& info, const datablock::
             {
                 const datablock* unitPtr = &*block;
                 myfaction = false;
-                int id = mapFile->getFactionIdForUnit(unitPtr);
+                int id = datafile::getFactionIdForUnit(unitPtr);
                 if (factionId == id) {
                     myfaction = true;
                 }

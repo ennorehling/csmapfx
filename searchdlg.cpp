@@ -320,7 +320,7 @@ namespace
         // compare faction names?
         if (context.searchFactions) {
             datablock::itor faction;
-            int fac_id = context.report->getFactionIdForUnit(unitPtr);
+            int fac_id = datafile::getFactionIdForUnit(unitPtr);
             if (context.compare_icase(FXStringValEx(fac_id, 36))) {
                 return true;
             }
@@ -669,7 +669,7 @@ FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor& buil
     else if (unit != end)
     {
         const datablock* unitPtr = &*unit;
-        int factionId = mapFile->getFactionIdForUnit(unitPtr);
+        int factionId = datafile::getFactionIdForUnit(unitPtr);
 
         FXString name = unitPtr->getName();
         object_str = name + " (" + unitPtr->id() + ")";
