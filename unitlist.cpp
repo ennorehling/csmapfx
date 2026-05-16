@@ -174,7 +174,7 @@ void FXUnitList::makeItems()
         datablock* factionPtr = nullptr;
         if (factionId < 0 && otherFactionId < 0)
         {
-            label.assign("Parteigetarnt");
+            label.assign("Anonym");
         }
         else {
             datablock::itor faction;

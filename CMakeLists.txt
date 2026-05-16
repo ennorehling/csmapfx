@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 project (csmapfx CXX C)
 
 if (WIN32)
 ## set to FALSE to prefer the WinAPI PNG encoder:
-set(USE_LIBPNG TRUE)
+set(USE_LIBPNG FALSE)
 add_compile_definitions(-DUNICODE)
 add_compile_definitions(WITH_MAP_EXPORT)
 set(PLATFORM_SOURCES win32.cpp)

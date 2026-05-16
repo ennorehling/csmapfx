@@ -1433,8 +1433,15 @@ FXString datafile::unitName(const datablock& unit, bool verbose)
                 FXStringValEx(fid, 36).text()
             );
         }
-        else {
+        else if (fid) {
             label.format("%s (%s), Unbekannt (%s)",
+                unit.value(TYPE_NAME).text(),
+                FXStringValEx(uid, 36).text(),
+                FXStringValEx(fid, 36).text()
+            );
+        }
+        else {
+            label.format("%s (%s), anonym",
                 unit.value(TYPE_NAME).text(),
                 FXStringValEx(uid, 36).text(),
                 FXStringValEx(fid, 36).text()

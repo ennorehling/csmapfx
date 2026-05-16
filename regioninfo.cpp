@@ -194,13 +194,17 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
                     for (auto &it : guard_units) {
                         int id = it.first;
                         datablock::itor faction;
+                        FXString label;
                         if (mapFile->getFaction(faction, id)) {
-                            FXString label = faction->getLabel();
-                            FXTreeItem *parent = appendItem(guards, label);
-                            for (auto &unit : it.second) {
-                                FXTreeItem *item = appendItem(parent, unit->getLabel());
-                                item->setData(unit);
-                            }
+                            label = faction->getLabel();
+                        }
+                        else {
+                            label.assign("Anonym");
+                        }
+                        FXTreeItem *parent = appendItem(guards, label);
+                        for (auto &unit : it.second) {
+                            FXTreeItem *item = appendItem(parent, unit->getLabel());
+                            item->setData(unit);
                         }
                     }
                 }

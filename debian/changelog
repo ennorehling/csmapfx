@@ -1,3 +1,9 @@
+csmapfx (1.7.45) stable; urgency=low
+
+  * show anonymous guarding units
+
+  -- Enno Rehling <enno@eressea.de>  Tue, 16 May 2026 21:00:00 +0200
+
 csmapfx (1.7.44) stable; urgency=low
 
   * version number increase
