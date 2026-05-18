@@ -102,43 +102,31 @@ int datafile::getFactionIdForUnit(const datablock* unit)
     return unit->valueInt(TYPE_FACTION, (int)special_faction::ANONYMOUS);
 }
 
+FXString datafile::getFactionName(const datablock *faction)
+{
+    return faction->getLabel();
+}
+
 FXString datafile::getFactionName(int factionId)
 {
-    FXString name;
+    if (factionId == (int)special_faction::ANONYMOUS) {
+        return FXString("Unbekannt");
+    }
+    if (factionId == (int)special_faction::TRAITOR) {
+        return FXString(L"Verr\u00e4ter");
+    }
     datablock::itor faction;
-    if (factionId >= 0 && getFaction(faction, factionId)) {
-        datablock* facPtr = &*faction;
-        name = facPtr->value(TYPE_FACTIONNAME);
-        if (facPtr->info() < 0)
-        {
-            if (name.empty()) {
-                name.assign("Parteigetarnt");
-            }
-        }
-        else
-        {
-            FXString fid = facPtr->id();
-            if (name.empty()) {
-                name.format("Partei %s (%s)", fid.text(), fid.text());
-            }
-            else {
-                name += " (";
-                name += fid;
-                name += ')';
-            }
-        }
+    if (getFaction(faction, factionId)) {
+        datablock *facPtr = &*faction;
+        return getFactionName(facPtr);
     }
     else {
-        datablock block;
-        block.infostr(FXStringVal(factionId));
-        if (factionId == (int)special_faction::ANONYMOUS) {
-            name.assign("Parteigetarnt");
-        }
-        else {
-            name.assign(L"Verr\u00e4ter");
-        }
+        FXString name;
+        const FXString fid = faction->id();
+        // this should never happen
+        name.format("Partei %s (%s)", fid.text(), fid.text());
+        return name;
     }
-    return name;
 }
 
 datablock* datafile::getMessageTarget(const datablock& msg)

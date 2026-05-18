@@ -43,6 +43,8 @@ public:
     int getFactionId() const { return m_factionId; }
 
     static int getFactionIdForUnit(const datablock* unit);
+
+    FXString getFactionName(const datablock *faction);
     FXString getFactionName(int factionId);
 
     datablock* getMessageTarget(const datablock& msg);
