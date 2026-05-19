@@ -104,7 +104,7 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
                     else if (block->type() == block_type::TYPE_UNIT) {
                         int guard = block->valueInt("bewacht");
                         if (guard) {
-                            int faction = block->valueInt("Partei");
+                            int faction = block->valueInt(key_type::TYPE_FACTION, -1);
                             guard_ids.insert(faction);
                             guard_units[faction].push_back(&*block);
                         }
