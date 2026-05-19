@@ -115,6 +115,7 @@ FXString datafile::getFactionName(int factionId)
     if (factionId == (int)special_faction::TRAITOR) {
         return FXString(L"Verr\u00e4ter");
     }
+
     datablock::itor faction;
     if (getFaction(faction, factionId)) {
         datablock *facPtr = &*faction;
@@ -122,9 +123,8 @@ FXString datafile::getFactionName(int factionId)
     }
     else {
         FXString name;
-        const FXString fid = faction->id();
         // this should never happen
-        name.format("Partei %s (%s)", fid.text(), fid.text());
+        name.format("Partei %d (%d)", factionId, factionId);
         return name;
     }
 }
@@ -1435,6 +1435,11 @@ FXString datafile::unitName(const datablock& unit, bool verbose)
                 FXStringValEx(fid, 36).text()
             );
         }
+        label.format("%s (%s), %s",
+            unit.value(TYPE_NAME).text(),
+            FXStringValEx(uid, 36).text(),
+            getFactionName(fid).text()
+        );
         return label;
     }
     return unit.getName();
