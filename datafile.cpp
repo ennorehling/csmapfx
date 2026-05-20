@@ -110,7 +110,7 @@ FXString datafile::getFactionName(const datablock *faction)
 FXString datafile::getFactionName(int factionId)
 {
     if (factionId == (int)special_faction::ANONYMOUS) {
-        return FXString("Unbekannt");
+        return FXString("Getarnt");
     }
     if (factionId == (int)special_faction::TRAITOR) {
         return FXString(L"Verr\u00e4ter");

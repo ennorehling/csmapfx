@@ -141,15 +141,9 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 		{
 			unitId = block->info();
 
-			FXString fac = block->value(TYPE_FACTION);
-			int faction = -1;
-			if (!fac.empty())
-				faction = atoi(fac.text());
+            int faction = datafile::getFactionIdForUnit(&*block);
 
-			if (faction == selected_faction || selected_faction == 0)
-				unitInFaction = true;
-			else
-				unitInFaction = false;
+            unitInFaction = (faction == selected_faction || selected_faction == 0);
 		}
 
 		if (!unitInFaction)
@@ -600,6 +594,15 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 	return 0;
 }
 
+static FXint SortFactionBox(const FXListItem *lhs, const FXListItem *rhs)
+{
+    FXival l = (FXival)lhs->getData();
+    FXival r = (FXival)rhs->getData();
+    if (l > r) return 1;
+    if (l < r) return -1;
+    return 0;
+}
+
 bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor region)
 {
     if (!mapFile) return false;
@@ -610,36 +613,20 @@ bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 	{
 		if (block->type() == block_type::TYPE_UNIT)
 		{
-			FXString fac = block->value(TYPE_FACTION);
-			FXival factionId = -1;
-			if (!fac.empty())
-				factionId = atoi(fac.text());
-
+            FXival factionId = datafile::getFactionIdForUnit(&*block);
 			if (factions.find(factionId) == factions.end())
 			{
 				factions.insert(factionId);
 
-                FXString label;
-                datablock::itor faction;
-                if (factionId <= 0) {
-                    label.assign("Parteigetarnt");
-                }
-                else if (mapFile->getFaction(faction, factionId)) {
-                    FXString name = faction->value(TYPE_FACTIONNAME);
-
-                    if (name.empty())
-                        label.assign("Parteigetarnt");
-                    else
-                        label.format("%s (%s)", name.text(), faction->id().text());
-
-                }
-                else {
-                    // missing PARTEI block in report? how?
-                    label.format("Unbekannt (%s)", FXStringValEx((FXulong)factionId, 36).text());
-                }
+                FXString label = mapFile->getFactionName(factionId);
                 FXint index;
                 if (mapFile->getActiveFactionId() == factionId) {
-                    index = factionBox->prependItem(label, (void *)factionId);
+                    if (block->valueInt(TYPE_TRAITOR, 0) != 1) {
+                        index = factionBox->prependItem(label, (void *)factionId);
+                    }
+                    else {
+                        index = factionBox->appendItem(label, (void *)factionId);
+                    }
                 }
                 else {
                     index = factionBox->appendItem(label, (void *)factionId);
@@ -652,6 +639,8 @@ bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 			}
 		}
 	}
+    factionBox->setSortFunc(SortFactionBox);
+    factionBox->sortItems();
     return bFound;
 }
 
