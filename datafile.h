@@ -44,7 +44,8 @@ public:
 
     static int getFactionIdForUnit(const datablock* unit);
 
-    FXString getFactionName(const datablock *faction);
+    static FXString getFactionLabel(const datablock *faction, int factionId = 0);
+    static FXString getFactionName(const datablock *faction, int factionId);
     FXString getFactionName(int factionId);
 
     datablock* getMessageTarget(const datablock& msg);

@@ -608,6 +608,7 @@ bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
     if (!mapFile) return false;
 	// list factions of selected region
     bool bFound = false;
+    FXival OwnFaction = 0, TraitorFaction = 0, AnonFaction = 0;
     datablock::itor end = mapFile->blocks().end();
 	for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
 	{
@@ -618,21 +619,16 @@ bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 			{
 				factions.insert(factionId);
 
-                FXString label = mapFile->getFactionName(factionId);
-                FXint index;
+                FXint index = -1;
                 if (mapFile->getActiveFactionId() == factionId) {
                     if (block->valueInt(TYPE_TRAITOR, 0) != 1) {
-                        index = factionBox->prependItem(label, (void *)factionId);
-                    }
-                    else {
-                        index = factionBox->appendItem(label, (void *)factionId);
+                        TraitorFaction = factionId;
+                        continue;
                     }
                 }
-                else {
-                    index = factionBox->appendItem(label, (void *)factionId);
-                }
+                index = appendFaction(factionId);
                 // select previously selected faction again
-                if (select.faction == factionId) {
+                if (index >= 0 && select.faction == factionId) {
                     factionBox->setCurrentItem(index);
                     bFound = true;
                 }
@@ -641,7 +637,40 @@ bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 	}
     factionBox->setSortFunc(SortFactionBox);
     factionBox->sortItems();
+    if (AnonFaction != 0) {
+        FXint index = prependFaction(AnonFaction);
+        if (index >= 0 && select.faction == AnonFaction) {
+            factionBox->setCurrentItem(index);
+            bFound = true;
+        }
+    }
+    if (TraitorFaction != 0) {
+        FXint index = prependFaction(TraitorFaction);
+        if (index >= 0 && select.faction == TraitorFaction) {
+            factionBox->setCurrentItem(index);
+            bFound = true;
+        }
+    }
+    if (OwnFaction != 0) {
+        FXint index = appendFaction(OwnFaction);
+        if (index >= 0 && select.faction == OwnFaction) {
+            factionBox->setCurrentItem(index);
+            bFound = true;
+        }
+    }
     return bFound;
+}
+
+FXint FXStatistics::prependFaction(FXint factionId)
+{
+    return factionBox->prependItem(mapFile->getFactionName(factionId),
+        (void *)factionId);
+}
+
+FXint FXStatistics::appendFaction(FXint factionId)
+{
+    return factionBox->appendItem(mapFile->getFactionName(factionId),
+        (void *)factionId);
 }
 
 long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)

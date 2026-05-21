@@ -497,7 +497,8 @@ void FXRegionList::rebuildTree()
                             }
                         }
                         if (active_faction_group || bullet != blue) {
-                            factionItem = new FXRegionItem(mapFile->getFactionName(factionId), bullet, bullet, facPtr);
+                            FXString label = datafile::getFactionLabel(facPtr, factionId);
+                            factionItem = new FXRegionItem(label, bullet, bullet, facPtr);
                             factions.push_back({ factionId, factionItem });
                             if (bullet == blue) {
                                 // active faction should always be the first in the list

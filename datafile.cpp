@@ -102,31 +102,47 @@ int datafile::getFactionIdForUnit(const datablock* unit)
     return unit->valueInt(TYPE_FACTION, (int)special_faction::ANONYMOUS);
 }
 
-FXString datafile::getFactionName(const datablock *faction)
+FXString datafile::getFactionLabel(const datablock *faction, int factionId)
 {
-    return faction->getLabel();
+    FXString name = getFactionName(faction, factionId);
+    if (factionId > 0) {
+        FXString label;
+        return label.format("%s (%s)", name.text(), FXStringValEx(factionId, 36));
+    }
+    return name;
 }
 
-FXString datafile::getFactionName(int factionId)
+FXString datafile::getFactionName(const datablock *faction, int factionId)
 {
+    if (factionId == 0 || factionId == 666)	// Monster (0) and the new Monster (ii)
+    {
+        return FXString("Monster");
+    }
     if (factionId == (int)special_faction::ANONYMOUS) {
         return FXString("Getarnt");
     }
     if (factionId == (int)special_faction::TRAITOR) {
         return FXString(L"Verr\u00e4ter");
     }
-
-    datablock::itor faction;
-    if (getFaction(faction, factionId)) {
-        datablock *facPtr = &*faction;
-        return getFactionName(facPtr);
+    if (faction) {
+        return faction->getName().text();
     }
     else {
         FXString name;
         // this should never happen
-        name.format("Partei %d (%d)", factionId, factionId);
+        name.format("Partei %d", factionId);
         return name;
     }
+}
+
+FXString datafile::getFactionName(int factionId)
+{
+    datablock::itor faction;
+    datablock *facPtr = nullptr;
+    if (getFaction(faction, factionId)) {
+        facPtr = &*faction;
+    }
+    return getFactionLabel(facPtr, factionId);
 }
 
 datablock* datafile::getMessageTarget(const datablock& msg)
@@ -1903,13 +1919,7 @@ void datafile::updateHashTables(const datablock::itor& start)
                 faction.infostr(FXStringVal(factionId));
 
                 FXString name;
-                if (factionId == 0 || factionId == 666)	// Monster (0) and the new Monster (ii)
-                {
-                    name.assign("Monster");
-                }
-                else {
-                    name.format("Partei %s", FXStringValEx(factionId, 36).text());
-                }
+                name = getFactionName(&faction, factionId);
                 datakey key;
                 key.key("Parteiname", block->type());
                 key.value(name);

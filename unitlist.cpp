@@ -174,7 +174,7 @@ void FXUnitList::makeItems()
         datablock* factionPtr = nullptr;
         if (factionId < 0 && otherFactionId < 0)
         {
-            label.assign("Anonym");
+            label.assign("Getarnt");
         }
         else {
             datablock::itor faction;
@@ -182,11 +182,7 @@ void FXUnitList::makeItems()
             if (factionId > 0) {
                 if (mapFile->getFaction(faction, factionId)) {
                     factionPtr = &*faction;
-                    name = factionPtr->value(TYPE_FACTIONNAME);
-                    if (name.empty())
-                        label.assign("Parteigetarnt");
-                    else
-                        label.format("%s (%s)", name.text(), factionPtr->id().text());
+                    label = mapFile->getFactionLabel(factionPtr, factionId);
                 }
                 else {
                     label.format("Unbekannt (%s)", FXStringValEx((FXulong)factionId, 36).text());
