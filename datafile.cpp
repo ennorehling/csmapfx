@@ -132,8 +132,7 @@ FXString datafile::getFactionName(const datablock *faction, int factionId)
     else {
         FXString name;
         // this should never happen
-        name.format("Partei %s", FXStringValEx(factionId, 36));
-        return name;
+        return name.format("Partei %s", FXStringValEx(factionId, 36));
     }
 }
 
