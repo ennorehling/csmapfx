@@ -445,7 +445,7 @@ void FXRegionList::rebuildTree()
                 FXRegionItem* child = nullptr;
                 if (type == block_type::TYPE_UNIT) {
                     // get faction id, -1 means unknown faction (or stealth/anonymous)
-                    int factionId = mapFile->getFactionIdForUnit(objectPtr);
+                    int factionId = datafile::getFactionIdForUnit(*block);
                     FXRegionItem* factionItem = nullptr;
                     auto it = std::find_if(factions.begin(), factions.end(), [factionId](const FactionKeyValue& item) {
                         return factionId == item.id;
@@ -497,7 +497,8 @@ void FXRegionList::rebuildTree()
                             }
                         }
                         if (active_faction_group || bullet != blue) {
-                            factionItem = new FXRegionItem(mapFile->getFactionName(factionId), bullet, bullet, facPtr);
+                            FXString label = datafile::getFactionLabel(facPtr, factionId);
+                            factionItem = new FXRegionItem(label, bullet, bullet, facPtr);
                             factions.push_back({ factionId, factionItem });
                             if (bullet == blue) {
                                 // active faction should always be the first in the list

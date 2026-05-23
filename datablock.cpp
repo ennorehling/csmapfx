@@ -556,7 +556,7 @@ FXString datablock::getLabel() const
         return label;
     }
     else {
-        return getName() + " (" + id() + ")";
+        return getName();
     }
 }
 

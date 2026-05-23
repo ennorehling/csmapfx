@@ -163,18 +163,11 @@ int FXCommands::getConfirmed()
 	if (selection.selected & selection.UNIT)
 	{
         const datablock& block = *selection.unit;
-        if (block.valueInt(TYPE_FACTION) == mapFile->getActiveFactionId()) {
+        if (datafile::getFactionIdForUnit(block) == mapFile->getActiveFactionId()) {
             return block.valueInt(TYPE_ORDERS_CONFIRMED);
         }
         return -1;
 	}
-    else if (selection.selected & selection.REGION)
-    {
-        const datablock& block = *selection.region;
-        if (att_region* stats = static_cast<att_region*>(block.attachment())) {
-            return stats->unconfirmed;
-        }
-    }
     return -1;	// no unit with command block
 }
 
@@ -256,7 +249,7 @@ long FXCommands::onUpdate(FXObject* sender,FXSelector sel,void* ptr)
 	return FXText::onUpdate(sender, sel, ptr);
 }
 
-long FXCommands::updConfirmed(FXObject* sender, FXSelector, void*) {
+long FXCommands::updConfirmed(FXObject* sender, FXSelector sel, void* ptr) {
     FXCheckButton * btn = (FXCheckButton *)sender;
     int conf = getConfirmed();
     if (conf == -1) {

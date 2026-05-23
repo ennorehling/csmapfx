@@ -104,7 +104,7 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
                     else if (block->type() == block_type::TYPE_UNIT) {
                         int guard = block->valueInt("bewacht");
                         if (guard) {
-                            int faction = block->valueInt("Partei");
+                            int faction = block->valueInt(key_type::TYPE_FACTION, -1);
                             guard_ids.insert(faction);
                             guard_units[faction].push_back(&*block);
                         }
@@ -194,13 +194,12 @@ long FXRegionInfo::onMapChange(FXObject * sender, FXSelector sel, void * ptr)
                     for (auto &it : guard_units) {
                         int id = it.first;
                         datablock::itor faction;
-                        if (mapFile->getFaction(faction, id)) {
-                            FXString label = faction->getLabel();
-                            FXTreeItem *parent = appendItem(guards, label);
-                            for (auto &unit : it.second) {
-                                FXTreeItem *item = appendItem(parent, unit->getLabel());
-                                item->setData(unit);
-                            }
+                        FXString label;
+                        label = mapFile->getFactionName(id);
+                        FXTreeItem *parent = appendItem(guards, label);
+                        for (auto &unit : it.second) {
+                            FXTreeItem *item = appendItem(parent, unit->getLabel());
+                            item->setData(unit);
                         }
                     }
                 }

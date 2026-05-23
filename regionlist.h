@@ -41,7 +41,6 @@ public:
         return colorized_units;
     }
 
-    bool isConfirmed(const datablock* block) const;
     FXFont* getBoldFont() const { return boldfont; }
 public: 
 	enum

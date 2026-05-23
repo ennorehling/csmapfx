@@ -141,15 +141,9 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 		{
 			unitId = block->info();
 
-			FXString fac = block->value(TYPE_FACTION);
-			int faction = -1;
-			if (!fac.empty())
-				faction = atoi(fac.text());
+            int faction = datafile::getFactionIdForUnit(*block);
 
-			if (faction == selected_faction || selected_faction == 0)
-				unitInFaction = true;
-			else
-				unitInFaction = false;
+            unitInFaction = (faction == selected_faction || selected_faction == 0);
 		}
 
 		if (!unitInFaction)
@@ -600,59 +594,83 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 	return 0;
 }
 
+static FXint SortFactionBox(const FXListItem *lhs, const FXListItem *rhs)
+{
+    FXival l = (FXival)lhs->getData();
+    FXival r = (FXival)rhs->getData();
+    if (l > r) return 1;
+    if (l < r) return -1;
+    return 0;
+}
+
 bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor region)
 {
     if (!mapFile) return false;
 	// list factions of selected region
     bool bFound = false;
+    FXival OwnFaction = 0, TraitorFaction = 0, AnonFaction = 0;
     datablock::itor end = mapFile->blocks().end();
 	for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
 	{
 		if (block->type() == block_type::TYPE_UNIT)
 		{
-			FXString fac = block->value(TYPE_FACTION);
-			FXival factionId = -1;
-			if (!fac.empty())
-				factionId = atoi(fac.text());
-
+            FXival factionId = datafile::getFactionIdForUnit(*block);
 			if (factions.find(factionId) == factions.end())
 			{
 				factions.insert(factionId);
 
-                FXString label;
-                datablock::itor faction;
-                if (factionId <= 0) {
-                    label.assign("Parteigetarnt");
-                }
-                else if (mapFile->getFaction(faction, factionId)) {
-                    FXString name = faction->value(TYPE_FACTIONNAME);
-
-                    if (name.empty())
-                        label.assign("Parteigetarnt");
-                    else
-                        label.format("%s (%s)", name.text(), faction->id().text());
-
-                }
-                else {
-                    // missing PARTEI block in report? how?
-                    label.format("Unbekannt (%s)", FXStringValEx((FXulong)factionId, 36).text());
-                }
-                FXint index;
+                FXint index = -1;
                 if (mapFile->getActiveFactionId() == factionId) {
-                    index = factionBox->prependItem(label, (void *)factionId);
+                    if (block->valueInt(TYPE_TRAITOR, 0) != 1) {
+                        TraitorFaction = factionId;
+                        continue;
+                    }
                 }
-                else {
-                    index = factionBox->appendItem(label, (void *)factionId);
-                }
+                index = appendFaction(factionId);
                 // select previously selected faction again
-                if (select.faction == factionId) {
+                if (index >= 0 && select.faction == factionId) {
                     factionBox->setCurrentItem(index);
                     bFound = true;
                 }
 			}
 		}
 	}
+    factionBox->setSortFunc(SortFactionBox);
+    factionBox->sortItems();
+    if (AnonFaction != 0) {
+        FXint index = prependFaction(AnonFaction);
+        if (index >= 0 && select.faction == AnonFaction) {
+            factionBox->setCurrentItem(index);
+            bFound = true;
+        }
+    }
+    if (TraitorFaction != 0) {
+        FXint index = prependFaction(TraitorFaction);
+        if (index >= 0 && select.faction == TraitorFaction) {
+            factionBox->setCurrentItem(index);
+            bFound = true;
+        }
+    }
+    if (OwnFaction != 0) {
+        FXint index = appendFaction(OwnFaction);
+        if (index >= 0 && select.faction == OwnFaction) {
+            factionBox->setCurrentItem(index);
+            bFound = true;
+        }
+    }
     return bFound;
+}
+
+FXint FXStatistics::prependFaction(FXint factionId)
+{
+    return factionBox->prependItem(mapFile->getFactionName(factionId),
+        (void *)factionId);
+}
+
+FXint FXStatistics::appendFaction(FXint factionId)
+{
+    return factionBox->appendItem(mapFile->getFactionName(factionId),
+        (void *)factionId);
 }
 
 long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
