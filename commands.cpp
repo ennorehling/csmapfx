@@ -168,13 +168,6 @@ int FXCommands::getConfirmed()
         }
         return -1;
 	}
-    else if (selection.selected == selection.REGION)
-    {
-        const datablock& block = *selection.region;
-        if (att_region* stats = static_cast<att_region*>(block.attachment())) {
-            return stats->unconfirmed;
-        }
-    }
     return -1;	// no unit with command block
 }
 
@@ -256,7 +249,7 @@ long FXCommands::onUpdate(FXObject* sender,FXSelector sel,void* ptr)
 	return FXText::onUpdate(sender, sel, ptr);
 }
 
-long FXCommands::updConfirmed(FXObject* sender, FXSelector, void*) {
+long FXCommands::updConfirmed(FXObject* sender, FXSelector sel, void* ptr) {
     FXCheckButton * btn = (FXCheckButton *)sender;
     int conf = getConfirmed();
     if (conf == -1) {
