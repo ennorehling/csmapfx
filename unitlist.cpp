@@ -84,13 +84,16 @@ void FXUnitList::makeItems()
         FXString hp, hungry, combatstatus, guards;
         FXint factionId = -1, familiarMage = -1, group = -1, weight = 0;
         FXint otherFactionId = -2;
-        bool anonymous = false;
+        bool anonymous = false, traitor = false;
 
         std::vector<datakey::list_type::const_iterator> unhandled;
 
         for (datakey::list_type::const_iterator key = unit->data().begin(); key != unit->data().end(); ++key)
         {
             switch (key->type()) {
+            case TYPE_TRAITOR:
+                traitor = true;
+                break;
             case TYPE_NAME:
                 name = key->value();
                 break;
@@ -170,48 +173,43 @@ void FXUnitList::makeItems()
         label.format("%s (%s)", name.text(), unit->id().text());
         FXTreeItem* unititem = appendItem(nullptr, makeItem(label, &*unit));
         unititem->setExpanded(true);
+        int stealthId = -1; // getarnt als
+        int trueId = factionId; 
 
-        datablock* factionPtr = nullptr;
-        if (factionId < 0 && otherFactionId < 0)
-        {
-            label.assign("Getarnt");
+        if (anonymous) {
+            appendItem(unititem, makeItem("Anonym", nullptr));
         }
-        else {
+        else if (traitor) {
+            stealthId = factionId;
+            trueId = otherFactionId;
+            appendItem(unititem, makeItem("Verräter", nullptr));
+        }
+        else if (otherFactionId > 0) {
+            // als andere Partei getarnt, aber wir erkennen die wahre:
+            trueId = otherFactionId;
+            stealthId = factionId;
+        }
+
+        if (trueId >= 0) {
+            datablock *factionPtr = nullptr;
             datablock::itor faction;
 
-            if (factionId > 0) {
-                if (mapFile->getFaction(faction, factionId)) {
-                    factionPtr = &*faction;
-                    label = mapFile->getFactionLabel(factionPtr, factionId);
-                }
-                else {
-                    label.format("Unbekannt (%s)", FXStringValEx((FXulong)factionId, 36).text());
-                }
-            }
-            if (otherFactionId > 0) {
-                datablock::itor anotherfaction;
-                if (mapFile->getFaction(anotherfaction, otherFactionId)) {
-                    factionPtr = &*anotherfaction;
-                    name = factionPtr->value(TYPE_FACTIONNAME);
-                    FXString label2;
-                    if (name.empty()) {
-                        label2.assign(", parteigetarnt");
-                    }
-                    else {
-                        label2.format(", als %s (%s)", name.text(), FXStringValEx(otherFactionId, 36).text());
-                    }
-
-                    label += label2;
-                }
-                else {
-                    label.format("Unbekannt (%s)", FXStringValEx(otherFactionId, 36).text());
-                }
-            }
-            else if (anonymous) {
-                label += ", parteigetarnt";
+            if (mapFile->getFaction(faction, trueId)) {
+                factionPtr = &*faction;
+                label = mapFile->getFactionLabel(factionPtr, trueId);
+                appendItem(unititem, makeItem(label, factionPtr));
             }
         }
-        FXTreeItem* item = appendItem(unititem, makeItem(label, factionPtr));
+        if (stealthId >= 0) {
+            datablock *factionPtr = nullptr;
+            datablock::itor faction;
+
+            if (mapFile->getFaction(faction, stealthId)) {
+                factionPtr = &*faction;
+                label = "Getarnt als " + mapFile->getFactionLabel(factionPtr, stealthId);
+                appendItem(unititem, makeItem(label, factionPtr));
+            }
+        }
 
         if (group > 0)
         {
@@ -224,7 +222,7 @@ void FXUnitList::makeItems()
                 // TODO: find group name in mapFile
                 label += FXStringVal(group);
             }
-            item = appendItem(unititem, label);
+            appendItem(unititem, label);
         }
 
         if (familiarMage > 0) {
@@ -232,8 +230,7 @@ void FXUnitList::makeItems()
             if (mapFile->getUnit(mage, familiarMage)) {
                 FXString mage_name = mage->value(TYPE_NAME);
                 label.format("Vertrauter von %s (%s)", mage_name.text(), FXStringValEx(familiarMage, 36).text());
-                item = appendItem(unititem, label);
-                item->setData(&*mage);
+                appendItem(unititem, label)->setData(&*mage);
             }
         }
 
@@ -255,7 +252,7 @@ void FXUnitList::makeItems()
             label += ", ";
             label += (count == 1) ? "Held" : "Helden";
         }
-        item = appendItem(unititem, label);
+        appendItem(unititem, label);
 
         if (!combatstatus.empty() || !hp.empty() || !hungry.empty() || !guards.empty())
         {
@@ -301,13 +298,13 @@ void FXUnitList::makeItems()
                 label += "bewacht";
             }
 
-            item = appendItem(unititem, label);
+            appendItem(unititem, label);
         }
 
         if (!aura.empty() || !auramax.empty())
         {
             label.format("%s von %s Aura", aura.text(), auramax.text());
-            item = appendItem(unititem, label);
+            appendItem(unititem, label);
         }
 
         if (weight > 0)
@@ -319,7 +316,7 @@ void FXUnitList::makeItems()
             else {
                 label.format("%.2f", weight / 100.f);
             }
-            item = appendItem(unititem, "Gewicht: " + label);
+            appendItem(unititem, "Gewicht: " + label);
         }
 
         // list unhandled keys
@@ -491,7 +488,7 @@ void FXUnitList::makeItems()
         else {
             label.format("%.2f", walk_cap / 100.f);
         }
-        insertItem(item, unititem, L"Kapazit\u00e4t: " + label);
+        appendItem(unititem, L"Kapazit\u00e4t: " + label);
         if (horses > 0) {
             // riding capacity
             max_horses = riding_skill * 2 * count;
@@ -525,7 +522,7 @@ void FXUnitList::makeItems()
                 else {
                     label.format("%.2f", ride_cap / 100.f);
                 }
-                insertItem(item, unititem, L"Kapazit\u00e4t beritten: " + label);
+                appendItem(unititem, L"Kapazit\u00e4t beritten: " + label);
             }
         }
 
@@ -584,10 +581,10 @@ void FXUnitList::makeItems()
                     label.format("%s: %s", t->key().text(), t->value().text());
                 }
                 if (block) {
-                    item = appendItem(node, makeItem(label, block, nullptr));
+                    appendItem(node, makeItem(label, block, nullptr));
                 }
                 else {
-                    item = appendItem(node, label);
+                    appendItem(node, label);
                 }
             }
 
@@ -683,10 +680,10 @@ void FXUnitList::makeItems()
                     label.format("%s: %s", key.text(), t->value().text());
                 }
                 if (block) {
-                    item = appendItem(node, makeItem(label, block, nullptr));
+                    appendItem(node, makeItem(label, block, nullptr));
                 }
                 else {
-                    item = appendItem(node, label);
+                    appendItem(node, label);
                 }
             }
 
