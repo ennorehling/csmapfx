@@ -1429,7 +1429,7 @@ FXString datafile::unitName(const datablock& unit, bool verbose)
     if (verbose) {
         FXString label;
         int uid = unit.info();
-        int fid = unit.valueInt(TYPE_FACTION);
+        int fid = getFactionIdForUnit(unit);
         datablock::itor faction_owner;
         if (getFaction(faction_owner, fid)) {
             label.format("%s (%s), %s (%s)",
