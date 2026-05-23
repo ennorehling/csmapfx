@@ -141,7 +141,7 @@ void FXStatistics::collectData(std::map<FXString, entry> &persons, std::map<FXSt
 		{
 			unitId = block->info();
 
-            int faction = datafile::getFactionIdForUnit(&*block);
+            int faction = datafile::getFactionIdForUnit(*block);
 
             unitInFaction = (faction == selected_faction || selected_faction == 0);
 		}
@@ -614,7 +614,7 @@ bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 	{
 		if (block->type() == block_type::TYPE_UNIT)
 		{
-            FXival factionId = datafile::getFactionIdForUnit(&*block);
+            FXival factionId = datafile::getFactionIdForUnit(*block);
 			if (factions.find(factionId) == factions.end())
 			{
 				factions.insert(factionId);

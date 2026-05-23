@@ -221,14 +221,13 @@ void FXRegionPanel::collectData(std::vector<RegionInfo>& info, const datablock::
             }
             else if (block->type() == block_type::TYPE_UNIT)
             {
-                const datablock* unitPtr = &*block;
                 myfaction = false;
-                int id = datafile::getFactionIdForUnit(unitPtr);
+                int id = datafile::getFactionIdForUnit(*block);
                 if (factionId == id) {
                     myfaction = true;
                 }
 
-                int number = unitPtr->valueInt(TYPE_NUMBER, -1);
+                int number = block->valueInt(TYPE_NUMBER, -1);
                 if (number > 0)
                 {
                     Personen += number;

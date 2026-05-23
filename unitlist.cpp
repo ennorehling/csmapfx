@@ -176,13 +176,17 @@ void FXUnitList::makeItems()
         int stealthId = -1; // getarnt als
         int trueId = factionId; 
 
-        if (anonymous) {
-            appendItem(unititem, makeItem("Anonym", nullptr));
+        if (anonymous || (factionId<0 && otherFactionId<0)) {
+            appendItem(unititem, makeItem(
+                datafile::getFactionName(nullptr, (int)datafile::special_faction::ANONYMOUS),
+                nullptr));
         }
         else if (traitor) {
             stealthId = factionId;
             trueId = otherFactionId;
-            appendItem(unititem, makeItem("Verräter", nullptr));
+            appendItem(unititem, makeItem(
+                datafile::getFactionName(nullptr, (int)datafile::special_faction::TRAITOR),
+                nullptr));
         }
         else if (otherFactionId > 0) {
             // als andere Partei getarnt, aber wir erkennen die wahre:

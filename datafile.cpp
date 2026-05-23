@@ -93,13 +93,15 @@ int datafile::turn()
     return m_turn;
 }
 
-int datafile::getFactionIdForUnit(const datablock* unit)
+int datafile::getFactionIdForUnit(const datablock &unit)
 {
-    FXASSERT(unit->type() == block_type::TYPE_UNIT);
-    if (unit->valueInt(TYPE_TRAITOR, 0) != 0) {
+    FXASSERT(unit.type() == block_type::TYPE_UNIT);
+    if (unit.valueInt(TYPE_TRAITOR, 0) != 0) {
         return (int)special_faction::TRAITOR;
     }
-    return unit->valueInt(TYPE_FACTION, (int)special_faction::ANONYMOUS);
+    int result = unit.valueInt(TYPE_OTHER_FACTION, 0);
+    if (result > 0) return result;
+    return unit.valueInt(TYPE_FACTION, (int)special_faction::ANONYMOUS);
 }
 
 FXString datafile::getFactionLabel(const datablock *faction, int factionId)
@@ -119,7 +121,7 @@ FXString datafile::getFactionName(const datablock *faction, int factionId)
         return FXString("Monster");
     }
     if (factionId == (int)special_faction::ANONYMOUS) {
-        return FXString("Getarnt");
+        return FXString("Anonym");
     }
     if (factionId == (int)special_faction::TRAITOR) {
         return FXString(L"Verr\u00e4ter");
@@ -1500,7 +1502,7 @@ bool datafile::isConfirmed(const datablock& block) const
         }
     }
     else if (block.type() == block_type::TYPE_UNIT) {
-        if (block.valueInt(TYPE_FACTION) == getActiveFactionId()) {
+        if (getFactionIdForUnit(block) == getActiveFactionId()) {
             return block.valueInt(TYPE_ORDERS_CONFIRMED) != 0;
         }
     }
@@ -1976,7 +1978,7 @@ void datafile::updateHashTables(const datablock::itor& start)
 
                 if (m_factionId != 0)
                 {
-                    int factionId = getFactionIdForUnit(unitPtr);
+                    int factionId = getFactionIdForUnit(*block);
                     if (factionId > 0)
                     {
                         if (factionId == m_factionId)

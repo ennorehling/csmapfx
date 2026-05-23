@@ -445,7 +445,7 @@ void FXRegionList::rebuildTree()
                 FXRegionItem* child = nullptr;
                 if (type == block_type::TYPE_UNIT) {
                     // get faction id, -1 means unknown faction (or stealth/anonymous)
-                    int factionId = datafile::getFactionIdForUnit(objectPtr);
+                    int factionId = datafile::getFactionIdForUnit(*block);
                     FXRegionItem* factionItem = nullptr;
                     auto it = std::find_if(factions.begin(), factions.end(), [factionId](const FactionKeyValue& item) {
                         return factionId == item.id;
