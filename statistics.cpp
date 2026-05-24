@@ -596,8 +596,8 @@ long FXStatistics::onPopupClicked(FXObject* sender,FXSelector, void*)
 
 static FXint SortFactionBox(const FXListItem *lhs, const FXListItem *rhs)
 {
-    FXival l = (FXival)lhs->getData();
-    FXival r = (FXival)rhs->getData();
+    const FXString& l = lhs->getText();
+    const FXString& r = rhs->getText();
     if (l > r) return 1;
     if (l < r) return -1;
     return 0;
@@ -608,7 +608,7 @@ bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
     if (!mapFile) return false;
 	// list factions of selected region
     bool bFound = false;
-    FXival OwnFaction = 0, TraitorFaction = 0, AnonFaction = 0;
+    FXival OwnFaction = mapFile->getActiveFactionId();
     datablock::itor end = mapFile->blocks().end();
 	for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
 	{
@@ -619,17 +619,10 @@ bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 			{
 				factions.insert(factionId);
 
-                FXint index = -1;
-                if (mapFile->getActiveFactionId() == factionId) {
-                    if (block->valueInt(TYPE_TRAITOR, 0) == 1) {
-                        TraitorFaction = factionId;
-                    }
-                    else {
-                        OwnFaction = factionId;
-                    }
+                if (factionId < 0 || OwnFaction == factionId) {
                     continue;
                 }
-                index = appendFaction(factionId);
+                FXint index = appendFaction(factionId);
                 // select previously selected faction again
                 if (index >= 0 && select.faction == factionId) {
                     factionBox->setCurrentItem(index);
@@ -638,29 +631,6 @@ bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 			}
 		}
 	}
-    factionBox->setSortFunc(SortFactionBox);
-    factionBox->sortItems();
-    if (AnonFaction != 0) {
-        FXint index = prependFaction(AnonFaction);
-        if (index >= 0 && select.faction == AnonFaction) {
-            factionBox->setCurrentItem(index);
-            bFound = true;
-        }
-    }
-    if (TraitorFaction != 0) {
-        FXint index = prependFaction(TraitorFaction);
-        if (index >= 0 && select.faction == TraitorFaction) {
-            factionBox->setCurrentItem(index);
-            bFound = true;
-        }
-    }
-    if (OwnFaction != 0) {
-        FXint index = prependFaction(OwnFaction);
-        if (index >= 0 && select.faction == OwnFaction) {
-            factionBox->setCurrentItem(index);
-            bFound = true;
-        }
-    }
     return bFound;
 }
 
@@ -729,6 +699,33 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 			{
                 bSelection |= collectFactionList(factions, selection.region);
 			}
+            factionBox->setSortFunc(SortFactionBox);
+            factionBox->sortItems();
+
+            FXival AnonFaction = (int)datafile::special_faction::ANONYMOUS;
+            if (factions.find(AnonFaction) != factions.end()) {
+                FXint index = prependFaction(AnonFaction);
+                if (index >= 0 && select.faction == AnonFaction) {
+                    factionBox->setCurrentItem(index);
+                    bSelection = true;
+                }
+            }
+            FXival TraitorFaction = (int)datafile::special_faction::TRAITOR;
+            if (factions.find(TraitorFaction) != factions.end()) {
+                FXint index = prependFaction(TraitorFaction);
+                if (index >= 0 && select.faction == TraitorFaction) {
+                    factionBox->setCurrentItem(index);
+                    bSelection = true;
+                }
+            }
+            FXival OwnFaction = mapFile->getActiveFactionId();
+            if (factions.find(OwnFaction) != factions.end()) {
+                FXint index = prependFaction(OwnFaction);
+                if (index >= 0 && select.faction == OwnFaction) {
+                    factionBox->setCurrentItem(index);
+                    bSelection = true;
+                }
+            }
             FXint index = factionBox->appendItem("Alles");
             // set size of combo box list
             factionBox->setNumVisible(std::min(factionBox->getNumItems(), 10));
