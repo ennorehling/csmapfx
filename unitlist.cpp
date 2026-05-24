@@ -200,9 +200,9 @@ void FXUnitList::makeItems()
 
             if (mapFile->getFaction(faction, trueId)) {
                 factionPtr = &*faction;
-                label = mapFile->getFactionLabel(factionPtr, trueId);
-                appendItem(unititem, makeItem(label, factionPtr));
             }
+            label = mapFile->getFactionLabel(factionPtr, trueId);
+            appendItem(unititem, makeItem(label, factionPtr));
         }
         if (stealthId >= 0) {
             datablock *factionPtr = nullptr;
@@ -323,16 +323,20 @@ void FXUnitList::makeItems()
             appendItem(unititem, "Gewicht: " + label);
         }
 
+        // once we have calculated capacity, insert it before this node:
+        FXTreeItem *capacityPos = nullptr;
         // list unhandled keys
         for (std::vector<datakey::list_type::const_iterator>::const_iterator itag = unhandled.begin(); itag != unhandled.end(); ++itag)
         {
             label.format("%s: %s", (*itag)->key().text(), (*itag)->value().text());
-            appendItem(unititem, label);
+            FXTreeItem * item = appendItem(unititem, label);
+            if (!capacityPos) capacityPos = item;
         }
 
         if (spells != end)		// does a SPRUECHE block exist?
         {
             FXTreeItem* node = appendItem(unititem, FXString(L"Zauberspr\u00fcche"));
+            if (!capacityPos) capacityPos = node;
 
             for (datakey::list_type::const_iterator key = spells->data().begin(); key != spells->data().end(); ++key)
             {
@@ -344,7 +348,7 @@ void FXUnitList::makeItems()
         if (!combatspells.empty())	// do some KAMPFZAUBER blocks exist?
         {
             FXTreeItem* node = appendItem(unititem, "Kampfzauber");
-            //node->setExpanded(true);
+            if (!capacityPos) capacityPos = node;
 
             for (std::map<int, datablock::itor>::iterator itor = combatspells.begin(); itor != combatspells.end(); itor++)
             {
@@ -372,6 +376,7 @@ void FXUnitList::makeItems()
         {
             FXTreeItem* node = appendItem(unititem, "Effekte");
             node->setExpanded(true);
+            if (!capacityPos) capacityPos = node;
 
             for (datakey::list_type::const_iterator key = effects->data().begin(); key != effects->data().end(); ++key)
                 appendItem(node, key->value());
@@ -385,6 +390,8 @@ void FXUnitList::makeItems()
         {
             FXTreeItem* node = appendItem(unititem, "Talente");
             node->setExpanded(true);
+            if (!capacityPos) capacityPos = node;
+
             std::vector<UnitProperty> properties;
             for (datakey::list_type::const_iterator key = talents->data().begin(); key != talents->data().end(); ++key)
             {
@@ -410,6 +417,8 @@ void FXUnitList::makeItems()
         {
             FXTreeItem* node = appendItem(unititem, FXString(L"Gegenst\u00e4nde"));
             node->setExpanded(true);
+            if (!capacityPos) capacityPos = node;
+
             std::vector<UnitProperty> properties;
             for (datakey::list_type::const_iterator key = items->data().begin(); key != items->data().end(); ++key)
             {
@@ -492,7 +501,7 @@ void FXUnitList::makeItems()
         else {
             label.format("%.2f", walk_cap / 100.f);
         }
-        appendItem(unititem, L"Kapazit\u00e4t: " + label);
+        insertItem(capacityPos, unititem, L"Kapazit\u00e4t: " + label);
         if (horses > 0) {
             // riding capacity
             max_horses = riding_skill * 2 * count;
@@ -526,7 +535,7 @@ void FXUnitList::makeItems()
                 else {
                     label.format("%.2f", ride_cap / 100.f);
                 }
-                appendItem(unititem, L"Kapazit\u00e4t beritten: " + label);
+                insertItem(capacityPos, unititem, L"Kapazit\u00e4t beritten: " + label);
             }
         }
 

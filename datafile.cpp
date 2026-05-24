@@ -132,7 +132,7 @@ FXString datafile::getFactionName(const datablock *faction, int factionId)
     else {
         FXString name;
         // this should never happen
-        name.format("Partei %d", factionId);
+        name.format("Partei %s", FXStringValEx(factionId, 36));
         return name;
     }
 }
@@ -1963,7 +1963,6 @@ void datafile::updateHashTables(const datablock::itor& start)
         {
             if (block->type() == block_type::TYPE_UNIT)
             {
-                const datablock* unitPtr = &*block;
                 regionPtr->setFlags(datablock::FLAG_TROOPS);			// region has units
 
                 // count persons
