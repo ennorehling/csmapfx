@@ -2075,7 +2075,7 @@ void datafile::parseMessages()
                 datablock& block = *it++;
                 int type = block.valueInt(TYPE_MSG_TYPE);
                 if (type == 1784377885) {
-                    // Passwort wurde ge‰ndert
+                    // Passwort wurde ge√§ndert
                     m_password = block.value("value");
                 }
                 else if (type != 771334452 && type != 443066738) {

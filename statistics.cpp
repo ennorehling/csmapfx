@@ -606,18 +606,18 @@ static FXint SortFactionBox(const FXListItem *lhs, const FXListItem *rhs)
 bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor region)
 {
     if (!mapFile) return false;
-	// list factions of selected region
+    // list factions of selected region
     bool bFound = false;
     FXival OwnFaction = mapFile->getActiveFactionId();
     datablock::itor end = mapFile->blocks().end();
-	for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
-	{
-		if (block->type() == block_type::TYPE_UNIT)
-		{
+    for (datablock::itor block = std::next(region); block != end && block->depth() > region->depth(); block++)
+    {
+        if (block->type() == block_type::TYPE_UNIT)
+        {
             FXival factionId = datafile::getFactionIdForUnit(*block);
-			if (factions.find(factionId) == factions.end())
-			{
-				factions.insert(factionId);
+            if (factions.find(factionId) == factions.end())
+            {
+                factions.insert(factionId);
 
                 if (factionId < 0 || OwnFaction == factionId) {
                     continue;
@@ -628,9 +628,9 @@ bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
                     factionBox->setCurrentItem(index);
                     bFound = true;
                 }
-			}
-		}
-	}
+            }
+        }
+    }
     return bFound;
 }
 
