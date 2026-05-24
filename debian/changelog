@@ -1,3 +1,13 @@
+csmapfx (1.7.46) stable; urgency=low
+
+  * fix missing unit ids in regionlist
+  * fix position of capacity in unitlist
+  * fix display of missing factions
+  * sort statistics faction dropdown
+  * Bug 3100: search does not require spaces in coordinates
+
+  -- Enno Rehling <enno@eressea.de>  Sun, 24 May 2026 16:00:00 +0200
+
 csmapfx (1.7.45) stable; urgency=low
 
   * Bug 3094: show anonymous building owners

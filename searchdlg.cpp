@@ -289,9 +289,9 @@ namespace
 		if (name.empty())
 			name = block->terrainString();
 
-		name += " (" + FXStringVal(block->x()) + ", " + FXStringVal(block->y());
+		name += " (" + FXStringVal(block->x()) + "," + FXStringVal(block->y());
 		if (block->info())
-			name += ", " + datablock::planeName(block->info());
+			name += "," + datablock::planeName(block->info());
 		name += ")";
 
 		if (compare(name))

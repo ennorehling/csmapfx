@@ -99,9 +99,9 @@ int datafile::getFactionIdForUnit(const datablock &unit)
     if (unit.valueInt(TYPE_TRAITOR, 0) != 0) {
         return (int)special_faction::TRAITOR;
     }
-    int result = unit.valueInt(TYPE_OTHER_FACTION, 0);
+    int result = unit.valueInt(TYPE_FACTION, 0);
     if (result > 0) return result;
-    return unit.valueInt(TYPE_FACTION, (int)special_faction::ANONYMOUS);
+    return unit.valueInt(TYPE_OTHER_FACTION, (int)special_faction::ANONYMOUS);
 }
 
 FXString datafile::getFactionLabel(const datablock *faction, int factionId)
@@ -132,8 +132,7 @@ FXString datafile::getFactionName(const datablock *faction, int factionId)
     else {
         FXString name;
         // this should never happen
-        name.format("Partei %d", factionId);
-        return name;
+        return name.format("Partei %s", FXStringValEx(factionId, 36));
     }
 }
 
@@ -1431,34 +1430,15 @@ FXString datafile::unitName(const datablock& unit, bool verbose)
         int uid = unit.info();
         int fid = getFactionIdForUnit(unit);
         datablock::itor faction_owner;
+        datablock *facPtr = nullptr;
         if (getFaction(faction_owner, fid)) {
-            label.format("%s (%s), %s (%s)",
-                unit.value(TYPE_NAME).text(),
-                FXStringValEx(uid, 36).text(),
-                faction_owner->value(TYPE_FACTIONNAME).text(),
-                FXStringValEx(fid, 36).text()
-            );
+            facPtr = &*faction_owner;
         }
-        else if (fid) {
-            label.format("%s (%s), Unbekannt (%s)",
-                unit.value(TYPE_NAME).text(),
-                FXStringValEx(uid, 36).text(),
-                FXStringValEx(fid, 36).text()
-            );
-        }
-        else {
-            label.format("%s (%s), anonym",
-                unit.value(TYPE_NAME).text(),
-                FXStringValEx(uid, 36).text(),
-                FXStringValEx(fid, 36).text()
-            );
-        }
-        label.format("%s (%s), %s",
+        return label.format("%s (%s), %s",
             unit.value(TYPE_NAME).text(),
             FXStringValEx(uid, 36).text(),
-            getFactionName(fid).text()
+            getFactionLabel(facPtr, fid)
         );
-        return label;
     }
     return unit.getName();
 }
@@ -1963,7 +1943,6 @@ void datafile::updateHashTables(const datablock::itor& start)
         {
             if (block->type() == block_type::TYPE_UNIT)
             {
-                const datablock* unitPtr = &*block;
                 regionPtr->setFlags(datablock::FLAG_TROOPS);			// region has units
 
                 // count persons
@@ -2096,7 +2075,7 @@ void datafile::parseMessages()
                 datablock& block = *it++;
                 int type = block.valueInt(TYPE_MSG_TYPE);
                 if (type == 1784377885) {
-                    // Passwort wurde ge‰ndert
+                    // Passwort wurde ge√§ndert
                     m_password = block.value("value");
                 }
                 else if (type != 771334452 && type != 443066738) {
