@@ -99,9 +99,9 @@ int datafile::getFactionIdForUnit(const datablock &unit)
     if (unit.valueInt(TYPE_TRAITOR, 0) != 0) {
         return (int)special_faction::TRAITOR;
     }
-    int result = unit.valueInt(TYPE_OTHER_FACTION, 0);
+    int result = unit.valueInt(TYPE_FACTION, 0);
     if (result > 0) return result;
-    return unit.valueInt(TYPE_FACTION, (int)special_faction::ANONYMOUS);
+    return unit.valueInt(TYPE_OTHER_FACTION, (int)special_faction::ANONYMOUS);
 }
 
 FXString datafile::getFactionLabel(const datablock *faction, int factionId)
@@ -1431,32 +1431,14 @@ FXString datafile::unitName(const datablock& unit, bool verbose)
         int uid = unit.info();
         int fid = getFactionIdForUnit(unit);
         datablock::itor faction_owner;
+        datablock *facPtr = nullptr;
         if (getFaction(faction_owner, fid)) {
-            label.format("%s (%s), %s (%s)",
-                unit.value(TYPE_NAME).text(),
-                FXStringValEx(uid, 36).text(),
-                faction_owner->value(TYPE_FACTIONNAME).text(),
-                FXStringValEx(fid, 36).text()
-            );
-        }
-        else if (fid) {
-            label.format("%s (%s), Unbekannt (%s)",
-                unit.value(TYPE_NAME).text(),
-                FXStringValEx(uid, 36).text(),
-                FXStringValEx(fid, 36).text()
-            );
-        }
-        else {
-            label.format("%s (%s), anonym",
-                unit.value(TYPE_NAME).text(),
-                FXStringValEx(uid, 36).text(),
-                FXStringValEx(fid, 36).text()
-            );
+            facPtr = &*faction_owner;
         }
         label.format("%s (%s), %s",
             unit.value(TYPE_NAME).text(),
             FXStringValEx(uid, 36).text(),
-            getFactionName(fid).text()
+            getFactionLabel(facPtr, fid)
         );
         return label;
     }

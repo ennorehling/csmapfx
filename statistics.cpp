@@ -621,10 +621,13 @@ bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 
                 FXint index = -1;
                 if (mapFile->getActiveFactionId() == factionId) {
-                    if (block->valueInt(TYPE_TRAITOR, 0) != 1) {
+                    if (block->valueInt(TYPE_TRAITOR, 0) == 1) {
                         TraitorFaction = factionId;
-                        continue;
                     }
+                    else {
+                        OwnFaction = factionId;
+                    }
+                    continue;
                 }
                 index = appendFaction(factionId);
                 // select previously selected faction again
@@ -652,7 +655,7 @@ bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
         }
     }
     if (OwnFaction != 0) {
-        FXint index = appendFaction(OwnFaction);
+        FXint index = prependFaction(OwnFaction);
         if (index >= 0 && select.faction == OwnFaction) {
             factionBox->setCurrentItem(index);
             bFound = true;

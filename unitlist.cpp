@@ -190,8 +190,8 @@ void FXUnitList::makeItems()
         }
         else if (otherFactionId > 0) {
             // als andere Partei getarnt, aber wir erkennen die wahre:
-            trueId = otherFactionId;
-            stealthId = factionId;
+            stealthId = otherFactionId;
+            trueId = factionId;
         }
 
         if (trueId >= 0) {
@@ -210,9 +210,9 @@ void FXUnitList::makeItems()
 
             if (mapFile->getFaction(faction, stealthId)) {
                 factionPtr = &*faction;
-                label = "Getarnt als " + mapFile->getFactionLabel(factionPtr, stealthId);
-                appendItem(unititem, makeItem(label, factionPtr));
             }
+            label = "Getarnt als " + mapFile->getFactionLabel(factionPtr, stealthId);
+            appendItem(unititem, makeItem(label, factionPtr));
         }
 
         if (group > 0)
