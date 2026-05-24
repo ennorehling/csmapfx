@@ -1434,12 +1434,11 @@ FXString datafile::unitName(const datablock& unit, bool verbose)
         if (getFaction(faction_owner, fid)) {
             facPtr = &*faction_owner;
         }
-        label.format("%s (%s), %s",
+        return label.format("%s (%s), %s",
             unit.value(TYPE_NAME).text(),
             FXStringValEx(uid, 36).text(),
             getFactionLabel(facPtr, fid)
         );
-        return label;
     }
     return unit.getName();
 }
