@@ -289,9 +289,9 @@ namespace
 		if (name.empty())
 			name = block->terrainString();
 
-		name += " (" + FXStringVal(block->x()) + ", " + FXStringVal(block->y());
+		name += " (" + FXStringVal(block->x()) + "," + FXStringVal(block->y());
 		if (block->info())
-			name += ", " + datablock::planeName(block->info());
+			name += "," + datablock::planeName(block->info());
 		name += ")";
 
 		if (compare(name))
@@ -307,20 +307,19 @@ namespace
 	{
 		if (block->type() != block_type::TYPE_UNIT)
 			return false;
-        const datablock* unitPtr = &*block;
 		const compare_func_t& compare = context.compare;
 
-		if (compare(unitPtr->value(TYPE_NAME)))
+		if (compare(block->value(TYPE_NAME)))
 			return true;
 
         // compare descriptions?
-		if (context.searchDescriptions && (compare(unitPtr->value(TYPE_DESCRIPTION)) || compare(block->value(TYPE_NOTES))))
+		if (context.searchDescriptions && (compare(block->value(TYPE_DESCRIPTION)) || compare(block->value(TYPE_NOTES))))
 			return true;
 
         // compare faction names?
         if (context.searchFactions) {
             datablock::itor faction;
-            int fac_id = context.report->getFactionIdForUnit(unitPtr);
+            int fac_id = datafile::getFactionIdForUnit(*block);
             if (context.compare_icase(FXStringValEx(fac_id, 36))) {
                 return true;
             }
@@ -668,11 +667,10 @@ FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor& buil
     }
     else if (unit != end)
     {
-        const datablock* unitPtr = &*unit;
-        int factionId = mapFile->getFactionIdForUnit(unitPtr);
+        int factionId = datafile::getFactionIdForUnit(*unit);
 
-        FXString name = unitPtr->getName();
-        object_str = name + " (" + unitPtr->id() + ")";
+        FXString name = unit->getName();
+        object_str = name + " (" + unit->id() + ")";
         faction_str = mapFile->getFactionName(factionId);
     }
 

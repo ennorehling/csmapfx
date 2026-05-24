@@ -545,18 +545,17 @@ FXString datablock::getName() const
 
 FXString datablock::getLabel() const
 {
+    FXString label, name = getName();
     if (type() == block_type::TYPE_REGION || type() == block_type::TYPE_BATTLE) {
-        FXString label, name = getName();
         if (info()) {
-            label.format("%s (%d,%d,%s)", name.text(), x(), y(), planeName(info()).text());
+            return label.format("%s (%d,%d,%s)", name.text(), x(), y(), planeName(info()).text());
         }
         else {
-            label.format("%s (%d,%d)", name.text(), x(), y());
+            return label.format("%s (%d,%d)", name.text(), x(), y());
         }
-        return label;
     }
     else {
-        return getName() + " (" + id() + ")";
+        return label.format("%s (%s)", name.text(), id());
     }
 }
 

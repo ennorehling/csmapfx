@@ -1,7 +1,31 @@
+csmapfx (1.7.46) stable; urgency=low
+
+  * fix missing unit ids in regionlist
+  * fix position of capacity in unitlist
+  * fix display of missing factions
+  * sort statistics faction dropdown
+  * Bug 3100: search does not require spaces in coordinates
+
+  -- Enno Rehling <enno@eressea.de>  Sun, 24 May 2026 16:00:00 +0200
+
+csmapfx (1.7.45) stable; urgency=low
+
+  * Bug 3094: show anonymous building owners
+  * Bug 3099: show anonymous guarding units
+  * Misc changes to (stealth) faction display
+
+  -- Enno Rehling <enno@eressea.de>  Sat, 23 May 2026 21:00:00 +0200
+
+csmapfx (1.7.44) stable; urgency=low
+
+  * version number increase
+
+  -- Enno Rehling <enno@eressea.de>  Tue, 28 Oct 2025 01:00:00 +0100
+
 csmapfx (1.7.43) stable; urgency=low
 
   * show guarding units
-  * show anonymous stateus for own units
+  * show anonymous status for own units
 
   -- Enno Rehling <enno@eressea.de>  Mon, 27 Oct 2025 15:00:00 +0100
 
