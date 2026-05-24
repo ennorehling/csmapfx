@@ -680,6 +680,10 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
 		if ((selection.selected & selection.REGION) || !selection.regionsSelected.empty())
 		{
 			// clear Box and create new one
+            FXString prevSelection;
+            FXint prev = factionBox->getCurrentItem();
+            if (prev>=0) 
+                prevSelection = factionBox->getItem(prev);
 			factionBox->clearItems();
             factionBox->setCurrentItem(-1);
 
@@ -726,14 +730,21 @@ long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
                     bSelection = true;
                 }
             }
+            if (prev >= 0) {
+                prev = factionBox->findItem(prevSelection);
+                if (prev >= 0) {
+                    factionBox->setCurrentItem(prev);
+                    bSelection = true;
+                }
+            }
             FXint index = factionBox->appendItem("Alles");
-            // set size of combo box list
-            factionBox->setNumVisible(std::min(factionBox->getNumItems(), 10));
             if (!bSelection) {
                 factionBox->setCurrentItem(index);
             }
 
-			// change statistics in list
+            // set size of combo box list
+            factionBox->setNumVisible(std::min(factionBox->getNumItems(), 10));
+            // change statistics in list
             updateList();
 		}
 		else
