@@ -66,7 +66,7 @@ public:
 
 protected:
 	datafile::SelectionState selection;
-    std::shared_ptr<datafile> mapFile;
+    std::shared_ptr<datafile> mapFile = nullptr;
 
 	FXTextField		*txtSearch = nullptr;			// textfield for search
 	FXButton		*btnSearch = nullptr;		    // do the search
