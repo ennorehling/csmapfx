@@ -70,7 +70,6 @@ const char *FXReportInfo::messageSection(const FXString& section)
 void FXReportInfo::addMessage(FXTreeItem *group, const datablock& msg)
 {
     FXTreeItem* item;
-    FXival uid = msg.valueInt("target");
     FXString section = msg.value("section");
 
     if (!section.empty()) {

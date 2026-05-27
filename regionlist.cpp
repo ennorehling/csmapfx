@@ -205,10 +205,7 @@ FXDEFMAP(FXRegionList) MessageMap[]=
 FXIMPLEMENT(FXRegionList,FXTreeList,MessageMap, ARRAYNUMBER(MessageMap))
 
 FXRegionList::FXRegionList(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXint x,FXint y,FXint w,FXint h) :
-    FXTreeList(p, tgt,sel, opts | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES | TREELIST_ROOT_BOXES, x, y, w, h),
-    mapFile(nullptr),
-    active_faction_group(false),
-    colorized_units(false)
+    FXTreeList(p, tgt,sel, opts | TREELIST_SHOWS_LINES | TREELIST_SHOWS_BOXES | TREELIST_ROOT_BOXES, x, y, w, h)
 {
 	// create/load images for terrain types
 	for (int i = 0; i <  data::TERRAIN_LAST; i++)
