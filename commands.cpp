@@ -187,8 +187,6 @@ long FXCommands::onMapChange(FXObject* sender, FXSelector, void* ptr)
 		if (mapFile && selection.selected & selection.UNIT)
 		{
             getApp()->beginWaitCursor();
-            datablock::itor unit = selection.unit;
-
             datablock::itor cmd;
             if (mapFile->getCommands(cmd, selection.unit))
 			{
@@ -219,7 +217,6 @@ long FXCommands::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 	{
 		int curs = getCursorPos();
 		int begin = lineStart(curs);
-		int end = lineEnd(curs);
 
         FXString line;
         extractText(line, begin, curs - begin);

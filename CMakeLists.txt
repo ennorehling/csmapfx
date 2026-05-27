@@ -26,6 +26,14 @@ message(STATUS "LIBPNG ${PNG_LIBRARY}")
 endif (PNG_FOUND)
 endif (USE_LIBPNG)
 
+if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wsign-compare -Wall -Werror -Wno-switch -Wno-unknown-pragmas -Wpointer-arith -Wno-char-subscripts -Wno-long-long)
+elseif(MSVC)
+  add_compile_options(/W3 /WX /MP /FC)
+else()
+    message(STATUS "unknown compiler ${CMAKE_C_COMPILER_ID}")
+endif()
+
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
   #GCC >= 7.2 needs -Wno-psabi
   add_compile_options(-Wno-psabi)

@@ -53,7 +53,7 @@ public:
 protected:
 	datafile::SelectionState selection;
 
-    std::shared_ptr<datafile> mapFile;
+    std::shared_ptr<datafile> mapFile = nullptr;
 
     FXIcon* terrainIcons[data::TERRAIN_LAST] = {};
 	FXIcon *green = nullptr, *red = nullptr, *blue = nullptr, *cyan = nullptr, *yellow = nullptr, *orange = nullptr, *gray = nullptr, *black = nullptr;
