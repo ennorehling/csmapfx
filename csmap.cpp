@@ -2597,7 +2597,6 @@ void CSMap::addClipboardPane(FXMenuPane *pane, datablock * block)
     datablock::itor match;
     datablock* parent = nullptr;
     std::vector<clip_t> clips;
-    block_type type = block->type();
     new FXMenuSeparatorEx(pane, "Zwischenablage");
     
     FXString str = block->getName();
@@ -3061,7 +3060,6 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
 #ifdef WITH_MAP_EXPORT
     FXRegistry &reg = getApp()->reg();
     FXuval maxScale = 128;
-    FXival visiblePlane = map->getVisiblePlane();
     if (!report) return 0;
     FXFileDialog dlg(this, "Karte exportieren unter...", DLGEX_SAVE|DLGEX_DONTADDTORECENT);
     dlg.setIcon(icon);
@@ -3101,6 +3099,7 @@ long CSMap::onFileExportImage(FXObject *, FXSelector, void *)
         if (mimeType == "image/png") maxSize = 0;
 #endif
         if (maxSize > 0) {
+            FXival visiblePlane = map->getVisiblePlane();
             FXRectangle unitSize = report->getContentSize(visiblePlane);
             FXuval pixels = FXuval(unitSize.w) * FXuval(unitSize.h);
             while (pixels > maxSize / maxScale / maxScale) {
@@ -3298,7 +3297,6 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
     {
         changed = false;
 
-        datablock::itor notfound = report->blocks().end();
         for (std::set<datablock*>::iterator itor = selection.regionsSelected.begin(); itor != selection.regionsSelected.end(); ++itor)
         {
             datablock* blockPtr = *itor;
