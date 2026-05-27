@@ -637,13 +637,13 @@ bool FXStatistics::collectFactionList(std::set<int> &factions, datablock::itor r
 FXint FXStatistics::prependFaction(FXint factionId)
 {
     return factionBox->prependItem(mapFile->getFactionName(factionId),
-        (void *)factionId);
+        (void *)(uintptr_t)factionId);
 }
 
 FXint FXStatistics::appendFaction(FXint factionId)
 {
     return factionBox->appendItem(mapFile->getFactionName(factionId),
-        (void *)factionId);
+        (void *)(uintptr_t)factionId);
 }
 
 long FXStatistics::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
