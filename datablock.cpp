@@ -26,17 +26,17 @@ void att_commands::addCommand(const FXString &line) {
 
 void datakey::key(const FXString& type, enum block_type btype)
 {
-	m_type = parseType(type, btype);
+    m_type = parseType(type, btype);
 
-	if (m_type == TYPE_UNKNOWN)
-		m_key = type;
-	else
-		m_key.clear();
+    if (m_type == TYPE_UNKNOWN)
+        m_key = type;
+    else
+        m_key.clear();
 }
 
 void datakey::value(const FXString& s)
 {
-	m_value = s;
+    m_value = s;
 }
 
 void datakey::value(const FXchar* str, FXint length)
@@ -85,11 +85,11 @@ int datakey::parseType(const FXString& type, enum block_type btype)
     if (type == "Bauern")
         return TYPE_PEASANTS;
     if (type == "name")
-		return TYPE_LOWERCASE_NAME;
-	if (type == "privat")
-		return TYPE_NOTES;
-	if (type == "Beschr")
-		return TYPE_DESCRIPTION;
+        return TYPE_LOWERCASE_NAME;
+    if (type == "privat")
+        return TYPE_NOTES;
+    if (type == "Beschr")
+        return TYPE_DESCRIPTION;
     if (type == "Baeume" || type == L"B\u00e4ume")
         return TYPE_TREES;
     if (type == "Schoesslinge" || type == L"Sch\u00f6\u00dflinge")
@@ -97,33 +97,33 @@ int datakey::parseType(const FXString& type, enum block_type btype)
     if (type == "Lohn")
         return TYPE_SALARY;
     if (type == "Terrain")
-		return TYPE_TERRAIN;
-	if (type == "Insel")
-		return TYPE_ISLAND;
-	if (type == "id")
-		return TYPE_ID|TYPE_INTEGER;
-	if (type == "Partei")
-		return TYPE_FACTION;
-	if (type == "Anderepartei")
-		return TYPE_OTHER_FACTION;
-	if (type == "Verraeter")
-		return TYPE_TRAITOR;
-	if (type == "Parteiname")
-		return TYPE_FACTIONNAME;
+        return TYPE_TERRAIN;
+    if (type == "Insel")
+        return TYPE_ISLAND;
+    if (type == "id")
+        return TYPE_ID|TYPE_INTEGER;
+    if (type == "Partei")
+        return TYPE_FACTION;
+    if (type == "Anderepartei")
+        return TYPE_OTHER_FACTION;
+    if (type == "Verraeter")
+        return TYPE_TRAITOR;
+    if (type == "Parteiname")
+        return TYPE_FACTIONNAME;
     if (type == "Parteitarnung")
         return TYPE_FACTIONSTEALTH;
     if (type == "Anzahl")
-		return TYPE_NUMBER;
-	if (type == "Burg")
-		return TYPE_BUILDING;
-	if (type == "Schiff")
-		return TYPE_SHIP;
-	if (type == "Typ")
-		return TYPE_TYPE;
-	if (type == "Groesse")
-		return TYPE_SIZE;
-	if (type == "Konfiguration")
-		return TYPE_KONFIGURATION;
+        return TYPE_NUMBER;
+    if (type == "Burg")
+        return TYPE_BUILDING;
+    if (type == "Schiff")
+        return TYPE_SHIP;
+    if (type == "Typ")
+        return TYPE_TYPE;
+    if (type == "Groesse")
+        return TYPE_SIZE;
+    if (type == "Konfiguration")
+        return TYPE_KONFIGURATION;
     if (type == "weight")
         return TYPE_WEIGHT;
     if (type == "gruppe")
@@ -143,31 +143,31 @@ int datakey::parseType(const FXString& type, enum block_type btype)
     if (type == "hero")
         return TYPE_HERO;
     if (type == "charset")
-		return TYPE_CHARSET;
-	if (type == "visibility")
-		return TYPE_VISIBILITY;
-	if (type == "Runde")
-		return TYPE_TURN | TYPE_INTEGER;
-	if (type == "Silber")
-		return TYPE_SILVER;
-	if (type == "Rekrutierungskosten")
-		return TYPE_RECRUITMENTCOST;
-	if (type == "Aura")
-		return TYPE_AURA;
-	if (type == "Auramax")
-		return TYPE_AURAMAX;
-	if (type == "Optionen")
-		return TYPE_OPTIONS;
-	if (type == "email")
-		return TYPE_EMAIL;
-	if (type == "banner")
-		return TYPE_BANNER;
-	if (type == "locale")
-		return TYPE_LOCALE;
-	if (type == "Besitzer")
-		return TYPE_OWNER;
-	if (type == "ejcOrdersConfirmed")
-		return TYPE_ORDERS_CONFIRMED;
+        return TYPE_CHARSET;
+    if (type == "visibility")
+        return TYPE_VISIBILITY;
+    if (type == "Runde")
+        return TYPE_TURN | TYPE_INTEGER;
+    if (type == "Silber")
+        return TYPE_SILVER;
+    if (type == "Rekrutierungskosten")
+        return TYPE_RECRUITMENTCOST;
+    if (type == "Aura")
+        return TYPE_AURA;
+    if (type == "Auramax")
+        return TYPE_AURAMAX;
+    if (type == "Optionen")
+        return TYPE_OPTIONS;
+    if (type == "email")
+        return TYPE_EMAIL;
+    if (type == "banner")
+        return TYPE_BANNER;
+    if (type == "locale")
+        return TYPE_LOCALE;
+    if (type == "Besitzer")
+        return TYPE_OWNER;
+    if (type == "ejcOrdersConfirmed")
+        return TYPE_ORDERS_CONFIRMED;
     if (type == "Schaden")
         return TYPE_DAMAGE;
     if (type == "Kapitaen")
@@ -184,7 +184,7 @@ int datakey::parseType(const FXString& type, enum block_type btype)
         return TYPE_LOAD;
     if (type == "MaxLadung")
         return TYPE_MAXLOAD;
-	return TYPE_UNKNOWN;
+    return TYPE_UNKNOWN;
 }
 
 const FXint datakey::valueInt(FXint section) const
@@ -319,30 +319,30 @@ FXString datakey::key() const
         return "cost";
     case TYPE_MSG_MODE:
         return "mode";
-	case TYPE_LAST:
-		break;
+    case TYPE_LAST:
+        break;
     }
-	return FXString_Empty;
+    return FXString_Empty;
 }
 
 int datakey::getInt() const
 {
-	return FXIntVal(m_value, 10);
+    return FXIntVal(m_value, 10);
 }
 
 // parses str and returns created datakey object or NULL pointer
 bool datakey::parse(const char* str, enum block_type btype, bool isUtf8)
 {
-	if (!str)
-		return false;
+    if (!str)
+        return false;
 
-	// skip indentation
-	while(*str && isspace(*str))
-		str++;
+    // skip indentation
+    while(*str && isspace(*str))
+        str++;
 
     const char* begin = str;
     int mask = 0;
-	// Ist die Zeile ein Tag?
+    // Ist die Zeile ein Tag?
     if (*str == '\"') {
         ++begin;
     }
@@ -354,23 +354,23 @@ bool datakey::parse(const char* str, enum block_type btype, bool isUtf8)
     }
 
 
-	const char *srch = str + 1, *semikolon = NULL;
+    const char *srch = str + 1, *semikolon = NULL;
 
-	for (; *srch; srch++)		// search for semicolon ';' in this line
-	{
-		if (*srch == ';')
-			semikolon = srch;
-		else if (*srch == '\"')
-			semikolon = NULL;
-	}
+    for (; *srch; srch++)        // search for semicolon ';' in this line
+    {
+        if (*srch == ';')
+            semikolon = srch;
+        else if (*srch == '\"')
+            semikolon = NULL;
+    }
 
-	// ok, so assign new values
+    // ok, so assign new values
 
     if (semikolon) {
-        key(semikolon + 1, btype);			// ... and the FXString::operator=() copies the string itself.
+        key(semikolon + 1, btype);            // ... and the FXString::operator=() copies the string itself.
     }
     else {
-        key("", btype);					// no semikolon found.
+        key("", btype);                    // no semikolon found.
     }
     m_type |= mask;
     const char* end = semikolon;
@@ -380,14 +380,14 @@ bool datakey::parse(const char* str, enum block_type btype, bool isUtf8)
             --end;
         }
     }
-	else
-	{
+    else
+    {
         for (end = srch - 1;  end >= begin; --end) {
             if (*end == '\"') {
                 break;
             }
-		}
-	}
+        }
+    }
     if (end >= begin) {
         FXint nsrc = (FXint)(end - begin);
         FXString val;
@@ -452,59 +452,59 @@ FXString datablock::TERRAIN_NAMES[] =
 
 /*static*/ datablock::blocknames datablock::BLOCKNAMES[] =
 {
-	{ block_type::TYPE_VERSION, "VERSION" },
-	{ block_type::TYPE_OPTIONS, "OPTIONEN" },
-	{ block_type::TYPE_FACTION, "PARTEI" },
-	{ block_type::TYPE_GROUP, "GRUPPE" },
-	{ block_type::TYPE_ALLIANCE, "ALLIANZ" },
-	{ block_type::TYPE_REGION, "REGION" },
-	{ block_type::TYPE_ISLAND, "ISLAND" },
-	{ block_type::TYPE_SCHEMEN, "SCHEMEN" },
-	{ block_type::TYPE_RESOURCE, "RESOURCE" },
-	{ block_type::TYPE_PRICES, "PREISE" },
-	{ block_type::TYPE_DURCHREISE, "DURCHREISE" },
-	{ block_type::TYPE_DURCHSCHIFFUNG, "DURCHSCHIFFUNG" },
-	{ block_type::TYPE_BORDER, "GRENZE" },
-	{ block_type::TYPE_BORDER, "BORDER" },
-	{ block_type::TYPE_SHIP, "SCHIFF" },
-	{ block_type::TYPE_BUILDING, "BURG" },
-	{ block_type::TYPE_UNIT, "EINHEIT" },
-	{ block_type::TYPE_UNITMESSAGES, "EINHEITSBOTSCHAFTEN" },
-	{ block_type::TYPE_TALENTS, "TALENTE" },
-	{ block_type::TYPE_SPELLS, "SPRUECHE" },
-	{ block_type::TYPE_COMBATSPELL, "KAMPFZAUBER" },
-	{ block_type::TYPE_ZAUBER, "ZAUBER" },
-	{ block_type::TYPE_KOMPONENTEN, "KOMPONENTEN" },
-	{ block_type::TYPE_TRANK, "TRANK" },
-	{ block_type::TYPE_ZUTATEN, "ZUTATEN" },
-	{ block_type::TYPE_ITEMS, "GEGENSTAENDE" },
-	{ block_type::TYPE_COMMANDS, "COMMANDS" },
-	{ block_type::TYPE_EFFECTS, "EFFECTS" },
-	{ block_type::TYPE_MESSAGE, "MESSAGE" },
-	{ block_type::TYPE_BATTLE, "BATTLE" },
-	{ block_type::TYPE_MESSAGETYPE, "MESSAGETYPE" },
-	{ block_type::TYPE_TRANSLATION, "TRANSLATION" },
-	{ block_type::TYPE_UNKNOWN, NULL }
+    { block_type::TYPE_VERSION, "VERSION" },
+    { block_type::TYPE_OPTIONS, "OPTIONEN" },
+    { block_type::TYPE_FACTION, "PARTEI" },
+    { block_type::TYPE_GROUP, "GRUPPE" },
+    { block_type::TYPE_ALLIANCE, "ALLIANZ" },
+    { block_type::TYPE_REGION, "REGION" },
+    { block_type::TYPE_ISLAND, "ISLAND" },
+    { block_type::TYPE_SCHEMEN, "SCHEMEN" },
+    { block_type::TYPE_RESOURCE, "RESOURCE" },
+    { block_type::TYPE_PRICES, "PREISE" },
+    { block_type::TYPE_DURCHREISE, "DURCHREISE" },
+    { block_type::TYPE_DURCHSCHIFFUNG, "DURCHSCHIFFUNG" },
+    { block_type::TYPE_BORDER, "GRENZE" },
+    { block_type::TYPE_BORDER, "BORDER" },
+    { block_type::TYPE_SHIP, "SCHIFF" },
+    { block_type::TYPE_BUILDING, "BURG" },
+    { block_type::TYPE_UNIT, "EINHEIT" },
+    { block_type::TYPE_UNITMESSAGES, "EINHEITSBOTSCHAFTEN" },
+    { block_type::TYPE_TALENTS, "TALENTE" },
+    { block_type::TYPE_SPELLS, "SPRUECHE" },
+    { block_type::TYPE_COMBATSPELL, "KAMPFZAUBER" },
+    { block_type::TYPE_ZAUBER, "ZAUBER" },
+    { block_type::TYPE_KOMPONENTEN, "KOMPONENTEN" },
+    { block_type::TYPE_TRANK, "TRANK" },
+    { block_type::TYPE_ZUTATEN, "ZUTATEN" },
+    { block_type::TYPE_ITEMS, "GEGENSTAENDE" },
+    { block_type::TYPE_COMMANDS, "COMMANDS" },
+    { block_type::TYPE_EFFECTS, "EFFECTS" },
+    { block_type::TYPE_MESSAGE, "MESSAGE" },
+    { block_type::TYPE_BATTLE, "BATTLE" },
+    { block_type::TYPE_MESSAGETYPE, "MESSAGETYPE" },
+    { block_type::TYPE_TRANSLATION, "TRANSLATION" },
+    { block_type::TYPE_UNKNOWN, NULL }
 };
 
 /*static*/ block_type datablock::parseType(const FXString& type)
 {
-	// region moved to top (performance)
-	if (type == "REGION")
-		return block_type::TYPE_REGION;
+    // region moved to top (performance)
+    if (type == "REGION")
+        return block_type::TYPE_REGION;
 
     for (int i = 0; BLOCKNAMES[i].name ; i++)
-		if (type == BLOCKNAMES[i].name)
-			return BLOCKNAMES[i].id;
-	
-	return block_type::TYPE_UNKNOWN;
+        if (type == BLOCKNAMES[i].name)
+            return BLOCKNAMES[i].id;
+    
+    return block_type::TYPE_UNKNOWN;
 }
 
 const FXString& datablock::terrainString() const
 {
-	const FXString &type = value(TYPE_TERRAIN);
-	if (!type.empty())
-		return type;
+    const FXString &type = value(TYPE_TERRAIN);
+    if (!type.empty())
+        return type;
  
     int t = terrain();
     if (t >= data::TERRAIN_UNKNOWN && t < data::TERRAIN_LAST) {
@@ -561,32 +561,32 @@ FXString datablock::getLabel() const
 
 /*static*/ int datablock::parseTerrain(const FXString& terrain)
 {
-	// this terrain does not need textual representation
+    // this terrain does not need textual representation
 
-	if (terrain == "Ozean")
-		return data::TERRAIN_OCEAN;
-	if (terrain == "Sumpf")
-		return data::TERRAIN_SWAMP;
-	if (terrain == "Ebene")
-		return data::TERRAIN_PLAINS;
-	if (terrain == "Wueste" || terrain == FXString(L"W\u00fcste"))
-		return data::TERRAIN_DESERT;
-	if (terrain == "Wald")
-		return data::TERRAIN_FOREST;
-	if (terrain == "Hochland")
-		return data::TERRAIN_HIGHLAND;
-	if (terrain == "Berge")
-		return data::TERRAIN_MOUNTAIN;
-	if (terrain == "Gletscher")
-		return data::TERRAIN_GLACIER;
-	if (terrain == "Vulkan")
-		return data::TERRAIN_VOLCANO;
-	if (terrain == "Eisberg")
-		return data::TERRAIN_ICEBERG;
-	if (terrain == "Feuerwand")
-		return data::TERRAIN_FIREWALL;
-	if (terrain == "Mahlstrom")
-		return data::TERRAIN_MAHLSTROM;
+    if (terrain == "Ozean")
+        return data::TERRAIN_OCEAN;
+    if (terrain == "Sumpf")
+        return data::TERRAIN_SWAMP;
+    if (terrain == "Ebene")
+        return data::TERRAIN_PLAINS;
+    if (terrain == "Wueste" || terrain == FXString(L"W\u00fcste"))
+        return data::TERRAIN_DESERT;
+    if (terrain == "Wald")
+        return data::TERRAIN_FOREST;
+    if (terrain == "Hochland")
+        return data::TERRAIN_HIGHLAND;
+    if (terrain == "Berge")
+        return data::TERRAIN_MOUNTAIN;
+    if (terrain == "Gletscher")
+        return data::TERRAIN_GLACIER;
+    if (terrain == "Vulkan")
+        return data::TERRAIN_VOLCANO;
+    if (terrain == "Eisberg")
+        return data::TERRAIN_ICEBERG;
+    if (terrain == "Feuerwand")
+        return data::TERRAIN_FIREWALL;
+    if (terrain == "Mahlstrom")
+        return data::TERRAIN_MAHLSTROM;
     if (terrain == "Aktiver Vulkan")
         return data::TERRAIN_VOLCANO_ACTIVE;
     if (terrain == "Packeis")
@@ -606,80 +606,80 @@ FXString datablock::getLabel() const
     else if (terrain == "Dichter Nebel")
         return data::TERRAIN_THICKFOG;
 
-	return data::TERRAIN_UNKNOWN;
+    return data::TERRAIN_UNKNOWN;
 }
 
 /*static*/ int datablock::parseSpecialTerrain(const FXString& terrain)
 {
-	// (terrain that uses image of another terrain)
+    // (terrain that uses image of another terrain)
 
-	// this terrain types should be kept as text,
-	// so if you resave the file, it's exact terrain type (_Aktiver_ Vulkan) 
-	// could be saved.
+    // this terrain types should be kept as text,
+    // so if you resave the file, it's exact terrain type (_Aktiver_ Vulkan) 
+    // could be saved.
 
-	return data::TERRAIN_UNKNOWN;
+    return data::TERRAIN_UNKNOWN;
 }
 
 /*static*/ FXString datablock::planeName(int plane)
 {
-	if (plane == 0)
-		return "Standardebene";
-	if (plane == 1)
-		return "Astralraum";
-	if (plane == 1137)
-		return "Arena";
-	if (plane == 59034966)
-		return "Eternath";
-	if (plane == 2000)
-		return "Weihnachtsinsel";
-	
-	// else...
-	return FXStringFormat("Ebene %d", plane);
+    if (plane == 0)
+        return "Standardebene";
+    if (plane == 1)
+        return "Astralraum";
+    if (plane == 1137)
+        return "Arena";
+    if (plane == 59034966)
+        return "Eternath";
+    if (plane == 2000)
+        return "Weihnachtsinsel";
+    
+    // else...
+    return FXStringFormat("Ebene %d", plane);
 }
 
 // try to parse str as a datablock header
 bool datablock::parse(const char* str)
 {
-	if (!str)
-		return false;
+    if (!str)
+        return false;
 
-	// skip potential indentation
-	while (*str && isspace(*str))
-		str++;
+    // skip potential indentation
+    while (*str && isspace(*str))
+        str++;
 
-	if (*str < 'A' || *str > 'Z')
-		return false;
+    if (*str < 'A' || *str > 'Z')
+        return false;
 
-	const char* srch = str + 1, *space = NULL;
+    const char* srch = str + 1, *space = NULL;
 
     // TODO: can we rewrite this using FXString members?
-	for (; *srch; srch++)
-	{
-		if (*srch == ' ' && !space)
-			space = srch;
-		
-		if (*srch == '\"' || *srch == ';')	// block headers cannot contain '\"' or ';'
-			return false;
-	}
+    for (; *srch; srch++)
+    {
+        if (*srch == ' ' && !space)
+            space = srch;
+        
+        if (*srch == '\"' || *srch == ';')    // block headers cannot contain '\"' or ';'
+            return false;
+    }
 
-	// unset flags
-	flags(FLAG_NONE);
+    // unset flags
+    flags(FLAG_NONE);
 
     if (space)
-	{
+    {
         FXString name(str, space - str);
         string(name);
-		infostr(FXString(space + 1));
-	}
+        infostr(FXString(space + 1));
+    }
     else {
         string(FXString(str));
         infostr(FXString_Empty);
     }
 
-	// unset all other states
-	terrain(data::TERRAIN_UNKNOWN);
-	attachment(nullptr);
-	return true;
+    // unset all other states
+    terrain(data::TERRAIN_UNKNOWN);
+    attachment(nullptr);
+    return true;
 }
 
 datablock::datablock() : m_type(block_type::TYPE_UNKNOWN), m_info(0), m_x(0),m_y(0), m_terrain(0), m_flags(0), m_depth(-1), m_attachment(0)
@@ -688,36 +688,36 @@ datablock::datablock() : m_type(block_type::TYPE_UNKNOWN), m_info(0), m_x(0),m_y
 
 datablock::~datablock()
 {
-	delete m_attachment;
+    delete m_attachment;
 }
 
 void datablock::string(const FXString& s)
 {
-	m_type = parseType(s);
+    m_type = parseType(s);
 
-	if (m_type == block_type::TYPE_UNKNOWN)
-		m_string = s;
-	else
-		m_string.clear();
+    if (m_type == block_type::TYPE_UNKNOWN)
+        m_string = s;
+    else
+        m_string.clear();
 }
 
 const FXString datablock::string() const
 {
-	if (m_type == block_type::TYPE_UNKNOWN)
-		return m_string;
+    if (m_type == block_type::TYPE_UNKNOWN)
+        return m_string;
 
     for (int i = 0; BLOCKNAMES[i].name; i++)
-		if (m_type == BLOCKNAMES[i].id)
-			return BLOCKNAMES[i].name;
+        if (m_type == BLOCKNAMES[i].id)
+            return BLOCKNAMES[i].name;
 
-	return "";
+    return "";
 }
 
 // return info() as base36
 FXString datablock::id() const
 {
-	int nn = info();
-	return (nn > 0) ? FXStringValEx(nn, 36) : "0";
+    int nn = info();
+    return (nn > 0) ? FXStringValEx(nn, 36) : "0";
 }
 
 void datablock::move(int x_offset, int y_offset)
@@ -728,55 +728,55 @@ void datablock::move(int x_offset, int y_offset)
 
 void datablock::infostr(const FXString& s)
 {  
-	flags(flags() & ~(FLAG_BLOCKID_BIT0|FLAG_BLOCKID_BIT1));
-	m_x = m_y = m_info = 0;
+    flags(flags() & ~(FLAG_BLOCKID_BIT0|FLAG_BLOCKID_BIT1));
+    m_x = m_y = m_info = 0;
 
-	if (!s.empty())
-	{
-		if (s.find(' ') == -1)
-		{
-			setFlags(FLAG_BLOCKID_BIT0);
+    if (!s.empty())
+    {
+        if (s.find(' ') == -1)
+        {
+            setFlags(FLAG_BLOCKID_BIT0);
 
-			m_info = strtol(s.text(), NULL, 10);
-		}
-		else
-		{
-			setFlags(FLAG_BLOCKID_BIT1);
+            m_info = strtol(s.text(), NULL, 10);
+        }
+        else
+        {
+            setFlags(FLAG_BLOCKID_BIT1);
 
-			m_x = strtol(s.text(), NULL, 10);
-			m_y = strtol(s.section(' ',1).text(), NULL, 10);
+            m_x = strtol(s.text(), NULL, 10);
+            m_y = strtol(s.section(' ',1).text(), NULL, 10);
 
-			m_info = strtol(s.section(' ',2).text(), NULL, 10);
-			if (m_info)
-				setFlags(FLAG_BLOCKID_BIT0);
-		}
-	}
+            m_info = strtol(s.section(' ',2).text(), NULL, 10);
+            if (m_info)
+                setFlags(FLAG_BLOCKID_BIT0);
+        }
+    }
 }
 
 void datablock::terrain(int terrain)
 {
-	m_terrain = terrain;
+    m_terrain = terrain;
 }
 
 void datablock::flags(int flags)
 {
-	m_flags = flags;
+    m_flags = flags;
 }
 
 void datablock::setFlags(int flags)
 {
-	m_flags |= flags;
+    m_flags |= flags;
 }
 
 void datablock::depth(int depth)
 {
-	m_depth = depth;
+    m_depth = depth;
 }
 
 void datablock::attachment(::attachment* attach)
 {
-	delete m_attachment;		// free old attachment and set new
-	m_attachment = attach;
+    delete m_attachment;        // free old attachment and set new
+    m_attachment = attach;
 }
 
 const char* datablock::UNITKEYS[] = {
@@ -858,7 +858,7 @@ const FXString& datablock::value(const FXString& key) const
             return srch->value();
         }
     }
-	return FXString_Empty;
+    return FXString_Empty;
 }
 
 int datablock::valueSkill(const FXString &skill) const
@@ -874,11 +874,11 @@ int datablock::valueSkill(const FXString &skill) const
 
 const FXString& datablock::value(key_type key) const
 {
-	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
-		if (srch->type() == key)
-			return srch->value();
+    for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
+        if (srch->type() == key)
+            return srch->value();
 
-	return FXString_Empty;
+    return FXString_Empty;
 }
 
 int datablock::valueInt(const FXString& key, int def /* = 0 */) const
@@ -890,7 +890,7 @@ int datablock::valueInt(const FXString& key, int def /* = 0 */) const
         }
     }
 
-	return def;
+    return def;
 }
 
 int datablock::valueInt(key_type key, int def /* = 0 */) const
@@ -903,16 +903,16 @@ int datablock::valueInt(key_type key, int def /* = 0 */) const
             return srch->getInt();
         }
     }
-	return def;
+    return def;
 }
 
 const datakey* datablock::valueKey(int key) const
 {
-	for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
-		if (srch->type() == key)
-			return &*srch;
+    for(datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++)
+        if (srch->type() == key)
+            return &*srch;
 
-	return NULL;
+    return NULL;
 }
 
 bool datablock::removeKey(int key)

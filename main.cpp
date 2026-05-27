@@ -142,7 +142,7 @@ static void ParseCommandLine(CSMap *csmap, int argc, char** argv)
             try {
                 csmap->saveMapImage(param.value, "image/png", scale, color, options);
             }
-            catch (std::runtime_error e) {
+            catch (std::runtime_error &e) {
                 std::cerr << e.what() << std::endl;
             }
         }

@@ -456,7 +456,6 @@ void FXUnitList::makeItems()
         FXint troll_carts = 0;
         FXint carry = CAPACITY_PERSON;
         FXint self = WEIGHT_PERSON;
-        FXint vehicles = carts;
         FXbool catapult_is_vehicle = datafile::compareVersions(mapFile->getVersion(), "28.4") >= 0;
         if (!catapult_is_vehicle) {
             // catapults are vehicles, too!

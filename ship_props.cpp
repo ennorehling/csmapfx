@@ -93,12 +93,9 @@ void FXShipProperties::makeItems()
             if (mapFile->getUnit(unit, captainId)) {
                 label.assign(L"Kapit\u00e4n: ");
                 label += mapFile->unitName(*unit, true);
-                FXTreeItem* item = appendItem(root, makeItem(label, &*unit));
+                appendItem(root, makeItem(label, &*unit));
             }
         }
-
-        // Kueste
-        const wchar_t* coasts[] = { L"Nordwestk\u00fcste", L"Nordostk\u00fcste", L"Ostk\u00fcste", L"S\u00fcdostk\u00fcste", L"S\u00fcdwestk\u00fcste", L"Westk\u00fcste" };
 
         if (coast >= 0 && coast < 6) {
             appendItem(root, coastToString(coast));

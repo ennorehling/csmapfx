@@ -47,7 +47,7 @@ public:
 };
 
 FXSearchDlg::FXSearchDlg(FXWindow* owner, FXObject* tgt, FXSelector sel, FXSearchResults* resultList, const FXString& name, FXIcon* icon, FXuint opts, FXint x, FXint y, FXint w, FXint h)
-		: FXDialogBox(owner, name, opts, x, y, w, h, 10, 10, 10, 10, 10, 10), results(resultList), matches(nullptr), modifiedText(false), mapFile(nullptr)
+		: FXDialogBox(owner, name, opts, x, y, w, h, 10, 10, 10, 10, 10, 10), results(resultList)
 {
 	setIcon(icon);
     setTarget(tgt);
