@@ -1029,7 +1029,6 @@ int datafile::saveCmds(const FXString& filename, const FXString& password, bool 
 		out << "\n";
 	}
 
-	std::vector<int> *unit_order = nullptr;
 	for (datablock::itor region = m_blocks.end(), block = m_blocks.begin(); block != m_blocks.end(); block++)
 	{
         if (block->type() == block_type::TYPE_REGION)
