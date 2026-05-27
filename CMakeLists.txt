@@ -28,15 +28,15 @@ endif (USE_LIBPNG)
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
   #GCC >= 7.2 needs -Wno-psabi
-  add_compile_options(-Wno-psabi)
+  add_compile_options(-Wno-psabi -Werror)
 endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL Clang)
-  add_compile_options(-Wno-inconsistent-missing-override)
+  add_compile_options(-Wno-inconsistent-missing-override -Werror)
 endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL AppleClang)
-  add_compile_options(-Wno-inconsistent-missing-override)
+  add_compile_options(-Wno-inconsistent-missing-override -Werror)
 endif()
 
 include (CheckIncludeFile)

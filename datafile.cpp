@@ -109,7 +109,7 @@ FXString datafile::getFactionLabel(const datablock *faction, int factionId)
     FXString name = getFactionName(faction, factionId);
     if (factionId > 0) {
         FXString label;
-        return label.format("%s (%s)", name.text(), FXStringValEx(factionId, 36));
+        return label.format("%s (%s)", name.text(), FXStringValEx(factionId, 36).text());
     }
     return name;
 }
@@ -132,7 +132,7 @@ FXString datafile::getFactionName(const datablock *faction, int factionId)
     else {
         FXString name;
         // this should never happen
-        return name.format("Partei %s", FXStringValEx(factionId, 36));
+        return name.format("Partei %s", FXStringValEx(factionId, 36).text());
     }
 }
 
@@ -1437,7 +1437,7 @@ FXString datafile::unitName(const datablock& unit, bool verbose)
         return label.format("%s (%s), %s",
             unit.value(TYPE_NAME).text(),
             FXStringValEx(uid, 36).text(),
-            getFactionLabel(facPtr, fid)
+            getFactionLabel(facPtr, fid).text()
         );
     }
     return unit.getName();
