@@ -3,8 +3,6 @@
 #include "fxhelper.h"
 #include "terrain.h"
 
-#include <cassert>
-
 att_commands::att_commands(const datablock& source)
 {
     const datakey::list_type& list = source.data();
@@ -885,8 +883,10 @@ int datablock::valueInt(const FXString& key, int def /* = 0 */) const
 {
     for (datakey::list_type::const_iterator srch = m_data.begin(); srch != m_data.end(); srch++) {
         if (key == srch->key()) {
-            assert(srch->isInt());
-            return srch->getInt();
+            if (srch->isInt()) {
+                return srch->getInt();
+            }
+            return def;
         }
     }
 
@@ -899,8 +899,10 @@ int datablock::valueInt(key_type key, int def /* = 0 */) const
     {
         if (srch->type() == key)
         {
-            assert(srch->isInt());
-            return srch->getInt();
+            if (srch->isInt()) {
+                return srch->getInt();
+            }
+            return def;
         }
     }
     return def;
