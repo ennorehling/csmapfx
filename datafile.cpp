@@ -206,6 +206,7 @@ bool datafile::load(const FXString& filename, FXString & outError)
     datablock* block = NULL, newblock;
     datakey key;
     bool utf8 = true;
+    bool invalidBlock = false;
     skip_bom(file);
     std::string line;
     while (std::getline(file, line)) {
@@ -216,7 +217,7 @@ bool datafile::load(const FXString& filename, FXString & outError)
         const char* str = line.c_str();
 
         // erster versuch: enthaelt die Zeile einen datakey?
-        if (key.parse(str, block ? block->type() : block_type::TYPE_UNKNOWN, utf8))
+        if (key.parse(str, block ? block->type(false) : block_type::TYPE_UNKNOWN, utf8))
         {
             if (block)
             {
@@ -249,7 +250,14 @@ bool datafile::load(const FXString& filename, FXString & outError)
         // zweiter versuch: enthaelt die Zeile einen datablock-header?
         else if (newblock.parse(str))
         {
+            if (newblock.flags() & (datablock::FLAG_BLOCKID_BIT0| datablock::FLAG_BLOCKID_BIT1)) {
+                invalidBlock = newblock.type() == block_type::TYPE_UNKNOWN;
+            }
+            if (invalidBlock) {
+                newblock.setIgnored();
+            }
             m_blocks.push_back(newblock);		// appends BLOCK Info - tags
+            newblock.setIgnored(false);
             block = &m_blocks.back();
         }
         else if (block) {

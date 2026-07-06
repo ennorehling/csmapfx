@@ -246,8 +246,13 @@ public:
     datablock();
 	~datablock();
 
-    block_type type() const { return m_type; }
-	int info() const { return m_info; }	// identifier for UNIT, SCHIFF... plane for REGION
+    block_type type(bool ignore = true) const {
+        if (ignore) {
+            return m_ignored ? block_type::TYPE_UNKNOWN : m_type;
+        }
+        return m_type;
+    }
+    int info() const { return m_info; }	// identifier for UNIT, SCHIFF... plane for REGION
 	FXString id() const;					// identifier as base36
 	int x() const { return m_x; }
 	int y() const { return m_y; }
@@ -257,6 +262,9 @@ public:
 	int flags() const { return m_flags; }
 	const FXString string() const;
 	const datakey::list_type& data() const { return m_data; }
+
+    bool ignored() const { return m_ignored; }
+    void setIgnored(bool value = true) { m_ignored = value; }
 
 	void string(const FXString& s);
 	void infostr(const FXString& s);
@@ -363,6 +371,7 @@ public:
 
 
 protected:
+    bool m_ignored = false;
     block_type m_type;
     int m_info;
 	int m_x, m_y, m_terrain;

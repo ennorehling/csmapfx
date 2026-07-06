@@ -1,8 +1,9 @@
-csmapfx (1.7.47) stable; urgency=low
+csmapfx (1.7.48) stable; urgency=low
 
   * some MESSAGE blocks have a non-int target, deal with that
+  * deal with invalid CR content like ALTEINHEIT (ignore but preserve)
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 5 Jul 2026 21:00:00 +0200
+  -- Enno Rehling <enno@eressea.de>  Mon, 6 Jul 2026 10:00:00 +0200
 
 csmapfx (1.7.47) stable; urgency=low
 
