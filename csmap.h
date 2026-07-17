@@ -133,7 +133,7 @@ public:		// this functions are slots for menu commands
     void resetPlanes();
 
     int getActiveFactionId() const;
-
+    static bool isIslandTerrain(int terrain);
     enum
 	{
 		ID_REGIONS = FXMainWindow::ID_LAST,
