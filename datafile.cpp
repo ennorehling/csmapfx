@@ -38,24 +38,6 @@ static bool skip_bom(std::ifstream& file)
     return true;
 }
 
-// helper function that strips lines and return pointer to next line
-static inline char* getNextLine(char* str)
-{
-	char* next = str;
-
-	// search start of next line
-	while(*next && *next != '\n')
-		next++;		
-		
-	// overwrite cr and newline
-	if (next > str && next[-1] == '\r')
-		next[-1] = '\0';
-	if(*next)
-		*next++ = '\0';		// mark end of line
-
-	return next;
-}
-
 FXString datafile::getVersion()
 {
     if (m_version.empty()) {
