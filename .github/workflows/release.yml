@@ -27,14 +27,14 @@ jobs:
           submodules: true
 
       - name: Build Debian Package
-        uses: jtdor/build-deb-action@v1
+        uses: jtdor/build-deb-action@v1.9.1
         with:
            host-arch: ${{ matrix.arch }}
            artifacts-dir: artifacts
 
       - name: Upload to Packagecloud
         continue-on-error: true
-        uses: danielmundi/upload-packagecloud@v1.9.1
+        uses: danielmundi/upload-packagecloud@v1
         with:
           package-name: artifacts/csmapfx_*_${{ matrix.arch }}.deb
           packagecloud-username: enno
