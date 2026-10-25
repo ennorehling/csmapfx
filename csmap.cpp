@@ -526,6 +526,7 @@ CSMap::CSMap(FXApp *app) :
 
     menu.colorizeUnits->setTarget(regions);
     menu.colorizeUnits->setSelector(FXRegionList::ID_TOGGLE_UNITCOLORS);
+    menu.colorizeUnits->setCheck(0);
 
     // Middle splitter
     middle = new FXVerticalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0, 0,2);
@@ -844,8 +845,9 @@ void CSMap::create()
     if (reg.readUnsignedEntry("SHOW", "OWNFACTIONGROUP", 1))
         regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLE_OWNFACTIONGROUP), nullptr);
 
-    if (reg.readUnsignedEntry("SHOW", "COLORIZEUNITS", 1))
+    if (reg.readUnsignedEntry("SHOW", "COLORIZEUNITS", 1)) {
         regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLE_UNITCOLORS), nullptr);
+    }
 
     reload_type check = (reload_type)reg.readUnsignedEntry("SHOW", "RELOAD", (int)reload_type::RELOAD_ASK);
     setAutoReload(check);

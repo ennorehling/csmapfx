@@ -65,7 +65,7 @@ protected:
 	FXTreeItem* findTreeItem(FXTreeItem* first, void* data);
 
 	bool active_faction_group = false;
-	bool colorized_units = true;
+	bool colorized_units = false;
 
 private:
 	FXRegionList() {}
