@@ -31,6 +31,8 @@ jobs:
         with:
            host-arch: ${{ matrix.arch }}
            artifacts-dir: artifacts
+        env:
+          DEB_BUILD_OPTIONS: noopt
 
       - name: Upload to Packagecloud
         continue-on-error: true
