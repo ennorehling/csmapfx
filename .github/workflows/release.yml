@@ -25,15 +25,16 @@ jobs:
         uses: actions/checkout@v7
         with:
           submodules: true
+
       - name: Build Debian Package
-        uses: dawidd6/action-debian-package@v5
+        uses: jtdor/build-deb-action@v1
         with:
-           os_distribution: ${{ matrix.dist }}
-           cpu_architecture: ${{ matrix.arch }}
-           artifacts_directory: artifacts
+           host-arch: ${{ matrix.arch }}
+           artifacts-dir: artifacts
+
       - name: Upload to Packagecloud
         continue-on-error: true
-        uses: danielmundi/upload-packagecloud@v1
+        uses: danielmundi/upload-packagecloud@v1.9.1
         with:
           package-name: artifacts/csmapfx_*_${{ matrix.arch }}.deb
           packagecloud-username: enno
