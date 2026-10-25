@@ -26,7 +26,7 @@ jobs:
         with:
           submodules: true
       - name: Build Debian Package
-        uses: dawidd6/action-debian-package@latest
+        uses: dawidd6/action-debian-package@v5
         with:
            os_distribution: ${{ matrix.dist }}
            cpu_architecture: ${{ matrix.arch }}
