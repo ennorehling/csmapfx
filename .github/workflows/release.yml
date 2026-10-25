@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         dist:
-          - bullseye
+          - bookworm
         arch:
           - amd64
     steps:
