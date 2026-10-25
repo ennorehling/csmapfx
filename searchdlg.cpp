@@ -687,10 +687,6 @@ FXSearchDlg::addMatch(const datablock::itor& region, const datablock::itor& buil
     return item;
 }
 
-static const int ICON_SPACING = 4;	// Spacing between parent and child in x direction
-static const int TEXT_SPACING = 4;	// Spacing between icon and text
-static const int SIDE_SPACING = 4;	// Spacing between side and item
-
 void FXSearchItem::draw(const FXFoldingList* l, FXDC& dc, FXint xx, FXint yy, FXint ww, FXint hh) const
 {
     const FXSearchResults* list = static_cast<const FXSearchResults*>(l);

@@ -1,3 +1,15 @@
+csmapfx (1.7.50) stable; urgency=low
+
+  * Unit colorization state was not saved/applied properly.
+
+  -- Enno Rehling <enno@eressea.de>  Sun, 25 Oct 2026 23:00:00 +0200
+
+csmapfx (1.7.49) stable; urgency=low
+
+  * Maelstrom is not part of an island (for selections)
+
+  -- Enno Rehling <enno@eressea.de>  Mon, 17 Jul 2026 20:00:00 +0200
+
 csmapfx (1.7.48) stable; urgency=low
 
   * some MESSAGE blocks have a non-int target, deal with that

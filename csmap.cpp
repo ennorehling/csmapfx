@@ -526,6 +526,7 @@ CSMap::CSMap(FXApp *app) :
 
     menu.colorizeUnits->setTarget(regions);
     menu.colorizeUnits->setSelector(FXRegionList::ID_TOGGLE_UNITCOLORS);
+    menu.colorizeUnits->setCheck(0);
 
     // Middle splitter
     middle = new FXVerticalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0, 0,2);
@@ -844,8 +845,9 @@ void CSMap::create()
     if (reg.readUnsignedEntry("SHOW", "OWNFACTIONGROUP", 1))
         regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLE_OWNFACTIONGROUP), nullptr);
 
-    if (reg.readUnsignedEntry("SHOW", "COLORIZEUNITS", 1))
+    if (reg.readUnsignedEntry("SHOW", "COLORIZEUNITS", 1)) {
         regions->handle(this, FXSEL(SEL_COMMAND, FXRegionList::ID_TOGGLE_UNITCOLORS), nullptr);
+    }
 
     reload_type check = (reload_type)reg.readUnsignedEntry("SHOW", "RELOAD", (int)reload_type::RELOAD_ASK);
     setAutoReload(check);
@@ -2670,6 +2672,11 @@ int CSMap::getActiveFactionId() const
     return 0;
 }
 
+bool CSMap::isIslandTerrain(int terrain)
+{
+    return terrain != data::TERRAIN_MAHLSTROM && terrain != data::TERRAIN_OCEAN;
+}
+
 long CSMap::onFileOpen(FXObject*, FXSelector, void* r)
 {
     FXFileDialog dlg(this, FXString(L"\u00d6ffnen..."));
@@ -3283,7 +3290,7 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
     if (!report) return 1;
     if (selection.regionsSelected.empty())
     {
-        if (!(selection.selected & selection.REGION) || (selection.region->terrain() == data::TERRAIN_OCEAN)) {
+        if (!(selection.selected & selection.REGION) || (!isIslandTerrain(selection.region->terrain()))) {
             // nothing to do
             return 1;
         }
@@ -3307,7 +3314,7 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
                 continue;
             }
 
-            if (terrain == data::TERRAIN_OCEAN)
+            if (!isIslandTerrain(terrain))
             {
                 // always ignore ocean
                 continue;
@@ -3321,7 +3328,7 @@ long CSMap::onRegionSelIslands(FXObject*, FXSelector, void*)
                 datablock::itor region;
                 if (report->getRegion(region, x + hex_offset[d][0], y + hex_offset[d][1], visiblePlane)) {
                     datablock* regionPtr = &*region;
-                    if (regionPtr->terrain() != data::TERRAIN_OCEAN) {
+                    if (isIslandTerrain(regionPtr->terrain())) {
                         if ((terrain == data::TERRAIN_FIREWALL) == (regionPtr->terrain() == data::TERRAIN_FIREWALL)) {
                             if (selection.regionsSelected.find(regionPtr) == selection.regionsSelected.end()) {
                                 selection.regionsSelected.insert(regionPtr);
@@ -3389,7 +3396,7 @@ long CSMap::onRegionSelAllIslands(FXObject*, FXSelector, void*)
 
         // skip ocean, firewall and iceberg
         if (block->terrain() == data::TERRAIN_OCEAN || block->terrain() == data::TERRAIN_FIREWALL
-            || block->terrain() == data::TERRAIN_ICEBERG)
+            || block->terrain() == data::TERRAIN_ICEBERG || block->terrain() == data::TERRAIN_MAHLSTROM)
             continue;
 
         selection.regionsSelected.insert(&*block);
