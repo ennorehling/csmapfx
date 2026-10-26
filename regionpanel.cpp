@@ -33,24 +33,24 @@ FXRegionPanel::FXRegionPanel(FXComposite* p, FXObject* tgt,FXSelector sel, FXuin
 	setFrameStyle(FRAME_LINE);
 
 	// create layout
-	tags.name = new FXLabel(this, "", terrainIcons[ data::TERRAIN_UNKNOWN], ICON_BEFORE_TEXT|LAYOUT_FILL_X);
+	tags.name = new FXLabel(this, "", terrainIcons[ data::TERRAIN_UNKNOWN], (FXuint) ICON_BEFORE_TEXT|LAYOUT_FILL_X);
 
-	tags.matrixsep = new FXHorizontalSeparator(this, LAYOUT_FILL_X|SEPARATOR_LINE, 0,0,0,0, 0,0,0,0);
+	tags.matrixsep = new FXHorizontalSeparator(this, (FXuint) LAYOUT_FILL_X|SEPARATOR_LINE, 0,0,0,0, 0,0,0,0);
 	tags.matrixsep->setBorderColor(getBorderColor());
 	tags.matrixsep->hide();
 
-	tags.matrixframe = new FXHorizontalFrame(this, LAYOUT_SIDE_TOP|LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
+	tags.matrixframe = new FXHorizontalFrame(this, (FXuint) LAYOUT_SIDE_TOP|LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
 	tags.matrixframe->hide();
 
-	tags.leftmatrix = new FXMatrix(tags.matrixframe,2,MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
-	FXFrame *sep = new FXVerticalSeparator(tags.matrixframe,LAYOUT_FILL_Y|SEPARATOR_LINE, 0,0,0,0, 0,0,0,0);
+	tags.leftmatrix = new FXMatrix(tags.matrixframe,2, (FXuint) MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
+	FXFrame *sep = new FXVerticalSeparator(tags.matrixframe, (FXuint) LAYOUT_FILL_Y|SEPARATOR_LINE, 0,0,0,0, 0,0,0,0);
 	sep->setBorderColor(getBorderColor());
-	tags.rightmatrix = new FXMatrix(tags.matrixframe,2,MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
+	tags.rightmatrix = new FXMatrix(tags.matrixframe,2, (FXuint) MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
 
-	tags.descsep = new FXHorizontalSeparator(this, LAYOUT_FILL_X|SEPARATOR_LINE, 0,0,0,0, 0,0,0,0);
+	tags.descsep = new FXHorizontalSeparator(this, (FXuint) LAYOUT_FILL_X|SEPARATOR_LINE, 0,0,0,0, 0,0,0,0);
 	tags.descsep->setBorderColor(getBorderColor());
 
-	tags.desc = new FXText(this, this,ID_DESCRIPTION, LAYOUT_FILL_X|TEXT_READONLY|TEXT_WORDWRAP|HSCROLLER_NEVER);
+	tags.desc = new FXText(this, this,ID_DESCRIPTION, (FXuint) LAYOUT_FILL_X|TEXT_READONLY|TEXT_WORDWRAP|HSCROLLER_NEVER);
 	tags.desc->disable();
 }
 
@@ -107,8 +107,8 @@ void FXRegionPanel::createLabels(const FXString& name, const FXString& label, in
 	FXMatrix *matrix = (column==0) ? tags.leftmatrix : tags.rightmatrix;
 
 	// create labels
-	FXLabel *lname = new FXLabel(matrix, name, NULL, JUSTIFY_LEFT|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
-	FXLabel *lfirst = new FXLabel(matrix, label, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
+	FXLabel *lname = new FXLabel(matrix, name, NULL, (FXuint) JUSTIFY_LEFT|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
+	FXLabel *lfirst = new FXLabel(matrix, label, NULL, (FXuint) JUSTIFY_RIGHT|LAYOUT_RIGHT);
 	lname->create();
     lfirst->create();
 

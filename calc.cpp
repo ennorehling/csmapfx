@@ -5,13 +5,16 @@
 #include "calc.h"
 #include "symbols.h"
 
-#undef USE_CEVAL
 #ifdef USE_CEVAL
 #define CEVAL_STOICAL
 #include "ceval.h"
-#else
+#endif
+#ifdef USE_CPARSE
 #include "cparse/shunting-yard.h"
 #include "cparse/shunting-yard-exceptions.h"
+#endif
+#ifdef USE_TINYEXPR
+#include "tinyexpr/tinyexpr.h"
 #endif
 
 // *********************************************************************************************************
@@ -68,14 +71,14 @@ FXCalculator::FXCalculator(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
     formula = new FXTextField(firstline, 10, this,ID_FORMULA, LAYOUT_FILL_X|LAYOUT_FILL_Y);
     formula->setHelpText("Taschenrechner");
 
-    result = new FXTextField(firstline, 13, NULL,0, TEXTFIELD_READONLY|JUSTIFY_RIGHT|LAYOUT_FILL_Y);
+    result = new FXTextField(firstline, 13, NULL,0, (FXuint)TEXTFIELD_READONLY|JUSTIFY_RIGHT|LAYOUT_FILL_Y);
     result->setBackColor(getBackColor());
 
     // second line
     secondline = new FXHorizontalFrame(frame, LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0);
     secondline->hide();
 
-    longresult = new FXTextField(secondline, 13, NULL,0, TEXTFIELD_READONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    longresult = new FXTextField(secondline, 13, NULL,0, (FXuint)TEXTFIELD_READONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     longresult->setBackColor(getBackColor());
 
 }
@@ -168,6 +171,7 @@ long FXCalculator::onMapChange(FXObject* /*sender*/, FXSelector, void* ptr)
     return 1;
 }
 
+#if defined(USE_CPARSE) || defined(USE_CEVAL) || defined(USE_TINYEXPR)
 static FXString format_double(double v) {
     FXString x = FXStringFormat("%lf", v);
     FXint pos = x.length();
@@ -178,6 +182,7 @@ static FXString format_double(double v) {
     x.trunc(pos + 1);
     return x;
 }
+#endif
 
 #ifdef USE_CEVAL
 static FXString evaluate(const char* expr)
@@ -190,7 +195,7 @@ static FXString evaluate(const char* expr)
     }
     return FXString::null;
 }
-#else
+#elif defined(USE_CPARSE)
 static FXString evaluate(const char* expr)
 {
     if (expr && expr[0]) {
@@ -212,6 +217,18 @@ static FXString evaluate(const char* expr)
         }
         catch (...) {
             return FXString("Fehler");
+        }
+    }
+    return FXString::null;
+}
+#elif defined(USE_TINYEXPR)
+static FXString evaluate(const char* expr)
+{
+    if (expr && expr[0]) {
+        te_parser tep;
+        te_type result = tep.evaluate(expr);
+        if (!std::isnan(result)) {
+            return format_double(result);
         }
     }
     return FXString::null;

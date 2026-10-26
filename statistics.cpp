@@ -38,7 +38,7 @@ FXStatistics::FXStatistics(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	select.filter = select.FILTER_PERSONS|select.FILTER_ITEMS|select.FILTER_TALENTS;
 
 	// create faction combobox
-	factionBox = new FXComboBox(this, 0, this,ID_FACTIONBOX, COMBOBOX_STATIC|LAYOUT_FILL_X|FRAME_RAISED);
+	factionBox = new FXComboBox(this, 0, this,ID_FACTIONBOX, (FXuint) COMBOBOX_STATIC|LAYOUT_FILL_X|FRAME_RAISED);
 
 	// create filter checkboxes
 	FXHorizontalFrame *filterboxes = new FXHorizontalFrame(this, 0, 0,0,0,0, 0,0,0,0, 0,0);
@@ -46,7 +46,7 @@ FXStatistics::FXStatistics(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
     opTab = new FXToolBarTab(filterboxes, NULL,0, TOOLBARTAB_HORIZONTAL, 0,0,0,0);
 	opTab->setTipText("Filteroptionen ein- und ausblenden");
 
-	FXMatrix *optionmatrix = new FXMatrix(filterboxes, 3, MATRIX_BY_COLUMNS|PACK_UNIFORM_HEIGHT, 0,0,0,0, 2,2,2,2, 2,2);
+	FXMatrix *optionmatrix = new FXMatrix(filterboxes, 3, (FXuint) MATRIX_BY_COLUMNS|PACK_UNIFORM_HEIGHT, 0,0,0,0, 2,2,2,2, 2,2);
 
 	FXToggleButton *btn;		
 	btn = new FXToggleButton(optionmatrix, "Personen", "Personen", NULL,NULL, this,ID_FILTERBOX, TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE|FRAME_RAISED|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
@@ -61,7 +61,7 @@ FXStatistics::FXStatistics(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	btn->setUserData((void*)select.FILTER_SHIPS);
 
 	// create list
-    list = new FXList(this, this,ID_LIST, LIST_BROWSESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    list = new FXList(this, this,ID_LIST, (FXuint) LIST_BROWSESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     // hide the selection:
 	list->setSelTextColor(list->getTextColor());
 	list->setSelBackColor(list->getBackColor());

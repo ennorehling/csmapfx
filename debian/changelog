@@ -2,26 +2,26 @@ csmapfx (1.7.50) stable; urgency=low
 
   * Unit colorization state was not saved/applied properly.
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 25 Oct 2026 23:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 25 Oct 2026 23:00:00 +0200
 
 csmapfx (1.7.49) stable; urgency=low
 
   * Maelstrom is not part of an island (for selections)
 
-  -- Enno Rehling <enno@eressea.de>  Mon, 17 Jul 2026 20:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Mon, 17 Jul 2026 20:00:00 +0200
 
 csmapfx (1.7.48) stable; urgency=low
 
   * some MESSAGE blocks have a non-int target, deal with that
   * deal with invalid CR content like ALTEINHEIT (ignore but preserve)
 
-  -- Enno Rehling <enno@eressea.de>  Mon, 6 Jul 2026 10:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Mon, 6 Jul 2026 10:00:00 +0200
 
 csmapfx (1.7.47) stable; urgency=low
 
   * fix unit and faction labels in regionlist
 
-  -- Enno Rehling <enno@eressea.de>  Wed, 27 May 2026 13:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Wed, 27 May 2026 13:00:00 +0200
 
 csmapfx (1.7.46) stable; urgency=low
 
@@ -31,7 +31,7 @@ csmapfx (1.7.46) stable; urgency=low
   * sort statistics faction dropdown
   * Bug 3100: search does not require spaces in coordinates
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 24 May 2026 16:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 24 May 2026 16:00:00 +0200
 
 csmapfx (1.7.45) stable; urgency=low
 
@@ -39,20 +39,20 @@ csmapfx (1.7.45) stable; urgency=low
   * Bug 3099: show anonymous guarding units
   * Misc changes to (stealth) faction display
 
-  -- Enno Rehling <enno@eressea.de>  Sat, 23 May 2026 21:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sat, 23 May 2026 21:00:00 +0200
 
 csmapfx (1.7.44) stable; urgency=low
 
   * version number increase
 
-  -- Enno Rehling <enno@eressea.de>  Tue, 28 Oct 2025 01:00:00 +0100
+ -- Enno Rehling <enno@eressea.de>  Tue, 28 Oct 2025 01:00:00 +0100
 
 csmapfx (1.7.43) stable; urgency=low
 
   * show guarding units
   * show anonymous status for own units
 
-  -- Enno Rehling <enno@eressea.de>  Mon, 27 Oct 2025 15:00:00 +0100
+ -- Enno Rehling <enno@eressea.de>  Mon, 27 Oct 2025 15:00:00 +0100
 
 csmapfx (1.7.42) stable; urgency=low
 
@@ -60,20 +60,20 @@ csmapfx (1.7.42) stable; urgency=low
   * fix display of calculator route arrows
   * show number of units in faction menu
 
-  -- Enno Rehling <enno@eressea.de>  Mon, 15 Sep 2025 09:40:00 +0100
+ -- Enno Rehling <enno@eressea.de>  Mon, 15 Sep 2025 09:40:00 +0100
 
 csmapfx (1.7.41-1) stable; urgency=low
 
   * fix tracking file modification times
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 17 Nov 2024 19:00:00 +0100
+ -- Enno Rehling <enno@eressea.de>  Sun, 17 Nov 2024 19:00:00 +0100
 
 csmapfx (1.7.40-1) stable; urgency=low
 
   * on Mac/Linux, we do not search for echeck
   * clean up the registry password code
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 3 Nov 2024 15:00:00 +0100
+ -- Enno Rehling <enno@eressea.de>  Sun, 3 Nov 2024 15:00:00 +0100
 
 csmapfx (1.7.39-1) stable; urgency=low
 
@@ -81,7 +81,7 @@ csmapfx (1.7.39-1) stable; urgency=low
   * registry setting to set echeck warning level
   * relocate the echeck registry keys
 
-  -- Enno Rehling <enno@eressea.de>  Thu, 31 Oct 2024 21:30:00 +0100
+ -- Enno Rehling <enno@eressea.de>  Thu, 31 Oct 2024 21:30:00 +0100
 
 csmapfx (1.7.38-1) stable; urgency=low
 
@@ -90,32 +90,32 @@ csmapfx (1.7.38-1) stable; urgency=low
   * small menu tweaks
   * display heroes in the statistics view
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 21 Oct 2024 20:15:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 21 Oct 2024 20:15:00 +0200
 
 csmapfx (1.7.37-1) stable; urgency=low
 
   * bugfix: redraw minimap only when map data has changed
   * bugfix: resize events must repaint the map
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 14 Jul 2024 16:45:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 14 Jul 2024 16:45:00 +0200
 
 csmapfx (1.7.36-1) stable; urgency=low
 
   * bugfix: update arrows when needed
 
-  -- Enno Rehling <enno@eressea.de>  Wed, 10 Jul 2024 18:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Wed, 10 Jul 2024 18:00:00 +0200
 
 csmapfx (1.7.35-1) stable; urgency=low
 
   * bugfix: "Einheit hat keinen Befehlsblock"
 
-  -- Enno Rehling <enno@eressea.de>  Sat, 06 Jul 2024 11:30:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sat, 06 Jul 2024 11:30:00 +0200
 
 csmapfx (1.7.34-1) stable; urgency=low
 
   * fix patterns in FxFileDialogEx
 
-  -- Enno Rehling <enno@eressea.de>  Fri, 05 Jul 2024 19:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Fri, 05 Jul 2024 19:00:00 +0200
 
 csmapfx (1.7.33-1) stable; urgency=low
 
@@ -125,26 +125,26 @@ csmapfx (1.7.33-1) stable; urgency=low
   * install csmapfx.Eressea.info in LOCALAPPDATA
   * fix minimap updates (issue #32)
 
-  -- Enno Rehling <enno@eressea.de>  Thu, 04 Jul 2024 17:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Thu, 04 Jul 2024 17:00:00 +0200
 
 csmapfx (1.7.32-1) stable; urgency=low * display ship's total sailing skill
     * file menu reorganization
 
-  -- Enno Rehling <enno@eressea.de>  Sat, 25 May 2024 14:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sat, 25 May 2024 14:00:00 +0200
 
 csmapfx (1.7.31-1) stable; urgency=low
 
   * display ship's total sailing skill
   * fix PNG export
 
-  -- Enno Rehling <enno@eressea.de>  Sat, 25 May 2024 13:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sat, 25 May 2024 13:00:00 +0200
 
 csmapfx (1.7.30-1) stable; urgency=low
 
   * start rearranging menus
   * use Fox's built-in automatic indentation
 
-  -- Enno Rehling <enno@eressea.de>  Fri, 15 Mar 2024 22:00:00 +0100
+ -- Enno Rehling <enno@eressea.de>  Fri, 15 Mar 2024 22:00:00 +0100
 
 csmapfx (1.7.29-1) stable; urgency=low
 
@@ -152,7 +152,7 @@ csmapfx (1.7.29-1) stable; urgency=low
   * use Shift-Tab to un-indent current line
   * double-click on units in ship and building details.
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 18 Feb 2024 21:00:00 +0100
+ -- Enno Rehling <enno@eressea.de>  Sun, 18 Feb 2024 21:00:00 +0100
 
 csmapfx (1.7.28-1) stable; urgency=low
 
@@ -161,7 +161,7 @@ csmapfx (1.7.28-1) stable; urgency=low
   * origin change was confusing the map widget
   * fix merging maps with different origins
 
-  -- Enno Rehling <enno@eressea.de>  Thu, 01 Feb 2024 21:00:00 +0100
+ -- Enno Rehling <enno@eressea.de>  Thu, 01 Feb 2024 21:00:00 +0100
 
 csmapfx (1.7.27-1) stable; urgency=low
 
@@ -169,14 +169,14 @@ csmapfx (1.7.27-1) stable; urgency=low
   * detect origin mismatch in order files
   * read order files with origin offset
 
-  -- Enno Rehling <enno@eressea.de>  Sat, 30 Dec 2023 12:00:00 +0100
+ -- Enno Rehling <enno@eressea.de>  Sat, 30 Dec 2023 12:00:00 +0100
 
 csmapfx (1.7.26-1) stable; urgency=low
 
   * map merge was clearing error list.
   * check errors after reloading order file.
 
-  -- Enno Rehling <enno@eressea.de>  Sat, 11 Nov 2023 12:30:00 +0100
+ -- Enno Rehling <enno@eressea.de>  Sat, 11 Nov 2023 12:30:00 +0100
 
 csmapfx (1.7.25-1) stable; urgency=low
 
@@ -184,14 +184,14 @@ csmapfx (1.7.25-1) stable; urgency=low
   * show teaching message on student units.
   * fix an occasional crash at startup.
 
-  -- Enno Rehling <enno@eressea.de>  Mon, 06 Nov 2023 18:15:00 +0100
+ -- Enno Rehling <enno@eressea.de>  Mon, 06 Nov 2023 18:15:00 +0100
 
 csmapfx (1.7.24-1) stable; urgency=low
 
   * remember passwords for more than one faction
   * windows: encrypt stored passwords
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 08 Oct 2023 16:45:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 08 Oct 2023 16:45:00 +0200
 
 csmapfx (1.7.23-1) stable; urgency=low
 
@@ -200,7 +200,7 @@ csmapfx (1.7.23-1) stable; urgency=low
   * windows: use IFileDialog, populate Recent Files jumplist.
   * windows: installer registers CR file type.
 
-  -- Enno Rehling <enno@eressea.de>  Tue, 12 Sep 2023 07:15:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Tue, 12 Sep 2023 07:15:00 +0200
 
 csmapfx (1.7.22-1) stable; urgency=low
 
@@ -208,14 +208,14 @@ csmapfx (1.7.22-1) stable; urgency=low
   * statistics: display all if selected faction not in region
   * statistics: remember that user chose to see all factions
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 27 Aug 2023 08:30:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 27 Aug 2023 08:30:00 +0200
 
 csmapfx (1.7.21-1) stable; urgency=low
 
   * fix a bug in report merge
   * fix another merge bug when reports have different origin
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 20 Aug 2023 14:30:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 20 Aug 2023 14:30:00 +0200
 
 csmapfx (1.7.20-1) stable; urgency=low
 
@@ -224,28 +224,28 @@ csmapfx (1.7.20-1) stable; urgency=low
   * fix some messages containing encoded umlauts.
   * windows: extended upload error reporting.
 
-  -- Enno Rehling <enno@eressea.de>  Sat, 19 Aug 2023 19:10:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sat, 19 Aug 2023 19:10:00 +0200
 
 csmapfx (1.7.19-1) stable; urgency=low
 
   * more image export options.
   * limit the max scale factor for some codecs.
 
-  -- Enno Rehling <enno@eressea.de>  Mon, 14 Aug 2023 19:10:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Mon, 14 Aug 2023 19:10:00 +0200
 
 csmapfx (1.7.18-1) stable; urgency=low
 
   * Ask before overwriting PNG files.
   * map extent calculation optimization
 
-  -- Enno Rehling <enno@eressea.de>  Sat, 12 Aug 2023 19:30:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sat, 12 Aug 2023 19:30:00 +0200
 
 csmapfx (1.7.17-1) stable; urgency=low
 
   * reduce memory usage during PNG export.
   * add command line option for PNG export.
 
-  -- Enno Rehling <enno@eressea.de>  Mon, 07 Aug 2023 17:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Mon, 07 Aug 2023 17:00:00 +0200
 
 csmapfx (1.7.16-1) stable; urgency=low
 
@@ -254,7 +254,7 @@ csmapfx (1.7.16-1) stable; urgency=low
   * show physfs version in about dialog.
   * adaptive license display in "about" dialog.
 
-  -- Enno Rehling <enno@eressea.de>  Sun, 06 Aug 2023 12:00:00 +0200
+ -- Enno Rehling <enno@eressea.de>  Sun, 06 Aug 2023 12:00:00 +0200
 
 csmapfx (1.7.15-2) stable; urgency=low
 

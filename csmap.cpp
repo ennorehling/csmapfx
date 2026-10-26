@@ -215,22 +215,22 @@ CSMap::CSMap(FXApp *app) :
     status->getStatusLine()->setBorderColor(getApp()->getShadowColor());
     status->getStatusLine()->setNormalText("");
 
-    status_file = new FXLabel(status, "-", 0,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-    status_lfile = new FXLabel(status, " Datei:", nullptr,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+    status_file = new FXLabel(status, "-", 0, (FXuint) FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+    status_lfile = new FXLabel(status, " Datei:", nullptr, LAYOUT_RIGHT|LAYOUT_CENTER_Y);
     status_file->setBorderColor(getApp()->getShadowColor());
     status_file->hide(); status_lfile->hide();
 
-    status_turn = new FXLabel(status, "-", 0,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-    status_lturn = new FXLabel(status, " Runde:", nullptr,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+    status_turn = new FXLabel(status, "-", 0, (FXuint) FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+    status_lturn = new FXLabel(status, " Runde:", nullptr, LAYOUT_RIGHT|LAYOUT_CENTER_Y);
     status_turn->setBorderColor(getApp()->getShadowColor());
     status_turn->hide(); status_lturn->hide();
 
-    status_faction = new FXLabel(status, "-", 0,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-    status_lfaction = new FXLabel(status, " Partei:", nullptr,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+    status_faction = new FXLabel(status, "-", 0, (FXuint) FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+    status_lfaction = new FXLabel(status, " Partei:", nullptr, LAYOUT_RIGHT|LAYOUT_CENTER_Y);
     status_faction->setBorderColor(getApp()->getShadowColor());
     status_faction->hide(); status_lfaction->hide();
 
-    status_date = new FXLabel(status, "-", 0, FRAME_LINE | LAYOUT_RIGHT | LAYOUT_CENTER_Y);
+    status_date = new FXLabel(status, "-", 0, (FXuint)FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
     status_ldate = new FXLabel(status, " Datum:", nullptr, LAYOUT_RIGHT | LAYOUT_CENTER_Y);
     status_date->setBorderColor(getApp()->getShadowColor());
     status_date->hide(); status_ldate->hide();
@@ -285,26 +285,26 @@ CSMap::CSMap(FXApp *app) :
         this,
         ID_FILE_CLOSE, BUTTON_TOOLBAR);
 
-    FXVerticalSeparator *tb_separator = new FXVerticalSeparator(toolbar, SEPARATOR_LINE|LAYOUT_FILL_Y);
+    FXVerticalSeparator *tb_separator = new FXVerticalSeparator(toolbar, (FXuint)SEPARATOR_LINE|LAYOUT_FILL_Y);
     tb_separator->setBorderColor(getApp()->getShadowColor());
 
-    new FXToggleButton(toolbar, "\tZeige Regel-Informationen.", "\tZeige Regel-Informationen.", icons.info,icons.info, this, ID_VIEW_INFODLG, FRAME_RAISED|TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE);
+    new FXToggleButton(toolbar, "\tZeige Regel-Informationen.", "\tZeige Regel-Informationen.", icons.info,icons.info, this, ID_VIEW_INFODLG, (FXuint)FRAME_RAISED|TOGGLEBUTTON_TOOLBAR|TOGGLEBUTTON_KEEPSTATE);
 
-    tb_separator = new FXVerticalSeparator(toolbar, SEPARATOR_LINE|LAYOUT_FILL_Y);
+    tb_separator = new FXVerticalSeparator(toolbar, (FXuint)SEPARATOR_LINE|LAYOUT_FILL_Y);
     tb_separator->setBorderColor(getApp()->getShadowColor());
 
-    planes = new FXListBox(toolbar, this, ID_MAP_VISIBLEPLANE, LISTBOX_NORMAL|LAYOUT_FILL_Y|FRAME_LINE);
+    planes = new FXListBox(toolbar, this, ID_MAP_VISIBLEPLANE, (FXuint)LISTBOX_NORMAL|LAYOUT_FILL_Y|FRAME_LINE);
     planes->setBorderColor(getApp()->getShadowColor());
     planes->appendItem("Standardebene (0)", nullptr, (void*)0);
     planes->setNumVisible(planes->getNumItems());
 
-    tb_separator = new FXVerticalSeparator(toolbar, SEPARATOR_LINE|LAYOUT_FILL_Y);
+    tb_separator = new FXVerticalSeparator(toolbar, (FXuint)SEPARATOR_LINE|LAYOUT_FILL_Y);
     tb_separator->setBorderColor(getApp()->getShadowColor());
 
     FXButton *modus;
-    modus = new FXButton(toolbar, "\tNormaler Modus", icons.pointer, this, ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
+    modus = new FXButton(toolbar, "\tNormaler Modus", icons.pointer, this, ID_MAP_SETMODUS, (FXuint)FRAME_RAISED|BUTTON_TOOLBAR);
     modus->setUserData((void*)FXCSMap::MODUS_NORMAL);
-    modus = new FXButton(toolbar, "\tAuswahl-Modus: Anklicken selektiert Regionen", icons.select, this, ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
+    modus = new FXButton(toolbar, "\tAuswahl-Modus: Anklicken selektiert Regionen", icons.select, this, ID_MAP_SETMODUS, (FXuint)FRAME_RAISED|BUTTON_TOOLBAR);
     modus->setUserData((void*)FXCSMap::MODUS_SELECT);
 
     terrainPopup = new FXPopup(this);
@@ -324,9 +324,9 @@ CSMap::CSMap(FXApp *app) :
     cmd->setUserData((void*)(FXCSMap::MODUS_SETTERRAIN));
 
     FXHorizontalFrame *terrainFrame = new FXHorizontalFrame(toolbar, LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-    terrainSelect = new FXButton(terrainFrame, L"\tZeichnen-Modus: Erstelle oder L\u00f6sche Regionen", icons.terrain[0], this, ID_MAP_SETMODUS, FRAME_RAISED|BUTTON_TOOLBAR);
+    terrainSelect = new FXButton(terrainFrame, L"\tZeichnen-Modus: Erstelle oder L\u00f6sche Regionen", icons.terrain[0], this, ID_MAP_SETMODUS, (FXuint)FRAME_RAISED|BUTTON_TOOLBAR);
     terrainSelect->setUserData((void*)FXCSMap::MODUS_SETTERRAIN);
-    new FXMenuButton(terrainFrame, L"\tZeichnen-Modus: Erstelle oder L\u00f6sche Regionen", nullptr, terrainPopup, FRAME_RAISED|BUTTON_TOOLBAR|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|MENUBUTTON_DOWN, 0, 0,12, 0);
+    new FXMenuButton(terrainFrame, L"\tZeichnen-Modus: Erstelle oder L\u00f6sche Regionen", nullptr, terrainPopup, (FXuint)FRAME_RAISED|BUTTON_TOOLBAR|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|MENUBUTTON_DOWN, 0, 0,12, 0);
 
     // Recent file list
     recentFiles.setTarget(this);
@@ -513,7 +513,7 @@ CSMap::CSMap(FXApp *app) :
     new FXToolTip(app);
 
     // *** create workdesk ***
-    content = new FXSplitterEx(this, SPLITTER_HORIZONTAL|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    content = new FXSplitterEx(this, (FXuint) SPLITTER_HORIZONTAL|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
     // Left splitter
     leftframe = new FXVerticalFrame(content,LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 3, 0, 0, 0);
@@ -557,7 +557,7 @@ CSMap::CSMap(FXApp *app) :
     msgBorder = new FXVerticalFrame(mapsplit,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
     msgBorder->setBorderColor(getApp()->getShadowColor());
 
-    outputTabs = new FXTabBook(msgBorder, nullptr, 0, TABBOOK_NORMAL | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
+    outputTabs = new FXTabBook(msgBorder, nullptr, 0, (FXuint)TABBOOK_NORMAL | LAYOUT_FILL_X | LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
     new FXTabItem(outputTabs, "Rep&ort");
     reportInfo = new FXReportInfo(outputTabs, this, ID_SELECTION, LAYOUT_FILL_X | LAYOUT_FILL_Y);
     new FXTabItem(outputTabs, "Re&gion");
@@ -565,7 +565,7 @@ CSMap::CSMap(FXApp *app) :
     new FXTabItem(outputTabs, "&Fehler");
     errorList = new FXList(outputTabs, this, ID_ERRROR_SELECTED, LAYOUT_FILL_X | LAYOUT_FILL_Y);
     new FXTabItem(outputTabs, "&Suchergebnisse");
-    searchResults = new FXSearchResults(outputTabs, this, ID_RESULT_SELECTED, FOLDINGLIST_BROWSESELECT | LAYOUT_FILL_X | LAYOUT_FILL_Y);
+    searchResults = new FXSearchResults(outputTabs, this, ID_RESULT_SELECTED, (FXuint) FOLDINGLIST_BROWSESELECT | LAYOUT_FILL_X | LAYOUT_FILL_Y);
     searchResults->getHeader()->setHeaderStyle(HEADER_RESIZE | HEADER_TRACKING);
     searchResults->appendHeader("Region");
     searchResults->appendHeader(L"Einheit/Geb\u00e4ude/Schiff");
@@ -597,7 +597,7 @@ CSMap::CSMap(FXApp *app) :
 
     commandsplitter = new FXSplitterEx(rightframe, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
-    tabbook = new FXTabBook(commandsplitter, nullptr, 0, TABBOOK_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
+    tabbook = new FXTabBook(commandsplitter, nullptr, 0, (FXuint) TABBOOK_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
 
     new FXTabItem(tabbook, "Statistik");
     statistics = new FXStatistics(tabbook, this, ID_SELECTION, LAYOUT_FILL_X);
@@ -609,7 +609,7 @@ CSMap::CSMap(FXApp *app) :
     FXHorizontalFrame* hFrame = new FXHorizontalFrame(frame, LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     FXToolBarTab * dTab = new FXToolBarTab(hFrame, nullptr, 0, TOOLBARTAB_HORIZONTAL, 0, 0, 0, 0);
     dTab->setTipText("Beschreibung ein- und ausblenden");
-    descriptionText = new FXText(hFrame, this, ID_SELECTION, LAYOUT_FILL_X|TEXT_READONLY|TEXT_WORDWRAP|HSCROLLER_NEVER);
+    descriptionText = new FXText(hFrame, this, ID_SELECTION, (FXuint) LAYOUT_FILL_X|TEXT_READONLY|TEXT_WORDWRAP|HSCROLLER_NEVER);
     descriptionText->disable();
 
     unitProperties = new FXUnitList(frame, this, ID_SELECTION, 
@@ -624,20 +624,20 @@ CSMap::CSMap(FXApp *app) :
     getAccelTable()->addAccel(MKUINT(KEY_2, ALTMASK), this, FXSEL(SEL_COMMAND, ID_TAB_2));
 
     // Befehlseditor
-    commandframe = new FXVerticalFrame(commandsplitter,LAYOUT_FILL_X|FRAME_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
+    commandframe = new FXVerticalFrame(commandsplitter, (FXuint) LAYOUT_FILL_X|FRAME_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
     commandframe->setBorderColor(getApp()->getShadowColor());
-    commands = new FXCommands(commandframe, this, ID_SELECTION, TEXT_AUTOINDENT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    commands = new FXCommands(commandframe, this, ID_SELECTION, (FXuint) TEXT_AUTOINDENT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     commands->connectMap(map);
     if (fontFixed) {
         commands->setFont(fontFixed);
     }
 
     // commands editor tools
-    FXHorizontalFrame *cmdBottomFrame = new FXHorizontalFrame(rightframe,LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    FXHorizontalFrame *cmdBottomFrame = new FXHorizontalFrame(rightframe, LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     FXToolBarTab *cmdTab = new FXToolBarTab(cmdBottomFrame, nullptr, 0, TOOLBARTAB_HORIZONTAL, 0, 0, 0, 0);
     cmdTab->setTipText("Befehlstools ein- und ausblenden");
 
-    FXHorizontalFrame *cmdOptFrame = new FXHorizontalFrame(cmdBottomFrame,LAYOUT_FILL_X|FRAME_LINE, 0, 0, 0, 0, 3,3,1,1);
+    FXHorizontalFrame *cmdOptFrame = new FXHorizontalFrame(cmdBottomFrame, (FXuint) LAYOUT_FILL_X|FRAME_LINE, 0, 0, 0, 0, 3,3,1,1);
     cmdOptFrame->setBorderColor(getApp()->getShadowColor());
     FXCheckButton *chk = new FXCheckButton(cmdOptFrame,
         L"&best\u00e4tigt\tBefehle best\u00e4tigen\tBefehle f\u00fcr diese Einheit best\u00e4tigen",
@@ -660,7 +660,7 @@ CSMap::CSMap(FXApp *app) :
         "+&temp\tNeue Temp-Einheit\tTemp-Einheit erstellen", nullptr,
         commands, FXCommands::ID_UNIT_ADD, BUTTON_TOOLBAR);
 
-    FXTextField* rowcol = new FXTextField(cmdOptFrame, 5, commands,FXCommands::ID_ROWCOL, TEXTFIELD_READONLY|JUSTIFY_RIGHT|LAYOUT_FILL_X|LAYOUT_RIGHT);
+    FXTextField* rowcol = new FXTextField(cmdOptFrame, 5, commands,FXCommands::ID_ROWCOL, (FXuint)TEXTFIELD_READONLY|JUSTIFY_RIGHT|LAYOUT_FILL_X|LAYOUT_RIGHT);
     rowcol->disable();
     rowcol->setDefaultCursor(getDefaultCursor());
     rowcol->setTextColor(getApp()->getShadowColor());
@@ -1971,7 +1971,7 @@ long CSMap::onMapSetModus(FXObject* sender, FXSelector, void* ptr)
         FXId *item = (FXId*)sender;
         FXuval udata = (FXuval)item->getUserData();
 
-        if (udata >= FXCSMap::MODUS_SETTERRAIN && udata < FXCSMap::MODUS_SETTERRAIN+ data::TERRAIN_LAST)
+        if (udata >= FXCSMap::MODUS_SETTERRAIN && udata < (FXuval)FXCSMap::MODUS_SETTERRAIN+data::TERRAIN_LAST)
         {
             terrainSelect->setIcon(icons.terrain[udata-FXCSMap::MODUS_SETTERRAIN]);
             terrainSelect->setUserData((void*)udata);

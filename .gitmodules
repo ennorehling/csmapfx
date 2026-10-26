@@ -1,3 +1,6 @@
 [submodule "cparse"]
 	path = cparse
 	url = https://github.com/ennorehling/cparse.git
+[submodule "tinyexpr"]
+	path = tinyexpr
+	url = https://github.com/ennorehling/tinyexpr-plusplus.git
