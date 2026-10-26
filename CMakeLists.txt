@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 
 project (csmapfx CXX C)
 
@@ -27,7 +27,8 @@ endif (PNG_FOUND)
 endif (USE_LIBPNG)
 
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wsign-compare -Wall -Werror -Wno-switch -Wno-unknown-pragmas -Wpointer-arith -Wno-char-subscripts -Wno-long-long)
+  add_compile_options(-Wsign-compare -Wall -Werror -Wno-switch -Wno-unknown-pragmas -Wpointer-arith -Wno-char-subscripts -Wno-long-long
+   -Wno-deprecated-enum-enum-conversion)
 elseif(MSVC)
   add_compile_options(/W3 /WX /MP /FC)
 else()
@@ -59,6 +60,9 @@ if (MKSTEMP_FOUND)
   add_compile_definitions(HAVE_MKSTEMP)
 endif (MKSTEMP_FOUND)
 
+set (USE_CPARSE FALSE)
+if (USE_CPARSE)
+add_compile_definitions(USE_CPARSE)
 set (CPARSE_SOURCES
   cparse/shunting-yard.cpp
   cparse/packToken.cpp
@@ -66,6 +70,13 @@ set (CPARSE_SOURCES
   cparse/containers.cpp
   cparse/builtin-features.cpp
 )
+else(USE_CPARSE)
+    add_compile_definitions(USE_TINYEXPR)
+set (CPARSE_SOURCES
+    tinyexpr/tinyexpr.cpp
+)
+#set_source_files_properties(tinyexpr/tinyexpr.cpp PROPERTIES COMPILE_FLAGS -Wno-deprecated-enum-enum-conversion)
+endif(USE_CPARSE)
 
 if (WIN32)
 set (APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/version.rc")
@@ -160,9 +171,9 @@ add_compile_definitions(FLOAT_MATH_FUNCTIONS)
 endif (WIN32)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-	CXX_STANDARD 11)
+	CXX_STANDARD 20)
 set_target_properties(${PROJECT_NAME} PROPERTIES
-	CXX_STANDARD_REQUIRED 11)
+	CXX_STANDARD_REQUIRED 20)
 target_link_libraries(${PROJECT_NAME} PRIVATE
   ${FOX_LINK_LIBRARIES}
   ${CMAKE_DL_LIBS} 
