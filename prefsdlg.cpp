@@ -15,8 +15,8 @@ FXPrefsDlg::FXPrefsDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXui
 
     // buttons on bottom of the dialog
     FXHorizontalFrame* buttons = new FXHorizontalFrame(this, LAYOUT_SIDE_BOTTOM | LAYOUT_FILL_X | PACK_UNIFORM_WIDTH | PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
-    new FXButton(buttons, "&Abbrechen", NULL, this, ID_CANCEL, BUTTON_DEFAULT | FRAME_RAISED | LAYOUT_FILL_Y | LAYOUT_RIGHT);
-    new FXButton(buttons, "&Ok", NULL, this, ID_ACCEPT, BUTTON_INITIAL | BUTTON_DEFAULT | FRAME_RAISED | LAYOUT_FILL_Y | LAYOUT_RIGHT);
+    new FXButton(buttons, "&Abbrechen", NULL, this, ID_CANCEL, (FXuint) BUTTON_DEFAULT | FRAME_RAISED | LAYOUT_FILL_Y | LAYOUT_RIGHT);
+    new FXButton(buttons, "&Ok", NULL, this, ID_ACCEPT, BUTTON_INITIAL | (FXuint) BUTTON_DEFAULT | FRAME_RAISED | LAYOUT_FILL_Y | LAYOUT_RIGHT);
 
     // new FXHorizontalSeparator(this, SEPARATOR_GROOVE | LAYOUT_SIDE_BOTTOM | LAYOUT_FILL_X);
 }

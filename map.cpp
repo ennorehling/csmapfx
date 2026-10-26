@@ -74,7 +74,7 @@ FXCSMap::FXCSMap(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint opts, FXbo
 	islandfont = std::unique_ptr<FXFont>(new FXFont(getApp(), "helvetica", 5*8, FXFont::Bold));
 
 	// create client area
-	map = new FXCSMapCanvas(this, this,FXCSMap::ID_MAP, FRAME_SUNKEN|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+	map = new FXCSMapCanvas(this, this,FXCSMap::ID_MAP, (FXint)FRAME_SUNKEN|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     map->disable();
 	map->setBackColor(FXRGB(0,0,0));
 
@@ -242,7 +242,7 @@ void FXCSMap::calculateContentSize()
 void FXCSMap::layout()
 {
 	if (!(flags&FLAG_PRESSED)			// don't relayout when we are painting
-		|| modus < MODUS_SETTERRAIN || modus >= MODUS_SETTERRAIN+data::TERRAIN_LAST)
+		|| modus < MODUS_SETTERRAIN || modus >= (FXint)MODUS_SETTERRAIN+data::TERRAIN_LAST)
 	{
 		calculateContentSize();
 		map->position(0, 0, getWidth(), getHeight());
@@ -847,7 +847,7 @@ long FXCSMap::onMotion(FXObject*,FXSelector,void* ptr)
 		FXint x = GetHexFromScreenX(cursor_x, cursor_y);
 		FXint y = GetHexFromScreenY(cursor_x, cursor_y);
 
-		if (modus >= MODUS_SETTERRAIN && modus < MODUS_SETTERRAIN+data::TERRAIN_LAST)
+		if (modus >= MODUS_SETTERRAIN && modus < (FXint)MODUS_SETTERRAIN+data::TERRAIN_LAST)
 		{
 			// in SETTERRAIN modus, every click transforms region
             terraform(x, y, visiblePlane, modus-MODUS_SETTERRAIN);
@@ -922,7 +922,7 @@ long FXCSMap::onLeftButtonRelease(FXObject* /*sender*/, FXSelector /*sel*/, void
 		flags &= ~FLAG_PRESSED;
 
 		// when in painting mode, relayout should not be done when button is pressed, so do it on buttonrelease
-		if (modus >= MODUS_SETTERRAIN && modus < MODUS_SETTERRAIN+ data::TERRAIN_LAST)
+		if (modus >= MODUS_SETTERRAIN && modus < (FXint)MODUS_SETTERRAIN+data::TERRAIN_LAST)
 		{
             if (mapFile) {
                 selection.selected &= ~(selection.REGION | selection.UNKNOWN_REGION);
@@ -1381,7 +1381,7 @@ void FXCSMap::terraform(FXint x, FXint y, FXint plane, FXint new_terrain)
 	}
 
 	// map changed
-	if (!(flags&FLAG_PRESSED) || modus < MODUS_SETTERRAIN || modus >= MODUS_SETTERRAIN+ data::TERRAIN_LAST)
+	if (!(flags&FLAG_PRESSED) || modus < MODUS_SETTERRAIN || modus >= (FXint)MODUS_SETTERRAIN+data::TERRAIN_LAST)
 	{
         if (mapFile) {
             selection.selected &= ~(selection.REGION | selection.UNKNOWN_REGION);

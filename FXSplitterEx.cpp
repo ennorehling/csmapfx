@@ -59,9 +59,9 @@ FXDEFMAP(FXSplitterEx) FXSplitterExMap[]={
   FXMAPFUNC(SEL_FOCUS_NEXT,0,FXSplitterEx::onFocusNext),
   FXMAPFUNC(SEL_FOCUS_PREV,0,FXSplitterEx::onFocusPrev),
   FXMAPFUNC(SEL_FOCUS_UP,0,FXSplitterEx::onFocusUp),
-  FXMAPFUNC(SEL_FOCUS_DOWN,0,FXSplitterEx::onFocusDown),
-  FXMAPFUNC(SEL_FOCUS_LEFT,0,FXSplitterEx::onFocusLeft),
-  FXMAPFUNC(SEL_FOCUS_RIGHT,0,FXSplitterEx::onFocusRight),
+  FXMAPFUNC((FXuint)SEL_FOCUS_DOWN,0,FXSplitterEx::onFocusDown),
+  FXMAPFUNC((FXuint)SEL_FOCUS_LEFT,0,FXSplitterEx::onFocusLeft),
+  FXMAPFUNC((FXuint)SEL_FOCUS_RIGHT,0,FXSplitterEx::onFocusRight),
   };
 
 

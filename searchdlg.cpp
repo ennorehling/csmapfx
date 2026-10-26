@@ -56,10 +56,10 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, FXObject* tgt, FXSelector sel, FXSearc
     // buttons on bottom
     FXHorizontalFrame* buttons = new FXHorizontalFrame(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
     info_text = new FXLabel(buttons, "", NULL, LABEL_NORMAL);
-    new FXButton(buttons, "S&chliessen", NULL, this, ID_CLOSE, BUTTON_DEFAULT | FRAME_RAISED | LAYOUT_FILL_Y | LAYOUT_RIGHT);
-    btnTransfer = new FXButton(buttons, L"In Such&ergebnissen \u00f6ffnen", NULL, this, ID_TRANSFER, BUTTON_DEFAULT | FRAME_RAISED | LAYOUT_FILL_Y | LAYOUT_RIGHT);
+    new FXButton(buttons, "S&chliessen", NULL, this, ID_CLOSE, (FXuint) BUTTON_DEFAULT | FRAME_RAISED | LAYOUT_FILL_Y | LAYOUT_RIGHT);
+    btnTransfer = new FXButton(buttons, L"In Such&ergebnissen \u00f6ffnen", NULL, this, ID_TRANSFER, (FXuint) BUTTON_DEFAULT | FRAME_RAISED | LAYOUT_FILL_Y | LAYOUT_RIGHT);
 	
-	new FXHorizontalSeparator(this, SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
+	new FXHorizontalSeparator(this, (FXuint) (FXuint) SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
 
     // create layout
 	FXVerticalFrame* content = new FXVerticalFrame(this, LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -67,23 +67,23 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, FXObject* tgt, FXSelector sel, FXSearc
 	// search field
 	new FXLabel(content, "&Suche nach:", NULL, LABEL_NORMAL);
 
-	FXHorizontalFrame* search_line = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
-	txtSearch = new FXTextField(search_line, 12, this,ID_SEARCH, FRAME_LINE|TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X);
+	FXHorizontalFrame* search_line = new FXHorizontalFrame(content, (FXuint) LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
+	txtSearch = new FXTextField(search_line, 12, this,ID_SEARCH, (FXuint) FRAME_LINE|TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X);
 	txtSearch->setBorderColor(getApp()->getShadowColor());
-	btnSearch = new FXButton(search_line, "&Suchen", NULL, this, ID_SEARCH, BUTTON_DEFAULT|FRAME_RAISED);
+	btnSearch = new FXButton(search_line, "&Suchen", NULL, this, ID_SEARCH, (FXuint) BUTTON_DEFAULT|FRAME_RAISED);
 	// search mode: Ignore case, regular expression matching
-	FXHorizontalFrame* mode_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
+	FXHorizontalFrame* mode_frame = new FXHorizontalFrame(content, (FXuint) LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
 	options.regardcase = new FXCheckButton(mode_frame, FXString(L"&Gro\u00df-/Kleinschreibung beachten"), this, ID_SEARCH, CHECKBUTTON_NORMAL);
 	options.regexp = new FXCheckButton(mode_frame, FXString(L"&Regul\u00e4rer Ausdruck"), this, ID_SEARCH, CHECKBUTTON_NORMAL);
     options.selection = new FXCheckButton(mode_frame, FXString(L"&Ausgew\u00e4hlte Regionen"), this, ID_SEARCH, CHECKBUTTON_NORMAL);
 
 	// search domain: Search for what type, search in descriptions
-	FXHorizontalFrame* domain_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X | PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
+	FXHorizontalFrame* domain_frame = new FXHorizontalFrame(content, (FXuint) LAYOUT_FILL_X | PACK_UNIFORM_HEIGHT, 0, 0, 0, 0, 0, 0, 0, 0);
 	options.descriptions = new FXCheckButton(domain_frame, "&Beschreibungen", this, ID_SEARCH, CHECKBUTTON_NORMAL);
 	options.factions = new FXCheckButton(domain_frame, "&Parteien", this,ID_SEARCH, CHECKBUTTON_NORMAL);
-	new FXVerticalSeparator(domain_frame, SEPARATOR_GROOVE|LAYOUT_FILL_Y);
+	new FXVerticalSeparator(domain_frame, (FXuint) SEPARATOR_GROOVE|LAYOUT_FILL_Y);
 	new FXLabel(domain_frame, "&Durchsuche", NULL, LABEL_NORMAL);
-	FXListBox *box = options.domain = new FXListBox(domain_frame, this, ID_SEARCH, LISTBOX_NORMAL|LAYOUT_FILL_X|FRAME_LINE);
+	FXListBox *box = options.domain = new FXListBox(domain_frame, this, ID_SEARCH, (FXuint) LISTBOX_NORMAL|LAYOUT_FILL_X|FRAME_LINE);
 	box->setBorderColor(getApp()->getShadowColor());
 	
 	box->appendItem("Alles");
@@ -95,12 +95,12 @@ FXSearchDlg::FXSearchDlg(FXWindow* owner, FXObject* tgt, FXSelector sel, FXSearc
 	box->setNumVisible(box->getNumItems());
 
 	// results list
-	new FXHorizontalSeparator(content, SEPARATOR_GROOVE|LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, DEFAULT_SPACING, DEFAULT_SPACING);
+	new FXHorizontalSeparator(content, (FXuint) SEPARATOR_GROOVE|LAYOUT_FILL_X, 0, 0, 0, 0, 0, 0, DEFAULT_SPACING, DEFAULT_SPACING);
 
 	FXHorizontalFrame *list_frame = new FXHorizontalFrame(content, LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_LINE, 0, 0, 0, 0, 0, 0, 0, 0);
 	list_frame->setBorderColor(getApp()->getShadowColor());
 
-    matches = new FXSearchResults(list_frame, this, ID_RESULTS, FOLDINGLIST_BROWSESELECT |LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    matches = new FXSearchResults(list_frame, this, ID_RESULTS, (FXuint) FOLDINGLIST_BROWSESELECT |LAYOUT_FILL_X|LAYOUT_FILL_Y);
     matches->getHeader()->setHeaderStyle(HEADER_RESIZE|HEADER_TRACKING);
 	
     matches->appendHeader("Region");

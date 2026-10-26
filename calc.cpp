@@ -68,14 +68,14 @@ FXCalculator::FXCalculator(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
     formula = new FXTextField(firstline, 10, this,ID_FORMULA, LAYOUT_FILL_X|LAYOUT_FILL_Y);
     formula->setHelpText("Taschenrechner");
 
-    result = new FXTextField(firstline, 13, NULL,0, TEXTFIELD_READONLY|JUSTIFY_RIGHT|LAYOUT_FILL_Y);
+    result = new FXTextField(firstline, 13, NULL,0, (FXuint)TEXTFIELD_READONLY|JUSTIFY_RIGHT|LAYOUT_FILL_Y);
     result->setBackColor(getBackColor());
 
     // second line
     secondline = new FXHorizontalFrame(frame, LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0);
     secondline->hide();
 
-    longresult = new FXTextField(secondline, 13, NULL,0, TEXTFIELD_READONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    longresult = new FXTextField(secondline, 13, NULL,0, (FXuint)TEXTFIELD_READONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     longresult->setBackColor(getBackColor());
 
 }

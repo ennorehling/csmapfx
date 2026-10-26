@@ -18,20 +18,20 @@ FXExportDlg::FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	setIcon(icon);
 
     // buttons on bottom of the dialog
-	FXHorizontalFrame* buttons = new FXHorizontalFrame(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT, 0,0,0,0, 0,0,0,0);
-	new FXButton(buttons, "&Abbrechen", NULL, this,ID_CANCEL, BUTTON_DEFAULT|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_RIGHT);
-	new FXButton(buttons, "&Ok", NULL, this,ID_ACCEPT, BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_RIGHT);
+	FXHorizontalFrame* buttons = new FXHorizontalFrame(this, (FXuint) LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT, 0,0,0,0, 0,0,0,0);
+	new FXButton(buttons, "&Abbrechen", NULL, this,ID_CANCEL, (FXuint) BUTTON_DEFAULT|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_RIGHT);
+	new FXButton(buttons, "&Ok", NULL, this,ID_ACCEPT, (FXuint) BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_RIGHT);
 
-	new FXHorizontalSeparator(this, SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
+	new FXHorizontalSeparator(this, (FXuint) SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
 
 	// options
 	FXVerticalFrame* vfoptions = new FXVerticalFrame(this, PACK_UNIFORM_HEIGHT);
 
-	FXHorizontalFrame* regionsize = new FXHorizontalFrame(vfoptions, LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT);
+	FXHorizontalFrame* regionsize = new FXHorizontalFrame(vfoptions, (FXuint) LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT);
 
 	new FXLabel(regionsize, FXString(L"Regionsgr\u00f6\u00dfe"));
 
-	scalebox = new FXComboBox(regionsize, 0, NULL,0, COMBOBOX_STATIC|FRAME_NORMAL);
+	scalebox = new FXComboBox(regionsize, 0, NULL,0, (FXuint) COMBOBOX_STATIC|FRAME_NORMAL);
     for (FXuint i = 1; i <= maxScale; i *= 2) {
         scalebox->appendItem(FXStringVal(i), (void*)(FXival)i);
     }
@@ -44,11 +44,11 @@ FXExportDlg::FXExportDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FX
 	showislandsbox = new FXCheckButton(vfoptions, "&Inselnamen anzeigen", NULL,0, CHECKBUTTON_NORMAL);
 
 	// background color
-	FXHorizontalFrame* backgrcolor = new FXHorizontalFrame(vfoptions, LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT);
+	FXHorizontalFrame* backgrcolor = new FXHorizontalFrame(vfoptions, (FXuint) LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT);
 
 	new FXLabel(backgrcolor, FXString("Hintergrundfarbe"));
 
-	colorbox = new FXComboBox(backgrcolor, 0, NULL,0, COMBOBOX_STATIC|FRAME_NORMAL);
+	colorbox = new FXComboBox(backgrcolor, 0, NULL,0, (FXuint) COMBOBOX_STATIC|FRAME_NORMAL);
 	colorbox->appendItem(FXString("Schwarz"), (void*)0);
 	colorbox->appendItem(FXString(L"Wei\u00df"), (void*)1);
 	colorbox->setCurrentItem(0);

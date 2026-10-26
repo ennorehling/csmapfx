@@ -34,16 +34,16 @@ FXInfoDlg::FXInfoDlg(FXWindow* owner, const FXString& name, FXIcon* icon, FXuint
 
     // buttons on bottom
 	FXHorizontalFrame* buttons = new FXHorizontalFrame(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT, 0,0,0,0, 0,0,0,0);
-	new FXButton(buttons, "S&chliessen", NULL, this,ID_CLOSE, BUTTON_DEFAULT|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_RIGHT);
-	new FXVerticalSeparator(buttons, SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_Y|LAYOUT_RIGHT);
-	search = new FXTextField(buttons, 17, this,ID_SEARCH, FRAME_LINE|TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_Y|LAYOUT_RIGHT);
+	new FXButton(buttons, "S&chliessen", NULL, this, ID_CLOSE, (FXint)BUTTON_DEFAULT|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_RIGHT);
+	new FXVerticalSeparator(buttons, (FXint)SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_Y|LAYOUT_RIGHT);
+	search = new FXTextField(buttons, 17, this, ID_SEARCH, (FXint)FRAME_LINE|TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_Y|LAYOUT_RIGHT);
 	search->setBorderColor(getApp()->getShadowColor());
 	new FXLabel(buttons, "&Suche:", NULL, LAYOUT_FILL_Y|LAYOUT_RIGHT);
 
-	new FXHorizontalSeparator(this, SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
+	new FXHorizontalSeparator(this, (FXint)SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
 
 	// tabbook
-	tabbook = new FXTabBook(this, NULL,0, TABBOOK_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
+	tabbook = new FXTabBook(this, NULL,0, (FXint)TABBOOK_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
 
     setGame("default");
 }

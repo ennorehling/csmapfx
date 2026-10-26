@@ -31,11 +31,11 @@ FXStatsPanel::FXStatsPanel(FXComposite* p, FXObject* tgt,FXSelector sel, FXuint 
 	// create layout
 	tags.matrixframe = new FXHorizontalFrame(this, LAYOUT_SIDE_TOP|LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0, 0,0);
 
-	tags.leftmatrix = new FXMatrix(tags.matrixframe,3,MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
-	tags.matrixsep = new FXVerticalSeparator(tags.matrixframe,LAYOUT_FILL_Y|SEPARATOR_LINE, 0,0,0,0, 0,0,0,0);
+	tags.leftmatrix = new FXMatrix(tags.matrixframe,3, (FXuint) MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
+	tags.matrixsep = new FXVerticalSeparator(tags.matrixframe, (FXuint) LAYOUT_FILL_Y|SEPARATOR_LINE, 0,0,0,0, 0,0,0,0);
 	tags.matrixsep->setBorderColor(getBorderColor());
 	tags.matrixsep->hide();
-	tags.rightmatrix = new FXMatrix(tags.matrixframe,3,MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
+	tags.rightmatrix = new FXMatrix(tags.matrixframe,3, (FXuint) MATRIX_BY_COLUMNS|LAYOUT_FILL_X, 0,0,0,0, 2,2,2,2, 0,0);
 }
 
 void FXStatsPanel::create()
@@ -87,9 +87,9 @@ void FXStatsPanel::createLabels(const FXString& name, const FXString& one, const
 	FXMatrix *matrix = (column==0) ? tags.leftmatrix : tags.rightmatrix;
 
 	// create labels
-	FXLabel *lname = new FXLabel(matrix, name, NULL, JUSTIFY_LEFT|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
-	FXLabel *lfirst = new FXLabel(matrix, one, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
-	FXLabel *lsecond = new FXLabel(matrix, two, NULL, JUSTIFY_RIGHT|LAYOUT_RIGHT);
+	FXLabel *lname = new FXLabel(matrix, name, NULL, (FXuint) JUSTIFY_LEFT|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
+	FXLabel *lfirst = new FXLabel(matrix, one, NULL, (FXuint) JUSTIFY_RIGHT|LAYOUT_RIGHT);
+	FXLabel *lsecond = new FXLabel(matrix, two, NULL, (FXuint) JUSTIFY_RIGHT|LAYOUT_RIGHT);
 	lsecond->disable();
 	lname->create(); lfirst->create(); lsecond->create();
 
